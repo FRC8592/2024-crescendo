@@ -21,6 +21,7 @@ public class Robot extends TimedRobot {
   // private RobotContainer m_robotContainer;
   private DriveTrain drive;
   private XboxController gamePad;
+  private Turret turret;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -32,7 +33,7 @@ public class Robot extends TimedRobot {
     // m_robotContainer = new RobotContainer();
     drive = new DriveTrain();
     gamePad = new XboxController(0);
-
+    turret = new Turret();
   }
 
   /**
@@ -90,10 +91,10 @@ public class Robot extends TimedRobot {
     // Variables for input from the gamePad
     double leftStickY = gamePad.getLeftY();
     double leftStickX = gamePad.getLeftX();
-    double rightStickY = gamePad.getRightY();
     double rightStickX = gamePad.getRightX();
 
     drive.xyDrive(leftStickX, leftStickY);
+    turret.speedRotate(rightStickX*0.25);
   }
 
   @Override

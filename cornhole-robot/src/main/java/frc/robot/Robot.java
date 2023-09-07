@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     // m_robotContainer = new RobotContainer();
     drive = new DriveTrain();
-    gamePad = new XboxController(0);
+    gamePad = new XboxController(Constants.DRIVER_GAMEPAD_PORT);
     turret = new Turret();
   }
 

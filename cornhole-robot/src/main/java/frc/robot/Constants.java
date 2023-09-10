@@ -1,19 +1,40 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
- */
 public final class Constants {
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-  }
+    private Constants(){throw new UnsupportedOperationException();}
+    public static final double deadBandValue = 0.01;
+    public static final double motorPowerMultiplier = 0.15;
+
+    //constants for turret/shooter
+    public static final double TURRET_LAUNCH_SPEED = 0.5;
+    public static final int TURRET_ROTATION_LIMIT = 1700;
+    public static final double TICKS_PER_DEGREE = 1700/90; //1700 ticks for about 90 degrees. Refine later with CAD files.
+    public static final double TURN_TO_RANGE = 20;
+    public static final double FLYWHEEL_MULTIPLIER = 0.2;
+
+    public static final double FOUR_BAR_kP = 0.0;
+    public static final double FOUR_BAR_kI = 0.0;
+    public static final double FOUR_BAR_kD = 0.0;
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+// Hardware ID Mapping
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Joystick USB IDs
+    public static final int DRIVER_GAMEPAD_PORT = 0;
+    public static final int OPERATOR_GAMEPAD_PORT = 1;
+
+    // Drivetrain CAN bus IDs
+    public static final int LEFT_FRONT_CAN_ID = 1;
+    public static final int LEFT_BACK_CAN_ID = 3;
+    public static final int RIGHT_FRONT_CAN_ID = 4;
+    public static final int RIGHT_BACK_CAN_ID = 2;
+
+
+
+    // Turret CAN bus IDs
+    public static final int TURRET_LAUNCH_CAN_ID = 7; // High speed shooter flywheel
+    public static final int TURRET_ROTATE_CAN_ID = 12; // Control rotation of turret
+
+    public static final double FOURBAR_LAUNCH_MAX_ROTATION_TICKS = 1024.0;
 }

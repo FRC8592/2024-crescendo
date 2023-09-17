@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -22,6 +23,8 @@ public class Robot extends TimedRobot {
   private DriveTrain drive;
   private XboxController gamePad;
   private Turret turret;
+  private Launcher launcher;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -31,9 +34,10 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     // m_robotContainer = new RobotContainer();
-    drive = new DriveTrain();
-    gamePad = new XboxController(Constants.DRIVER_GAMEPAD_PORT);
-    turret = new Turret();
+    // drive    = new DriveTrain();
+    gamePad  = new XboxController(Constants.DRIVER_GAMEPAD_PORT);
+    //turret   = new Turret();
+    launcher = new Launcher();
   }
 
   /**
@@ -49,7 +53,7 @@ public class Robot extends TimedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
+    // CommandScheduler.getInstance().run();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -80,21 +84,44 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
+    //if (m_autonomousCommand != null) {
+    //  m_autonomousCommand.cancel();
+    //}
+
+    // Ensure the launch motor is not moving
+    launcher.launchIdle();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
     // Variables for input from the gamePad
-    double leftStickY = gamePad.getLeftY();
-    double leftStickX = gamePad.getLeftX();
-    double rightStickX = gamePad.getRightX();
+    //double leftStickY = gamePad.getLeftY();
+    //double leftStickX = gamePad.getLeftX();
+    //double rightStickX = gamePad.getRightX();
 
-    drive.xyDrive(leftStickX, leftStickY);
-    turret.speedRotate(rightStickX*0.25);
+    //drive.xyDrive(leftStickX, leftStickY);
+    //turret.speedRotate(rightStickX*0.25);
+
+    //
+    // Launch functions
+    //
+    // Reverse the launcher
+    if (gamePad.getLeftBumper()) {
+      launcher.launchDown();
+    }
+
+    // Power the launcher until it reaches maximum position
+    // launchCheckMaxPosition will set power to 0.  Brake mode is used to stop the launch motor
+    else if (gamePad.getRightBumper() && !launcher.launchCheckMaxPosition()) {
+        launcher.launchAccel();
+      }
+  
+    // Sit Idle
+    else {
+      launcher.launchIdle();
+    }
+
   }
 
   @Override

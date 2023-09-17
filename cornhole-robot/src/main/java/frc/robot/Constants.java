@@ -5,7 +5,7 @@ public final class Constants {
     public static final double deadBandValue = 0.01;
     public static final double motorPowerMultiplier = 0.15;
 
-    //constants for turret/shooter
+    // Constants for turret/shooter
     public static final double TURRET_LAUNCH_SPEED = 0.5;
     public static final int TURRET_ROTATION_LIMIT = 1700;
     public static final double TICKS_PER_DEGREE = 1700/90; //1700 ticks for about 90 degrees. Refine later with CAD files.
@@ -16,25 +16,35 @@ public final class Constants {
     public static final double FOUR_BAR_kI = 0.0;
     public static final double FOUR_BAR_kD = 0.0;
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static final double FOURBAR_LAUNCH_MAX_ROTATION_TICKS = 1024.0;
+
+    //
+    // Constants for Launcher mechanism
+    //
+    public static final double LAUNCH_ACCEL_POWER =  0.20;
+    public static final double LAUNCH_BRAKE_POWER = -0.10;
+    public static final double LAUNCH_MAX_POSITION = 20500.0;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 // Hardware ID Mapping
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Joystick USB IDs
-    public static final int DRIVER_GAMEPAD_PORT = 0;
+    public static final int DRIVER_GAMEPAD_PORT   = 0;
     public static final int OPERATOR_GAMEPAD_PORT = 1;
 
     // Drivetrain CAN bus IDs
-    public static final int LEFT_FRONT_CAN_ID = 1;
-    public static final int LEFT_BACK_CAN_ID = 3;
+    public static final int LEFT_FRONT_CAN_ID  = 21;
+    public static final int LEFT_BACK_CAN_ID   = 3;
     public static final int RIGHT_FRONT_CAN_ID = 4;
-    public static final int RIGHT_BACK_CAN_ID = 2;
-
-
+    public static final int RIGHT_BACK_CAN_ID  = 2;
 
     // Turret CAN bus IDs
-    public static final int TURRET_LAUNCH_CAN_ID = 7; // High speed shooter flywheel
-    public static final int TURRET_ROTATE_CAN_ID = 12; // Control rotation of turret
+    public static final int TURRET_ROTATE_CAN_ID = 12;  // Control rotation of turret
+    public static final int TURRET_LAUNCH_CAN_ID = 25;   // High speed flywheel
 
-    public static final double FOURBAR_LAUNCH_MAX_ROTATION_TICKS = 1024.0;
+    // Launcher CAN  bus IDs
+    public static final int LAUNCH_CAN_ID = 25; // Set to correct value
+
+
 }

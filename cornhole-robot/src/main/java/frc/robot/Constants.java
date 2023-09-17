@@ -21,9 +21,14 @@ public final class Constants {
     //
     // Constants for Launcher mechanism
     //
-    public static final double LAUNCH_ACCEL_POWER =  0.20;
-    public static final double LAUNCH_BRAKE_POWER = -0.10;
     public static final double LAUNCH_MAX_POSITION = 20500.0;
+    public static final double LAUNCH_RPM          = 50.0;
+    public static final double LAUNCH_VOLTAGE      = 11.5;      // Voltage compensation
+    //
+    public static final double LAUNCH_P = 0.0;
+    public static final double LAUNCH_I = 0.0;
+    public static final double LAUNCH_D = 0.0;
+    public static final double LAUNCH_F = 0.0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Hardware ID Mapping

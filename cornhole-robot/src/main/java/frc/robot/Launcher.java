@@ -26,11 +26,30 @@ public class Launcher {
         // Define the launch motor
         launchMotor = new WPI_TalonFX(Constants.LAUNCH_CAN_ID);
 
-        // Configure the launch motor
+        // Basic configuration for the launch motor
         launchMotor.configFactoryDefault();
         launchMotor.setNeutralMode(NeutralMode.Brake);
+
+        // Configure voltage compensation to help maintain stable speed as battery voltage changes
+        launchMotor.configVoltageCompSaturation(Constants.FLYWHEEL_VOLTAGE);
+        launchMotor.enableVoltageCompensation(true);   // Enable voltage compensation
+
+        // Settings for flywheel PID constant velocity mode
         launchMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0 ,0);
         launchMotor.setSelectedSensorPosition(0);
+     
+        launchMotor.config_kP(0, Constants.LAUNCH_P);
+        launchMotor.config_kI(0, Constants.LAUNCH_I);
+        launchMotor.config_kD(0, Constants.LAUNCH_D);
+        launchMotor.config_kF(0, Constants.LAUNCH_F);
+
+        // Set for velocity mode usign the constants in slot 0
+        launchMotor.selectProfileSlot(0, 0);
+        launchMotor.set(ControlMode.Velocity, 0);
+
+        // Provide a ramp rate for 0 to full power
+        launchMotor.configClosedloopRamp(1);
+
 
     }
 

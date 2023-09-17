@@ -107,19 +107,12 @@ public class Robot extends TimedRobot {
     // Launch functions
     //
     // Reverse the launcher
-    if (gamePad.getLeftBumper()) {
-      launcher.launchDown();
+    if (gamePad.getRightBumper()) {
+      launcher.launch();
     }
 
-    // Power the launcher until it reaches maximum position
-    // launchCheckMaxPosition will set power to 0.  Brake mode is used to stop the launch motor
-    else if (gamePad.getRightBumper() && !launcher.launchCheckMaxPosition()) {
-        launcher.launchAccel();
-      }
-  
-    // Sit Idle
-    else {
-      launcher.launchIdle();
+    if (gamePad.getLeftBumper()) {
+      launcher.launchDown();
     }
 
   }

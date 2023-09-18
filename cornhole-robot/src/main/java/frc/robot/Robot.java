@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,6 +19,7 @@ public class Robot extends TimedRobot {
   private XboxController gamePad;
   private Turret turret;
   private Jetson jetson;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -34,13 +36,16 @@ public class Robot extends TimedRobot {
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
    * that you want ran during disabled, autonomous, teleoperated and test.
    *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
-   */ 
+   * <p>
+   * This runs after the mode specific periodic functions, but before LiveWindow and SmartDashboard
+   * integrated updating.
+   */
   @Override
   public void robotPeriodic() {
-    System.out.println("JETSON X " + jetson.getX());
-    System.out.println("JETSON Y " + jetson.getY());
+    SmartDashboard.putNumber("JETSON DISTANCE", jetson.getDistance());
+    SmartDashboard.putNumber("JETSON X", jetson.getX());
+    SmartDashboard.putNumber("JETSON Y", jetson.getY());
+    SmartDashboard.putBoolean("JETSON ALIVE?", jetson.isAlive());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -70,7 +75,7 @@ public class Robot extends TimedRobot {
     double rightStickX = gamePad.getRightX();
 
     drive.xyDrive(leftStickX, leftStickY);
-    turret.speedRotate(rightStickX*0.25);
+    turret.speedRotate(rightStickX * 0.25);
   }
 
   @Override

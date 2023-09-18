@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,7 +23,6 @@ public class Robot extends TimedRobot {
   // private RobotContainer m_robotContainer;
   private DriveTrain drive;
   private XboxController gamePad;
-  private Turret turret;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -33,7 +34,6 @@ public class Robot extends TimedRobot {
     // m_robotContainer = new RobotContainer();
     drive = new DriveTrain();
     gamePad = new XboxController(Constants.DRIVER_GAMEPAD_PORT);
-    turret = new Turret();
   }
 
   /**
@@ -89,12 +89,16 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Variables for input from the gamePad
-    double leftStickY = gamePad.getLeftY();
-    double leftStickX = gamePad.getLeftX();
-    double rightStickX = gamePad.getRightX();
-
-    drive.xyDrive(leftStickX, leftStickY);
-    turret.speedRotate(rightStickX*0.25);
+    if(gamePad.getLeftBumper()){
+      drive.updateRotation(NetworkTableInstance.getDefault().getTable("jetson").getEntry("x").getDouble(0));
+    }
+    else{
+      double leftStickY = gamePad.getLeftY();
+      double leftStickX = gamePad.getLeftX();
+      double rightStickX = gamePad.getRightX();
+  
+      drive.xyDrive(leftStickX, leftStickY);
+    }
   }
 
   @Override

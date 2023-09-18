@@ -3,6 +3,9 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.math.controller.PIDController;
 public class DriveTrain{
 
   //Create the motor objects
@@ -10,6 +13,10 @@ public class DriveTrain{
   private WPI_TalonFX backLeft;
   private WPI_TalonFX frontRight;
   private WPI_TalonFX backRight;
+  private double targetRotation;
+  private PIDController turnController = new PIDController(0.0033, 0, 0);
+  
+  private final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
 
   public DriveTrain(){
     //define left side motor objects
@@ -69,6 +76,7 @@ public class DriveTrain{
     rightMotor = rightMotor * Constants.motorPowerMultiplier;
 
     double motorScale = 1; //This is another motor power multiplier, which we use to account for >100% motor speeds.
+    
 
     //In some cases, the formula above can output numbers more than 1 on one of the tracks, so we set
     //our multiplier so that the motor that is more than 1 will run at exactly 1, and the other will be
@@ -88,7 +96,16 @@ public class DriveTrain{
     SmartDashboard.putNumber("Left Side", leftMotor);
     SmartDashboard.putNumber("Right Side", rightMotor);
   }
-
+  /*
+   * This is relative to current rotation.
+   */
+  public void updateRotation(double offset){
+    double turnSpeed = turnController.calculate(offset);
+    if(turnSpeed<-1){turnSpeed=-1;} 
+    if(turnSpeed>1){turnSpeed=1;}
+    frontLeft.set(ControlMode.PercentOutput, turnSpeed);
+    frontRight.set(ControlMode.PercentOutput, -turnSpeed);
+  }
   //Stop the robot
   public void haltDriveTrain(){
     frontLeft.set(ControlMode.PercentOutput, 0);

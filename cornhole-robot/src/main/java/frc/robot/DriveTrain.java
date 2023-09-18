@@ -14,11 +14,11 @@ public class DriveTrain{
   public DriveTrain(){
     //define left side motor objects
     frontLeft = new WPI_TalonFX(Constants.LEFT_FRONT_CAN_ID);
-    backLeft = new WPI_TalonFX(Constants.LEFT_BACK_CAN_ID);
+    backLeft  = new WPI_TalonFX(Constants.LEFT_BACK_CAN_ID);
     
     //define right side motor objects
     frontRight = new WPI_TalonFX(Constants.RIGHT_FRONT_CAN_ID);
-    backRight = new WPI_TalonFX(Constants.RIGHT_BACK_CAN_ID);
+    backRight  = new WPI_TalonFX(Constants.RIGHT_BACK_CAN_ID);
     
     //configure frontLeft motor
     frontLeft.configFactoryDefault();

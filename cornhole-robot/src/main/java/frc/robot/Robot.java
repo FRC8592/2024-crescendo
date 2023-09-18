@@ -22,7 +22,6 @@ public class Robot extends TimedRobot {
   // private RobotContainer m_robotContainer;
   private DriveTrain drive;
   private XboxController gamePad;
-  private Turret turret;
   private Launcher launcher;
 
   /**
@@ -87,35 +86,20 @@ public class Robot extends TimedRobot {
     //if (m_autonomousCommand != null) {
     //  m_autonomousCommand.cancel();
     //}
-
-    // Ensure the launch motor is not moving
     launcher.launchIdle();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    // Variables for input from the gamePad
-    //double leftStickY = gamePad.getLeftY();
-    //double leftStickX = gamePad.getLeftX();
-    //double rightStickX = gamePad.getRightX();
-
-    //drive.xyDrive(leftStickX, leftStickY);
-    //turret.speedRotate(rightStickX*0.25);
-
+   
     //
-    // Launch functions
+    // Launch function
     //
-    // Reverse the launcher
-    if (gamePad.getRightBumper()) {
-      launcher.launch();
-    }
-
-    if (gamePad.getLeftBumper()) {
-      launcher.launchDown();
-    }
-
+    if (gamePad.getRightBumper())
+      launcher.setLaunch();
   }
+
 
   @Override
   public void testInit() {

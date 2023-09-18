@@ -8,6 +8,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.littletonrobotics.junction.*;
+import org.littletonrobotics.junction.wpilog.*;
+import org.littletonrobotics.junction.networktables.*;
 import frc.robot.Constants;
 
 
@@ -17,7 +20,8 @@ public class Launcher {
     // Object variables for motors
     //
     private WPI_TalonFX launchMotor;
-
+    
+    private double posLastFrame;//This will hold the position of the motor the frame before the current frame
 
     //
     // Create all Launcher motor instances
@@ -31,10 +35,15 @@ public class Launcher {
         launchMotor.setNeutralMode(NeutralMode.Brake);
         launchMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0 ,0);
         launchMotor.setSelectedSensorPosition(0);
+        posLastFrame=0;
 
     }
-
-
+    public void updateLogging(){ //Should be called constantly in teleopPeriodic()
+        double localPos=launchMotor.getSelectedSensorPosition();
+        Logger.getInstance().recordOutput("Launcher/Position", localPos);
+        Logger.getInstance().recordOutput("Launcher/MovementPerFrame", localPos-posLastFrame);
+        posLastFrame=localPos;
+    }
     //
     // Get the encoder value of the launch motor
     //
@@ -42,13 +51,15 @@ public class Launcher {
         double localPos;
 
         localPos = launchMotor.getSelectedSensorPosition();
-
+        
         SmartDashboard.putNumber("CATAPAULT ENCODER POS", localPos);
 
         if ( localPos >= Constants.LAUNCH_MAX_POSITION) {
             launchMotor.set(ControlMode.PercentOutput, 0.0);
+            Logger.getInstance().recordOutput("Launcher/PositionGreaterThanMax", true);
             return true;
         }
+        Logger.getInstance().recordOutput("Launcher/PositionGreaterThanMax", false);
         return false;
     }
 
@@ -60,6 +71,7 @@ public class Launcher {
     //
     public void launchAccel() {
         launchMotor.set(ControlMode.PercentOutput, Constants.LAUNCH_ACCEL_POWER);
+        Logger.getInstance().recordOutput("Launcher/IsLaunching", true);
     }
 
 
@@ -70,6 +82,7 @@ public class Launcher {
     //
     public void launchDown() {
         launchMotor.set(ControlMode.PercentOutput, Constants.LAUNCH_BRAKE_POWER);
+        Logger.getInstance().recordOutput("Launcher/IsLaunching", false);
     }
 
     //
@@ -79,6 +92,7 @@ public class Launcher {
     //
     public void launchIdle() {
         launchMotor.set(ControlMode.PercentOutput, 0.0);
+        Logger.getInstance().recordOutput("Launcher/IsLaunching", false);
     }
 
 }

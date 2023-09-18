@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.littletonrobotics.junction.*;
+import org.littletonrobotics.junction.wpilog.*;
+import org.littletonrobotics.junction.networktables.*;
 
 
 /**
@@ -16,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   // private RobotContainer m_robotContainer;
@@ -31,6 +34,22 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+
+    //AdvantageKit init code
+    Logger.getInstance().recordMetadata("ProjectName", "MyProject");
+    if (isReal()) {
+      Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // TODO: This might need to change depending on where the USB stick mounts.
+      Logger.getInstance().addDataReceiver(new NT4Publisher());
+    }
+    else {
+      setUseTiming(false);
+      String logPath = LogFileUtil.findReplayLog();
+      Logger.getInstance().setReplaySource(new WPILOGReader(logPath));
+      Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+    }
+    Logger.getInstance().start();
+
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     // m_robotContainer = new RobotContainer();
@@ -106,6 +125,10 @@ public class Robot extends TimedRobot {
     //
     // Launch functions
     //
+    
+    //Update the logging on the launcher
+    launcher.updateLogging();
+    
     // Reverse the launcher
     if (gamePad.getLeftBumper()) {
       launcher.launchDown();

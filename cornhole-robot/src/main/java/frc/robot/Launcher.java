@@ -12,6 +12,8 @@ import frc.robot.Constants;
 
 
 public class Launcher {
+    private double launchPosition;
+    private double launchVelocity;
 
     //
     // Object variables for motors
@@ -36,16 +38,23 @@ public class Launcher {
 
 
     //
+    // Execute periodic functions.  In this case, we're mostly gathering data
+    //
+    public void launchPeriodic() {
+        launchPosition = launchMotor.getSelectedSensorPosition();
+        launchVelocity = launchMotor.getSelectedSensorVelocity();
+
+        SmartDashboard.putNumber("Launch Position", launchPosition);
+        SmartDashboard.putNumber("Launch Velocity", launchVelocity);
+    }
+
+
+    //
     // Get the encoder value of the launch motor
     //
     public boolean launchCheckMaxPosition() {
-        double localPos;
 
-        localPos = launchMotor.getSelectedSensorPosition();
-
-        SmartDashboard.putNumber("CATAPAULT ENCODER POS", localPos);
-
-        if ( localPos >= Constants.LAUNCH_MAX_POSITION) {
+        if ( launchPosition >= Constants.LAUNCH_MAX_POSITION) {
             launchMotor.set(ControlMode.PercentOutput, 0.0);
             return true;
         }

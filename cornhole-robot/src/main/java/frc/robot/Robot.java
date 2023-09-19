@@ -106,6 +106,11 @@ public class Robot extends TimedRobot {
     //
     // Launch functions
     //
+
+    // MUST call this to update launcher velocity and position information
+    // DISASTER SHALL BEFALL THEM WHO REMOVE THIS
+    launcher.launchPeriodic();
+
     // Reverse the launcher
     if (gamePad.getLeftBumper()) {
       launcher.launchDown();

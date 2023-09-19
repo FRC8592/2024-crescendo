@@ -12,14 +12,17 @@ import frc.robot.Constants;
 
 
 public class Launcher {
-
     // Values and variables for the launcher state machine
-    private static enum launcherStates {LAUNCHER_IDLE, LAUNCHER_LAUNCH, LAUNCHER_RESET}
+    private static enum launcherStates {LAUNCHER_IDLE, LAUNCHER_LAUNCH, LAUNCHER_BRAKE, LAUNCHER_RESET}
     private launcherStates launcherState;
 
     // Launch readiness and command
     private boolean launchReady  = false;
     private boolean launchActive = false;
+
+    // Motor velocity and position
+    private double launchPosition;      // Launch motor encoder value
+    private double launchVelocity;      // Launch motor code speed
 
     // Object variables for motors
     private WPI_TalonFX launchMotor;
@@ -56,7 +59,7 @@ public class Launcher {
         launchMotor.set(ControlMode.Velocity, 0);
 
         // Provide a ramp rate for 0 to full power
-        launchMotor.configClosedloopRamp(1);
+        launchMotor.configClosedloopRamp(Constants.LAUNCH_RAMP_RATE);
     }
 
 
@@ -85,19 +88,24 @@ public class Launcher {
     }
 
 
-    /**
-     * Execute launch sequence and reset
-     * @return
-     */
-    public void launchControl() {
-        double launchPosition;      // Launch motor encoder value
-
-        // Read motor encoder value
+    //
+    // Update sensor data every loop and post to Smart Dashboard.  MUST call this
+    //
+    public void launchPeriodic() {
         launchPosition = launchMotor.getSelectedSensorPosition();
+        launchVelocity = launchMotor.getSelectedSensorVelocity();
 
-        // Push values to the Smart Dashboard
         SmartDashboard.putBoolean("Launch Ready", launchReady);
+        SmartDashboard.putBoolean("Launch Ready", launchActive);
         SmartDashboard.putNumber("Launch Position", launchPosition);
+        SmartDashboard.putNumber("Launch Velocity", launchVelocity);
+    }
+
+
+    //
+    // Execute launch sequence and reset
+    //
+    public void launchControl() {
 
         //
         // State machine to control the launch sequence
@@ -118,10 +126,22 @@ public class Launcher {
 
             // Launch the beanbag
             case LAUNCHER_LAUNCH:
-                launchMotor.set(ControlMode.Velocity, Constants.LAUNCH_RPM);    // Closed loop velocity control
+                //launchMotor.set(ControlMode.Velocity, Constants.LAUNCH_RPM);    // Closed loop velocity control
         
+                launchMotor.set(ControlMode.PercentOutput, Constants.LAUNCH_POWER);
+
                 // Stop the arm when we reach our launch position
                 if (launchPosition >= Constants.LAUNCH_MAX_POSITION) {
+                    launchMotor.setNeutralMode(NeutralMode.Brake);             // Activate motor brake
+                    launcherState = launcherStates.LAUNCHER_BRAKE;
+                }
+
+
+            // Reverse power to stop the arm quickly
+            case LAUNCHER_BRAKE:
+                launchMotor.set(ControlMode.PercentOutput, -Constants.LAUNCH_POWER);
+
+                if (launchPosition <= Constants.LAUNCH_MAX_POSITION) {
                     launchMotor.setNeutralMode(NeutralMode.Brake);             // Activate motor brake
                     launcherState = launcherStates.LAUNCHER_RESET;
                 }

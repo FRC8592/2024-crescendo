@@ -8,7 +8,9 @@ public final class Constants {
     //
     // Constants for Launcher mechanism
     //
-    public static final double LAUNCH_RESET_POWER  = -0.05;     // Power for returning arm to parked position
+    public static final double LAUNCH_POWER = 0.20;     // Temporary power value until PID is enabled
+
+    public static final double LAUNCH_RESET_POWER  = -0.10;     // Power for returning arm to parked position
     public static final double LAUNCH_MAX_POSITION = 20500.0;
     public static final double LAUNCH_RPM          = 50.0;
     public static final double LAUNCH_VOLTAGE      = 11.5;      // Voltage compensation

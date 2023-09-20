@@ -45,6 +45,7 @@ public final class Constants {
 
     // Launcher CAN  bus IDs
     public static final int LAUNCH_CAN_ID = 25; // Set to correct value
+    public static final int LAUNCH_2_CAN_ID = -1;
 
 
 }

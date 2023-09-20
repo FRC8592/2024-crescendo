@@ -19,8 +19,8 @@ public class Launcher {
     //
     // Object variables for motors
     //
-    private WPI_TalonFX launchMotor;
-    
+    private WPI_TalonFX launchMotor1;
+    private WPI_TalonFX launchMotor2;
     private double posLastFrame;//This will hold the position of the motor the frame before the current frame
 
     //
@@ -28,20 +28,31 @@ public class Launcher {
     //
     public Launcher() {
         // Define the launch motor
-        launchMotor = new WPI_TalonFX(Constants.LAUNCH_CAN_ID);
+        launchMotor1 = new WPI_TalonFX(Constants.LAUNCH_CAN_ID);
 
         // Configure the launch motor
-        launchMotor.configFactoryDefault();
-        launchMotor.setNeutralMode(NeutralMode.Brake);
-        launchMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0 ,0);
-        launchMotor.setSelectedSensorPosition(0);
+        launchMotor1.configFactoryDefault();
+        launchMotor1.setNeutralMode(NeutralMode.Brake);
+        launchMotor1.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0 ,0);
+        launchMotor1.setSelectedSensorPosition(0);
+        
+        launchMotor2 = new WPI_TalonFX(Constants.LAUNCH_CAN_ID);
+
+        // Configure the launch motor
+        launchMotor2.configFactoryDefault();
+        launchMotor2.setNeutralMode(NeutralMode.Brake);
+        launchMotor2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0 ,0);
+        launchMotor2.setSelectedSensorPosition(0);
+        launchMotor2.setInverted(true);
+        launchMotor2.follow(launchMotor1);
         posLastFrame=0;
 
     }
     public void updateLogging(){ //Should be called constantly in teleopPeriodic()
-        double localPos=launchMotor.getSelectedSensorPosition();
+        double localPos=launchMotor1.getSelectedSensorPosition();
         Logger.getInstance().recordOutput("Launcher/Position", localPos);
         Logger.getInstance().recordOutput("Launcher/MovementPerFrame", localPos-posLastFrame);
+        Logger.getInstance().recordOutput("Launcher/LauncherSpeed", launchMotor1.getSelectedSensorVelocity());
         posLastFrame=localPos;
     }
     //
@@ -50,12 +61,12 @@ public class Launcher {
     public boolean launchCheckMaxPosition() {
         double localPos;
 
-        localPos = launchMotor.getSelectedSensorPosition();
-        
+        localPos = launchMotor1.getSelectedSensorPosition();
+
         SmartDashboard.putNumber("CATAPAULT ENCODER POS", localPos);
 
         if ( localPos >= Constants.LAUNCH_MAX_POSITION) {
-            launchMotor.set(ControlMode.PercentOutput, 0.0);
+            launchMotor1.set(ControlMode.PercentOutput, 0.0);
             Logger.getInstance().recordOutput("Launcher/PositionGreaterThanMax", true);
             return true;
         }
@@ -70,7 +81,7 @@ public class Launcher {
     // For now this is a simple motor power controller
     //
     public void launchAccel() {
-        launchMotor.set(ControlMode.PercentOutput, Constants.LAUNCH_ACCEL_POWER);
+        launchMotor1.set(ControlMode.PercentOutput, Constants.LAUNCH_ACCEL_POWER);
         Logger.getInstance().recordOutput("Launcher/IsLaunching", true);
     }
 
@@ -81,7 +92,7 @@ public class Launcher {
     // For now this is a simple motor power controller
     //
     public void launchDown() {
-        launchMotor.set(ControlMode.PercentOutput, Constants.LAUNCH_BRAKE_POWER);
+        launchMotor1.set(ControlMode.PercentOutput, Constants.LAUNCH_BRAKE_POWER);
         Logger.getInstance().recordOutput("Launcher/IsLaunching", false);
     }
 
@@ -91,7 +102,7 @@ public class Launcher {
     // For now this is a simple motor power controller
     //
     public void launchIdle() {
-        launchMotor.set(ControlMode.PercentOutput, 0.0);
+        launchMotor1.set(ControlMode.PercentOutput, 0.0);
         Logger.getInstance().recordOutput("Launcher/IsLaunching", false);
     }
 

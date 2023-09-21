@@ -25,7 +25,7 @@ public class Robot extends LoggedRobot {
   // private RobotContainer m_robotContainer;
   private DriveTrain drive;
   private XboxController gamePad;
-  private Turret turret;
+  // private Turret turret;
   private Launcher launcher;
 
   /**
@@ -108,7 +108,7 @@ public class Robot extends LoggedRobot {
     //}
 
     // Ensure the launch motor is not moving
-    launcher.launchIdle();
+    launcher.setIdle();
     launcher.reZero();
   }
 
@@ -123,28 +123,22 @@ public class Robot extends LoggedRobot {
     //drive.xyDrive(leftStickX, leftStickY);
     //turret.speedRotate(rightStickX*0.25);
 
-    //
-    // Launch functions
-    //
-    
-    //Update the logging on the launcher
-    launcher.updateLogging();
-    
-    // Reverse the launcher
-    if (gamePad.getLeftBumper()) {
-      launcher.launchDown();
+
+
+    //Update the logging and state machine on the launcher
+    launcher.update();
+
+    // Hold the left bumper and click the right bumper to launch. Given
+    // that we need people to walk up to this thing to load the beanbag,
+    // it's probably best to make it so a misclick or dropping the
+    // controller isn't likely to cause it to launch. Especially not at
+    // a public demo.
+
+    if (gamePad.getRightBumperPressed() && gamePad.getLeftBumper()){
+      launcher.launch();
     }
 
-    // Power the launcher until it reaches maximum position
-    // launchCheckMaxPosition will set power to 0.  Brake mode is used to stop the launch motor
-    else if (gamePad.getRightBumper() && !launcher.launchCheckMaxPosition()) {
-        launcher.launchAccel();
-      }
-  
-    // Sit Idle
-    else {
-      launcher.launchIdle();
-    }
+    //There should be no need for this, but just in case...
     if(gamePad.getAButton()){
       launcher.reZero();
     }

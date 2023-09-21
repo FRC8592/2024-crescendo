@@ -6,24 +6,25 @@ public final class Constants {
     public static final double motorPowerMultiplier = 0.15;
 
     // Constants for turret/shooter
-    public static final double TURRET_LAUNCH_SPEED = 0.5;
-    public static final int TURRET_ROTATION_LIMIT = 1700;
-    public static final double TICKS_PER_DEGREE = 1700/90; //1700 ticks for about 90 degrees. Refine later with CAD files.
-    public static final double TURN_TO_RANGE = 20;
-    public static final double FLYWHEEL_MULTIPLIER = 0.2;
+    // public static final double TURRET_LAUNCH_SPEED = 0.5;
+    // public static final int TURRET_ROTATION_LIMIT = 1700;
+    // public static final double TICKS_PER_DEGREE = 1700/90; //1700 ticks for about 90 degrees. Refine later with CAD files.
+    // public static final double TURN_TO_RANGE = 20;
+    // public static final double FLYWHEEL_MULTIPLIER = 0.2;
 
-    public static final double FOUR_BAR_kP = 0.0;
-    public static final double FOUR_BAR_kI = 0.0;
-    public static final double FOUR_BAR_kD = 0.0;
+    // public static final double FOUR_BAR_kP = 0.0;
+    // public static final double FOUR_BAR_kI = 0.0;
+    // public static final double FOUR_BAR_kD = 0.0;
 
-    public static final double FOURBAR_LAUNCH_MAX_ROTATION_TICKS = 1024.0;
+    // public static final double FOURBAR_LAUNCH_MAX_ROTATION_TICKS = 1024.0;
 
     //
     // Constants for Launcher mechanism
     //
     public static final double LAUNCH_ACCEL_POWER =  1.0;
-    public static final double LAUNCH_BRAKE_POWER = -0.10;
+    public static final double LAUNCH_DOWN_POWER = -0.10;
     public static final double LAUNCH_MAX_POSITION = 7500.0;
+    public static final double DOWN_MIN_POSITION = 100;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Hardware ID Mapping

@@ -21,10 +21,10 @@ public final class Constants {
     //
     // Constants for Launcher mechanism
     //
-    public static final double LAUNCH_ACCEL_POWER =  1.0;
+    public static final double LAUNCH_ACCEL_POWER =  0.60;
     public static final double LAUNCH_BRAKE_POWER = -0.10;
     //public static final double LAUNCH_MAX_POSITION = 33300.0;
-    public static final double LAUNCH_MAX_POSITION = 20000.0;
+    public static final double LAUNCH_MAX_POSITION = 9500.0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Hardware ID Mapping
@@ -45,7 +45,8 @@ public final class Constants {
     public static final int TURRET_LAUNCH_CAN_ID = 25;   // High speed flywheel
 
     // Launcher CAN  bus IDs
-    public static final int LAUNCH_CAN_ID = 25; // Set to correct value
+    public static final int LAUNCH_CAN_ID = 25;
+    public static final int LAUNCH_CAN_ID2 = 26;
 
 
 }

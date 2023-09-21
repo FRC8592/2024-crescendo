@@ -109,6 +109,7 @@ public class Robot extends LoggedRobot {
 
     // Ensure the launch motor is not moving
     launcher.launchIdle();
+    launcher.reZero();
   }
 
   /** This function is called periodically during operator control. */
@@ -143,6 +144,9 @@ public class Robot extends LoggedRobot {
     // Sit Idle
     else {
       launcher.launchIdle();
+    }
+    if(gamePad.getAButton()){
+      launcher.reZero();
     }
 
   }

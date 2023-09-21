@@ -36,7 +36,7 @@ public class Launcher {
         launchMotor1.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0 ,0);
         launchMotor1.setSelectedSensorPosition(0);
         
-        launchMotor2 = new WPI_TalonFX(Constants.LAUNCH_CAN_ID);
+        launchMotor2 = new WPI_TalonFX(Constants.LAUNCH_2_CAN_ID);
 
         // Configure the launch motor
         launchMotor2.configFactoryDefault();
@@ -104,6 +104,10 @@ public class Launcher {
     public void launchIdle() {
         launchMotor1.set(ControlMode.PercentOutput, 0.0);
         Logger.getInstance().recordOutput("Launcher/IsLaunching", false);
+    }
+    public void reZero(){
+        launchMotor2.setSelectedSensorPosition(0);
+        launchMotor1.setSelectedSensorPosition(0);
     }
 
 }

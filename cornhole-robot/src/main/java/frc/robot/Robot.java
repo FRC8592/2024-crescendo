@@ -53,7 +53,7 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     // m_robotContainer = new RobotContainer();
-    // drive    = new DriveTrain();
+    drive    = new DriveTrain();
     gamePad  = new XboxController(Constants.DRIVER_GAMEPAD_PORT);
     //turret   = new Turret();
     launcher = new Launcher();
@@ -142,7 +142,20 @@ public class Robot extends LoggedRobot {
     if(gamePad.getAButton()){
       launcher.reZero();
     }
-
+    if(gamePad.getBButton()){
+      drive.xyDrive((gamePad.getRightTriggerAxis()-gamePad.getLeftTriggerAxis())/3, 0);
+      launcher.up();
+    }
+    if(gamePad.getBButtonReleased()){
+      launcher.setIdle();
+    }
+    if(gamePad.getYButton()){
+      drive.xyDrive(gamePad.getLeftX(), gamePad.getLeftY());
+      launcher.up();
+    }
+    if(gamePad.getYButtonReleased()){
+      launcher.setIdle();
+    }
   }
 
   @Override

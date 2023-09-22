@@ -3,7 +3,7 @@ package frc.robot;
 public final class Constants {
     private Constants(){throw new UnsupportedOperationException();}
     public static final double deadBandValue = 0.01;
-    public static final double motorPowerMultiplier = 0.15;
+    public static final double motorPowerMultiplier = 0.3;
 
     // Constants for turret/shooter
     // public static final double TURRET_LAUNCH_SPEED = 0.5;
@@ -21,10 +21,19 @@ public final class Constants {
     //
     // Constants for Launcher mechanism
     //
-    public static final double LAUNCH_ACCEL_POWER =  1.0;
-    public static final double LAUNCH_DOWN_POWER = -0.10;
+    //public static final double LAUNCH_ACCEL_POWER =  0.8;
+    public static final double LAUNCH_VELOCTY_TICKS_100MS = 5000;
+    public static final double LAUNCH_DOWN_POWER = -0.05;
     public static final double LAUNCH_MAX_POSITION = 7500.0;
-    public static final double DOWN_MIN_POSITION = 100;
+    public static final double DOWN_MIN_POSITION = 1000;
+    public static final double LAUNCH_MOTOR_kP = 0.20;
+    public static final double LAUNCH_MOTOR_kI = 0;
+    public static final double LAUNCH_MOTOR_kD = 0;
+    public static final double LAUNCH_MOTOR_kF = 0.25;
+    public static final double LAUNCH_MOTOR_kP_BRAKE = 0.05;
+    public static final double LAUNCH_MOTOR_kI_BRAKE = 0;
+    public static final double LAUNCH_MOTOR_kD_BRAKE = 0;
+    public static final double LAUNCH_MOTOR_kF_BRAKE = -0.2;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Hardware ID Mapping

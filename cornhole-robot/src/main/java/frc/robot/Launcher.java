@@ -24,7 +24,7 @@ public class Launcher {
     private WPI_TalonFX launchMotor1;
     private WPI_TalonFX launchMotor2;
     private double posLastFrame;//This will hold the position of the motor the frame before the current frame
-    private enum States {IDLE, IDLE_WAIT, LAUNCH, DOWN};
+    private enum States {IDLE, IDLE_WAIT, LAUNCH, DOWN, UP};
     private States state;
     private Timer timer;
 
@@ -40,7 +40,15 @@ public class Launcher {
         launchMotor1.setNeutralMode(NeutralMode.Brake);
         launchMotor1.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0 ,0);
         launchMotor1.setSelectedSensorPosition(0);
-        
+        launchMotor1.config_kP(0,Constants.LAUNCH_MOTOR_kP);
+        launchMotor1.config_kI(0,Constants.LAUNCH_MOTOR_kI);
+        launchMotor1.config_kD(0,Constants.LAUNCH_MOTOR_kD);
+        launchMotor1.config_kF(0,Constants.LAUNCH_MOTOR_kF);
+        launchMotor1.config_kP(1,Constants.LAUNCH_MOTOR_kP_BRAKE);
+        launchMotor1.config_kI(1,Constants.LAUNCH_MOTOR_kI_BRAKE);
+        launchMotor1.config_kD(1,Constants.LAUNCH_MOTOR_kD_BRAKE);
+        launchMotor1.config_kF(1,Constants.LAUNCH_MOTOR_kF_BRAKE);
+        launchMotor1.selectProfileSlot(0, 0);
         launchMotor2 = new WPI_TalonFX(Constants.LAUNCH_2_CAN_ID);
 
         // Configure the launch motor
@@ -59,10 +67,21 @@ public class Launcher {
         Logger.getInstance().recordOutput("Launcher/Position", localPos);
         Logger.getInstance().recordOutput("Launcher/MovementPerFrame", localPos-posLastFrame);
         Logger.getInstance().recordOutput("Launcher/LauncherSpeed", launchMotor1.getSelectedSensorVelocity());
+        Logger.getInstance().recordOutput("Launcher/State", state.name());
         posLastFrame=localPos;
         switch(state){ //This state machine is shown in chronological order.
 
+            case UP:
+                if(launchMotor1.getSelectedSensorPosition()<1000){
+                    launchMotor1.set(ControlMode.PercentOutput, 0.12);
+                }
+                else{
+                    launchMotor1.set(ControlMode.PercentOutput, 0.07);
+                }
+                break;
+
             case LAUNCH: //Activated from a button combo in Robot.java. 
+                launchMotor1.selectProfileSlot(0, 0);
                 SmartDashboard.putNumber("CATAPAULT ENCODER POS", localPos);
                 Logger.getInstance().recordOutput("Launcher/IsLaunching", true);
 
@@ -71,17 +90,24 @@ public class Launcher {
                     timer.reset(); // These two lines are prep for
                     timer.start(); // IDLE_WAIT's timeout function.
                     state=States.IDLE_WAIT;
+                    
+                    //More immediate response time
+                    launchMotor1.selectProfileSlot(1, 0);
+                    launchMotor1.set(ControlMode.Velocity, 0);
+                    Logger.getInstance().recordOutput("Launcher/IsLaunching", false);
                 }
                 else{
                     Logger.getInstance().recordOutput("Launcher/PositionGreaterThanMax", false);
-                    launchMotor1.set(ControlMode.PercentOutput, Constants.LAUNCH_ACCEL_POWER);
+                    //launchMotor1.set(ControlMode.Velocity, Constants.LAUNCH_VELOCTY_TICKS_100MS);
+                    launchMotor1.set(ControlMode.PercentOutput, 1.0);
                 }
                 break;
 
             case IDLE_WAIT: // Does nothing for 2 seconds, then switches the state to lowering the arm
-                launchMotor1.set(ControlMode.PercentOutput, 0.0);
+                launchMotor1.selectProfileSlot(1, 0);
+                launchMotor1.set(ControlMode.Velocity, 0);
                 Logger.getInstance().recordOutput("Launcher/IsLaunching", false);
-                if(timer.get()>2){
+                if(timer.get()>0.5){
                     state=States.DOWN;
                 }
                 break;
@@ -99,7 +125,8 @@ public class Launcher {
                 }
                 break;
 
-            case IDLE: //Doing nothing
+            case IDLE:
+            default: //Doing nothing
                 launchMotor1.set(ControlMode.PercentOutput, 0.0);
                 Logger.getInstance().recordOutput("Launcher/IsLaunching", false);
                 break;
@@ -139,6 +166,9 @@ public class Launcher {
     }
     public void setIdle(){
         state=States.IDLE;
+    }
+    public void up(){
+        state=States.UP;
     }
 
 

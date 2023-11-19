@@ -1,6 +1,5 @@
 package frc.robot;
 
-import frc.robot.Constants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.RelativeEncoder;
@@ -13,46 +12,63 @@ public class BunnyDropper {
     CANSparkMax dropperMotor;
     RelativeEncoder dropperEncoder;
     SparkMaxPIDController dropperController;
-    //BunnyDropper constructor, creates and initilializes hardware objects
+
+    public enum States {
+        START, HOLD, DROP
+    }
+
+    States dropperStates;
+
+    // BunnyDropper constructor, creates and initilializes hardware objects
     public BunnyDropper() {
         dropperMotor = new CANSparkMax(Constants.BUNNY_DROPPER_CANID, MotorType.kBrushless);
         dropperMotor.stopMotor();
         dropperEncoder = dropperMotor.getEncoder();
-        dropperController  = dropperMotor.getPIDController();
-        
+        dropperController = dropperMotor.getPIDController();
+        dropperController.setP(Constants.BUNNY_DROPPER_P);
+        dropperController.setI(Constants.BUNNY_DROPPER_I);
+        dropperController.setD(Constants.BUNNY_DROPPER_D);
+        dropperStates = States.START;
+
     }
 
-    public boolean dropBunny(){
-        //dropping the bunny, when the motor reaches the max position the speed is set to zero
-        dropperController.setReference(0.5* Constants.BUNNY_DROPPER_GEAR_RATIO, ControlType.kPosition, 0);
-        if(dropperEncoder.getPosition()>= Constants.BUNNY_DROPPER_MAXIMUM_POSITION){
-            dropperMotor.set(0);
-            return true;
+    public boolean dropBunny(States state) {
+        dropperStates = state;
+        // dropping the bunny
+        switch (dropperStates) {
+            default:
+            case START:
+                dropperController.setReference(0, ControlType.kPosition);
+                break;
+            case HOLD:
+                dropperController.setReference(Constants.BUNNY_DROPPER_HOLD_POSITION, ControlType.kPosition);
+                break;
+            case DROP:
+                dropperController.setReference(Constants.BUNNY_DROPPER_DROP_POSITION, ControlType.kPosition);
+                if (Math.abs(dropperEncoder.getPosition() - Constants.BUNNY_DROPPER_DROP_POSITION) < 0.1) {
+                    return true;
+                }
+                break;
         }
-        else{
-            dropperMotor.set(Constants.BUNNY_DROPPER_MOTOR_SPEED*Constants.BUNNY_DROPPER_GEAR_RATIO);
-            return false;
-        }
+        return false;
     }
-        //Testing if motors move. Speed should be scaled down value of left joystick y 
-    public void testPlanOne(double speed){
+// Testing if motors move. Speed should be scaled down value of left joystick y
+    public void testPlanOne(double speed) {
         dropperMotor.set(speed);
     }
-    
-    public void testPlanTwo(double speed){
+
+    // spinning motor at scaled joystick y value, records postition on smart
+    // dashboard
+    public void testPlanTwo(double speed) {
         dropperMotor.set(speed);
-        SmartDashboard.putNumber("bunnydropper position", dropperEncoder.getPosition()*Constants.BUNNY_DROPPER_GEAR_RATIO);
+        SmartDashboard.putNumber("bunnydropper position",
+                dropperEncoder.getPosition() * Constants.BUNNY_DROPPER_GEAR_RATIO);
     }
-    
-    public void testPlanThree(){
-        
-        if(dropperEncoder.getPosition()>= Constants.BUNNY_DROPPER_MAXIMUM_POSITION){
-            dropperMotor.set(0);
-        }
-        else{
-            dropperMotor.set(Constants.BUNNY_DROPPER_MOTOR_SPEED*Constants.BUNNY_DROPPER_GEAR_RATIO);
-        }
+
+    // moving it to set position and when at said position, speed is set to 0
+    public void testPlanThree() {
+        dropperController.setReference(Constants.BUNNY_DROPPER_DROP_POSITION * Constants.BUNNY_DROPPER_GEAR_RATIO,
+                ControlType.kPosition, 0);
     }
 
 }
-

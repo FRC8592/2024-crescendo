@@ -62,7 +62,6 @@ public class Robot extends TimedRobot {
      * chooser code and
      * uncomment the getString line to get the auto name from the text box below the
      * Gyro
-     *
      * <p>
      * You can add additional auto modes by adding additional comparisons to the
      * switch structure

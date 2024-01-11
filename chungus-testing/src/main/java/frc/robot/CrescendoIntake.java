@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class CrescendoIntake {
+    //Defining constants for this class
     public static final int TOP_MOTOR_CAN_ID = 15;
     public static final int BOTTOM_MOTOR_CAN_ID = 18;
     public static final double TOP_MOTOR_kP = 0;
@@ -24,11 +25,13 @@ public class CrescendoIntake {
     public static final double BOTTOM_MOTOR_kI = 0;
     public static final int TOP_MOTOR_INTAKE_SPEED = 1000;
     public static final int BOTTOM_MOTOR_INTAKE_SPEED = 2000;
+
     private TalonFX topMotor;
     private TalonFX bottomMotor;
 
     public CrescendoIntake() {
         topMotor = new TalonFX(TOP_MOTOR_CAN_ID);
+        topMotor.setInverted(true);
         bottomMotor = new TalonFX(BOTTOM_MOTOR_CAN_ID);
 
         topMotor.config_kP(0, TOP_MOTOR_kP);
@@ -39,12 +42,19 @@ public class CrescendoIntake {
         bottomMotor.config_kD(0, BOTTOM_MOTOR_kD);
     }
 
-    public void spinPercentOutput() {
-        topMotor.set(ControlMode.PercentOutput, -0.2);
-        bottomMotor.set(ControlMode.PercentOutput, 0.2);
+    /**
+     * Spins the intake motors at the given power ({@code PercentOutput})
+     * @param speed the power to send to the motors
+     */
+    public void spinPercentOutput(double speed) {
+        topMotor.set(ControlMode.PercentOutput, speed);
+        bottomMotor.set(ControlMode.PercentOutput, speed);
     }
 
-    public void intakeNote (){
+    /**
+     * Run the motors with velocity control (CURRENTLY NOT SET)
+     */
+    public void intakeNote() {
         topMotor.set(ControlMode.Velocity, TOP_MOTOR_INTAKE_SPEED);
         bottomMotor.set(ControlMode.Velocity, BOTTOM_MOTOR_INTAKE_SPEED);
     }

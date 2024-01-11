@@ -12,10 +12,15 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.autonomous.*;
 
 public class Robot extends TimedRobot {
+
+    public static final double JOYSTICK_DEADBAND = 0.01;
+    public static final int DRIVER_PORT = -1; // TODO: Value isn't set yet. Usually 0.
+    public static final int OPERATOR_PORT = -1; // TODO: Value isn't set yet. Usually 1.
+
     public static Field2d FIELD = new Field2d();
 
-    private XboxController operatorController;
     private XboxController driverController;
+    private XboxController operatorController;
 
     private BaseAuto currentAuto;
     private AutonomousSelector autoSelect;
@@ -26,10 +31,10 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         autoSelect = new AutonomousSelector();
-        pigeon = new NewtonPigeon(new Pigeon2(Constants.SWERVE_PIGEON_CAN_ID));
+        pigeon = new NewtonPigeon(new Pigeon2(Swerve.PIGEON_CAN_ID));
         swerve = new Swerve(pigeon);
-        driverController = new XboxController(Constants.CONTROLLER_DRIVER_PORT);
-        operatorController = new XboxController(Constants.CONTROLLER_OPERATOR_PORT);
+        driverController = new XboxController(DRIVER_PORT);
+        operatorController = new XboxController(OPERATOR_PORT);
     }
 
     @Override
@@ -39,9 +44,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         currentAuto = autoSelect.getSelectedAutonomous();
-        currentAuto.addModules(swerve, null /* vision */);// 0.02,
-                                                          // 0,
-                                                          // 0.01
+        currentAuto.addModules(swerve, null /* vision */);
         currentAuto.initialize();
         swerve.resetEncoder();
         swerve.resetPose(currentAuto.getStartPose());
@@ -70,17 +73,17 @@ public class Robot extends TimedRobot {
         if (slowMode) {
             currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     new ChassisSpeeds(
-                            driveTranslateY * Constants.SWERVE_TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * Constants.SWERVE_TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            robotRotationSpeed * Constants.SWERVE_ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
+                            driveTranslateY * Swerve.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * Swerve.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            robotRotationSpeed * Swerve.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
                     swerve.getGyroscopeRotation());
         }
         else {
             currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     new ChassisSpeeds(
-                            driveTranslateY * Constants.SWERVE_TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * Constants.SWERVE_TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            robotRotationSpeed * Constants.SWERVE_ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
+                            driveTranslateY * Swerve.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * Swerve.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            robotRotationSpeed * Swerve.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
                     swerve.getGyroscopeRotation());
         }
         swerve.drive(currentSpeeds);

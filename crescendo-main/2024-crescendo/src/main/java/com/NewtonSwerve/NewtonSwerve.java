@@ -7,13 +7,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 import com.NewtonSwerve.Gyro.Gyro;
 
 public class NewtonSwerve {
+
+    public static final double METERS_SECOND_TO_TICKS = ((2048 * 6.75 * 60) / (200 * Math.PI * 0.0508));
 
     // PASSED IN BY USER
     private final Gyro gyro;
@@ -202,11 +203,11 @@ public class NewtonSwerve {
     }
 
     public double metersPerSecondToTicks(double input) {
-        return input * Constants.CONVERSION_METERS_SECOND_TO_TICKS;
+        return input * METERS_SECOND_TO_TICKS;
     }
 
     public double ticksToMetersPerSecond(double input) {
-        return input / Constants.CONVERSION_METERS_SECOND_TO_TICKS;
+        return input / METERS_SECOND_TO_TICKS;
     }
 
     public void resetSteerAngles() {

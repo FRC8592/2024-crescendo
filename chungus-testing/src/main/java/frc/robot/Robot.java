@@ -152,6 +152,8 @@ public class Robot extends LoggedRobot {
         if (!wasZeroed) {
             pigeon.zeroYaw();
         }
+        SmartDashboard.putNumber("Lower Intake Speed", 0);
+        SmartDashboard.putNumber("Upper Intake Speed", 0);
     }
 
     /** This function is called periodically during operator control. */
@@ -167,7 +169,11 @@ public class Robot extends LoggedRobot {
             cIntake.spinPercentOutput(0.2); // Set for the first test
         }
         else if (driverController.getBButton()) {
-            cIntake.intakeNote();
+            cIntake.intakeNote(SmartDashboard.getNumber("Lower Intake Speed", 0),
+                    SmartDashboard.getNumber("Upper Intake Speed", 0));
+        }
+        else {
+            cIntake.spinPercentOutput(0);
         }
     }
 

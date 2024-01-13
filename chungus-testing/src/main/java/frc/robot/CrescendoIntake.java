@@ -54,8 +54,8 @@ public class CrescendoIntake {
     /**
      * Run the motors with velocity control (CURRENTLY NOT SET)
      */
-    public void intakeNote() {
-        topMotor.set(ControlMode.Velocity, TOP_MOTOR_INTAKE_SPEED);
-        bottomMotor.set(ControlMode.Velocity, BOTTOM_MOTOR_INTAKE_SPEED);
+    public void intakeNote(double bottom, double top) {
+        topMotor.set(ControlMode.Velocity, top);
+        bottomMotor.set(ControlMode.Velocity, bottom);
     }
 }

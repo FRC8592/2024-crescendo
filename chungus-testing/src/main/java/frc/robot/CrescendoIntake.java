@@ -23,8 +23,8 @@ public class CrescendoIntake {
     public static final double BOTTOM_MOTOR_kP = 0.01;
     public static final double BOTTOM_MOTOR_kI = 0.001;
     public static final double BOTTOM_MOTOR_kD = 0.001;
-    public static final int TOP_MOTOR_INTAKE_SPEED = 1000;
-    public static final int BOTTOM_MOTOR_INTAKE_SPEED = 2000;
+    public static final double BOTTOM_ROLLER_DIAMETER = 0.0254; // meters
+    public static final double TOP_ROLLER_DIAMETER = 0.0508;
 
     private TalonFX topMotor;
     private TalonFX bottomMotor;
@@ -55,36 +55,39 @@ public class CrescendoIntake {
      * Gets the velocity of the top motor in meters per second
      * @return topMotorVelocityMetersPerSecond
      */
-    public double getTopMotorVelocityMs() {
+    public double getTopMotorVelocityRPM() {
         double topMotorVelocity = topMotor.getSelectedSensorVelocity();
-        double topMotorVelocityMetersPerSecond = UnitUtil.ticksToMetersPerSecond(topMotorVelocity);
+        double topMotorVelocityRPM = UnitUtil.ticksToRPM(topMotorVelocity);
         SmartDashboard.putNumber("Top Vel Ticks", topMotorVelocity);
-        SmartDashboard.putNumber("Top Motor Velocity (m/s)", topMotorVelocityMetersPerSecond);
-        return topMotorVelocityMetersPerSecond;
+        SmartDashboard.putNumber("Top Motor Velocity (RPM)", topMotorVelocityRPM);
+        return topMotorVelocityRPM;
     }
 
     /**
      * Gets the velocity of the bottom motor in meters per second
      * @return bottomMotorVelocityMetersPerSecond
      */
-    public double getBottomMotorVelocityMs() {
+    public double getBottomMotorVelocityRPM() {
         double bottomMotorVelocity = bottomMotor.getSelectedSensorVelocity();
-        double bottomMotorVelocityMetersPerSecond = UnitUtil.ticksToMetersPerSecond(bottomMotorVelocity);
+        double bottomMotorVelocityRPM = UnitUtil.ticksToRPM(bottomMotorVelocity);
         SmartDashboard.putNumber("Bottom Vel Ticks", bottomMotorVelocity);
-        SmartDashboard.putNumber("Bottom Motor Velocity (m/s)", bottomMotorVelocityMetersPerSecond);
-        return bottomMotorVelocityMetersPerSecond;
+        SmartDashboard.putNumber("Bottom Motor Velocity (RPM)", bottomMotorVelocityRPM);
+        return bottomMotorVelocityRPM;
     }
 
     /**
      * Run the motors with velocity control
-     * @param bottom Ticks-based velocity for bottom motor
-     * @param top Ticks-based velocity for top motor
+     * @param bottom Velocity for bottom motor (RPM)
+     * @param top Velocity for top motor (RPM)
      */
     public void intakeNote(double bottom, double top) {
-        topMotor.set(ControlMode.Velocity, top);
-        bottomMotor.set(ControlMode.Velocity, bottom);
+        double topVelocity = UnitUtil.RPMToTicks(top); // Convert RPM to ticks (100ms)
+        double bottomVelocity = UnitUtil.RPMToTicks(bottom); // Convert RPM to ticks (100ms)
 
-        getTopMotorVelocityMs();
-        getBottomMotorVelocityMs();
+        topMotor.set(ControlMode.Velocity, topVelocity);
+        bottomMotor.set(ControlMode.Velocity, bottomVelocity);
+
+        getTopMotorVelocityRPM();
+        getBottomMotorVelocityRPM();
     }
 }

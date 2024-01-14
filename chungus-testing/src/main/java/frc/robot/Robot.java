@@ -152,28 +152,33 @@ public class Robot extends LoggedRobot {
         if (!wasZeroed) {
             pigeon.zeroYaw();
         }
-        SmartDashboard.putNumber("Lower Intake Speed", 0);
-        SmartDashboard.putNumber("Upper Intake Speed", 0);
+        SmartDashboard.putNumber("Lower Intake RPM", 0);
+        SmartDashboard.putNumber("Upper Intake RPM", 0);
     }
 
     /** This function is called periodically during operator control. */
     @Override
     public void teleopPeriodic() {
-        swerve.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 new ChassisSpeeds(
                         -driverController.getLeftY() * swerve.getMaxTranslateVelo() * 0.15,
                         -driverController.getLeftX() * swerve.getMaxTranslateVelo() * 0.15,
                         driverController.getRightX() * swerve.getMaxAngularVelo() * 0.15),
-                swerve.getGyroscopeRotation()));
+                swerve.getGyroscopeRotation());
+        swerve.drive(speeds);
         if (driverController.getAButton()) {
             cIntake.spinPercentOutput(0.2); // Set for the first test
-            cIntake.getTopMotorVelocityMs();
-            cIntake.getBottomMotorVelocityMs();
+            cIntake.getTopMotorVelocityRPM();
+            cIntake.getBottomMotorVelocityRPM();
         }
         else if (driverController.getBButton()) {
-            cIntake.intakeNote(SmartDashboard.getNumber("Lower Intake Speed", 0),
-                    SmartDashboard.getNumber("Upper Intake Speed", 0));
+            cIntake.intakeNote(SmartDashboard.getNumber("Lower Intake RPM", 0),
+                    SmartDashboard.getNumber("Upper Intake RPM", 0));
         }
+        // else if (driverController.getXButton()) {
+        //     // spin intake motors proportionally to robot velocity in Y
+        //     // double yVel = swerve.
+        // }
         else {
             cIntake.spinPercentOutput(0);
         }

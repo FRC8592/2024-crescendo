@@ -14,7 +14,7 @@ public final class Constants {
     /****************************************************************************************
      * Conversions
     *****************************************************************************************/
-    public static final double  CONVERSION_METERS_SECOND_TO_TICKS = ((2048 * 6.75 * 60) / (200 * Math.PI * 0.0508));
+    public static final double  CONVERSION_METERS_SECOND_TO_TICKS = ((2048 * 6.75 * 60) / (200 * Math.PI * 0.0508)); // TODO move this to drivetrain
     public static final double  CONVERSION_RPM_TO_TICKS_100_MS = 2048.0 / 600.0;     // Conversion factor for rotational velocity (RPM to ticks per 100ms)
 
 

@@ -177,7 +177,11 @@ public class Robot extends LoggedRobot {
             cIntake.spinPercentOutput(0);
         }*/
         if (operatorController.getRightTriggerAxis() > 0.1){
-            crescendoShooter.shoot();
+            double shootSpeed = SmartDashboard.getNumber("shootSpeedRPM", defaultPeriodSecs);
+            crescendoShooter.shoot(shootSpeed);
+        }
+        else{
+            crescendoShooter.stop();
         }
     }
 

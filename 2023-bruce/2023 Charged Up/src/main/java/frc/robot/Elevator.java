@@ -3,9 +3,7 @@ package frc.robot;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMax.SoftLimitDirection;
+import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAnalogSensor.Mode;
 import com.revrobotics.SparkMaxPIDController.AccelStrategy;
@@ -13,12 +11,12 @@ import com.revrobotics.SparkMaxPIDController.AccelStrategy;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator {
-    
+
     // Elevator Lift Hardware
     private CANSparkMax liftMotor;
     private SparkMaxPIDController liftCtrl;
     private RelativeEncoder liftEncoder;
-    
+
     // Elevator Tilt Hardware
     private CANSparkMax tiltMotor;
     private SparkMaxPIDController tiltCtrl;
@@ -45,7 +43,7 @@ public class Elevator {
     // Current in Amps
     private final int MAX_CURRENT_LIFT = 30; // Amps
     private final int MAX_CURRENT_TILT = 40; // Amps
-    
+
     // Elevator States
     private Heights desiredHeight = Heights.STOWED;
     public enum Heights {
@@ -112,17 +110,17 @@ public class Elevator {
         liftEncoder.setPosition(0);
         tiltEncoder.setPosition(0);
 
-        liftMotor.setIdleMode(IdleMode.kBrake);
-        tiltMotor.setIdleMode(IdleMode.kBrake);
+        liftMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        tiltMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
         liftMotor.setSmartCurrentLimit(MAX_CURRENT_LIFT);
         tiltMotor.setSmartCurrentLimit(MAX_CURRENT_TILT);
 
-        liftMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)Constants.LIFT_MAX_ROTATIONS);
-        liftMotor.setSoftLimit(SoftLimitDirection.kForward, 0f);
+        liftMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float)Constants.LIFT_MAX_ROTATIONS);
+        liftMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 0f);
 
-        tiltMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)Constants.TILT_MAX_ROTATIONS);
-        tiltMotor.setSoftLimit(SoftLimitDirection.kForward, 0f);
+        tiltMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float)Constants.TILT_MAX_ROTATIONS);
+        tiltMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 0f);
 
         tiltMotor.setInverted(true);
 
@@ -162,14 +160,14 @@ public class Elevator {
         // SmartDashboard.putString("Elevator State", desiredHeight.name());
         // SmartDashboard.putNumber("Elevator Error Rotations", desiredHeight.getHeight() - rawLift);
         // SmartDashboard.putNumber("Elevator Velocity", liftEncoder.getVelocity());
-        
-        
+
+
         // SmartDashboard.putNumber("Tilt Rotations", rawTilt);
         // SmartDashboard.putNumber("Tilt Current", tiltMotor.getOutputCurrent());
         // SmartDashboard.putNumber("Tilt Error Rotations", errorTilt);
-        
+
     }
- 
+
 
     // Resets encoders and potentially other sensors to desired start angle
     public void reset(double lift, double tilt) {
@@ -247,7 +245,7 @@ public class Elevator {
     public double getDriveReduction() {
         double rawLift;
         if (Robot.isReal()) {
-            rawLift = liftEncoder.getPosition(); 
+            rawLift = liftEncoder.getPosition();
         } else {
             rawLift = liftMotor.getAnalog(Mode.kAbsolute).getPosition();
         }
@@ -282,6 +280,6 @@ public class Elevator {
             atTilt = Math.abs(tiltEncoder.getPosition() - Constants.TILT_MAX_ROTATIONS) <= 2.0;
         }
         return Math.abs(liftEncoder.getPosition() - desiredHeight.getHeight()) <= 2.0 && atTilt;
-                
+
     }
 }

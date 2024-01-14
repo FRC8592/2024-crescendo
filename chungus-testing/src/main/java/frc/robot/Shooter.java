@@ -12,6 +12,7 @@ import org.littletonrobotics.junction.Logger;
 public class Shooter{
     private WPI_TalonFX backMotor;
     private WPI_TalonFX frontMotor;
+    // private 
 
     private final String LOG_PATH = "Dead Axle Pop";
 

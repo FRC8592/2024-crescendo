@@ -3,8 +3,7 @@ package frc.robot;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxPIDController.AccelStrategy;
 
@@ -32,14 +31,14 @@ public class Intake {
         rollerEncoder = rollerMotor.getEncoder();
         rollerCtrl = rollerMotor.getPIDController();
         rollerMotor.setSmartCurrentLimit(Constants.ROLLER_MAX_CURRENT_AMPS);
-        rollerMotor.setIdleMode(IdleMode.kCoast);
+        rollerMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
         wristMotor = new CANSparkMax(Constants.WRIST_ID, MotorType.kBrushless);
         wristEncoder = wristMotor.getEncoder();
         wristCtrl = wristMotor.getPIDController();
         wristMotor.setSmartCurrentLimit(Constants.WRIST_MAX_CURRENT_AMPS);
-        wristMotor.setIdleMode(IdleMode.kBrake);
-        rollerMotor.setIdleMode(IdleMode.kBrake);
+        wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        rollerMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
         rollerCtrl.setP(Constants.ROLLER_KP, 0);
         rollerCtrl.setI(Constants.ROLLER_KI, 0);
@@ -73,7 +72,7 @@ public class Intake {
 
     public void writeToSmartDashboard() {
         double rawWristPosition = wristEncoder.getPosition(); // rotations
-        
+
         // SmartDashboard.putNumber("Wrist position", rawWristPosition);
         // SmartDashboard.putNumber("Wrist velocity", wristEncoder.getVelocity());
         // SmartDashboard.putNumber("Wrist current", wristMotor.getOutputCurrent());

@@ -65,7 +65,7 @@ public final class Constants {
     /****************************************************************************************
      * Dead Axle Pop (Shooter)
     *****************************************************************************************/
-    /*public static final int     DAP_BACK_MOTOR_CAN_ID = 18;
+    public static final int     DAP_BACK_MOTOR_CAN_ID = 18;
     public static final int     DAP_FRONT_MOTOR_CAN_ID = 19;
 
     public static final double  DAP_FRONT_MOTOR_kP = 0.1;
@@ -85,11 +85,6 @@ public final class Constants {
     public static final double  DAP_BOTTOM_DELOCITY_TARGET = 2000;
     public static final double  DAP_VELOCITY_TOLERANCE = 100;
     public static final double  DAP_INTAKE_MOVEMENT_POWER_FOR_SHOOT = 1.0;
-*/
-
-    public static final int LEFT_NEOSPARK_CAN_ID = 31;
-    public static final int RIGHT_NEOSPARK_CAN_ID = 29;
-
 
 
     /****************************************************************************************

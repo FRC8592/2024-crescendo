@@ -66,6 +66,7 @@ public class Robot extends LoggedRobot {
     private boolean wasZeroed = false;
     private boolean isAiming = false;
     public static Field2d FIELD = new Field2d();
+    private CrescendoShooter crescendoShooter = new CrescendoShooter();
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -165,7 +166,7 @@ public class Robot extends LoggedRobot {
                         -driverController.getLeftX() * swerve.getMaxTranslateVelo() * 0.15,
                         driverController.getRightX() * swerve.getMaxAngularVelo() * 0.15),
                 swerve.getGyroscopeRotation()));
-        if (driverController.getAButton()) {
+        /*if (driverController.getAButton()) {
             cIntake.spinPercentOutput(0.2); // Set for the first test
         }
         else if (driverController.getBButton()) {
@@ -174,6 +175,9 @@ public class Robot extends LoggedRobot {
         }
         else {
             cIntake.spinPercentOutput(0);
+        }*/
+        if (operatorController.getRightTriggerAxis() > 0.1){
+            crescendoShooter.shoot();
         }
     }
 

@@ -52,7 +52,7 @@ public class Robot extends LoggedRobot {
     private XboxController operatorController;
     private XboxController driverController;
 
-    private Intake intake;
+    // private Intake intake;
     private NewtonPigeon pigeon;
     private Swerve swerve;
     private Shooter shooter;
@@ -90,7 +90,7 @@ public class Robot extends LoggedRobot {
         pigeon = new NewtonPigeon(new Pigeon2(Constants.SWERVE_PIGEON_CAN_ID));
         swerve = new Swerve(pigeon);
         shooter = new Shooter();
-        intake = new Intake();
+        // intake = new Intake();
         dropper = new BunnyDropper();
         driverController = new XboxController(Constants.CONTROLLER_DRIVER_PORT);
         operatorController = new XboxController(Constants.CONTROLLER_OPERATOR_PORT);
@@ -167,6 +167,8 @@ public class Robot extends LoggedRobot {
                 swerve.getGyroscopeRotation()));
         if (driverController.getAButton()) {
             cIntake.spinPercentOutput(0.2); // Set for the first test
+            cIntake.getTopMotorVelocityMs();
+            cIntake.getBottomMotorVelocityMs();
         }
         else if (driverController.getBButton()) {
             cIntake.intakeNote(SmartDashboard.getNumber("Lower Intake Speed", 0),

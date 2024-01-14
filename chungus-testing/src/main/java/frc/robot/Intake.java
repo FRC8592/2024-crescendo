@@ -17,8 +17,8 @@ public class Intake {
     private WPI_TalonFX rollerMotor;
 
     // Pneumatics
-    private Compressor robotCompressor;
-    private DoubleSolenoid collectorSolenoid;
+    // private Compressor robotCompressor;
+    // private DoubleSolenoid collectorSolenoid;
 
     int toggleCounter = 0; // Counter to toggle intake
 
@@ -33,15 +33,15 @@ public class Intake {
         rollerMotor = new WPI_TalonFX(Constants.INTAKE_ROLLER_MOTOR_CAN_ID);
 
         // Start Pneumatics
-        robotCompressor = new Compressor(PneumaticsModuleType.REVPH);
+        // robotCompressor = new Compressor(PneumaticsModuleType.REVPH);
 
-        collectorSolenoid = new DoubleSolenoid(Constants.INTAKE_PNEUMATICS_CAN_ID,
-                PneumaticsModuleType.REVPH, Constants.INTAKE_SOLENOID_PORT_A, Constants.INTAKE_SOLENOID_PORT_B);
+        // collectorSolenoid = new DoubleSolenoid(Constants.INTAKE_PNEUMATICS_CAN_ID,
+        //        PneumaticsModuleType.REVPH, Constants.INTAKE_SOLENOID_PORT_A, Constants.INTAKE_SOLENOID_PORT_B);
 
         // *** DANGER : Closed loop control must be enabled to prevent overpressure ***
-        robotCompressor.enableDigital();
+        // robotCompressor.enableDigital();
         // robotCompressor.enableAnalog(100, 120);; // Cycle to control pressure robotCompressor.start(); // Start compressor running
-        collectorSolenoid.set(DoubleSolenoid.Value.kForward); // Move collector inboard (undeploy it)
+        // collectorSolenoid.set(DoubleSolenoid.Value.kForward); // Move collector inboard (undeploy it)
 
         //set motors to factory default
         rollerMotor.configFactoryDefault();
@@ -66,11 +66,11 @@ public class Intake {
                 if (!shootMode) {
                     rollerMotor.set(ControlMode.PercentOutput, 0);
                 }
-                collectorSolenoid.set(DoubleSolenoid.Value.kForward);
+                // collectorSolenoid.set(DoubleSolenoid.Value.kForward);
                 Logger.getInstance().recordOutput("Intake/SolenoidPosition", "kForward"); //Forward and reverse are inverted from how you would expect them to behave.
                 break;
             case EXTEND:
-                collectorSolenoid.set(DoubleSolenoid.Value.kReverse);
+                // collectorSolenoid.set(DoubleSolenoid.Value.kReverse);
                 rollerMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER_SPEED);
                 Logger.getInstance().recordOutput("Intake/SolenoidPosition", "kReverse");
                 break;
@@ -141,9 +141,9 @@ public class Intake {
 
 
     public void TEST_extendIntake(){
-        collectorSolenoid.set(DoubleSolenoid.Value.kForward);
+        // collectorSolenoid.set(DoubleSolenoid.Value.kForward);
     }
     public void TEST_retractIntake(){
-        collectorSolenoid.set(DoubleSolenoid.Value.kReverse);
+        // collectorSolenoid.set(DoubleSolenoid.Value.kReverse);
     }
 }

@@ -21,6 +21,7 @@ public class CrescendoShooter {
     RelativeEncoder leftShooterEncoder;
     RelativeEncoder rightShooterEncoder;
     XboxController operatorController;
+    XboxController driverController;
 
     public CrescendoShooter(){
         leftShooterMotor = new CANSparkFlex(LEFT_MOTOR_CAN_ID, MotorType.kBrushless);

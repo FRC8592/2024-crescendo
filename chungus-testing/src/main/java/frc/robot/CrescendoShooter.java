@@ -51,8 +51,13 @@ public class CrescendoShooter {
         rightShooterControl.setReference(speedRPM, com.revrobotics.CANSparkBase.ControlType.kVelocity);
     }
 
+    public void spinPower(double power){
+        leftShooterMotor.set(Math.min(Math.max(power,-0.25),0.25)); 
+        rightShooterMotor.set(Math.min(Math.max(power,-0.25),0.25));
+    }
+
     public void stop(){
-        leftShooterControl.setReference(0, com.revrobotics.CANSparkBase.ControlType.kVelocity);
-        rightShooterControl.setReference(0, com.revrobotics.CANSparkBase.ControlType.kVelocity);
+        leftShooterMotor.set(0);
+        rightShooterMotor.set(0);
     }
 }

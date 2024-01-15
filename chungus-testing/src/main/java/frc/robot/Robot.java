@@ -153,8 +153,7 @@ public class Robot extends LoggedRobot {
         // if (!wasZeroed) {
         //     pigeon.zeroYaw();
         // }
-        SmartDashboard.putNumber("Lower Intake Speed", 0);
-        SmartDashboard.putNumber("Upper Intake Speed", 0);
+        SmartDashboard.putNumber("shootSpeed", 0.0);
     }
 
     /** This function is called periodically during operator control. */
@@ -177,8 +176,8 @@ public class Robot extends LoggedRobot {
             cIntake.spinPercentOutput(0);
         }*/
         if (operatorController.getRightTriggerAxis() > 0.1){
-            double shootSpeed = SmartDashboard.getNumber("shootSpeedRPM", defaultPeriodSecs);
-            crescendoShooter.shoot(shootSpeed);
+            double shootSpeed = SmartDashboard.getNumber("shootSpeed", 0.0);
+            crescendoShooter.spinPower(shootSpeed);
         }
         else{
             crescendoShooter.stop();

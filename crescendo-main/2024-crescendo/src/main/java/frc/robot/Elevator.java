@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class Elevator {
@@ -21,10 +22,20 @@ public class Elevator {
         elevatorPID.setI(0);
         elevatorPID.setD(0);
         elevatorPID.setFF(0);
+
+        elevatorEncoder.setPosition(0);
     }
 
     public void percentOutputElevator(double speed){
         elevatorMotor.set(speed);
+    }
+
+    public void setPositionUp(double position){
+        elevatorPID.setReference(position, ControlType.kPosition);
+    }
+
+    public void setPositionHome(double position){
+        elevatorPID.setReference(position, ControlType.kPosition);
     }
 
     

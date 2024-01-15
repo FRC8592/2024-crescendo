@@ -52,20 +52,20 @@ public class Robot extends LoggedRobot {
     private XboxController operatorController;
     private XboxController driverController;
 
-    private Intake intake;
+    // private Intake intake;
     private NewtonPigeon pigeon;
-    private Swerve swerve;
-    private Shooter shooter;
-    private BunnyDropper dropper;
-    private CrescendoIntake cIntake;
+    //private Swerve swerve;
+    // private Shooter shooter;
+    // private BunnyDropper dropper;
+    // private CrescendoIntake cIntake;
 
-    private BaseAuto currentAuto;
-    private AutonomousSelector autoSelect;
-    private Timer aimTimer;
+    // private BaseAuto currentAuto;
+    // private AutonomousSelector autoSelect;
+    // private Timer aimTimer;
 
-    private boolean wasZeroed = false;
-    private boolean isAiming = false;
-    public static Field2d FIELD = new Field2d();
+    // private boolean wasZeroed = false;
+    // private boolean isAiming = false;
+    // public static Field2d FIELD = new Field2d();
     private CrescendoShooter crescendoShooter = new CrescendoShooter();
 
     /**
@@ -112,10 +112,10 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotPeriodic() {
-        if (!isReal()) {
-            SmartDashboard.putData(FIELD);
-        }
-        Logger.getInstance().recordOutput("Robot Pose", swerve.getCurrentPos());
+        // if (!isReal()) {
+        //     SmartDashboard.putData(FIELD);
+        // }
+      //  Logger.getInstance().recordOutput("Robot Pose", swerve.getCurrentPos());
     }
 
     /**
@@ -147,12 +147,12 @@ public class Robot extends LoggedRobot {
     /** This function is called once when teleop is enabled. */
     @Override
     public void teleopInit() {
-        swerve.setSteerAnglesToAbsEncoder();
-        swerve.setTeleopCurrentLimit();
+        // swerve.setSteerAnglesToAbsEncoder();
+        // swerve.setTeleopCurrentLimit();
 
-        if (!wasZeroed) {
-            pigeon.zeroYaw();
-        }
+        // if (!wasZeroed) {
+        //     pigeon.zeroYaw();
+        // }
         SmartDashboard.putNumber("Lower Intake Speed", 0);
         SmartDashboard.putNumber("Upper Intake Speed", 0);
     }
@@ -160,12 +160,12 @@ public class Robot extends LoggedRobot {
     /** This function is called periodically during operator control. */
     @Override
     public void teleopPeriodic() {
-        swerve.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-                new ChassisSpeeds(
-                        -driverController.getLeftY() * swerve.getMaxTranslateVelo() * 0.15,
-                        -driverController.getLeftX() * swerve.getMaxTranslateVelo() * 0.15,
-                        driverController.getRightX() * swerve.getMaxAngularVelo() * 0.15),
-                swerve.getGyroscopeRotation()));
+        // //swerve.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+        //         new ChassisSpeeds(
+        //                 -driverController.getLeftY() * swerve.getMaxTranslateVelo() * 0.15,
+        //                 -driverController.getLeftX() * swerve.getMaxTranslateVelo() * 0.15,
+        //                 driverController.getRightX() * swerve.getMaxAngularVelo() * 0.15),
+        //         swerve.getGyroscopeRotation()));
         /*if (driverController.getAButton()) {
             cIntake.spinPercentOutput(0.2); // Set for the first test
         }

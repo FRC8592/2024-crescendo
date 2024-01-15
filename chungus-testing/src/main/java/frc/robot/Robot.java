@@ -65,7 +65,7 @@ public class Robot extends LoggedRobot {
 
     // private boolean wasZeroed = false;
     // private boolean isAiming = false;
-    // public static Field2d FIELD = new Field2d();
+    public static Field2d FIELD = new Field2d();
     private CrescendoShooter crescendoShooter = new CrescendoShooter();
 
     /**

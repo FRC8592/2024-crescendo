@@ -23,27 +23,40 @@ public class CrescendoShooter {
     //Change right motor to inverted using documentation
     public static double LEFT_MOTOR_SPEED = 0.25;
     public static double RIGHT_MOTOR_SPEED = LEFT_MOTOR_SPEED;
+    //PID values below need to be changed this is just a guestimate
+    public static double LEFT_MOTOR_kP = 0.0002; //PID
+    public static double LEFT_MOTOR_kI = 0.00000001; //PID
+    public static double LEFT_MOTOR_kD = 0.00015; //PID
+    public static double RIGHT_MOTOR_kP = 0.0002; //PID
+    public static double RIGHT_MOTOR_kI = 0.00000001; //PID
+    public static double RIGHT_MOTOR_kD = 0.00015; //PID
 
 
     CANSparkFlex leftShooterMotor;
     CANSparkFlex rightShooterMotor;
     RelativeEncoder leftShooterEncoder;
     RelativeEncoder rightShooterEncoder;
-    XboxController operatorController;
-    XboxController driverController;
     SparkPIDController leftShooterControl;
     SparkPIDController rightShooterControl;
 
     public CrescendoShooter(){
         leftShooterMotor = new CANSparkFlex(LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
+        leftShooterMotor.setInverted(true);
         rightShooterMotor = new CANSparkFlex(RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
-        rightShooterMotor.setInverted(true);
         leftShooterEncoder = leftShooterMotor.getEncoder();
         rightShooterEncoder = rightShooterMotor.getEncoder();
 
         table = NetworkTableInstance.getDefault().getTable(shooterTableName);
         leftShooterControl =  leftShooterMotor.getPIDController();
         rightShooterControl = rightShooterMotor.getPIDController();
+        leftShooterControl.setP(LEFT_MOTOR_kP); //PID
+        leftShooterControl.setI(LEFT_MOTOR_kI); //PID
+        leftShooterControl.setD(LEFT_MOTOR_kD); //PID
+        rightShooterControl.setP(RIGHT_MOTOR_kP); //PID
+        rightShooterControl.setI(RIGHT_MOTOR_kI); //PID
+        rightShooterControl.setD(RIGHT_MOTOR_kD); //PID
+        rightShooterMotor.set(0);
+        leftShooterMotor.set(0);
     }
 
     public void shoot(double speedRPM){
@@ -52,8 +65,8 @@ public class CrescendoShooter {
     }
 
     public void spinPower(double power){
-        leftShooterMotor.set(Math.min(Math.max(power,-0.25),0.25)); 
-        rightShooterMotor.set(Math.min(Math.max(power,-0.25),0.25));
+        leftShooterMotor.set(Math.min(Math.max(power,-0.5),0.5)); 
+        rightShooterMotor.set(Math.min(Math.max(power,-0.5),0.5));
     }
 
     public void stop(){

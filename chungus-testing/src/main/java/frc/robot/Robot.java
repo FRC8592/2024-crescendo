@@ -49,7 +49,7 @@ public class Robot extends LoggedRobot {
     private String m_autoSelected;
     private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-    private XboxController operatorController;
+    // private XboxController operatorController;
     private XboxController driverController;
 
     // private Intake intake;
@@ -93,7 +93,7 @@ public class Robot extends LoggedRobot {
         // shooter = new Shooter();
         // intake = new Intake();
         // dropper = new BunnyDropper();
-        // driverController = new XboxController(Constants.CONTROLLER_DRIVER_PORT);
+        driverController = new XboxController(Constants.CONTROLLER_DRIVER_PORT);
         // operatorController = new XboxController(Constants.CONTROLLER_OPERATOR_PORT);
         // aimTimer = new Timer();
         // autoSelect = new AutonomousSelector();
@@ -175,7 +175,7 @@ public class Robot extends LoggedRobot {
         else {
             cIntake.spinPercentOutput(0);
         }*/
-        if (operatorController.getRightTriggerAxis() > 0.1){
+        if (driverController.getRightTriggerAxis() > 0.1){
             double shootSpeed = SmartDashboard.getNumber("shootSpeed", 0.0);
             crescendoShooter.spinPower(shootSpeed);
         }

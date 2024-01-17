@@ -23,13 +23,12 @@ public class CrescendoShooter {
     //Change right motor to inverted using documentation
     public static double LEFT_MOTOR_SPEED = 0.25;
     public static double RIGHT_MOTOR_SPEED = LEFT_MOTOR_SPEED;
-    //PID values below need to be changed this is just a guestimate
-    public static double LEFT_MOTOR_kP = 0.0002; //PID
-    public static double LEFT_MOTOR_kI = 0.00000001; //PID
-    public static double LEFT_MOTOR_kD = 0.00015; //PID
-    public static double RIGHT_MOTOR_kP = 0.0002; //PID
-    public static double RIGHT_MOTOR_kI = 0.00000001; //PID
-    public static double RIGHT_MOTOR_kD = 0.00015; //PID
+    public static double LEFT_MOTOR_kP = 0.0; //PID
+    public static double LEFT_MOTOR_kI = 0.0; //PID
+    public static double LEFT_MOTOR_kD = 0.0; //PID
+    public static double RIGHT_MOTOR_kP = 0.0; //PID
+    public static double RIGHT_MOTOR_kI = 0.0; //PID
+    public static double RIGHT_MOTOR_kD = 0.0; //PID
 
 
     CANSparkFlex leftShooterMotor;
@@ -55,6 +54,7 @@ public class CrescendoShooter {
         rightShooterControl.setP(RIGHT_MOTOR_kP); //PID
         rightShooterControl.setI(RIGHT_MOTOR_kI); //PID
         rightShooterControl.setD(RIGHT_MOTOR_kD); //PID
+
         rightShooterMotor.set(0);
         leftShooterMotor.set(0);
     }

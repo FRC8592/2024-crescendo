@@ -65,7 +65,7 @@ public class BunnyDropper {
     }
 
     public void zero() {
-        dropperEncoder.setPosition(0); 
+        dropperEncoder.setPosition(0);
     }
     // // spinning motor at scaled joystick y value, records postition on smart
     // // dashboard

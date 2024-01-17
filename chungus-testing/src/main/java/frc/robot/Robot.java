@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.AutonomousSelector;
 import frc.robot.autonomous.BaseAuto;
+import frc.robot.commands.VelocityControl;
 import pabeles.concurrency.IntOperatorTask.Min;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -66,7 +67,7 @@ public class Robot extends LoggedRobot {
     // private boolean wasZeroed = false;
     // private boolean isAiming = false;
     public static Field2d FIELD = new Field2d();
-    private CrescendoShooter crescendoShooter = new CrescendoShooter();
+    private VelocityControl crescendoShooter = new VelocityControl();
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -180,7 +181,7 @@ public class Robot extends LoggedRobot {
             crescendoShooter.spinPower(shootSpeed);
         }
         else{
-            crescendoShooter.stop();
+            crescendoShooter.stopPower();
         }
     }
 

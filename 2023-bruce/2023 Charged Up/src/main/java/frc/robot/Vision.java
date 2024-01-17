@@ -22,12 +22,10 @@ public class Vision {
   private double cameraHeight;
   private double cameraAngle;
   private double targetHeight;
-  private double rotationKP;
-  private double rotationKI;
-  private double rotationKD;
-  private double closeRotationKP;
-  private double closeRotationKI;
-  private double closeRotationKD;
+  private double lockKP;
+  private double lockKI;
+  private double lockKD;
+  private PIDController targetPID;
   // Network Table entries
   private NetworkTableEntry tx;   // Angle error (x) from LimeLight camera
   private NetworkTableEntry ty;   // Angle error (y) from LimeLight camera
@@ -42,7 +40,7 @@ public class Vision {
   public double processedDx = 0;
   private double processedDy = 0;
   //Private autoaim variables
-  private double turnSpeed;
+  private double lockSpeed;
   private double lastTime  = 0;
   private double xtime     = 0;
   private double lastAngle = 0;
@@ -67,18 +65,14 @@ public class Vision {
   private final double DEG_TO_RAD = 0.0174533;
   private final double IN_TO_METERS = 0.0254;
   
-  private FRCLogger logger;
-
-  // PID for locking in X/Y
-  private PIDController visionPid;
-  
+  private FRCLogger logger;  
 
   /**
    * This constructor will intialize internal variables for the robot turret
    */
   public Vision(String limelightName, double lockError, double closeError,
                 double cameraHeight, double cameraAngle, double targetHeight,
-                FRCLogger logger) {
+                FRCLogger logger, double lockKP, double lockKI, double lockKD) {
 
     // Set up networktables for limelight
     NetworkTable table = NetworkTableInstance.getDefault().getTable(limelightName);
@@ -105,7 +99,7 @@ public class Vision {
     this.targetHeight  = targetHeight;
 
     // Create the PID controller
-  
+    PIDController targetPID = new PIDController(lockKP, lockKI, lockKD);
     
     this.logger = logger;
   }
@@ -239,14 +233,19 @@ public class Vision {
 
 
   /**
-   * Turn the robot based on limelight data
-   * 1) If no targetValid turn in a circle until we get a targetValid indicator
-   * 2) if targetValid, turns towards the target using the PID controller output for turn speed
-   * 3) if targetValid and processedDx is within our "locked" criteria, stop turning
+   * Lock to an axis the robot based on limelight data
+   * 1) If no targetValid turn in a circle/move until we get a targetValid indicator
+   * 2) if targetValid, lock target using the PID controller output
+   * 3) if targetValid and processedDx is within our "locked" criteria, stop moving
    * 
-   * @return The turn speed
+   * @param defaultSpeed The speed to use when no target is found
+   * @param lockToVariable The variable to lock to (tx or ty)
+   * @param limit Output is clamped to this limit
+   * @param targetValue The value to lock to (generally 0 for turn, fixed distance for move)
+   * 
+   * @return The speed to actuate the robot (turn or move, depending on axis)
    */
-  public double lockTargetSpeed(double defaultSpeed, PIDController targetPID, String lockToVariable, double limit, double offset){
+  public double lockTargetSpeed(double defaultSpeed, String lockToVariable, double limit, double targetValue){
 
     // Stop turning if we have locked onto the target within acceptable angular error
     // if (targetValid && targetLocked) {
@@ -256,22 +255,24 @@ public class Vision {
     // Otherwise, if we have targetValid, turn towards the target using the PID controller to determine speed
     // Limit maximum speed
     if (targetValid) {
-      if(lockToVariable == "tx") turnSpeed = targetPID.calculate(tx.getDouble(0.0), offset);  // Setpoint is always 0 degrees (dead center)
-      else if(lockToVariable == "ty") turnSpeed = targetPID.calculate(ty.getDouble(0.0), offset);  // Setpoint is always 0 degrees (dead center)
-      turnSpeed = Math.max(turnSpeed, -limit);
-      turnSpeed = Math.min(turnSpeed, limit);
+      if(lockToVariable == "tx") {
+        lockSpeed = this.targetPID.calculate(tx.getDouble(0.0), targetValue); 
+      }
+      else if(lockToVariable == "ty") {
+        lockSpeed = this.targetPID.calculate(ty.getDouble(0.0), targetValue);
+      }
+      lockSpeed = Math.max(lockSpeed, -limit);
+      lockSpeed = Math.min(lockSpeed, limit);
     }
 
-    // If no targetValid, spin in a circle to search
+    // If no targetValid, go into search mode - default speed is passed in
     else {
-      turnSpeed = defaultSpeed;    // Spin in a circle until a target is located
+      lockSpeed = defaultSpeed;    // Spin in a circle until a target is located
     }
 
-    // SmartDashboard.putNumber(limelightName + "/Turn Speed", turnSpeed);
+    logger.log(this, String.join("Lock Speed for: ", lockToVariable), lockSpeed);
 
-    logger.log(this, "Lock Speed", turnSpeed);
-
-    return turnSpeed;
+    return lockSpeed;
   }
 
   //

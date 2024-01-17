@@ -61,13 +61,10 @@ public class Robot extends LoggedRobot {
   public Drivetrain drive;
   public LED ledStrips;
 
-  public Vision gameObjectVision;
-  public Vision substationVision;
+  public Vision turnToVision;
+  public Vision driveToVision;
   public String currentPiecePipeline;
   public FRCLogger logger;
-  public PIDController turnPID;
-  public PIDController driveToPID;
-  public PIDController strafePID;
   public boolean wasZeroed = false;
   private boolean coneVision = true;
   public Power power;
@@ -113,16 +110,13 @@ public class Robot extends LoggedRobot {
     power = new Power();
     drive = new Drivetrain(logger);
     cubeBeamSensor = new BeamSensor(Constants.BEAM_BREAK_CUBE_ID);
-    gameObjectVision = new Vision(Constants.LIMELIGHT_VISION, Constants.DRIVE_TO_LOCK_ERROR,
+    turnToVision = new Vision(Constants.LIMELIGHT_VISION, Constants.DRIVE_TO_LOCK_ERROR,
      Constants.DRIVE_TO_CLOSE_ERROR, Constants.DRIVE_TO_CAMERA_HEIGHT, Constants.DRIVE_TO_CAMERA_ANGLE, 
-     Constants.DRIVE_TO_TARGET_HEIGHT, logger);
-     substationVision = new Vision(Constants.LIMELIGHT_REAR, Constants.SUBSTATION_OFFSET,
+     Constants.DRIVE_TO_TARGET_HEIGHT, logger, Constants.TURN_TO_kP, Constants.TURN_TO_kI, Constants.TURN_TO_kD);
+     driveToVision = new Vision(Constants.LIMELIGHT_REAR, Constants.SUBSTATION_OFFSET,
      Constants.DRIVE_TO_CLOSE_ERROR, Constants.DRIVE_TO_CAMERA_HEIGHT, Constants.DRIVE_TO_CAMERA_ANGLE, 
-     Constants.DRIVE_TO_TARGET_HEIGHT, logger);
-    turnPID = new PIDController(Constants.TURN_TO_ROTATE_KP, Constants.TURN_TO_ROTATE_KI, Constants.TURN_TO_ROTATE_KD);
-    driveToPID = new PIDController(Constants.DRIVE_TO_ROTATE_KP, Constants.DRIVE_TO_ROTATE_KI, Constants.DRIVE_TO_ROTATE_KD);
-    ledStrips = new LED(power, gameObjectVision);
-    strafePID = new PIDController(-0.05, 0, 0);
+     Constants.DRIVE_TO_TARGET_HEIGHT, logger, Constants.DRIVE_TO_kP, Constants.DRIVE_TO_kI, Constants.DRIVE_TO_kD);
+    ledStrips = new LED(power, turnToVision);
     // intake.reset();
     // lift.reset();
     driveScaler = new DriveScaler();
@@ -233,14 +227,14 @@ public class Robot extends LoggedRobot {
     double translateX;
     double translateY;
     double rotate;
-    double rotateToAngle;
     translatePower = ConfigRun.TRANSLATE_POWER_SLOW;
     double rotatePower = ConfigRun.ROTATE_POWER_SLOW;
 
     ChassisSpeeds driveSpeeds = new ChassisSpeeds();
 
     drive.getCurrentPos();
-    gameObjectVision.updateVision();
+    turnToVision.updateVision();
+    driveToVision.updateVision();
 
     double translateXScaled = driveScaler.scale(-joystickDeadband(driverController.getLeftY()));
     double translateYScaled = driveScaler.scale(-joystickDeadband(driverController.getLeftX()));
@@ -252,14 +246,14 @@ public class Robot extends LoggedRobot {
     translateY = translateYScaled * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND * translatePower;
     if (driverController.getBButton()) {
     
-      double rotateSpeed = gameObjectVision.lockTargetSpeed(0, turnPID, "tx", Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
+      double rotateSpeed = turnToVision.lockTargetSpeed(0, "tx", Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
       rotate = rotateSpeed;
 
-      double driveToSpeed = gameObjectVision.lockTargetSpeed(0, strafePID, "ty", 1.0, 20); // 20 means its sorta close
+      double driveToSpeed = driveToVision.lockTargetSpeed(0, "ty", 1.0, 20); // 20 means its sorta close
       translateY = driveToSpeed; // go forwards at driveToSpeed towards the target
-      SmartDashboard.putNumber("pid based forward vel", driveToSpeed);
+      SmartDashboard.putNumber("PID Forwards Vel", driveToSpeed);
     }
-    ChassisSpeeds smoothedRobotRelative = smoothingFilter.smooth(new ChassisSpeeds(translateX, translateY, 0));
+    ChassisSpeeds smoothedRobotRelative = smoothingFilter.smooth(new ChassisSpeeds(translateX, translateY, rotate));
     driveSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(      
       smoothedRobotRelative.vxMetersPerSecond, 
       smoothedRobotRelative.vyMetersPerSecond,

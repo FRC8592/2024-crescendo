@@ -164,6 +164,7 @@ public final class Constants {
     public static final double MOVE_BACK_AIM_TIME = 0.4;
     public static final double MOVE_BACK_AIM_SPEED = 0.6;
 
+    public static final double SPARK_FLEX_MAX_VELOCITY = 6784;
 
 
 

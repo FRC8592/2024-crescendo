@@ -8,7 +8,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.XboxController;
 import com.revrobotics.SparkPIDController;
 
 public class CrescendoShooter {
@@ -59,12 +58,12 @@ public class CrescendoShooter {
         leftShooterMotor.set(0);
     }
 
-    public void shoot(double speedRPM){
+    public void shootVelocityMode(double speedRPM){
         leftShooterControl.setReference(speedRPM, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
         rightShooterControl.setReference(speedRPM, com.revrobotics.CANSparkBase.ControlType.kVelocity);
     }
 
-    public void spinPower(double power){
+    public void shootPercentOutput(double power){
         leftShooterMotor.set(Math.min(Math.max(power,-0.5),0.5)); 
         rightShooterMotor.set(Math.min(Math.max(power,-0.5),0.5));
     }

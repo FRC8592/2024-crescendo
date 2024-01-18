@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.AutonomousSelector;
 import frc.robot.autonomous.BaseAuto;
-import frc.robot.commands.SparkFlexVelocityControl;
+import frc.robot.commands.SparkFlexControl;
 import pabeles.concurrency.IntOperatorTask.Min;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -67,7 +67,8 @@ public class Robot extends LoggedRobot {
     // private boolean wasZeroed = false;
     // private boolean isAiming = false;
     public static Field2d FIELD = new Field2d();
-    private static CrescendoShooter crescendoShooter = new CrescendoShooter();
+    private static SparkFlexControl leftCrescendoShooter;
+    private static SparkFlexControl rightCrescendoShooter;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -99,6 +100,10 @@ public class Robot extends LoggedRobot {
         // aimTimer = new Timer();
         // autoSelect = new AutonomousSelector();
         // cIntake = new CrescendoIntake();
+        leftCrescendoShooter = new SparkFlexControl(31);
+        rightCrescendoShooter = new SparkFlexControl(29);
+        //leftCrescendoShooter.setPID(0.001, 0, 0);
+        //rightCrescendoShooter.setPID(0.001, 0, 0);
     }
 
     /**
@@ -178,10 +183,12 @@ public class Robot extends LoggedRobot {
         }*/
         if (driverController.getRightTriggerAxis() > 0.1){
             double shootSpeed = SmartDashboard.getNumber("shootSpeed", 0.0);
-            crescendoShooter.shoot(shootSpeed);
+            leftCrescendoShooter.setPercentOutput(-shootSpeed);
+            rightCrescendoShooter.setPercentOutput(shootSpeed);;
         }
         else{
-            crescendoShooter.stop();
+            leftCrescendoShooter.stop();
+            rightCrescendoShooter.stop();
         }
     }
 

@@ -184,7 +184,7 @@ public class Robot extends LoggedRobot {
         if (driverController.getRightTriggerAxis() > 0.1){
             double shootSpeed = SmartDashboard.getNumber("shootSpeed", 0.0);
             leftCrescendoShooter.setPercentOutput(-shootSpeed);
-            rightCrescendoShooter.setPercentOutput(shootSpeed);;
+            rightCrescendoShooter.setPercentOutput(shootSpeed);
         }
         else{
             leftCrescendoShooter.stop();

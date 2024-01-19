@@ -18,8 +18,8 @@ public class SparkFlexControl {
         motor.set(0);
     }
 
-    public void setVelocity(double RPM){
-        motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
+    public void setVelocity(double RPS){
+        motorControl.setReference(RPS, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
     }
 
     public void setPercentOutput(double RPM){
@@ -33,7 +33,7 @@ public class SparkFlexControl {
     public void setPID(double P, double I, double D){
         motorControl =  motor.getPIDController();
         motorControl.setP(P);
-        motorControl.setP(I);
-        motorControl.setP(D);
+        motorControl.setI(I);
+        motorControl.setD(D);
     }
 }

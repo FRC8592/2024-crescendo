@@ -125,7 +125,7 @@ public class Robot extends LoggedRobot {
     turnPID = new PIDController(Constants.TURN_TO_ROTATE_KP, Constants.TURN_TO_ROTATE_KI, Constants.TURN_TO_ROTATE_KD);
     driveToPID = new PIDController(Constants.DRIVE_TO_ROTATE_KP, Constants.DRIVE_TO_ROTATE_KI, Constants.DRIVE_TO_ROTATE_KD);
     ledStrips = new LED(power, gameObjectVision);
-    strafePID = new PIDController(-0.05, 0, 0);
+    strafePID = new PIDController(0.05, 0, 0);
     elevator = new Elevator();
     intake = new Intake();
     // intake.reset();

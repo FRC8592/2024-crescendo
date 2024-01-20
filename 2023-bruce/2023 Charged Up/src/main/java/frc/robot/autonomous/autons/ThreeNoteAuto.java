@@ -10,6 +10,7 @@ import frc.robot.commands.FollowerCommand;
 public class ThreeNoteAuto extends BaseAuto {
     private TrajectoryConfig config = new TrajectoryConfig(1, 1);
     private SwerveTrajectory pathOne = AutonomousPositions.generate(config, AutonomousPositions.SUBWOOFER_MIDDLE.getPose(), AutonomousPositions.WING_NOTE_2.getPose());
+    private SwerveTrajectory pathTwo = AutonomousPositions.generate(config, AutonomousPositions.WING_NOTE_2.getPose(), AutonomousPositions.WING_NOTE_1.getPose());
 
 
     @Override

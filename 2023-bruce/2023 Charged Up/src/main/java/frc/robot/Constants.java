@@ -173,7 +173,7 @@ public final class Constants {
     public static double DRIVE_TO_CAMERA_HEIGHT    = 35.75;
     public static double DRIVE_TO_CAMERA_ANGLE     = -30.0;
     public static double DRIVE_TO_TARGET_HEIGHT    = 4.75;
-    public static double DRIVE_TO_ROTATE_KP        = -0.1; //0.15;           // Proportional constant for turret rotate speed
+    public static double DRIVE_TO_ROTATE_KP        = 0.1; //0.15;           // Proportional constant for turret rotate speed
     public static double DRIVE_TO_ROTATE_KI        = 0.0;
     public static double DRIVE_TO_ROTATE_KD        = 0.0;   
     public static String LIMELIGHT_DRIVE_TO        = "limelight-DRIVE_TO";
@@ -184,7 +184,7 @@ public final class Constants {
     public static double CLOSE_DRIVE_TO_ROTATE_KD  = 0.0;  
 
     // Vision constants for the TURN_TO camera
-    public static double TURN_TO_ROTATE_KP        = -0.1; //0.15;           // Proportional constant for turret rotate speed
+    public static double TURN_TO_ROTATE_KP        = 0.1; //0.15;           // Proportional constant for turret rotate speed
     public static double TURN_TO_ROTATE_KI        = 0.0;
     public static double TURN_TO_ROTATE_KD        = 0.0;   
 

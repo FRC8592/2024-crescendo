@@ -134,7 +134,7 @@ public class Robot extends LoggedRobot {
 
     smoothingFilter = new SmoothingFilter(1, 1, 1); //5, 5, 1
 
-    // SmartDashboard.putData(FIELD);
+    SmartDashboard.putData(FIELD);
     selector = new AutonomousSelector();
 
 

@@ -10,6 +10,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 
@@ -52,6 +54,11 @@ public class SwerveTrajectory {
         // rotation = trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getRotation();
         rotation = new Rotation2d();
         mTrajectory = trajectory;
+
+        // boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+        // if (isRed){
+        //     rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
+        // }
     }
 
     public SwerveTrajectory(Trajectory trajectory, boolean vision) {
@@ -76,6 +83,12 @@ public class SwerveTrajectory {
         mTrajectory = trajectory;
 
         this.vision = vision;
+
+        boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+        if (isRed){
+            rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
+        }
+
     }
 
     /**
@@ -84,6 +97,12 @@ public class SwerveTrajectory {
      */
     public SwerveTrajectory addRotation(Rotation2d rotation) {
         this.rotation = Rotation2d.fromDegrees(rotation.getDegrees());
+        
+        boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+        if (isRed){
+            rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
+        }
+        
         return this;
     }
 
@@ -95,6 +114,12 @@ public class SwerveTrajectory {
         this.rotation = Rotation2d.fromDegrees(rotation.getDegrees());
         turnDelay = delay;
         maxRotationVelocity = turnSpeed;
+        
+        // boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+        // if (isRed){
+        //     rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
+        // }
+
         return this;
     }
 
@@ -105,6 +130,13 @@ public class SwerveTrajectory {
     public SwerveTrajectory addRotation(Rotation2d rotation, double delay) {
         this.rotation = Rotation2d.fromDegrees(rotation.getDegrees());
         turnDelay = delay;
+        
+        boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+        if (isRed){
+            SmartDashboard.putString("sample", "0");
+            rotation = Rotation2d.fromDegrees(90);
+        }
+
         return this;
     }
 
@@ -143,7 +175,7 @@ public class SwerveTrajectory {
         // if (DriverStation.getAlliance() == Alliance.Red) {
         //     this.rotation = Rotation2d.fromDegrees(180 - rotation.getDegrees());
         // }
-
+        SmartDashboard.putNumber("sample", rotation.getDegrees());
         ChassisSpeeds desired = mDrivePID.calculate(getInitialPose(), state, rotation);
         if (Robot.isReal()) {
             desired = mDrivePID.calculate(
@@ -167,10 +199,12 @@ public class SwerveTrajectory {
         // SmartDashboard.putBoolean("AT SETPOINT", mDrivePID.atReference());
 
         poseRobot = robotPose;
-
         double turn = turnPID.calculate(0, getErrorAngle(robotPose, new Pose2d(0, 0, rotation)));
         turn = Math.max(-maxRotationVelocity, Math.min(maxRotationVelocity, pSeconds >= turnDelay ? turn : 0.0));
-
+        if(DriverStation.getAlliance().get() == Alliance.Red){
+            turn = turnPID.calculate(0, getErrorAngle(robotPose, new Pose2d(0, 0, Rotation2d.fromDegrees(180+rotation.getDegrees()))));
+            turn = Math.max(-maxRotationVelocity, Math.min(maxRotationVelocity, pSeconds >= turnDelay ? turn : 0.0));
+        }
         desired = new ChassisSpeeds(desired.vxMetersPerSecond, desired.vyMetersPerSecond, -turn);
         return desired;
     }

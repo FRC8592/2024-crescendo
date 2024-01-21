@@ -104,6 +104,9 @@ public class Robot extends LoggedRobot {
         rightCrescendoShooter = new SparkFlexControl(29);
         //leftCrescendoShooter.setPID(0.001, 0, 0);
         //rightCrescendoShooter.setPID(0.001, 0, 0);
+
+        //leftCrescendoShooter.setPID(0.0001, 0, 0);
+        //rightCrescendoShooter.setPID(0.0001, 0, 0);
     }
 
     /**
@@ -183,8 +186,8 @@ public class Robot extends LoggedRobot {
         }*/
         if (driverController.getRightTriggerAxis() > 0.1){
             double shootSpeed = SmartDashboard.getNumber("shootSpeed", 0.0);
-            leftCrescendoShooter.setPercentOutput(-shootSpeed);
-            rightCrescendoShooter.setPercentOutput(shootSpeed);
+            leftCrescendoShooter.setPercentOutput(shootSpeed);
+            rightCrescendoShooter.setPercentOutput(-shootSpeed);
         }
         else{
             leftCrescendoShooter.stop();

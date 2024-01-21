@@ -1,6 +1,5 @@
 package frc.robot;
 import com.revrobotics.CANSparkFlex;
-import com.revrobotics.ControlType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 //import edu.wpi.first.wpilibj.XboxController;

@@ -3,7 +3,6 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkPIDController;
-import com.revrobotics.ControlType;
 
 public class SparkFlexControl {
     CANSparkFlex motor;
@@ -18,8 +17,8 @@ public class SparkFlexControl {
         motor.set(0);
     }
 
-    public void setVelocity(double RPS){
-        motorControl.setReference(RPS, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
+    public void setVelocity(double RPM){
+        motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
     }
 
     public void setPercentOutput(double RPM){

@@ -94,6 +94,7 @@ public class Robot extends LoggedRobot {
         // swerve = new Swerve(pigeon);
         // shooter = new Shooter();
         // intake = new Intake();
+        SmartDashboard.putNumber("shootSpeed", 0.0);
         // dropper = new BunnyDropper();
         driverController = new XboxController(Constants.CONTROLLER_DRIVER_PORT);
         // operatorController = new XboxController(Constants.CONTROLLER_OPERATOR_PORT);
@@ -102,11 +103,9 @@ public class Robot extends LoggedRobot {
         // cIntake = new CrescendoIntake();
         leftCrescendoShooter = new SparkFlexControl(31);
         rightCrescendoShooter = new SparkFlexControl(29);
-        //leftCrescendoShooter.setPID(0.001, 0, 0);
-        //rightCrescendoShooter.setPID(0.001, 0, 0);
 
-        //leftCrescendoShooter.setPID(0.0001, 0, 0);
-        //rightCrescendoShooter.setPID(0.0001, 0, 0);
+        leftCrescendoShooter.setPID(0.00045, 0, 0);
+        rightCrescendoShooter.setPID(0.00045, 0, 0);
     }
 
     /**
@@ -125,6 +124,8 @@ public class Robot extends LoggedRobot {
         //     SmartDashboard.putData(FIELD);
         // }
       //  Logger.getInstance().recordOutput("Robot Pose", swerve.getCurrentPos());
+        SmartDashboard.putNumber("leftShooterRPM", leftCrescendoShooter.getVelocity());
+        SmartDashboard.putNumber("rightShooterRPM", rightCrescendoShooter.getVelocity());
     }
 
     /**
@@ -162,7 +163,6 @@ public class Robot extends LoggedRobot {
         // if (!wasZeroed) {
         //     pigeon.zeroYaw();
         // }
-        SmartDashboard.putNumber("shootSpeed", 0.0);
     }
 
     /** This function is called periodically during operator control. */
@@ -186,8 +186,10 @@ public class Robot extends LoggedRobot {
         }*/
         if (driverController.getRightTriggerAxis() > 0.1){
             double shootSpeed = SmartDashboard.getNumber("shootSpeed", 0.0);
-            leftCrescendoShooter.setPercentOutput(shootSpeed);
-            rightCrescendoShooter.setPercentOutput(-shootSpeed);
+            leftCrescendoShooter.setVelocity(shootSpeed);
+            rightCrescendoShooter.setVelocity(-shootSpeed);
+            // leftCrescendoShooter.setPercentOutput((shootSpeed - leftCrescendoShooter.getVelocity())*0.001);
+            // rightCrescendoShooter.setPercentOutput((shootSpeed - rightCrescendoShooter.getVelocity())*0.001);
         }
         else{
             leftCrescendoShooter.stop();

@@ -12,6 +12,7 @@ public class SparkFlexControl {
 
     public SparkFlexControl(int MOTOR_CAN_ID){
         motor = new CANSparkFlex(MOTOR_CAN_ID, MotorType.kBrushless);
+        motor.restoreFactoryDefaults();
         motorControl = motor.getPIDController();
         motorEncoder = motor.getEncoder();
         motor.set(0);
@@ -21,8 +22,8 @@ public class SparkFlexControl {
         motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
     }
 
-    public void setPercentOutput(double RPM){
-        motor.set(RPM);
+    public void setPercentOutput(double power){
+        motor.set(power);
     }
 
     public void stop(){
@@ -34,5 +35,10 @@ public class SparkFlexControl {
         motorControl.setP(P);
         motorControl.setI(I);
         motorControl.setD(D);
+        
+    }
+
+    public double getVelocity(){
+        return motorEncoder.getVelocity();
     }
 }

@@ -104,8 +104,8 @@ public class Robot extends LoggedRobot {
         leftCrescendoShooter = new SparkFlexControl(31);
         rightCrescendoShooter = new SparkFlexControl(29);
 
-        leftCrescendoShooter.setPID(0.00045, 0, 0);
-        rightCrescendoShooter.setPID(0.00045, 0, 0);
+        leftCrescendoShooter.setPID(0.000375, 0, 0);
+        rightCrescendoShooter.setPID(0.000375, 0, 0);
     }
 
     /**

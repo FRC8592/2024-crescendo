@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 import java.rmi.registry.LocateRegistry;
+import java.util.ArrayList;
 
 import javax.swing.DropMode;
 
@@ -45,6 +46,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.LogFileUtil;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotController;
+
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
 /**
@@ -78,6 +81,15 @@ public class Robot extends LoggedRobot {
   public BeamSensor cubeBeamSensor;
   public SmoothingFilter smoothingFilter;
 
+  private double currentBatteryVoltage;
+  private ArrayList<Double> voltages;
+  private static final int VOLTAGE_SMOOTHING_LENGTH = 50;
+  private static final double DISABLED_LOW_BATTERY_VOLTAGE = 11.5;
+  private static final double TELEOP_LOW_BATTERY_VOLTAGE = 10.5;
+  private boolean isBatteryLow = false;
+
+  private static final String LOG_PATH = "CustomLogs/Robot/";
+
 
 
   private double currentWrist = Constants.WRIST_INTAKE_ROTATIONS;
@@ -109,7 +121,6 @@ public class Robot extends LoggedRobot {
     }
     Logger.getInstance().start();
 
-
     logger = new FRCLogger(true, "CustomLogs");
     driverController = new XboxController(0);
     operatorController = new XboxController(1);
@@ -136,6 +147,7 @@ public class Robot extends LoggedRobot {
 
     // SmartDashboard.putData(FIELD);
     selector = new AutonomousSelector();
+    voltages = new ArrayList<Double>();
 
 
     // SmartDashboard.putNumber("Command Counter", 0);
@@ -157,6 +169,33 @@ public class Robot extends LoggedRobot {
     elevator.writeToSmartDashboard();
     power.powerPeriodic();
     ledStrips.updatePeriodic();
+
+    voltages.add(0, RobotController.getBatteryVoltage());
+        if (voltages.size() > VOLTAGE_SMOOTHING_LENGTH) {
+            voltages.remove(VOLTAGE_SMOOTHING_LENGTH);
+        }
+        double x = 0.0;
+        for (double i: voltages){
+            x += i;
+        }
+        currentBatteryVoltage = x/VOLTAGE_SMOOTHING_LENGTH;
+
+        if (DriverStation.isDisabled() || DriverStation.isAutonomous() || DriverStation.isTest()) {
+            if (currentBatteryVoltage < DISABLED_LOW_BATTERY_VOLTAGE) {
+                isBatteryLow = true;
+            }
+        }
+
+        if (DriverStation.isTeleop()) {
+            if (currentBatteryVoltage < TELEOP_LOW_BATTERY_VOLTAGE) {
+                isBatteryLow = true;
+            }
+        }
+
+        Logger.recordOutput(LOG_PATH+"Is Battery Low", isBatteryLow);
+        SmartDashboard.putBoolean("Is Battery Low", isBatteryLow);
+
+    
   }
 
   /**

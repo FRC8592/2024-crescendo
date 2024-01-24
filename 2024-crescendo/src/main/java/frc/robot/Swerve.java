@@ -13,27 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class Swerve {
-    /****************************************************************************************
-     * TEAL is front-left
-     * ORANGE is front-right
-     * BLACK is back-right
-     * WHITE is back-left
-     *****************************************************************************************/
-    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-    public static final int FRONT_LEFT_MODULE_STEER_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-    public static final int FRONT_LEFT_MODULE_STEER_ENCODER_CAN_ID = -1; // TODO: Value isn't set.
 
-    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER_CAN_ID = -1; // TODO: Value isn't set.
-
-    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-    public static final int BACK_LEFT_MODULE_STEER_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-    public static final int BACK_LEFT_MODULE_STEER_ENCODER_CAN_ID = -1; // TODO: Value isn't set.
-
-    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-    public static final int BACK_RIGHT_MODULE_STEER_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-    public static final int BACK_RIGHT_MODULE_STEER_ENCODER_CAN_ID = -1; // TODO: Value isn't set.
 
     public static final int PIGEON_CAN_ID = -1; // TODO: Value isn't set.
 
@@ -107,26 +87,26 @@ public class Swerve {
         //         BACK_RIGHT_MODULE_STEER_ENCODER_CAN_ID, BACK_RIGHT_MODULE_STEER_OFFSET);
 
         SwerveModule m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,
-                Mk4SwerveModuleHelper.GearRatio.L2, FRONT_LEFT_MODULE_DRIVE_MOTOR_CAN_ID,
-                FRONT_LEFT_MODULE_STEER_MOTOR_CAN_ID,
-                FRONT_LEFT_MODULE_STEER_ENCODER_CAN_ID,
+                Mk4SwerveModuleHelper.GearRatio.L2, Hardware.FRONT_LEFT_MODULE_DRIVE_MOTOR_CAN_ID,
+                Hardware.FRONT_LEFT_MODULE_STEER_MOTOR_CAN_ID,
+                Hardware.FRONT_LEFT_MODULE_STEER_ENCODER_CAN_ID,
                 FRONT_LEFT_MODULE_STEER_OFFSET);
 
         SwerveModule m_frontRightModule = Mk4SwerveModuleHelper.createFalcon500(config,
-                Mk4SwerveModuleHelper.GearRatio.L2, FRONT_RIGHT_MODULE_DRIVE_MOTOR_CAN_ID,
-                FRONT_RIGHT_MODULE_STEER_MOTOR_CAN_ID,
-                FRONT_RIGHT_MODULE_STEER_ENCODER_CAN_ID,
+                Mk4SwerveModuleHelper.GearRatio.L2, Hardware.FRONT_RIGHT_MODULE_DRIVE_MOTOR_CAN_ID,
+                Hardware.FRONT_RIGHT_MODULE_STEER_MOTOR_CAN_ID,
+                Hardware.FRONT_RIGHT_MODULE_STEER_ENCODER_CAN_ID,
                 FRONT_RIGHT_MODULE_STEER_OFFSET);
 
         SwerveModule m_backLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,
-                Mk4SwerveModuleHelper.GearRatio.L2, BACK_LEFT_MODULE_DRIVE_MOTOR_CAN_ID,
-                BACK_LEFT_MODULE_STEER_MOTOR_CAN_ID,
-                BACK_LEFT_MODULE_STEER_ENCODER_CAN_ID, BACK_LEFT_MODULE_STEER_OFFSET);
+                Mk4SwerveModuleHelper.GearRatio.L2, Hardware.BACK_LEFT_MODULE_DRIVE_MOTOR_CAN_ID,
+                Hardware.BACK_LEFT_MODULE_STEER_MOTOR_CAN_ID,
+                Hardware.BACK_LEFT_MODULE_STEER_ENCODER_CAN_ID, BACK_LEFT_MODULE_STEER_OFFSET);
 
         SwerveModule m_backRightModule = Mk4SwerveModuleHelper.createFalcon500(config,
-                Mk4SwerveModuleHelper.GearRatio.L2, BACK_RIGHT_MODULE_DRIVE_MOTOR_CAN_ID,
-                BACK_RIGHT_MODULE_STEER_MOTOR_CAN_ID,
-                BACK_RIGHT_MODULE_STEER_ENCODER_CAN_ID,
+                Mk4SwerveModuleHelper.GearRatio.L2, Hardware.BACK_RIGHT_MODULE_DRIVE_MOTOR_CAN_ID,
+                Hardware.BACK_RIGHT_MODULE_STEER_MOTOR_CAN_ID,
+                Hardware.BACK_RIGHT_MODULE_STEER_ENCODER_CAN_ID,
                 BACK_RIGHT_MODULE_STEER_OFFSET);
 
         this.swerveConfig = config;

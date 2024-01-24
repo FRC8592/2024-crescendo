@@ -1,21 +1,28 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 import com.NewtonSwerve.Gyro.NewtonPigeon;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.autonomous.*;
 
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
 
     public static final double JOYSTICK_DEADBAND = 0.01;
-    public static final int DRIVER_PORT = -1; // TODO: Value isn't set yet. Usually 0.
-    public static final int OPERATOR_PORT = -1; // TODO: Value isn't set yet. Usually 1.
+    private static final String LOG_PATH = "CustomLogs/Robot/";
 
     public static Field2d FIELD = new Field2d();
 
@@ -28,13 +35,29 @@ public class Robot extends TimedRobot {
     private NewtonPigeon pigeon;
     private Swerve swerve;
 
+
     @Override
     public void robotInit() {
+        Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+
+        if (isReal()) {
+            Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+            Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+        } else {
+            setUseTiming(false); // Run as fast as possible
+            String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+            Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+        }
+
+        // Logger.disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
+        Logger.start();
         autoSelect = new AutonomousSelector();
         pigeon = new NewtonPigeon(new Pigeon2(Swerve.PIGEON_CAN_ID));
         swerve = new Swerve(pigeon);
-        driverController = new XboxController(DRIVER_PORT);
-        operatorController = new XboxController(OPERATOR_PORT);
+        driverController = new XboxController(Hardware.DRIVER_PORT);
+        operatorController = new XboxController(Hardware.OPERATOR_PORT);
     }
 
     @Override

@@ -13,11 +13,15 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.autonomous.*;
+import edu.wpi.first.wpilibj.RobotController;
+import java.util.ArrayList;
 
 public class Robot extends LoggedRobot {
 
@@ -34,6 +38,14 @@ public class Robot extends LoggedRobot {
 
     private NewtonPigeon pigeon;
     private Swerve swerve;
+    
+    private double currentBatteryVoltage;
+    private ArrayList<Double> voltages;
+    private static final int VOLTAGE_SMOOTHING_LENGTH = 50;
+    private static final double DISABLED_LOW_BATTERY_VOLTAGE = 11.5;
+    private static final double TELEOP_LOW_BATTERY_VOLTAGE = 10.5;
+    private boolean isBatteryLow = false;
+
 
 
     @Override
@@ -58,10 +70,36 @@ public class Robot extends LoggedRobot {
         swerve = new Swerve(pigeon);
         driverController = new XboxController(Hardware.DRIVER_PORT);
         operatorController = new XboxController(Hardware.OPERATOR_PORT);
+        voltages = new ArrayList<Double>();
     }
 
     @Override
     public void robotPeriodic() {
+        voltages.add(0, RobotController.getBatteryVoltage());
+        if (voltages.size() > VOLTAGE_SMOOTHING_LENGTH) {
+            voltages.remove(VOLTAGE_SMOOTHING_LENGTH);
+        }
+        double x = 0.0;
+        for (double i: voltages){
+            x += i;
+        }
+        currentBatteryVoltage = x/VOLTAGE_SMOOTHING_LENGTH;
+
+        if (DriverStation.isDisabled() || DriverStation.isAutonomous() || DriverStation.isTest()) {
+            if (currentBatteryVoltage < DISABLED_LOW_BATTERY_VOLTAGE) {
+                isBatteryLow = true;
+            }
+        }
+
+        if (DriverStation.isTeleop()) {
+            if (currentBatteryVoltage < TELEOP_LOW_BATTERY_VOLTAGE) {
+                isBatteryLow = true;
+            }
+        }
+
+        Logger.recordOutput(LOG_PATH+"Is Battery Low", isBatteryLow);
+        SmartDashboard.putBoolean("Is Battery Low", isBatteryLow);
+
     }
 
     @Override

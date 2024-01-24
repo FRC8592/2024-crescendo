@@ -104,8 +104,10 @@ public class Robot extends LoggedRobot {
         leftCrescendoShooter = new SparkFlexControl(31);
         rightCrescendoShooter = new SparkFlexControl(29);
 
-        leftCrescendoShooter.setPID(0.000375, 0, 0);
-        rightCrescendoShooter.setPID(0.000375, 0, 0);
+        SmartDashboard.putNumber("ShooterP", Constants.CRESCENDO_SHOOTER_kD);
+        SmartDashboard.putNumber("ShooterI", Constants.CRESCENDO_SHOOTER_kI);
+        SmartDashboard.putNumber("ShooterD", Constants.CRESCENDO_SHOOTER_kD);
+        SmartDashboard.putNumber("ShooterFF", Constants.CRESCENDO_SHOOTER_kFF);
     }
 
     /**
@@ -157,6 +159,14 @@ public class Robot extends LoggedRobot {
     /** This function is called once when teleop is enabled. */
     @Override
     public void teleopInit() {
+        // set PID from SmartDashboard
+        double kP = SmartDashboard.getNumber("ShooterP", 0);
+        double kI = SmartDashboard.getNumber("ShooterI", 0);
+        double kD = SmartDashboard.getNumber("ShooterD", 0);
+        double kFF = SmartDashboard.getNumber("ShooterFF", 0);
+
+        leftCrescendoShooter.setPIDF(kP, kI, kD, kFF);
+        rightCrescendoShooter.setPIDF(kP, kI, kD, kFF);
         // swerve.setSteerAnglesToAbsEncoder();
         // swerve.setTeleopCurrentLimit();
 

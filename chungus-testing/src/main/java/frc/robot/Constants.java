@@ -86,6 +86,11 @@ public final class Constants {
     public static final double  DAP_VELOCITY_TOLERANCE = 100;
     public static final double  DAP_INTAKE_MOVEMENT_POWER_FOR_SHOOT = 1.0;
 
+    public static final double  CRESCENDO_SHOOTER_kP =  0.000035;
+    public static final double  CRESCENDO_SHOOTER_kI =  0.0;
+    public static final double  CRESCENDO_SHOOTER_kD =  0.0;
+    public static final double  CRESCENDO_SHOOTER_kFF = 0.0001535;
+
 
     /****************************************************************************************
      * Bunny Dropper

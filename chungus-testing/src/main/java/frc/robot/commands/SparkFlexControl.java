@@ -30,12 +30,12 @@ public class SparkFlexControl {
         motor.set(0);
     }
 
-    public void setPID(double P, double I, double D){
+    public void setPIDF(double P, double I, double D, double FF){
         motorControl =  motor.getPIDController();
         motorControl.setP(P);
         motorControl.setI(I);
         motorControl.setD(D);
-        
+        motorControl.setFF(FF);
     }
 
     public double getVelocity(){

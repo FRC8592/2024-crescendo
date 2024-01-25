@@ -58,6 +58,10 @@ public class FollowerCommand extends Command {
         timer = new Timer();
     }
 
+    public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj, Pose2d pTargetPose){
+        
+    }
+
     // public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj, Rotation2d pRot, boolean lockWheels) {
     //     drive = pDrive;
     //     trajectory = pTraj.addRotation(pRot);

@@ -13,7 +13,7 @@
         }
       },
       "/SmartDashboard/Field": {
-        "image": "/home/martin/Documents/FRC/Crescendo/Software/2024-crescendo/2023-bruce/src/main/java/frc/robot/2024-field.png",
+        "image": "/Users/roshanjames/Desktop/Newton^2/2024-crescendo/2023-bruce/src/main/java/frc/robot/2024-field.png",
         "window": {
           "visible": true
         }
@@ -31,5 +31,8 @@
         "open": true
       }
     }
+  },
+  "NetworkTables Info": {
+    "visible": true
   }
 }

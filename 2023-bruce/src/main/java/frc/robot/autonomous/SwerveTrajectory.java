@@ -274,4 +274,9 @@ public class SwerveTrajectory {
     public Pose2d getInitialPose() {
         return mTrajectory.getInitialPose();
     }
+
+
+    public void setRotation(Rotation2d rotation){
+        this.rotation = rotation;
+    }
 }

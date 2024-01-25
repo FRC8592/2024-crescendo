@@ -104,7 +104,7 @@ public class Robot extends LoggedRobot {
         leftCrescendoShooter = new SparkFlexControl(31);
         rightCrescendoShooter = new SparkFlexControl(29);
 
-        SmartDashboard.putNumber("ShooterP", Constants.CRESCENDO_SHOOTER_kD);
+        SmartDashboard.putNumber("ShooterP", Constants.CRESCENDO_SHOOTER_kP);
         SmartDashboard.putNumber("ShooterI", Constants.CRESCENDO_SHOOTER_kI);
         SmartDashboard.putNumber("ShooterD", Constants.CRESCENDO_SHOOTER_kD);
         SmartDashboard.putNumber("ShooterFF", Constants.CRESCENDO_SHOOTER_kFF);

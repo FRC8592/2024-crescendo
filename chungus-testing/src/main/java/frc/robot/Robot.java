@@ -94,9 +94,10 @@ public class Robot extends LoggedRobot {
         // swerve = new Swerve(pigeon);
         // shooter = new Shooter();
         // intake = new Intake();
+
         SmartDashboard.putNumber("shootSpeed", 0.0);
-        SmartDashboard.putNumber("percentRPM of right shooter moto", 0.0);
-        SmartDashboard.putNumber("percentRPM of left shooter moto", 0.0);
+        SmartDashboard.putNumber("percentRPM of right shooter motor", 0.0);
+        SmartDashboard.putNumber("percentRPM of left shooter motor", 0.0);
         // dropper = new BunnyDropper();
         driverController = new XboxController(Constants.CONTROLLER_DRIVER_PORT);
         // operatorController = new XboxController(Constants.CONTROLLER_OPERATOR_PORT);
@@ -198,8 +199,8 @@ public class Robot extends LoggedRobot {
         }*/
         if (driverController.getRightTriggerAxis() > 0.1){
             double shootSpeed = SmartDashboard.getNumber("shootSpeed", 0.0);
-            double percentOutRight = SmartDashboard.getNumber("percentRPM of right shooter moto", 0.0);
-            double percentOutLeft = SmartDashboard.getNumber("percentRPM of left shooter moto", 0.0);
+            double percentOutRight = SmartDashboard.getNumber("percentRPM of right shooter motor", 0.0);
+            double percentOutLeft = SmartDashboard.getNumber("percentRPM of left shooter motor", 0.0);
             leftCrescendoShooter.setVelocity(percentOutLeft*shootSpeed);
             rightCrescendoShooter.setVelocity(-(percentOutRight*shootSpeed));
             // leftCrescendoShooter.setPercentOutput((shootSpeed - leftCrescendoShooter.getVelocity())*0.001);

@@ -25,7 +25,6 @@ public class FollowerCommand extends Command {
         drive = pDrive;
         trajectory = pTraj;
         timer = new Timer();
-        targetPose = null;
     }
 
     public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj, String tag) {
@@ -68,6 +67,7 @@ public class FollowerCommand extends Command {
         this.drive = pDrive;
         this.trajectory = pTraj;
         this.targetPose = pTargetPose;
+        this.timer = new Timer();
 
 
     }
@@ -101,19 +101,32 @@ public class FollowerCommand extends Command {
         ChassisSpeeds speeds = trajectory.sample(timer.get(), drive.getCurrentPos());
         double time = timer.get();
 
+        
+        if (targetPose != null){
+            Pose2d currentPose;
+            if(Robot.isReal()){
+                currentPose = drive.getCurrentPos();
+
+            }
+            else{
+                currentPose = trajectory.trajectory().sample(time).poseMeters;
+            }
+            double angleRadians = Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
+            
+            if(!Robot.isReal()){
+                angleRadians += Math.PI;
+            }
+            
+            Rotation2d targetRotation = new Rotation2d(angleRadians);
+            trajectory.setRotation(targetRotation);
+            System.out.println(targetRotation.getDegrees());
+            
+            
+        }
         if (!Robot.isReal()) {
             simulateRobotPose(trajectory.trajectory().sample(time).poseMeters, speeds);
         }
-
-        if (targetPose != null){
-            Pose2d currentPose = drive.getCurrentPos();
-            double angleRadians = Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
-            Rotation2d targetRotation = new Rotation2d(angleRadians);
-            trajectory.setRotation(targetRotation);
-
-
-        }
-
+        
         
         ChassisSpeeds newSpeeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
         if (vision != null) {
@@ -142,7 +155,7 @@ public class FollowerCommand extends Command {
 
     private void simulateRobotPose(Pose2d pose, ChassisSpeeds desiredSpeeds) {
         Trajectory traj = trajectory.trajectory();
-        Robot.FIELD.setRobotPose(new Pose2d(pose.getTranslation(), traj.sample(traj.getTotalTimeSeconds()).poseMeters.getRotation()));
+        Robot.FIELD.setRobotPose(new Pose2d(pose.getTranslation(), trajectory.getRotation()));
 
         // SmartDashboard.putNumber("Field Relative X Velocity", desiredSpeeds.vxMetersPerSecond);
         // SmartDashboard.putNumber("Field Relative Y Velocity", desiredSpeeds.vyMetersPerSecond);

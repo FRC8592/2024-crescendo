@@ -279,4 +279,8 @@ public class SwerveTrajectory {
     public void setRotation(Rotation2d rotation){
         this.rotation = rotation;
     }
+    
+    public Rotation2d getRotation() {
+        return rotation;
+    }
 }

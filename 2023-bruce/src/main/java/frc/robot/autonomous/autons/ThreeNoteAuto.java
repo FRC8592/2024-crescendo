@@ -10,7 +10,7 @@ import frc.robot.commands.DelayCommand;
 import frc.robot.commands.FollowerCommand;
 
 public class ThreeNoteAuto extends BaseAuto {
-    private TrajectoryConfig config = new TrajectoryConfig(4, 2);
+    private TrajectoryConfig config = new TrajectoryConfig(1, 1);
     private SwerveTrajectory pathOne = AutonomousPositions.generate(config, 
             AutonomousPositions.SUBWOOFER_MIDDLE.getPose(), 
             AutonomousPositions.WING_NOTE_3.translate(0, 0.5, Rotation2d.fromDegrees(-45))).addRotation(Rotation2d.fromDegrees(45), 0.5);
@@ -44,19 +44,19 @@ public class ThreeNoteAuto extends BaseAuto {
     public void initialize() {
         queue = new CommandQueue(
             new DelayCommand(0.75),
-            new FollowerCommand(drive, pathOne),
+            new FollowerCommand(drive, pathOne, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             new DelayCommand(0.75),
-            new FollowerCommand(drive,pathTwo),
+            new FollowerCommand(drive,pathTwo, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             new DelayCommand(0.75),
-            new FollowerCommand(drive, pathThree),
+            new FollowerCommand(drive, pathThree, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             new DelayCommand(0.75),
-            new FollowerCommand(drive, pathFour),
+            new FollowerCommand(drive, pathFour, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             new DelayCommand(0.75),
-            new FollowerCommand(drive, pathFive),
+            new FollowerCommand(drive, pathFive, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             new DelayCommand(0.75),
-            new FollowerCommand(drive, pathSix),
+            new FollowerCommand(drive, pathSix, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             new DelayCommand(0.75),
-            new FollowerCommand(drive, pathSeven)
+            new FollowerCommand(drive, pathSeven, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose())
 
         );
         // TODO Auto-generated method stub

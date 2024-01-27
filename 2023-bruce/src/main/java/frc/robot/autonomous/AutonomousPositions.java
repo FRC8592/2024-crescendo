@@ -16,6 +16,7 @@ public enum AutonomousPositions {
     
     SUBWOOFER_UP(1.0, 6.25, Rotation2d.fromDegrees(45)),
     SUBWOOFER_MIDDLE(1.4, 5.5, new Rotation2d()),
+    SUBWOOFER_MIDDLE_2(14.6, 5.5, new Rotation2d()),
     SUBWOOFER_DOWN(1.0, 4.5, Rotation2d.fromDegrees(-45)),
     WING_NOTE_1(2.4, 6.75, new Rotation2d()),
     WING_NOTE_2(2.4, 5.5, new Rotation2d()),

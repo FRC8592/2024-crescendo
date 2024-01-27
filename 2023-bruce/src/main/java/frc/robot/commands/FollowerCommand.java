@@ -19,11 +19,13 @@ public class FollowerCommand extends Command {
     private Vision vision;
     private PIDController visionPID;
     // private Rotation2d endRotation;
+    private Pose2d targetPose;
 
     public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj) {
         drive = pDrive;
         trajectory = pTraj;
         timer = new Timer();
+        targetPose = null;
     }
 
     public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj, String tag) {
@@ -31,12 +33,14 @@ public class FollowerCommand extends Command {
         trajectory = pTraj;
         timer = new Timer();
         setTag(tag);
+        targetPose = null;
     }
 
     public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj, Rotation2d pRot) {
         drive = pDrive;
         trajectory = pTraj.addRotation(pRot);
         timer = new Timer();
+        targetPose = null;
 
         // endRotation = pRot;
     }
@@ -46,6 +50,7 @@ public class FollowerCommand extends Command {
         trajectory = pTraj.addRotation(pRot);
         timer = new Timer();
         setTag(tag);
+        targetPose = null;
 
         // endRotation = pRot;
     }
@@ -56,10 +61,15 @@ public class FollowerCommand extends Command {
         trajectory = pTraj;
         visionPID = new PIDController(0.05, 0.0, 0.0);
         timer = new Timer();
+        targetPose =  null;
     }
 
     public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj, Pose2d pTargetPose){
-        
+        this.drive = pDrive;
+        this.trajectory = pTraj;
+        this.targetPose = pTargetPose;
+
+
     }
 
     // public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj, Rotation2d pRot, boolean lockWheels) {
@@ -94,6 +104,16 @@ public class FollowerCommand extends Command {
         if (!Robot.isReal()) {
             simulateRobotPose(trajectory.trajectory().sample(time).poseMeters, speeds);
         }
+
+        if (targetPose != null){
+            Pose2d currentPose = drive.getCurrentPos();
+            double angleRadians = Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
+            Rotation2d targetRotation = new Rotation2d(angleRadians);
+            trajectory.setRotation(targetRotation);
+
+
+        }
+
         
         ChassisSpeeds newSpeeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
         if (vision != null) {

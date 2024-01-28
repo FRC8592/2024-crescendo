@@ -176,3 +176,6 @@ logs/
 
 # Folder that has CTRE Phoenix Sim device config storage
 ctre_sim/
+
+#User-specific Java Language Support by Red Hat settings
+eclipse-formatter.xml

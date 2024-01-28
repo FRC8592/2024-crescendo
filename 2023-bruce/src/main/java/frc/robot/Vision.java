@@ -29,10 +29,10 @@ public class Vision {
   private double closeRotationKI;
   private double closeRotationKD;
   // Network Table entries
-  private NetworkTableEntry tx;   // Angle error (x) from LimeLight camera
-  private NetworkTableEntry ty;   // Angle error (y) from LimeLight camera
-  private NetworkTableEntry ta;   // Target area measurement from LimeLight camera
-  private NetworkTableEntry tv;   // Target valid indicator from Limelight camera
+  public NetworkTableEntry tx;   // Angle error (x) from LimeLight camera
+  public NetworkTableEntry ty;   // Angle error (y) from LimeLight camera
+  public NetworkTableEntry ta;   // Target area measurement from LimeLight camera
+  public NetworkTableEntry tv;   // Target valid indicator from Limelight camera
   // Shared variables
   public boolean targetValid;     // Indicate when the Limelight camera has found a target
   public boolean targetLocked;    // Indicate when the turret is centered on the target

@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -118,9 +120,9 @@ public class FollowerCommand extends Command {
         if (!Robot.isReal()) {
             simulateRobotPose(trajectory.trajectory().sample(time).poseMeters, speeds);
         }
-
         ChassisSpeeds newSpeeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond,
                 speeds.omegaRadiansPerSecond);
+        Pose2d idealPose = new Pose2d();
         if (vision != null) { // if we have vision
             vision.updateVision();
             double omegaVision;
@@ -128,14 +130,18 @@ public class FollowerCommand extends Command {
                 omegaVision = -vision.lockTargetSpeed(0, visionPID, "tx", 1, 0.0);
                 System.out.println("AprilTag Found, omega = " + omegaVision);
                 SmartDashboard.putNumber("AprilTag Omega", omegaVision);
-            } 
-            else {
+                idealPose = new Pose2d(trajectory.trajectory().sample(time).poseMeters.getTranslation(), // Same translation as the target from the trajectory
+                        drive.getCurrentPos().getRotation().plus(new Rotation2d(vision.tx.getDouble(0.0)))); // Current rotation plus the offset from the april tag target
+                Logger.recordOutput("CustomLogs/Autonomous/SeesAprilTag", true);
+                Logger.recordOutput("CustomLogs/Autonomous/TargetX", vision.tx.getDouble(0.0));
+                Logger.recordOutput("CustomLogs/Autonomous/TargetY", vision.ty.getDouble(0.0));
+            } else {
+                Logger.recordOutput("CustomLogs/Autonomous/SeesAprilTag", false);
                 if (targetPose != null) { // have a target pose
                     Pose2d currentPose;
                     if (Robot.isReal()) {
                         currentPose = drive.getCurrentPos();
-                    } 
-                    else {
+                    } else {
                         currentPose = trajectory.trajectory().sample(time).poseMeters;
                     }
                     double angleRadians = Math.atan2(targetPose.getY() - currentPose.getY(),
@@ -148,13 +154,14 @@ public class FollowerCommand extends Command {
                     Rotation2d targetRotation = new Rotation2d(angleRadians);
                     trajectory.setRotation(targetRotation);
                     System.out.println(targetRotation.getDegrees());
-                    speeds = trajectory.sample(timer.get(), drive.getCurrentPos());
-
+                    idealPose = new Pose2d(trajectory.trajectory().sample(time).poseMeters.getTranslation(), // Same translation as the target from the trajectory
+                            targetRotation); // Rotation
                 }
                 omegaVision = speeds.omegaRadiansPerSecond; // if we don't have vision, just
                 // use the trajectory's omega
                 // omegaVision = 0; // don't turn if you don't see apriltag
             }
+            Logger.recordOutput("CustomLogs/Autonomous/TargetPose", idealPose);
             // if
             // (Math.abs(trajectory.trajectory().sample(trajectory.trajectory().getTotalTimeSeconds()).poseMeters.getX()
             // - drive.getCurrentPos().getX()) <= 0.2) {
@@ -169,6 +176,7 @@ public class FollowerCommand extends Command {
                     omegaVision);
             newSpeeds = omegaSmoothing.smooth(newSpeeds);
         }
+        Logger.recordOutput("CustomLogs/Autonomous/ActualPose", drive.getCurrentPos()); // Log where the robot actually is. This is still dead-reckoning.
         drive.drive(newSpeeds);
 
         return trajectory.isFinished(time);

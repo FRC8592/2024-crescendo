@@ -177,7 +177,7 @@ public final class Constants {
     public static double DRIVE_TO_ROTATE_KI        = 0.0;
     public static double DRIVE_TO_ROTATE_KD        = 0.0;   
     public static String LIMELIGHT_DRIVE_TO        = "limelight-DRIVE_TO";
-    public static String LIMELIGHT_VISION       = "limelight-vision";
+    public static String LIMELIGHT_VISION       = "limelight-rear";
 
     public static double CLOSE_DRIVE_TO_ROTATE_KP  = 0.6; //0.15;           // Proportional constant for turret rotate speed
     public static double CLOSE_DRIVE_TO_ROTATE_KI  = 0.0;

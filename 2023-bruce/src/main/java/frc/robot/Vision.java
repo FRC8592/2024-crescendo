@@ -133,7 +133,7 @@ public class Vision {
     xError      = tx.getDouble(0.0);
     yError      = ty.getDouble(0.0);
     area        = ta.getDouble(0.0);
-    targetValid = (tv.getDouble(0.0) != 0); // Convert the double output to boolean
+    targetValid = (ty.getDouble(0.0) != 0); // Convert the double output to boolean (changed to ty, not sure if tv applies to apriltags)
 
     logger.log(this, "NewestTargetValid", targetValid); //Logging up here instead of down
     //below because targetValid gets modified with the processed value in a few lines

@@ -13,7 +13,7 @@
         }
       },
       "/SmartDashboard/Field": {
-        "image": "/Users/roshanjames/Desktop/Newton^2/2024-crescendo/2023-bruce/src/main/java/frc/robot/2024-field.png",
+        "image": "C:\\Users\\mgagv\\Documents\\FRC\\2024-crescendo\\2023-bruce\\src\\main\\java\\frc\\robot\\2024-field.png",
         "window": {
           "visible": true
         }

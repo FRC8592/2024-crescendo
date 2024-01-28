@@ -35,8 +35,8 @@ public class SwerveTrajectory {
     private double acceptanceRange = 0.1;
 
     public SwerveTrajectory(Trajectory trajectory) {
-        mXPID = new PIDController(1.0, 0, 0.0); // 0.1 0 -0.0002
-        mYPID = new PIDController(1.0, 0, 0.0); // 0.1 0 -0.0002
+        mXPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
+        mYPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
         mTurnPID = new ProfiledPIDController(0.5, 0, 0, new Constraints(4 * Math.PI, 2 * Math.PI)); // Probably should increase the P value or maybe even change constraints to degrees
         mDrivePID = new HolonomicDriveController(mXPID, mYPID, mTurnPID);
 

@@ -37,7 +37,7 @@ public class SwerveTrajectory {
     public SwerveTrajectory(Trajectory trajectory) {
         mXPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
         mYPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
-        mTurnPID = new ProfiledPIDController(0.5, 0, 0, new Constraints(4 * Math.PI, 2 * Math.PI)); // Probably should increase the P value or maybe even change constraints to degrees
+        mTurnPID = new ProfiledPIDController(0.5, 0, 0, new Constraints(4 * Math.PI, 2 * Math.PI)); // NOTE: UNUSED Probably should increase the P value or maybe even change constraints to degrees
         mDrivePID = new HolonomicDriveController(mXPID, mYPID, mTurnPID);
 
         mXPID.setTolerance(0.1, 0.1);
@@ -45,11 +45,11 @@ public class SwerveTrajectory {
         mTurnPID.setTolerance(0.1, 0.1);
         mTurnPID.enableContinuousInput(-Math.PI, Math.PI); // Might need to change to degrees
 
-        turnPID = new PIDController(0.05, 0, 0);
-        turnPID.setTolerance(0.1);
+        turnPID = new PIDController(0.05, 0, 0); // NOTE: this is used
+        turnPID.setTolerance(0.01);
         // turnPID.enableContinuousInput(-Math.PI/2, Math.PI/2);
 
-        mDrivePID.setTolerance(new Pose2d(0.3, 0.3, Rotation2d.fromDegrees(5)));
+        mDrivePID.setTolerance(new Pose2d(0.1, 0.1, Rotation2d.fromDegrees(5)));
 
         // rotation = trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getRotation();
         rotation = new Rotation2d();

@@ -25,7 +25,7 @@ public class FollowerCommand extends Command {
     private PIDController visionPID;
     // private Rotation2d endRotation;
     private Pose2d targetPose;
-    private SmoothingFilter omegaSmoothing;
+    // private SmoothingFilter omegaSmoothing;
 
     public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj) {
         drive = pDrive;
@@ -81,8 +81,8 @@ public class FollowerCommand extends Command {
         this.trajectory = pTraj;
         this.targetPose = pTargetPose;
         this.vision = vision;
-        this.visionPID = new PIDController(0.04, 0.003, 0.0);
-        this.omegaSmoothing = new SmoothingFilter(1, 1, 1); // x, y, omega
+        this.visionPID = new PIDController(0.04, 0.0, 0.0);
+        // this.omegaSmoothing = new SmoothingFilter(1, 1, 1); // x, y, omega
         this.timer = new Timer();
     }
 
@@ -127,11 +127,14 @@ public class FollowerCommand extends Command {
             vision.updateVision();
             double omegaVision;
             if (vision.isTargetValid()) { // target in view
-                omegaVision = -vision.lockTargetSpeed(0, visionPID, "tx", 1, 0.0);
-                System.out.println("AprilTag Found, omega = " + omegaVision);
-                SmartDashboard.putNumber("AprilTag Omega", omegaVision);
+                omegaVision = -vision.lockTargetSpeed(0, visionPID, "tx", 2, 0.0);
+                // System.out.println("AprilTag Found, omega = " + omegaVision);
+                // SmartDashboard.putNumber("AprilTag Omega", omegaVision);
+                Logger.recordOutput("CustomLogs/Autonomous/VisionRotationTarget", omegaVision);
+                Logger.recordOutput("CustomLogs/Autonomous/VisionOffset", vision.tx.getDouble(0.0));
+                Logger.recordOutput("CustomLogs/Autonomous/GyroscopeRotation", drive.getCurrentPos().getRotation().getDegrees());
                 idealPose = new Pose2d(trajectory.trajectory().sample(time).poseMeters.getTranslation(), // Same translation as the target from the trajectory
-                        drive.getCurrentPos().getRotation().plus(new Rotation2d(vision.tx.getDouble(0.0)))); // Current rotation plus the offset from the april tag target
+                        drive.getCurrentPos().getRotation().plus(Rotation2d.fromDegrees(-vision.tx.getDouble(0.0)))); // Current rotation plus the offset from the april tag target
                 Logger.recordOutput("CustomLogs/Autonomous/SeesAprilTag", true);
                 Logger.recordOutput("CustomLogs/Autonomous/TargetX", vision.tx.getDouble(0.0));
                 Logger.recordOutput("CustomLogs/Autonomous/TargetY", vision.ty.getDouble(0.0));
@@ -174,7 +177,7 @@ public class FollowerCommand extends Command {
                     speeds.vxMetersPerSecond,
                     speeds.vyMetersPerSecond,
                     omegaVision);
-            newSpeeds = omegaSmoothing.smooth(newSpeeds);
+            // newSpeeds = omegaSmoothing.smooth(newSpeeds);
         }
         Logger.recordOutput("CustomLogs/Autonomous/ActualPose", drive.getCurrentPos()); // Log where the robot actually is. This is still dead-reckoning.
         drive.drive(newSpeeds);

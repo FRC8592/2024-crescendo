@@ -1,4 +1,11 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -13,7 +20,6 @@
         }
       },
       "/SmartDashboard/Field": {
-        "image": "C:\\Users\\mgagv\\Documents\\FRC\\2024-crescendo\\2023-bruce\\src\\main\\java\\frc\\robot\\2024-field.png",
         "window": {
           "visible": true
         }
@@ -34,5 +40,8 @@
   },
   "NetworkTables Info": {
     "visible": true
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }

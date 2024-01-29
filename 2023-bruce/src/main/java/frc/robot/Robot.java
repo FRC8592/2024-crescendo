@@ -616,7 +616,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {
-    NetworkTableInstance.getDefault().getTable("limelight-vision").getEntry("pipeline").setNumber(Constants.CUBE_PIPELINE);
+    // NetworkTableInstance.getDefault().getTable("limelight-vision").getEntry("pipeline").setNumber(Constants.CUBE_PIPELINE);
 
   }
 
@@ -632,7 +632,7 @@ public class Robot extends LoggedRobot {
     ChassisSpeeds driveSpeeds = new ChassisSpeeds();
 
     drive.getCurrentPos();
-    gameObjectVision.updateVision();
+    substationVision.updateVision();
 
     double translateXScaled = driveScaler.scale(-joystickDeadband(driverController.getLeftY()));
     double translateYScaled = driveScaler.scale(-joystickDeadband(driverController.getLeftX()));
@@ -644,12 +644,12 @@ public class Robot extends LoggedRobot {
     translateY = translateYScaled * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND * translatePower;
     if (driverController.getBButton()) {
 
-      double rotateSpeed = gameObjectVision.lockTargetSpeed(0, turnPID, "tx", Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
+      double rotateSpeed = -substationVision.lockTargetSpeed(0, turnPID, "tx", Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
       rotate = rotateSpeed;
 
-      double driveToSpeed = gameObjectVision.lockTargetSpeed(0, strafePID, "ty", 1.0, 20); // 20 means its sorta close
-      translateY = driveToSpeed; // go forwards at driveToSpeed towards the target
-      SmartDashboard.putNumber("pid based forward vel", driveToSpeed);
+    //   double driveToSpeed = gameObjectVision.lockTargetSpeed(0, strafePID, "ty", 1.0, 20); // 20 means its sorta close
+    //   translateY = driveToSpeed; // go forwards at driveToSpeed towards the target
+    //   SmartDashboard.putNumber("pid based forward vel", driveToSpeed);
     }
     ChassisSpeeds smoothedRobotRelative = smoothingFilter.smooth(new ChassisSpeeds(translateX, translateY, 0));
     driveSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(

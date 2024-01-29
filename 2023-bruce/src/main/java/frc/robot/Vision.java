@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.LinkedList;
 
 import org.ejml.dense.row.decomposition.hessenberg.TridiagonalDecompositionHouseholderOrig_DDRM;
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 
@@ -260,6 +261,7 @@ public class Vision {
       else if(lockToVariable == "ty") turnSpeed = targetPID.calculate(ty.getDouble(0.0), offset);  // Setpoint is always 0 degrees (dead center)
       turnSpeed = Math.max(turnSpeed, -limit);
       turnSpeed = Math.min(turnSpeed, limit);
+      Logger.recordOutput("CustomLogs/Vision/TurnSpeed", turnSpeed);
     }
 
     // If no targetValid, spin in a circle to search

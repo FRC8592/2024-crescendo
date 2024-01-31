@@ -9,14 +9,14 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import com.revrobotics.SparkPIDController;
 
-public class CrescendoShooter {
+public class Shooter {
     // Constants
     public static final int LEFT_MOTOR_CAN_ID = 31;
     public static final int RIGHT_MOTOR_CAN_ID = 29;
 
-    private final String shooterTableName = "shooter_table";
-    private final NetworkTable table;
-    private NetworkTableEntry shooterSpeedRPS;
+    // private final String shooterTableName = "shooter_table"; TODO: What are these three lines?
+    // private final NetworkTable table;
+    // private NetworkTableEntry shooterSpeedRPS;
 
     //Change right motor to inverted using documentation
     public static double LEFT_MOTOR_SPEED = 0.25;
@@ -36,14 +36,14 @@ public class CrescendoShooter {
     SparkPIDController leftShooterControl;
     SparkPIDController rightShooterControl;
 
-    public CrescendoShooter(){
+    public Shooter(){
         leftShooterMotor = new CANSparkFlex(LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
         leftShooterMotor.setInverted(true);
         rightShooterMotor = new CANSparkFlex(RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
         leftShooterEncoder = leftShooterMotor.getEncoder();
         rightShooterEncoder = rightShooterMotor.getEncoder();
 
-        table = NetworkTableInstance.getDefault().getTable(shooterTableName);
+        // table = NetworkTableInstance.getDefault().getTable(shooterTableName);
         leftShooterControl =  leftShooterMotor.getPIDController();
         rightShooterControl = rightShooterMotor.getPIDController();
         leftShooterControl.setP(LEFT_MOTOR_kP); //PID

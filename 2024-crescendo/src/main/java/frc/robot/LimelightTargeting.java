@@ -1,7 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import frc.robot.Constants.CONVERSIONS;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -24,10 +24,10 @@ public class LimelightTargeting {
     private double closeRotationKI;
     private double closeRotationKD;
     // Network Table entries
-    private NetworkTableEntry tx; // Angle error (x) from LimeLight camera
-    private NetworkTableEntry ty; // Angle error (y) from LimeLight camera
-    private NetworkTableEntry ta; // Target area measurement from LimeLight camera
-    private NetworkTableEntry tv; // Target valid indicator from Limelight camera
+    public NetworkTableEntry tx; // Angle error (x) from LimeLight camera
+    public NetworkTableEntry ty; // Angle error (y) from LimeLight camera
+    public NetworkTableEntry ta; // Target area measurement from LimeLight camera
+    public NetworkTableEntry tv; // Target valid indicator from Limelight camera
     // Shared variables
     public boolean targetValid; // Indicate when the Limelight camera has found a target
     public boolean targetLocked; // Indicate when the turret is centered on the target
@@ -54,17 +54,11 @@ public class LimelightTargeting {
     private double optDistance;
     private double distanceFeet;
 
-    // Pipeline constants
-    private static int BLUE_PIPELINE = 1;
-    private static int RED_PIPELINE = 0;
-
-    private final double DEG_TO_RAD = 0.0174533;
-    private final double IN_TO_METERS = 0.0254;
 
     /**
      * This constructor will intialize internal variables for the robot turret
      */
-    public Vision(String limelightName, double lockError, double closeError,
+    public LimelightTargeting(String limelightName, double lockError, double closeError,
             double cameraHeight, double cameraAngle, double targetHeight) {
 
         // Set up networktables for limelight
@@ -189,13 +183,10 @@ public class LimelightTargeting {
      */
     public double distanceToTarget() {
         if (targetValid) {
-            double distanceInches = (targetHeight - cameraHeight) / Math.tan((cameraAngle + processedDy) * DEG_TO_RAD);// Equation
-                                                                                                                       // is
-                                                                                                                       // from
-                                                                                                                       // limelight
-                                                                                                                       // documentation
-                                                                                                                       // finding
-                                                                                                                       // distance
+            double distanceInches = (targetHeight - cameraHeight) /
+                    Math.tan((cameraAngle + processedDy) *
+                    CONVERSIONS.DEG_TO_RAD); // Equation is from limelight documentation finding distance
+
             return distanceInches;
         }
         return -1;
@@ -223,7 +214,7 @@ public class LimelightTargeting {
      *
      * @return The turn speed
      */
-    public double turnRobot(double visionSearchSpeed, PIDController turnPID, double limit, double offset) {
+    public double turnRobot(double visionSearchSpeed, PIDController turnPID, String variable, double limit, double offset) {
 
         // Stop turning if we have locked onto the target within acceptable angular
         // error

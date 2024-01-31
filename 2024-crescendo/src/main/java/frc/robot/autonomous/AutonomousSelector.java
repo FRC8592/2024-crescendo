@@ -12,7 +12,7 @@ public class AutonomousSelector {
     private GenericEntry delayEntry;
 
     public Class<?>[] autos = {
-        ThreeNoteAuto.class
+        SixNoteAuto.class
     };
 
     public AutonomousSelector() {

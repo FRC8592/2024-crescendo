@@ -21,8 +21,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.autonomous.*;
+import frc.robot.autonomous.autons.*;
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
+
+import frc.robot.Constants.*;
 
 public class Robot extends LoggedRobot {
     //Robot.java-specific constants
@@ -73,8 +76,8 @@ public class Robot extends LoggedRobot {
         Logger.start();
 
         
-        driverController = new XboxController(Hardware.DRIVER_PORT);
-        operatorController = new XboxController(Hardware.OPERATOR_PORT);
+        driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
+        operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
         pigeon = new NewtonPigeon(new Pigeon2(Swerve.PIGEON_CAN_ID));
         swerve = new Swerve(pigeon);
@@ -84,7 +87,8 @@ public class Robot extends LoggedRobot {
         poseGetter = new PoseVision();
         intake = new Intake();
         
-        noteLock = new LimelightTargeting(limelightName, lockError, closeError, cameraHeight, kP, kI, kD); // TODO: Add constants in Constants.java
+        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR,
+                NOTELOCK.CAMERA_HEIGHT, NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
         elevator = new Elevator();
         
     }
@@ -114,7 +118,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get())
+        shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
     }
@@ -155,7 +159,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get())
+        shooter.setAlliance(DriverStation.getAlliance().get());
     }
 
     @Override

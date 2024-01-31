@@ -5,14 +5,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
-import frc.robot.Vision;
 import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
 import frc.robot.commands.CommandQueue;
 import frc.robot.commands.DelayCommand;
 
 import frc.robot.commands.FollowerCommand;
-import frc.robot.Constants;
+import frc.robot.Constants.NOTELOCK;
+import frc.robot.LimelightTargeting;
 
 public class SixNoteAuto extends BaseAuto {
     private TrajectoryConfig config = new TrajectoryConfig(4, 2);
@@ -43,29 +43,25 @@ public class SixNoteAuto extends BaseAuto {
 
     private SwerveTrajectory pathSeven = AutonomousPositions.generate(config.setReversed(true),
             AutonomousPositions.MID_NOTE_2.getPose(),
-            AutonomousPositions.WING_NOTE_1.translate(3.0,0.2));
-
-    private Vision lockToSpeakerVision = new Vision(Constants.LIMELIGHT_VISION, Constants.DRIVE_TO_LOCK_ERROR,
-     Constants.DRIVE_TO_CLOSE_ERROR, Constants.DRIVE_TO_CAMERA_HEIGHT, Constants.DRIVE_TO_CAMERA_ANGLE,
-     Constants.DRIVE_TO_TARGET_HEIGHT);
+            AutonomousPositions.WING_NOTE_1.translate(3.0, 0.2));
 
 
     @Override
     public void initialize() {
         queue = new CommandQueue(
-            new FollowerCommand(drive, pathOne, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
+            new FollowerCommand(drive, pathOne, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             new DelayCommand(0.25),
-            new FollowerCommand(drive,pathTwo, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
+            new FollowerCommand(drive,pathTwo, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             new DelayCommand(0.25),
-            new FollowerCommand(drive, pathThree, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
+            new FollowerCommand(drive, pathThree, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             // new DelayCommand(0.25),
-            new FollowerCommand(drive, pathFour, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
+            new FollowerCommand(drive, pathFour, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             // new DelayCommand(0.75),
-            new FollowerCommand(drive, pathFive, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
+            new FollowerCommand(drive, pathFive, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             new DelayCommand(0.25),
-            new FollowerCommand(drive, pathSix, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
+            new FollowerCommand(drive, pathSix, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose()),
             // new DelayCommand(0.75),
-            new FollowerCommand(drive, pathSeven, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision)
+            new FollowerCommand(drive, pathSeven, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose())
 
         );
         // TODO Auto-generated method stub

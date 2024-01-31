@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -7,18 +9,23 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.Swerve;
 import frc.robot.Robot;
-import frc.robot.Vision;
+import frc.robot.SmoothingFilter;
+import frc.robot.LimelightTargeting;
 import frc.robot.autonomous.SwerveTrajectory;
+import frc.robot.SmoothingFilter;
 
 public class FollowerCommand extends Command {
     private Swerve drive;
     private SwerveTrajectory trajectory;
     private Timer timer;
-    private Vision vision;
+    private LimelightTargeting targeting;
     private PIDController visionPID;
     // private Rotation2d endRotation;
+    private Pose2d targetPose;
+    // private SmoothingFilter omegaSmoothing;
 
     public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj) {
         drive = pDrive;
@@ -31,12 +38,14 @@ public class FollowerCommand extends Command {
         trajectory = pTraj;
         timer = new Timer();
         setTag(tag);
+        targetPose = null;
     }
 
     public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Rotation2d pRot) {
         drive = pDrive;
         trajectory = pTraj.addRotation(pRot);
         timer = new Timer();
+        targetPose = null;
 
         // endRotation = pRot;
     }
@@ -46,19 +55,38 @@ public class FollowerCommand extends Command {
         trajectory = pTraj.addRotation(pRot);
         timer = new Timer();
         setTag(tag);
+        targetPose = null;
 
         // endRotation = pRot;
     }
 
-    public FollowerCommand(Swerve drive, Vision vision, SwerveTrajectory pTraj) {
+    public FollowerCommand(Swerve drive, LimelightTargeting targeting, SwerveTrajectory pTraj) {
         this.drive = drive;
-        this.vision = vision;
+        this.targeting = targeting;
         trajectory = pTraj;
         visionPID = new PIDController(0.05, 0.0, 0.0);
         timer = new Timer();
+        targetPose = null;
     }
 
-    // public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj, Rotation2d
+    public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Pose2d pTargetPose) {
+        this.drive = pDrive;
+        this.trajectory = pTraj;
+        this.targetPose = pTargetPose;
+        this.timer = new Timer();
+    }
+
+    public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Pose2d pTargetPose, LimelightTargeting targeting) {
+        this.drive = pDrive;
+        this.trajectory = pTraj;
+        this.targetPose = pTargetPose;
+        this.targeting = targeting;
+        this.visionPID = new PIDController(0.04, 0.0, 0.0);
+        // this.omegaSmoothing = new SmoothingFilter(1, 1, 1); // x, y, omega
+        this.timer = new Timer();
+    }
+
+    // public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Rotation2d
     // pRot, boolean lockWheels) {
     // drive = pDrive;
     // trajectory = pTraj.addRotation(pRot);
@@ -68,7 +96,7 @@ public class FollowerCommand extends Command {
     // endRotation = pRot;
     // }
 
-    // public FollowerCommand(Drivetrain pDrive, SwerveTrajectory pTraj, Rotation2d
+    // public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Rotation2d
     // pRot, boolean lockWheels, String tag) {
     // drive = pDrive;
     // trajectory = pTraj.addRotation(pRot);
@@ -92,23 +120,74 @@ public class FollowerCommand extends Command {
         if (!Robot.isReal()) {
             simulateRobotPose(trajectory.trajectory().sample(time).poseMeters, speeds);
         }
-
         ChassisSpeeds newSpeeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond,
                 speeds.omegaRadiansPerSecond);
-        if (vision != null) {
-            double vyVision = vision.turnRobot(0, visionPID, 1.0, 0.0);
-            if (Math.abs(trajectory.trajectory().sample(trajectory.trajectory().getTotalTimeSeconds()).poseMeters.getX()
-                    - drive.getCurrentPos().getX()) <= 0.2) {
-                vyVision = 0;
+        Pose2d idealPose = new Pose2d();
+        if (targeting != null) { // if we have vision
+            targeting.updateVision();
+            double omegaVision;
+            if (targeting.isTargetValid()) { // target in view
+                omegaVision = -targeting.turnRobot(0, visionPID, "tx", 2, 0.0);
+                // System.out.println("AprilTag Found, omega = " + omegaVision);
+                // SmartDashboard.putNumber("AprilTag Omega", omegaVision);
+                Logger.recordOutput("CustomLogs/Autonomous/VisionRotationTarget", omegaVision);
+                Logger.recordOutput("CustomLogs/Autonomous/VisionOffset", targeting.tx.getDouble(0.0));
+                Logger.recordOutput("CustomLogs/Autonomous/GyroscopeRotation",
+                        drive.getCurrentPos().getRotation().getDegrees());
+                idealPose = new Pose2d(trajectory.trajectory().sample(time).poseMeters.getTranslation(), // Same translation as the target from the trajectory
+                        drive.getCurrentPos().getRotation().plus(Rotation2d.fromDegrees(-targeting.tx.getDouble(0.0)))); // Current rotation plus the offset from the april tag target
+                Logger.recordOutput("CustomLogs/Autonomous/SeesAprilTag", true);
+                Logger.recordOutput("CustomLogs/Autonomous/TargetX", targeting.tx.getDouble(0.0));
+                Logger.recordOutput("CustomLogs/Autonomous/TargetY", targeting.ty.getDouble(0.0));
+            } else {
+                Logger.recordOutput("CustomLogs/Autonomous/SeesAprilTag", false);
+                if (targetPose != null) { // have a target pose
+                    Pose2d currentPose;
+                    if (Robot.isReal()) {
+                        currentPose = drive.getCurrentPos();
+                    } else {
+                        currentPose = trajectory.trajectory().sample(time).poseMeters;
+                    }
+                    double angleRadians = Math.atan2(targetPose.getY() - currentPose.getY(),
+                            targetPose.getX() - currentPose.getX());
+
+                    if (!Robot.isReal()) {
+                        angleRadians += Math.PI;
+                    }
+
+                    Rotation2d targetRotation = new Rotation2d(angleRadians);
+                    trajectory.setRotation(targetRotation);
+                    System.out.println(targetRotation.getDegrees());
+                    idealPose = new Pose2d(trajectory.trajectory().sample(time).poseMeters.getTranslation(), // Same
+                                                                                                             // translation
+                                                                                                             // as the
+                                                                                                             // target
+                                                                                                             // from the
+                                                                                                             // trajectory
+                            targetRotation); // Rotation
+                }
+                omegaVision = speeds.omegaRadiansPerSecond; // if we don't have vision, just
+                // use the trajectory's omega
+                // omegaVision = 0; // don't turn if you don't see apriltag
             }
+            Logger.recordOutput("CustomLogs/Autonomous/TargetPose", idealPose);
+            // if
+            // (Math.abs(trajectory.trajectory().sample(trajectory.trajectory().getTotalTimeSeconds()).poseMeters.getX()
+            // - drive.getCurrentPos().getX()) <= 0.2) {
+            // omegaVision = 0;
+            // }
 
             // SmartDashboard.putNumber("VY Speed From Vision", vyVision);
 
             newSpeeds = new ChassisSpeeds(
                     speeds.vxMetersPerSecond,
-                    -vyVision,
-                    speeds.omegaRadiansPerSecond);
+                    speeds.vyMetersPerSecond,
+                    omegaVision);
+            // newSpeeds = omegaSmoothing.smooth(newSpeeds);
         }
+        Logger.recordOutput("CustomLogs/Autonomous/ActualPose", drive.getCurrentPos()); // Log where the robot actually
+                                                                                        // is. This is still
+                                                                                        // dead-reckoning.
         drive.drive(newSpeeds);
 
         return trajectory.isFinished(time);
@@ -121,8 +200,7 @@ public class FollowerCommand extends Command {
 
     private void simulateRobotPose(Pose2d pose, ChassisSpeeds desiredSpeeds) {
         Trajectory traj = trajectory.trajectory();
-        Robot.FIELD.setRobotPose(
-                new Pose2d(pose.getTranslation(), traj.sample(traj.getTotalTimeSeconds()).poseMeters.getRotation()));
+        Robot.FIELD.setRobotPose(new Pose2d(pose.getTranslation(), trajectory.getRotation()));
 
         // SmartDashboard.putNumber("Field Relative X Velocity",
         // desiredSpeeds.vxMetersPerSecond);

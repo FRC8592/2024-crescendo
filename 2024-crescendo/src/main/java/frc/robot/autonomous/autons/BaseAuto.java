@@ -1,18 +1,16 @@
 package frc.robot.autonomous.autons;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.Swerve;
-import frc.robot.Elevator;
-import frc.robot.Intake;
-import frc.robot.Robot;
-import frc.robot.Vision;
+import frc.robot.*;
+import frc.robot.LimelightTargeting;
 import frc.robot.commands.CommandQueue;
 
 public abstract class BaseAuto {
     protected Swerve drive;
     protected Elevator elevator;
     protected Intake intake;
-    protected Vision vision;
+    protected LimelightTargeting targeting;
+    protected Shooter shooter;
     protected CommandQueue queue;
 
     protected double scoreTime = 1; // Remove once actual intake/outtake on the robot
@@ -21,11 +19,12 @@ public abstract class BaseAuto {
      * Add all running subsystems for use for all autonomous routines
      * @param pDrive {@code Swerve} object
      */
-    public void addModules(Swerve pDrive, Elevator pLift, Intake pIntake, Vision pVision) {
+    public void addModules(Swerve pDrive, Elevator pLift, Intake pIntake, Shooter pShooter, LimelightTargeting pTargeting) {
         drive = pDrive;
         elevator = pLift;
         intake = pIntake;
-        vision = pVision;
+        targeting = pTargeting;
+        shooter = pShooter;
     }
 
     /**

@@ -15,9 +15,7 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {
-    // Treat like a static class.  No instantiation
-    private Constants() {throw new UnsupportedOperationException();}
+public final class Constants_Bruce {
     // public static final double JOYSTICK_SCALE_FACTOR = 0.5;
     /**
      * The left-to-right distance between the drivetrain wheels
@@ -326,4 +324,3 @@ public final class Constants {
 
     public static final double MAX_JOYSTICK_DECELERATION = 0.075; //0.18
 }
-

@@ -16,13 +16,11 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
+import frc.robot.Constants.*;
+
 
 public class Power {
     //Constants
-    private static final int VOLTAGE_SMOOTHING_LENGTH = 50;
-    private static final double DISABLED_LOW_BATTERY_VOLTAGE = 11.5;
-    private static final double TELEOP_LOW_BATTERY_VOLTAGE = 10.5;
-    private static final String LOG_PATH = "CustomLogs/Power/";
     
     // Low battery warning
     private double currentBatteryVoltage;
@@ -50,7 +48,7 @@ public class Power {
     //
     public Power() {
         // Create new Rev Power Distribution object
-       revPDH = new PowerDistribution(Constants.PDH_CAN, PowerDistribution.ModuleType.kRev);
+       revPDH = new PowerDistribution(POWER.PDH_CAN_ID, PowerDistribution.ModuleType.kRev);
         
         // Create the shuffleboard tab for power data
         powerTab = Shuffleboard.getTab("Power");
@@ -71,29 +69,29 @@ public class Power {
         voltage = revPDH.getVoltage();
         power   = revPDH.getTotalPower();
         energy  = revPDH.getTotalEnergy();
-        
-        voltages.add(0, RobotController.getBatteryVoltage());
-        if (voltages.size() > VOLTAGE_SMOOTHING_LENGTH) {
-            voltages.remove(VOLTAGE_SMOOTHING_LENGTH);
+
+        voltages.add(0, voltage);
+        if (voltages.size() > POWER.VOLTAGE_SMOOTHING_LENGTH) {
+            voltages.remove(POWER.VOLTAGE_SMOOTHING_LENGTH);
         }
         double x = 0.0;
         for (double i : voltages) {
             x += i;
         }
-        currentBatteryVoltage = x / VOLTAGE_SMOOTHING_LENGTH;
+        currentBatteryVoltage = x / POWER.VOLTAGE_SMOOTHING_LENGTH;
         if (DriverStation.isDisabled() || DriverStation.isAutonomous() || DriverStation.isTest()) {
-            if (currentBatteryVoltage < DISABLED_LOW_BATTERY_VOLTAGE) {
+            if (currentBatteryVoltage < POWER.DISABLED_LOW_BATTERY_VOLTAGE) {
                 isBatteryLow = true;
             }
         }
 
         if (DriverStation.isTeleop()) {
-            if (currentBatteryVoltage < TELEOP_LOW_BATTERY_VOLTAGE) {
+            if (currentBatteryVoltage < POWER.TELEOP_LOW_BATTERY_VOLTAGE) {
                 isBatteryLow = true;
             }
         }
 
-        Logger.recordOutput(LOG_PATH + "Is Battery Low", isBatteryLow);
+        Logger.recordOutput(POWER.LOG_PATH + "Is Battery Low", isBatteryLow);
         SmartDashboard.putBoolean("Is Battery Low", isBatteryLow);
         // Place all parameters onto a dedicated Shuffleboard tab
         // Shuffleboard.selectTab("Power");

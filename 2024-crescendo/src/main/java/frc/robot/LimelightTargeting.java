@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 import java.util.LinkedList;
 
-public class Vision {
+public class LimelightTargeting {
     // constants passed in during initilization
     private double lockError;
     private double closeError;

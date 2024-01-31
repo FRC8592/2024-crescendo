@@ -1,11 +1,17 @@
-package frc.robot.autonomous;
+package frc.robot.autonomous.autons;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.*;
-import frc.robot.commands.*;
+import frc.robot.Swerve;
+import frc.robot.Elevator;
+import frc.robot.Intake;
+import frc.robot.Robot;
+import frc.robot.Vision;
+import frc.robot.commands.CommandQueue;
 
 public abstract class BaseAuto {
-    protected Swerve swerve;
+    protected Swerve drive;
+    protected Elevator elevator;
+    protected Intake intake;
     protected Vision vision;
     protected CommandQueue queue;
 
@@ -13,11 +19,12 @@ public abstract class BaseAuto {
 
     /**
      * Add all running subsystems for use for all autonomous routines
-     * 
-     * @param pDrive {@code drivetrain} object
+     * @param pDrive {@code Swerve} object
      */
-    public void addModules(Swerve pDrive, Vision pVision) {
-        swerve = pDrive;
+    public void addModules(Swerve pDrive, Elevator pLift, Intake pIntake, Vision pVision) {
+        drive = pDrive;
+        elevator = pLift;
+        intake = pIntake;
         vision = pVision;
     }
 
@@ -40,6 +47,5 @@ public abstract class BaseAuto {
     }
 
     public abstract void initialize();
-
     public abstract void periodic();
 }

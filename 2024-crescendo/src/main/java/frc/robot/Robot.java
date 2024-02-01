@@ -125,25 +125,48 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopPeriodic() {
+        //TODO: Move the auto-aim functions to driver controller, make sure no others are needed, and add in the logic for what they will do
+
+        /* Driver Controls:
+         * translate = left stick
+         * rotate = right stick x
+         * slowmode = right bumper
+         * 
+         * OPERATOR CONTROLLER:
+         * 
+         * 
+         */
         double driveTranslateY = driverController.getLeftY();
         double driveTranslateX = driverController.getLeftX();
-        double robotRotationSpeed = driverController.getRightX();
+        double driveRotate = driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
+       
+        boolean intaking = operatorController.getAButton();
+        boolean autoIntake = operatorController.getLeftTriggerAxis() > 0.1;
+        boolean shooting = operatorController.getBButton();
+        boolean autoShoot = operatorController.getRightTriggerAxis() > 0.1;
+        boolean ampPosition = operatorController.getXButton();
+        boolean ampScore = operatorController.getRightBumper();
+        boolean hangToggle = operatorController.getYButtonPressed();
+        
+        
+        
+        
         ChassisSpeeds currentSpeeds;
         if (slowMode) {
             currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     new ChassisSpeeds(
-                            driveTranslateY * Swerve.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * Swerve.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            robotRotationSpeed * Swerve.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
+                            driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
                     swerve.getGyroscopeRotation());
         }
         else {
             currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     new ChassisSpeeds(
-                            driveTranslateY * Swerve.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * Swerve.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            robotRotationSpeed * Swerve.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
+                            driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
                     swerve.getGyroscopeRotation());
         }
         swerve.drive(currentSpeeds);

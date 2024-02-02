@@ -50,8 +50,6 @@ public class Robot extends LoggedRobot {
     private PoseVision poseGetter;
     private LED leds;
     private Power power;
-    
-    public static Alliance alliance = null; //Set in all the *init functions
 
 
     @Override

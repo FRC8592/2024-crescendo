@@ -73,21 +73,21 @@ public final class Constants {
         * BLACK is back-right
         * WHITE is back-left
         *****************************************************************************************/
-        public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-        public static final int FRONT_LEFT_MODULE_STEER_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-        public static final int FRONT_LEFT_MODULE_STEER_ENCODER_CAN_ID = -1; // TODO: Value isn't set.
+        public static final int TEAL_FRONT_LEFT_DRIVE_CAN = -1; // TODO: Value isn't set.
+        public static final int TEAL_FRONT_LEFT_STEER_CAN = -1; // TODO: Value isn't set.
+        public static final int TEAL_FRONT_LEFT_ENCODER_CAN = -1; // TODO: Value isn't set.
 
-        public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-        public static final int FRONT_RIGHT_MODULE_STEER_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-        public static final int FRONT_RIGHT_MODULE_STEER_ENCODER_CAN_ID = -1; // TODO: Value isn't set.
+        public static final int ORANGE_FRONT_RIGHT_DRIVE_CAN = -1; // TODO: Value isn't set.
+        public static final int ORANGE_FRONT_RIGHT_STEER_CAN = -1; // TODO: Value isn't set.
+        public static final int ORANGE_FRONT_RIGHT_ENCODER_CAN = -1; // TODO: Value isn't set.
 
-        public static final int BACK_LEFT_MODULE_DRIVE_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-        public static final int BACK_LEFT_MODULE_STEER_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-        public static final int BACK_LEFT_MODULE_STEER_ENCODER_CAN_ID = -1; // TODO: Value isn't set.
+        public static final int BLACK_BACK_LEFT_DRIVE_CAN = -1; // TODO: Value isn't set.
+        public static final int BLACK_BACK_LEFT_STEER_CAN = -1; // TODO: Value isn't set.
+        public static final int BLACK_BACK_LEFT_ENCODER_CAN = -1; // TODO: Value isn't set.
 
-        public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-        public static final int BACK_RIGHT_MODULE_STEER_MOTOR_CAN_ID = -1; // TODO: Value isn't set.
-        public static final int BACK_RIGHT_MODULE_STEER_ENCODER_CAN_ID = -1; // TODO: Value isn't set.
+        public static final int WHITE_BACK_RIGHT_DRIVE_CAN = -1; // TODO: Value isn't set.
+        public static final int WHITE_BACK_RIGHT_STEER_CAN = -1; // TODO: Value isn't set.
+        public static final int WHITE_BACK_RIGHT_ENCODER_CAN = -1; // TODO: Value isn't set.
 
         public static final double THROTTLE_kP = 0.02;
         public static final double THROTTLE_kI = 0.0;
@@ -101,10 +101,10 @@ public final class Constants {
         public static final double DRIVE_TRAIN_LENGTH = -1; // meters // TODO: Value isn't set.
         public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI; // TODO: Check that this is accurate
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
+        public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
+        public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
+        public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
+        public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
 
         public static final double TRANSLATE_POWER_FAST = 1.0; // Scaling for teleop driving. 1.0 is maximum
         public static final double ROTATE_POWER_FAST = 0.75; // Scaling for teleop driving. 1.0 is maximum
@@ -118,5 +118,9 @@ public final class Constants {
 
     public final class PIGEON {
         public static final int CAN_ID = -1; // TODO: Value isn't set.
+    }
+    public class ROBOT {
+        public static final double JOYSTICK_DEADBAND = 0.01;
+        private static final String LOG_PATH = SHARED.LOG_FOLDER + "/Robot/";
     }
 }

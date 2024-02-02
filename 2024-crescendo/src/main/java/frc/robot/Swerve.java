@@ -61,27 +61,28 @@ public class Swerve {
         //         BACK_RIGHT_MODULE_STEER_ENCODER_CAN_ID, BACK_RIGHT_MODULE_STEER_OFFSET);
 
         SwerveModule m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,
-                Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.FRONT_LEFT_MODULE_DRIVE_MOTOR_CAN_ID,
-                SWERVE.FRONT_LEFT_MODULE_STEER_MOTOR_CAN_ID,
-                SWERVE.FRONT_LEFT_MODULE_STEER_ENCODER_CAN_ID,
-                SWERVE.FRONT_LEFT_MODULE_STEER_OFFSET);
+                Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.TEAL_FRONT_LEFT_DRIVE_CAN,
+                SWERVE.TEAL_FRONT_LEFT_STEER_CAN,
+                SWERVE.TEAL_FRONT_LEFT_ENCODER_CAN,
+                SWERVE.FRONT_LEFT_STEER_OFFSET);
 
         SwerveModule m_frontRightModule = Mk4SwerveModuleHelper.createFalcon500(config,
-                Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.FRONT_RIGHT_MODULE_DRIVE_MOTOR_CAN_ID,
-                SWERVE.FRONT_RIGHT_MODULE_STEER_MOTOR_CAN_ID,
-                SWERVE.FRONT_RIGHT_MODULE_STEER_ENCODER_CAN_ID,
-                SWERVE.FRONT_RIGHT_MODULE_STEER_OFFSET);
+                Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.ORANGE_FRONT_RIGHT_DRIVE_CAN,
+                SWERVE.ORANGE_FRONT_RIGHT_STEER_CAN,
+                SWERVE.ORANGE_FRONT_RIGHT_STEER_CAN,
+                SWERVE.FRONT_RIGHT_STEER_OFFSET);
 
         SwerveModule m_backLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,
-                Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.BACK_LEFT_MODULE_DRIVE_MOTOR_CAN_ID,
-                SWERVE.BACK_LEFT_MODULE_STEER_MOTOR_CAN_ID,
-                SWERVE.BACK_LEFT_MODULE_STEER_ENCODER_CAN_ID, SWERVE.BACK_LEFT_MODULE_STEER_OFFSET);
+                Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.BLACK_BACK_LEFT_DRIVE_CAN,
+                SWERVE.BLACK_BACK_LEFT_STEER_CAN,
+                SWERVE.BLACK_BACK_LEFT_STEER_CAN,
+                SWERVE.BACK_LEFT_STEER_OFFSET);
 
         SwerveModule m_backRightModule = Mk4SwerveModuleHelper.createFalcon500(config,
-                Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.BACK_RIGHT_MODULE_DRIVE_MOTOR_CAN_ID,
-                SWERVE.BACK_RIGHT_MODULE_STEER_MOTOR_CAN_ID,
-                SWERVE.BACK_RIGHT_MODULE_STEER_ENCODER_CAN_ID,
-                SWERVE.BACK_RIGHT_MODULE_STEER_OFFSET);
+                Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.WHITE_BACK_RIGHT_DRIVE_CAN,
+                SWERVE.WHITE_BACK_RIGHT_STEER_CAN,
+                SWERVE.WHITE_BACK_RIGHT_STEER_CAN,
+                SWERVE.BACK_RIGHT_STEER_OFFSET);
 
         this.swerveConfig = config;
 

@@ -28,9 +28,6 @@ import java.util.ArrayList;
 import frc.robot.Constants.*;
 
 public class Robot extends LoggedRobot {
-    //Robot.java-specific constants
-    public static final double JOYSTICK_DEADBAND = 0.01;
-    private static final String LOG_PATH = "CustomLogs/Robot/";
     
     //Used in simulation
     public static Field2d FIELD = new Field2d();
@@ -79,7 +76,7 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
-        pigeon = new NewtonPigeon(new Pigeon2(Swerve.PIGEON_CAN_ID));
+        pigeon = new NewtonPigeon(new Pigeon2(PIGEON.CAN_ID));
         swerve = new Swerve(pigeon);
         power = new Power();
         leds = new LED();
@@ -87,8 +84,8 @@ public class Robot extends LoggedRobot {
         poseGetter = new PoseVision();
         intake = new Intake();
         
-        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR,
-                NOTELOCK.CAMERA_HEIGHT, NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
+        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
+                NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
         elevator = new Elevator();
         
     }
@@ -101,7 +98,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get())
+        shooter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
         currentAuto.addModules(swerve, null /* vision */);
         currentAuto.initialize();

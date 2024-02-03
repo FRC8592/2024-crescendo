@@ -13,24 +13,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import com.revrobotics.SparkPIDController;
 
 public class Shooter {
-    // Constants
-    public static final int LEFT_MOTOR_CAN_ID = 31;
-    public static final int RIGHT_MOTOR_CAN_ID = 29;
-
+    
     // private final String shooterTableName = "shooter_table"; TODO: What are these three lines?
     // private final NetworkTable table;
     // private NetworkTableEntry shooterSpeedRPS;
-
-    //Change right motor to inverted using documentation
-    public static double LEFT_MOTOR_SPEED = 0.25;
-    public static double RIGHT_MOTOR_SPEED = LEFT_MOTOR_SPEED;
-    public static double LEFT_MOTOR_kP = 0.0; //PID
-    public static double LEFT_MOTOR_kI = 0.0; //PID
-    public static double LEFT_MOTOR_kD = 0.0; //PID
-    public static double RIGHT_MOTOR_kP = 0.0; //PID
-    public static double RIGHT_MOTOR_kI = 0.0; //PID
-    public static double RIGHT_MOTOR_kD = 0.0; //PID
-
 
     CANSparkFlex leftShooterMotor;
     CANSparkFlex rightShooterMotor;
@@ -44,21 +30,21 @@ public class Shooter {
     SparkPIDController feederControl;
 
     public Shooter(){
-        leftShooterMotor = new CANSparkFlex(LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
+        leftShooterMotor = new CANSparkFlex(SHOOTER.LEFT_SHOOTER_MOTOR_CAN_ID, MotorType.kBrushless);
         leftShooterMotor.setInverted(true);
-        rightShooterMotor = new CANSparkFlex(RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
+        rightShooterMotor = new CANSparkFlex(SHOOTER.RIGHT_SHOOTER_MOTOR_CAN_ID, MotorType.kBrushless);
         leftShooterEncoder = leftShooterMotor.getEncoder();
         rightShooterEncoder = rightShooterMotor.getEncoder();
 
         // table = NetworkTableInstance.getDefault().getTable(shooterTableName);
         leftShooterControl =  leftShooterMotor.getPIDController();
         rightShooterControl = rightShooterMotor.getPIDController();
-        leftShooterControl.setP(LEFT_MOTOR_kP); //PID
-        leftShooterControl.setI(LEFT_MOTOR_kI); //PID
-        leftShooterControl.setD(LEFT_MOTOR_kD); //PID
-        rightShooterControl.setP(RIGHT_MOTOR_kP); //PID
-        rightShooterControl.setI(RIGHT_MOTOR_kI); //PID
-        rightShooterControl.setD(RIGHT_MOTOR_kD); //PID
+        leftShooterControl.setP(SHOOTER.LEFT_SHOOTER_MOTOR_kP); //PID
+        leftShooterControl.setI(SHOOTER.LEFT_SHOOTER_MOTOR_kI); //PID
+        leftShooterControl.setD(SHOOTER.LEFT_SHOOTER_MOTOR_kD); //PID
+        rightShooterControl.setP(SHOOTER.RIGHT_SHOOTER_MOTOR_kP); //PID
+        rightShooterControl.setI(SHOOTER.RIGHT_SHOOTER_MOTOR_kI); //PID
+        rightShooterControl.setD(SHOOTER.RIGHT_SHOOTER_MOTOR_kD); //PID
 
         rightShooterMotor.set(0);
         leftShooterMotor.set(0);

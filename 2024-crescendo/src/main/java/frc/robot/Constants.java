@@ -44,14 +44,17 @@ public final class Constants {
 
     public final class SHOOTER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Shooter/";
-        public static final double LEFT_MOTOR_SPEED = 0.25;
-        public static final double RIGHT_MOTOR_SPEED = LEFT_MOTOR_SPEED;
-        public static final double LEFT_MOTOR_kP = 0.0; //PID
-        public static final double LEFT_MOTOR_kI = 0.0; //PID
-        public static final double LEFT_MOTOR_kD = 0.0; //PID
-        public static final double RIGHT_MOTOR_kP = 0.0; //PID
-        public static final double RIGHT_MOTOR_kI = 0.0; //PID
-        public static final double RIGHT_MOTOR_kD = 0.0; //PID
+        public static final int LEFT_SHOOTER_MOTOR_CAN_ID = 31;
+        public static final int RIGHT_SHOOTER_MOTOR_CAN_ID = 29;
+        //Change right motor to inverted using documentation
+        public static final double LEFT_SHOOTER_MOTOR_SPEED = 0.25;
+        public static final double RIGHT_SHOOTER_MOTOR_SPEED = LEFT_SHOOTER_MOTOR_SPEED;
+        public static final double LEFT_SHOOTER_MOTOR_kP = 0.0; //PID
+        public static final double LEFT_SHOOTER_MOTOR_kI = 0.0; //PID
+        public static final double LEFT_SHOOTER_MOTOR_kD = 0.0; //PID
+        public static final double RIGHT_SHOOTER_MOTOR_kP = 0.0; //PID
+        public static final double RIGHT_SHOOTER_MOTOR_kI = 0.0; //PID
+        public static final double RIGHT_SHOOTER_MOTOR_kD = 0.0; //PID
     }
 
     public final class ELEVATOR {

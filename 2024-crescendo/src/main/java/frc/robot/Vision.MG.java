@@ -10,10 +10,6 @@ import edu.wpi.first.wpilibj.Timer;
 
 import java.util.LinkedList;
 
-import org.ejml.dense.row.decomposition.hessenberg.TridiagonalDecompositionHouseholderOrig_DDRM;
-
-import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
-
 public class Vision {
   
   //constants passed in during initilization 

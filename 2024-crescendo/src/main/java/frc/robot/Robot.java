@@ -122,33 +122,118 @@ public class Robot extends LoggedRobot {
     public void teleopPeriodic() {
         //TODO: Move the auto-aim functions to driver controller, make sure no others are needed, and add in the logic for what they will do
 
-        /* Driver Controls:
-         * translate = left stick
-         * rotate = right stick x
-         * slowmode = right bumper
+        /* 1. Drivetrain movement
+         *      a. Translate: DRIVER left stick X and Y
+         *      b. Rotate: DRIVER right stick X
+         *      c. Slow Mode: DRIVER right bumper (hold)
+         *      d. Re-zero: DRIVER back
          * 
-         * OPERATOR CONTROLLER:
+         * 2. Intaking:
+         *      a. Auto-intake - <Button>:
+         *          i. Turn to note
+         *          ii. Drive to note
+         *          iii. Spin the rollers to collect
+         *          iv. Stop the rollers a set time after the beam-break sensors are triggered
+         *          v. MAYBE: Add note collection detection based on current as fallback for the beam-breaks
+         *      b. Manual intake - <button>
+         *          i. Spin the rollers
+         *          ii. Stop the rollers a set time after the beam-break sensors are triggered
+         *          iii. MAYBE: Add note collection detection based on current as fallback for the beam-breaks
          * 
+         * 3. Speaker scoring:
+         *      a. Auto-shoot - <button>:
+         *          i. Aim at the speaker based on april tags
+         *          ii. Use a range table to set pivot angle
+         *          iii. Use a range table to set shooter speed
+         *          iv. Run the feeder wheels to shoot the note
+         *          v. Lower the pivot so we can go under the stage
+         *      b. Manual shoot - <button>:
+         *          i. ASSUMPTION: Robot is up against the subwoofer
+         *          ii. ASSUMPTION: Pivot is completely down
+         *          iii. Run the shooter flywheels at a set RPM
+         *          iv. Run the feeder wheels to shoot the note
+         *      c. Pre-shoot - <button>:
+         *          i. Aim at the speaker based on april tags
+         *          ii. Use a range table to set pivot angle
+         *          iii. Use a range table to set shooter speed
+         *          iv. Lower the pivot when the button is let go
+         * 
+         * 4. Amp scoring
+         *      a. Auto amp score - <button>:
+         *          i. Turn the pivot to a set angle
+         *          ii. Extend the elevator to the right length
+         *          iii. Turn in the right direction
+         *          iv. Strafe to the right position
+         *          v. Run the shooter flywheels at a low speed
+         *          vi. Drive to the amp
+         *          vii. Run the feeder wheels to score the note into the amp
+         *          viii. Retract the elevator to the home position
+         *          ix. Rotate the pivot down into the home position
+         *      b. Manual amp preparation - <button>:
+         *          i. Turn the pivot to a set angle
+         *          ii. Extend the elevator to the right length
+         *      c. Manual amp score
+         *          i. Run the shooter flywheels at a low speed
+         *          ii. Run the feeder wheels to score the note into the amp
+         *          iii. Retract the elevator to the home position
+         *          iv. Rotate the pivot down into the home position
+         * 
+         * 5. Regurgitate
+         *      a. Regurgitate forward - <button>
+         *      b. Regurgitate back - <button>
+         * 
+         * 6. Stage
+         *      a. Pre-stage - <button>:
+         *          i. Extend the elevator to maximum height
+         *          ii. Rotate the pivot to 90°
+         *      b. Climb - <some variable control>:
+         *          i. Move the elevator up and down based on the control
+         * 
+         * 7. Stow - <button>: Retract the elevator, then lower the pivot
+         * 
+         * 8. Protective features:
+         *      a. Refuse to move the pivot under the stage
+         *      b. Refuse to manual shoot when not facing towards the speaker and when not close enough to it (won't fly over)
+         *      c. Disable pose-based features if the gyro yaw is too far from the MG Jetson system yaw
+         *      d. Disable shooting when in the other wing
+         *      e. <Add any other limiters for when something might cause a penalty>
+         * 
+         * 9. "Maybe" features
+         *      a. Juke (rotate around a point outside the robot to avoid a defender)
          * 
          */
+        //Basic driving controls
         double driveTranslateY = driverController.getLeftY();
         double driveTranslateX = driverController.getLeftX();
         double driveRotate = driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
-       
+        
+        //Intakes TODO: Revise with drivers
+        boolean autoIntake = driverController.getLeftTriggerAxis() > 0.1;
         boolean intaking = operatorController.getAButton();
-        boolean autoIntake = operatorController.getLeftTriggerAxis() > 0.1;
-        boolean shooting = operatorController.getBButton();
-        boolean autoShoot = operatorController.getRightTriggerAxis() > 0.1;
-        boolean ampPosition = operatorController.getXButton();
-        boolean ampScore = operatorController.getRightBumper();
-        boolean hangToggle = operatorController.getYButtonPressed();
         
+        //Shooting TODO: Revise with drivers
+        boolean prepareForShoot = operatorController.getLeftTriggerAxis() > 0.1;
+        boolean manualShoot = operatorController.getBButton();
+        boolean autoShoot = driverController.getRightTriggerAxis() > 0.1;
         
+        //Amp TODO: Revise with drivers
+        boolean ampPrep = operatorController.getXButton();
+        boolean autoAmpScore = driverController.getRightTriggerAxis() > 0.1;
+        boolean manualAmpScore = operatorController.getLeftBumper();
         
+        //Stage TODO: Revise with drivers
+        boolean preStage = operatorController.getYButton();
+        double elevatorControl = operatorController.getPOV() == 0 ? 1 : (operatorController.getPOV() == 180 ? -1 : 0);
         
+        //Other TODO: Revise with drivers
+        boolean regurgitateBack = operatorController.getLeftBumper();
+        boolean regurgitateFront = operatorController.getRightBumper();
+        boolean stow = operatorController.getAButton();
+        
+        //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
-        if (slowMode) {
+        if (slowMode) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     new ChassisSpeeds(
                             driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
@@ -163,6 +248,39 @@ public class Robot extends LoggedRobot {
                             driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
                             driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
                     swerve.getGyroscopeRotation());
+        }
+        if (autoIntake) { //Drive to the nearest note and intake it
+
+        }
+        else if (autoShoot) { //Aim at the speaker and shoot into it
+
+        }
+        else if (autoAmpScore) {
+
+        }
+        else if (prepareForShoot) {
+            if (manualShoot) {
+
+            }
+        }
+        else if (ampPrep) {
+            if (manualAmpScore) {
+
+            }
+        }
+        else if (preStage) {
+            if (elevatorControl == 1.0) {
+
+            }
+            else if (elevatorControl == -1.0) {
+
+            }
+        }
+        else if (regurgitateBack) {
+
+        }
+        else if (regurgitateFront) {
+
         }
         swerve.drive(currentSpeeds);
     }

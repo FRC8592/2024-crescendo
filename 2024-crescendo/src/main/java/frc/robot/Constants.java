@@ -117,7 +117,7 @@ public final class Constants {
     }
 
     public final class PIGEON {
-        public static final int CAN_ID = -1; // TODO: Value isn't set.
+        public static final int CAN_ID = 34;
     }
     public class ROBOT {
         public static final double JOYSTICK_DEADBAND = 0.01;

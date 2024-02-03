@@ -44,6 +44,7 @@ public final class Constants {
 
     public final class SHOOTER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Shooter/";
+        
     }
 
     public final class ELEVATOR {

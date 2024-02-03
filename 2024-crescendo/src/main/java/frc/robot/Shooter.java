@@ -38,6 +38,10 @@ public class Shooter {
     SparkPIDController leftShooterControl;
     SparkPIDController rightShooterControl;
 
+    CANSparkFlex feederMotor;
+    RelativeEncoder feederEncoder;
+    SparkPIDController feederControl;
+
     public Shooter(){
         leftShooterMotor = new CANSparkFlex(LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
         leftShooterMotor.setInverted(true);
@@ -79,8 +83,8 @@ public class Shooter {
      * @param speed speed in rpm
      */
     public void setFeederSpeed(int speed) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+        leftShooterMotor.set(speed);
+        rightShooterMotor.set(speed);
     }
     
     /**

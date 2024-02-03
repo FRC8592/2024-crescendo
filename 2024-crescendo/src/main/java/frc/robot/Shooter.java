@@ -31,7 +31,7 @@ public class Shooter {
 
     public Shooter(){
         leftShooterMotor = new SparkFlexControl(Constants.LEFT_SHOOTER_MOTOR_CAN_ID);
-        leftShooterMotor.setInverted(true);
+        leftShooterMotor.set(true);
         rightShooterMotor = new SparkFlexControl(Constants.RIGHT_SHOOTER_MOTOR_CAN_ID);
 
         // table = NetworkTableInstance.getDefault().getTable(shooterTableName);

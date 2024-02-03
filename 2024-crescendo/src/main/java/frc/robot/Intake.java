@@ -91,4 +91,11 @@ public class Intake {
         bottomMotor.set(ControlMode.Velocity, rollerSpeed);
 
     }
+
+    /**TODO:WRITE THIS METHOD PLS 
+     * @return if intake has note
+     */
+    public boolean hasNote() {
+        return false;
+    }
 }

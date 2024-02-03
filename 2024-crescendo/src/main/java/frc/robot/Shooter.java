@@ -7,6 +7,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import com.revrobotics.SparkPIDController;
 
 public class Shooter {
@@ -70,5 +72,71 @@ public class Shooter {
     public void stop(){
         leftShooterMotor.set(0);
         rightShooterMotor.set(0);
+    }
+
+    /**
+     * Sets speed of the feeder wheels
+     * @param speed speed in rpm
+     */
+    public void setFeederSpeed(int speed) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+    }
+    
+    /**
+     * Spins feeder motors to shoot note
+     */
+    public void shoot() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+    }
+
+    /**
+     * Checks whether note is in shooter
+     * @return 
+     */
+    public boolean hasNote() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+    }
+    
+    /**
+     * stops flywheels from moving!
+     */
+    public void stopFlywheels() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+    }
+    
+    /**
+     * stops feeder wheels from moving uwu
+     */
+    public void stopFeeders() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+    }
+    /**
+     * sets speed based on range table!!!
+     * @param distanceToAprilTag
+     */
+    public void setSpeedRangeTable(double distanceToAprilTag) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setSpeedRangeTable'");
+    }
+    /**
+     * checks if flywheels are at target speed to shoot
+     * @return
+     */
+    public boolean isReady() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isReady'");
+    }
+    /**
+     * sets the alliance to blue or red!!
+     * @param alliance
+     */
+    public void setAlliance(Alliance alliance) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setAlliance'");
     }
 }

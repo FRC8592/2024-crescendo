@@ -45,6 +45,29 @@ public class Elevator {
         elevatorPID.setReference(POSITION_START, ControlType.kPosition);
     }
     
+    /**
+     * sets angle of elevator to base of robot
+     * @param angle units: degrees
+     */
+    public void setAngle(double angle) {
+        
+    }
 
+    /**
+     * stows elevator and pivot 
+     */
+    public void stow() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'stow'");
+    }
+
+    /**
+     * gets position of  elevator
+     * @return
+     */
+    public double getPosition() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getPosition'");
+    }
 
 }

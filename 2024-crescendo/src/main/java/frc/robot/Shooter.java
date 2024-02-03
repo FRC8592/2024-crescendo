@@ -31,19 +31,17 @@ public class Shooter {
     public static double RIGHT_MOTOR_kD = 0.0; //PID
 
 
-    CANSparkFlex leftShooterMotor;
-    CANSparkFlex rightShooterMotor;
+    SparkFlexControl leftShooterMotor;
+    SparkFlexControl rightShooterMotor;
     RelativeEncoder leftShooterEncoder;
     RelativeEncoder rightShooterEncoder;
     SparkPIDController leftShooterControl;
     SparkPIDController rightShooterControl;
 
     public Shooter(){
-        leftShooterMotor = new CANSparkFlex(LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
+        leftShooterMotor = new SparkFlexControl(Constants.LEFT_SHOOTER_MOTOR_CAN_ID);
         leftShooterMotor.setInverted(true);
-        rightShooterMotor = new CANSparkFlex(RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
-        leftShooterEncoder = leftShooterMotor.getEncoder();
-        rightShooterEncoder = rightShooterMotor.getEncoder();
+        rightShooterMotor = new SparkFlexControl(Constants.RIGHT_SHOOTER_MOTOR_CAN_ID);
 
         // table = NetworkTableInstance.getDefault().getTable(shooterTableName);
         leftShooterControl =  leftShooterMotor.getPIDController();
@@ -70,7 +68,7 @@ public class Shooter {
     }
 
     public void stop(){
-        leftShooterMotor.set(0);
+        leftShooterMotor.setVelocity(0);
         rightShooterMotor.set(0);
     }
 
@@ -106,6 +104,7 @@ public class Shooter {
     public void stopFlywheels() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+
     }
     
     /**
@@ -122,6 +121,7 @@ public class Shooter {
     public void setSpeedRangeTable(double distanceToAprilTag) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setSpeedRangeTable'");
+        double targetSpeed = 
     }
     /**
      * checks if flywheels are at target speed to shoot
@@ -130,6 +130,9 @@ public class Shooter {
     public boolean isReady() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isReady'");
+        if (leftShooterMotor.getVelocity() == targetSpeed && rightShooterMotor.getVelocity() == targetSpeed){
+            return true;
+        }
     }
     /**
      * sets the alliance to blue or red!!

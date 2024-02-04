@@ -136,7 +136,7 @@ public class Robot extends LoggedRobot {
     turnPID = new PIDController(Constants.TURN_TO_ROTATE_KP, Constants.TURN_TO_ROTATE_KI, Constants.TURN_TO_ROTATE_KD);
     driveToPID = new PIDController(Constants.DRIVE_TO_ROTATE_KP, Constants.DRIVE_TO_ROTATE_KI, Constants.DRIVE_TO_ROTATE_KD);
     ledStrips = new LED(power, gameObjectVision);
-    strafePID = new PIDController(0.05, 0, 0);
+    strafePID = new PIDController(0.06, 0, 0);
     elevator = new Elevator();
     intake = new Intake();
     // intake.reset();
@@ -667,6 +667,10 @@ public class Robot extends LoggedRobot {
     double rotateToAngle;
     translatePower = ConfigRun.TRANSLATE_POWER_SLOW;
     double rotatePower = ConfigRun.ROTATE_POWER_SLOW;
+    
+    if (driverController.getBackButton()) {
+      drive.zeroGyroscope();
+    }
 
     ChassisSpeeds driveSpeeds = new ChassisSpeeds();
 
@@ -684,18 +688,21 @@ public class Robot extends LoggedRobot {
     if (driverController.getBButton()) {
 
       double rotateSpeed = gameObjectVision.lockTargetSpeed(0, turnPID, "tx", Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
-      rotate = rotateSpeed;
+      rotate = -rotateSpeed;
 
-      double driveToSpeed = gameObjectVision.lockTargetSpeed(0, strafePID, "ty", 1.0, 20); // 20 means its sorta close
-      translateY = driveToSpeed; // go forwards at driveToSpeed towards the target
+      double driveToSpeed = gameObjectVision.lockTargetSpeed(0, strafePID, "ty", 3, -20.0) /*+ 0.05 */; // -20 means its sorta close and the decimal being added is the FeedForward
+      translateX = driveToSpeed; // go forwards at driveToSpeed towards the target
       SmartDashboard.putNumber("pid based forward vel", driveToSpeed);
+      driveSpeeds=new ChassisSpeeds(translateX, 0, rotate);
     }
-    ChassisSpeeds smoothedRobotRelative = smoothingFilter.smooth(new ChassisSpeeds(translateX, translateY, 0));
-    driveSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
-      smoothedRobotRelative.vxMetersPerSecond,
-      smoothedRobotRelative.vyMetersPerSecond,
-      rotate
-    ), drive.getGyroscopeRotation());
+    else{
+      ChassisSpeeds smoothedRobotRelative = smoothingFilter.smooth(new ChassisSpeeds(translateX, translateY, 0));
+      driveSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
+        smoothedRobotRelative.vxMetersPerSecond,
+        smoothedRobotRelative.vyMetersPerSecond,
+        rotate
+      ), drive.getGyroscopeRotation());
+    }
     drive.drive(driveSpeeds);
   }
 

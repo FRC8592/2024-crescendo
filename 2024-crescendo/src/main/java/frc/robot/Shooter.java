@@ -17,7 +17,6 @@ public class Shooter {
     // private final String shooterTableName = "shooter_table"; TODO: What are these three lines?
     // private final NetworkTable table;
     // private NetworkTableEntry shooterSpeedRPS;
-    private double targetSpeed = 0;
 
     SparkFlexControl leftShooterMotor;
     SparkFlexControl rightShooterMotor;
@@ -25,6 +24,8 @@ public class Shooter {
     // SparkPIDController rightShooterControl;
 
     SparkFlexControl feederMotor;
+
+    int targetSpeed = 0;
 
     public Shooter(){
         leftShooterMotor = new SparkFlexControl(SHOOTER.LEFT_SHOOTER_MOTOR_CAN_ID);
@@ -64,20 +65,20 @@ public class Shooter {
     }
 
     /**
-     * Checks whether note is in shooter
-     * @return 
-     */
-    public boolean hasNote() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
-    }
-    
-    /**
-     * stops feeder wheels from moving uwu
+     * stops feeder wheels from moving
      */
     public void stopFeeders() {
         feederMotor.stop();
     }
+
+    /**
+     * Checks whether note is in shooter
+     * @return 
+     */
+    public boolean hasNote() {
+        return true;
+    }
+
     /**
      * sets speed based on range table!!!
      * @param distanceToAprilTag

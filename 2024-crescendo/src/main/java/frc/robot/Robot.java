@@ -265,7 +265,7 @@ public class Robot extends LoggedRobot {
             shooter.setSpeedRangeTable(poseGetter.distanceToAprilTag(-1));
             if (shooter.isReady()) {//isReady returns whether the shooter angle and 
                 //flywheel speeds are within a threshhold  of where we asked them to be
-                shooter.shootVelocity(elevatorControl); //runs the feeder wheels
+                shooter.setFeederSpeed(0); //runs the feeder wheels
                 if (! shooter.hasNote()) {
                     shooter.stop();
                     shooter.stopFeeders();
@@ -281,7 +281,7 @@ public class Robot extends LoggedRobot {
             double yVelocity = poseGetter.driveToAprilTag();
             currentSpeeds = new ChassisSpeeds(xVelocity, yVelocity, rotationSpeed);
             if (poseGetter.distanceToAprilTag(-1) < -1) {
-                shooter.shootVelocity(elevatorControl);
+                shooter.shootVelocity(-1);
                 currentSpeeds = new ChassisSpeeds();
                 if (! shooter.hasNote()) {
                     elevator.stow();
@@ -310,7 +310,7 @@ public class Robot extends LoggedRobot {
             elevator.setPositionAmp();
             if (manualAmpScore) {
                 shooter.shootVelocity(-1); // flywheels at low speed
-                shooter.shootVelocity(); // feeder wheels
+                shooter.shootVelocity(-1); // feeder wheels
                 elevator.stow();
             }
         }

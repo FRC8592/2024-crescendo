@@ -95,7 +95,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
         currentAuto.addModules(swerve, elevator, intake, shooter, noteLock);
         currentAuto.initialize();
@@ -112,7 +112,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
     }
@@ -345,7 +345,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
     }
 
     @Override

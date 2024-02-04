@@ -137,6 +137,6 @@ public class Shooter {
      */
     public void setAlliance(Alliance alliance) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setAlliance'");
+        // throw new UnsupportedOperationException("Unimplemented method 'setAlliance'");
     }
 }

@@ -8,7 +8,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.NewtonSwerve.Gyro.NewtonPigeon;
-import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.PigeonIMU;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -74,16 +74,16 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
-        pigeon = new NewtonPigeon(new Pigeon2(PIGEON.CAN_ID));
+        pigeon = new NewtonPigeon(new PigeonIMU(PIGEON.CAN_ID));
         swerve = new Swerve(pigeon);
         power = new Power();
         leds = new LED();
-        shooter = new Shooter();
+        // shooter = new Shooter();
         poseGetter = new PoseVision();
         intake = new Intake();
         noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
                 NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
-        elevator = new Elevator();
+        // elevator = new Elevator();
         
     }
 
@@ -95,7 +95,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
         currentAuto.addModules(swerve, elevator, intake, shooter, noteLock);
         currentAuto.initialize();
@@ -112,7 +112,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
     }
@@ -345,7 +345,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
     }
 
     @Override

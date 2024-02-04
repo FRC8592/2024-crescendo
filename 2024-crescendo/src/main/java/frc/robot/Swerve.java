@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.NewtonSwerve.NewtonSwerve;
 import com.NewtonSwerve.SwerveModule;
+import com.NewtonSwerve.Gyro.NewtonPigeon2;
+import com.NewtonSwerve.Gyro.Gyro;
 import com.NewtonSwerve.Gyro.NewtonPigeon;
 import com.NewtonSwerve.Mk4.Mk4ModuleConfiguration;
 import com.NewtonSwerve.Mk4.Mk4SwerveModuleHelper;
@@ -18,7 +20,7 @@ public class Swerve {
     private NewtonSwerve swerve;
     private ChassisSpeeds lastSpeeds;
 
-    public Swerve(NewtonPigeon gyro) {
+    public Swerve(Gyro gyro) {
         lastSpeeds = new ChassisSpeeds();
         
         Mk4ModuleConfiguration config = new Mk4ModuleConfiguration();
@@ -69,19 +71,19 @@ public class Swerve {
         SwerveModule m_frontRightModule = Mk4SwerveModuleHelper.createFalcon500(config,
                 Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.ORANGE_FRONT_RIGHT_DRIVE_CAN,
                 SWERVE.ORANGE_FRONT_RIGHT_STEER_CAN,
-                SWERVE.ORANGE_FRONT_RIGHT_STEER_CAN,
+                SWERVE.ORANGE_FRONT_RIGHT_ENCODER_CAN,
                 SWERVE.FRONT_RIGHT_STEER_OFFSET);
 
         SwerveModule m_backLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,
                 Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.BLACK_BACK_LEFT_DRIVE_CAN,
                 SWERVE.BLACK_BACK_LEFT_STEER_CAN,
-                SWERVE.BLACK_BACK_LEFT_STEER_CAN,
+                SWERVE.BLACK_BACK_LEFT_ENCODER_CAN,
                 SWERVE.BACK_LEFT_STEER_OFFSET);
 
         SwerveModule m_backRightModule = Mk4SwerveModuleHelper.createFalcon500(config,
                 Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.WHITE_BACK_RIGHT_DRIVE_CAN,
                 SWERVE.WHITE_BACK_RIGHT_STEER_CAN,
-                SWERVE.WHITE_BACK_RIGHT_STEER_CAN,
+                SWERVE.WHITE_BACK_RIGHT_ENCODER_CAN,
                 SWERVE.BACK_RIGHT_STEER_OFFSET);
 
         this.swerveConfig = config;

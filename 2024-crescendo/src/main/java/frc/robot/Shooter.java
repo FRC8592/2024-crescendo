@@ -17,50 +17,41 @@ public class Shooter {
     // private final String shooterTableName = "shooter_table"; TODO: What are these three lines?
     // private final NetworkTable table;
     // private NetworkTableEntry shooterSpeedRPS;
+    private double targetSpeed = 0;
 
     SparkFlexControl leftShooterMotor;
     SparkFlexControl rightShooterMotor;
-    RelativeEncoder leftShooterEncoder;
-    RelativeEncoder rightShooterEncoder;
-    SparkPIDController leftShooterControl;
-    SparkPIDController rightShooterControl;
+    // SparkPIDController leftShooterControl;
+    // SparkPIDController rightShooterControl;
 
-    CANSparkFlex feederMotor;
-    RelativeEncoder feederEncoder;
-    SparkPIDController feederControl;
+    SparkFlexControl feederMotor;
 
     public Shooter(){
-        leftShooterMotor = new SparkFlexControl(Constants.LEFT_SHOOTER_MOTOR_CAN_ID);
-        leftShooterMotor.set(true);
-        rightShooterMotor = new SparkFlexControl(Constants.RIGHT_SHOOTER_MOTOR_CAN_ID);
+        leftShooterMotor = new SparkFlexControl(SHOOTER.LEFT_SHOOTER_MOTOR_CAN_ID);
+        leftShooterMotor.setInverted();
+        rightShooterMotor = new SparkFlexControl(SHOOTER.RIGHT_SHOOTER_MOTOR_CAN_ID);
 
         // table = NetworkTableInstance.getDefault().getTable(shooterTableName);
-        leftShooterControl =  leftShooterMotor.getPIDController();
-        rightShooterControl = rightShooterMotor.getPIDController();
-        leftShooterControl.setP(SHOOTER.LEFT_SHOOTER_MOTOR_kP); //PID
-        leftShooterControl.setI(SHOOTER.LEFT_SHOOTER_MOTOR_kI); //PID
-        leftShooterControl.setD(SHOOTER.LEFT_SHOOTER_MOTOR_kD); //PID
-        rightShooterControl.setP(SHOOTER.RIGHT_SHOOTER_MOTOR_kP); //PID
-        rightShooterControl.setI(SHOOTER.RIGHT_SHOOTER_MOTOR_kI); //PID
-        rightShooterControl.setD(SHOOTER.RIGHT_SHOOTER_MOTOR_kD); //PID
+        leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP, SHOOTER.LEFT_SHOOTER_MOTOR_kI, SHOOTER.LEFT_SHOOTER_MOTOR_kD, 0);
+        rightShooterMotor.setPIDF(SHOOTER.RIGHT_SHOOTER_MOTOR_kP, SHOOTER.RIGHT_SHOOTER_MOTOR_kI, SHOOTER.RIGHT_SHOOTER_MOTOR_kD, 0);
 
-        rightShooterMotor.set(0);
-        leftShooterMotor.set(0);
+        rightShooterMotor.setPercentOutput(0);
+        leftShooterMotor.setPercentOutput(0);
     }
 
-    public void shootVelocityMode(double speedRPM){
-        leftShooterControl.setReference(speedRPM, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
-        rightShooterControl.setReference(speedRPM, com.revrobotics.CANSparkBase.ControlType.kVelocity);
+    public void shootVelocity(double speedRPM){
+        leftShooterMotor.setVelocity(speedRPM);
+        rightShooterMotor.setVelocity(speedRPM);
     }
 
     public void shootPercentOutput(double power){
-        leftShooterMotor.set(Math.min(Math.max(power,-0.5),0.5)); 
-        rightShooterMotor.set(Math.min(Math.max(power,-0.5),0.5));
+        leftShooterMotor.setPercentOutput(power);
+        rightShooterMotor.setPercentOutput(power);
     }
 
     public void stop(){
-        leftShooterMotor.setVelocity(0);
-        rightShooterMotor.set(0);
+        leftShooterMotor.stop();
+        rightShooterMotor.stop();
     }
 
     /**
@@ -68,16 +59,8 @@ public class Shooter {
      * @param speed speed in rpm
      */
     public void setFeederSpeed(int speed) {
-        leftShooterMotor.set(speed);
-        rightShooterMotor.set(speed);
-    }
-    
-    /**
-     * Spins feeder motors to shoot note
-     */
-    public void shoot() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+        leftShooterMotor.setPercentOutput(speed);
+        rightShooterMotor.setPercentOutput(speed);
     }
 
     /**
@@ -90,40 +73,26 @@ public class Shooter {
     }
     
     /**
-     * stops flywheels from moving!
-     */
-    public void stopFlywheels() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
-
-    }
-    
-    /**
      * stops feeder wheels from moving uwu
      */
     public void stopFeeders() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+        feederMotor.stop();
     }
     /**
      * sets speed based on range table!!!
      * @param distanceToAprilTag
      */
     public void setSpeedRangeTable(double distanceToAprilTag) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setSpeedRangeTable'");
-        double targetSpeed = 
+
     }
     /**
      * checks if flywheels are at target speed to shoot
-     * @return
      */
     public boolean isReady() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isReady'");
         if (leftShooterMotor.getVelocity() == targetSpeed && rightShooterMotor.getVelocity() == targetSpeed){
             return true;
         }
+        return false;
     }
     /**
      * sets the alliance to blue or red!!

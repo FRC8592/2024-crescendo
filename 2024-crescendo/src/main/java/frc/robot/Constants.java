@@ -73,21 +73,21 @@ public final class Constants {
         * BLACK is back-right
         * WHITE is back-left
         *****************************************************************************************/
-        public static final int TEAL_FRONT_LEFT_DRIVE_CAN = -1; // TODO: Value isn't set.
-        public static final int TEAL_FRONT_LEFT_STEER_CAN = -1; // TODO: Value isn't set.
-        public static final int TEAL_FRONT_LEFT_ENCODER_CAN = -1; // TODO: Value isn't set.
+        public static final int TEAL_FRONT_LEFT_DRIVE_CAN = 7; 
+        public static final int TEAL_FRONT_LEFT_STEER_CAN = 6; 
+        public static final int TEAL_FRONT_LEFT_ENCODER_CAN = 8; 
 
-        public static final int ORANGE_FRONT_RIGHT_DRIVE_CAN = -1; // TODO: Value isn't set.
-        public static final int ORANGE_FRONT_RIGHT_STEER_CAN = -1; // TODO: Value isn't set.
-        public static final int ORANGE_FRONT_RIGHT_ENCODER_CAN = -1; // TODO: Value isn't set.
+        public static final int ORANGE_FRONT_RIGHT_DRIVE_CAN = 4;
+        public static final int ORANGE_FRONT_RIGHT_STEER_CAN = 3;
+        public static final int ORANGE_FRONT_RIGHT_ENCODER_CAN = 5;
 
-        public static final int BLACK_BACK_LEFT_DRIVE_CAN = -1; // TODO: Value isn't set.
-        public static final int BLACK_BACK_LEFT_STEER_CAN = -1; // TODO: Value isn't set.
-        public static final int BLACK_BACK_LEFT_ENCODER_CAN = -1; // TODO: Value isn't set.
+        public static final int BLACK_BACK_LEFT_DRIVE_CAN = 10;
+        public static final int BLACK_BACK_LEFT_STEER_CAN = 9;
+        public static final int BLACK_BACK_LEFT_ENCODER_CAN = 11;
 
-        public static final int WHITE_BACK_RIGHT_DRIVE_CAN = -1; // TODO: Value isn't set.
-        public static final int WHITE_BACK_RIGHT_STEER_CAN = -1; // TODO: Value isn't set.
-        public static final int WHITE_BACK_RIGHT_ENCODER_CAN = -1; // TODO: Value isn't set.
+        public static final int WHITE_BACK_RIGHT_DRIVE_CAN = 13;
+        public static final int WHITE_BACK_RIGHT_STEER_CAN = 12;
+        public static final int WHITE_BACK_RIGHT_ENCODER_CAN = 14;
 
         public static final double THROTTLE_kP = 0.02;
         public static final double THROTTLE_kI = 0.0;
@@ -97,14 +97,14 @@ public final class Constants {
         public static final double STEER_kI = 0.0;
         public static final double STEER_kD = 0.1;
 
-        public static final double DRIVE_TRAIN_WIDTH = -1; // meters // TODO: Value isn't set.
-        public static final double DRIVE_TRAIN_LENGTH = -1; // meters // TODO: Value isn't set.
+        public static final double DRIVE_TRAIN_WIDTH = 0.498; // meters
+        public static final double DRIVE_TRAIN_LENGTH = 0.52; // meters 
         public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI; // TODO: Check that this is accurate
 
-        public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
-        public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
-        public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
-        public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(-1); // TODO: Value isn't set.
+        public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(233.525); 
+        public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(133.77); 
+        public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(78.75); 
+        public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(147.041); 
 
         public static final double TRANSLATE_POWER_FAST = 1.0; // Scaling for teleop driving. 1.0 is maximum
         public static final double ROTATE_POWER_FAST = 0.75; // Scaling for teleop driving. 1.0 is maximum
@@ -112,7 +112,7 @@ public final class Constants {
         public static final double ROTATE_POWER_SLOW = 0.15; // Scaling for teleop driving. 1.0 is maximum
 
         public static final double MAX_VOLTAGE = 12.0;
-        public static final double TELEOP_CURRENT_LIMIT = -1; // TODO: Value isn't set.
+        public static final double TELEOP_CURRENT_LIMIT = 15.0; 
         public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.5;
     }
 

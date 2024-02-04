@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.NewtonSwerve.NewtonSwerve;
 import com.NewtonSwerve.SwerveModule;
+import com.NewtonSwerve.Gyro.NewtonPigeon2;
+import com.NewtonSwerve.Gyro.Gyro;
 import com.NewtonSwerve.Gyro.NewtonPigeon;
 import com.NewtonSwerve.Mk4.Mk4ModuleConfiguration;
 import com.NewtonSwerve.Mk4.Mk4SwerveModuleHelper;
@@ -18,7 +20,7 @@ public class Swerve {
     private NewtonSwerve swerve;
     private ChassisSpeeds lastSpeeds;
 
-    public Swerve(NewtonPigeon gyro) {
+    public Swerve(Gyro gyro) {
         lastSpeeds = new ChassisSpeeds();
         
         Mk4ModuleConfiguration config = new Mk4ModuleConfiguration();

@@ -1,15 +1,12 @@
 package com.NewtonSwerve.Gyro;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.Pigeon2;
 
-public class NewtonPigeon implements Gyro {
-    /**
-     * For Pigeon 1 instead of Pigeon 2
-     */
+public class NewtonPigeon2 implements Gyro {
 
-    private PigeonIMU pigeon;
+    private Pigeon2 pigeon;
 
-    public NewtonPigeon(PigeonIMU pigeon) {
+    public NewtonPigeon2(Pigeon2 pigeon) {
         this.pigeon = pigeon;
         this.pigeon.configFactoryDefault();
     }

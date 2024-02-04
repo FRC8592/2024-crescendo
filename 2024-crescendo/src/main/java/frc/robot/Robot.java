@@ -95,7 +95,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        poseGetter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
         currentAuto.addModules(swerve, elevator, intake, shooter, noteLock);
         currentAuto.initialize();
@@ -112,7 +112,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        poseGetter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
     }
@@ -262,7 +262,7 @@ public class Robot extends LoggedRobot {
             poseGetter.turnToAprilTag();
             //TODO range table
             elevator.setAngle(poseGetter.distanceToAprilTag(-1));
-            shooter.setSpeedRangeTable(poseGetter.distanceToAprilTag(-1));
+            shooter.setSpeedRangeTable(poseGetter.distanceToAprilTag(-1), elevator);
             if (shooter.isReady()) {//isReady returns whether the shooter angle and 
                 //flywheel speeds are within a threshhold  of where we asked them to be
                 shooter.setFeederSpeed(0); //runs the feeder wheels
@@ -277,11 +277,11 @@ public class Robot extends LoggedRobot {
             elevator.setPositionAmp();
             double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
             double xVelocity = poseGetter.strafeToAprilTag();
-            shooter.shootVelocity(-1);
+            shooter.setShootVelocity(-1);
             double yVelocity = poseGetter.driveToAprilTag();
             currentSpeeds = new ChassisSpeeds(xVelocity, yVelocity, rotationSpeed);
             if (poseGetter.distanceToAprilTag(-1) < -1) {
-                shooter.shootVelocity(-1);
+                shooter.setShootVelocity(-1);
                 currentSpeeds = new ChassisSpeeds();
                 if (! shooter.hasNote()) {
                     elevator.stow();
@@ -293,10 +293,10 @@ public class Robot extends LoggedRobot {
             // TODO range table
             elevator.setAngle(poseGetter.distanceToAprilTag(-1));
             if (manualShoot) {
-                shooter.shootVelocity(-1);
+                shooter.setShootVelocity(-1);
                 if (shooter.isReady()) {// isReady returns whether the shooter angle and
                     // flywheel speeds are within a threshhold of where we asked them to be
-                    shooter.shootPercentOutput(-1); // runs the feeder wheels
+                    shooter.setShootPercentOutput(-1); // runs the feeder wheels
                     if (!shooter.hasNote()) {
                         shooter.stop();
                         shooter.stopFeeders();
@@ -309,8 +309,8 @@ public class Robot extends LoggedRobot {
             elevator.setAngle(-1); // set angle
             elevator.setPositionAmp();
             if (manualAmpScore) {
-                shooter.shootVelocity(-1); // flywheels at low speed
-                shooter.shootVelocity(-1); // feeder wheels
+                shooter.setShootVelocity(-1); // flywheels at low speed
+                shooter.setShootVelocity(-1); // feeder wheels
                 elevator.stow();
             }
         }
@@ -345,7 +345,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        poseGetter.setAlliance(DriverStation.getAlliance().get());
     }
 
     @Override

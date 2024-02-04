@@ -10,6 +10,7 @@ public final class Constants {
         public static final double RPM_TO_TICKS_100_MS = 2048.0 / 600.0;
         public static final double DEG_TO_RAD = 0.0174533;
         public static final double IN_TO_METERS = 0.0254;
+        public static final double METERS_TO_FEET = 3.28084;
     }
 
     public final class CONTROLLERS {
@@ -44,8 +45,10 @@ public final class Constants {
 
     public final class SHOOTER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Shooter/";
+
         public static final int LEFT_SHOOTER_MOTOR_CAN_ID = 31;
         public static final int RIGHT_SHOOTER_MOTOR_CAN_ID = 29;
+
         //Change right motor to inverted using documentation
         public static final double LEFT_SHOOTER_MOTOR_SPEED = 0.25;
         public static final double RIGHT_SHOOTER_MOTOR_SPEED = LEFT_SHOOTER_MOTOR_SPEED;
@@ -55,6 +58,11 @@ public final class Constants {
         public static final double RIGHT_SHOOTER_MOTOR_kP = 0.0; //PID
         public static final double RIGHT_SHOOTER_MOTOR_kI = 0.0; //PID
         public static final double RIGHT_SHOOTER_MOTOR_kD = 0.0; //PID
+
+        //Lookup table
+        public static final double[][] RANGE_TABLE = {
+            {0,3000}
+        };
     }
 
     public final class ELEVATOR {

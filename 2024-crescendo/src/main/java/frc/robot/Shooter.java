@@ -27,7 +27,10 @@ public class Shooter {
 
     int targetSpeed = 0;
 
-    public Shooter(){
+    /**
+     * Shooter object constructor
+     */
+    public Shooter() {
         leftShooterMotor = new SparkFlexControl(SHOOTER.LEFT_SHOOTER_MOTOR_CAN_ID);
         leftShooterMotor.setInverted();
         rightShooterMotor = new SparkFlexControl(SHOOTER.RIGHT_SHOOTER_MOTOR_CAN_ID);
@@ -40,17 +43,28 @@ public class Shooter {
         leftShooterMotor.setPercentOutput(0);
     }
 
-    public void shootVelocity(double speedRPM){
+    /**
+     * set shooter motors speeds in terms of RPM
+     * @param speedRPM
+     */
+    public void setShootVelocity(double speedRPM){
         leftShooterMotor.setVelocity(speedRPM);
         rightShooterMotor.setVelocity(speedRPM);
     }
 
-    public void shootPercentOutput(double power){
+    /**
+     * set shooter motors speeds in terms of percent output
+     * @param power
+     */
+    public void setShootPercentOutput(double power){
         leftShooterMotor.setPercentOutput(power);
         rightShooterMotor.setPercentOutput(power);
     }
 
-    public void stop(){
+    /**
+     * Stops the flywheels
+     */
+    public void stop() {
         leftShooterMotor.stop();
         rightShooterMotor.stop();
     }
@@ -60,8 +74,7 @@ public class Shooter {
      * @param speed speed in rpm
      */
     public void setFeederSpeed(int speed) {
-        leftShooterMotor.setPercentOutput(speed);
-        rightShooterMotor.setPercentOutput(speed);
+        feederMotor.setPercentOutput(speed);
     }
 
     /**
@@ -80,27 +93,25 @@ public class Shooter {
     }
 
     /**
-     * sets speed based on range table!!!
+     * sets speed and angle based on range table
      * @param distanceToAprilTag
      */
-    public void setSpeedRangeTable(double distanceToAprilTag) {
-
+    public void setSpeedRangeTable(double distanceToAprilTag, Elevator elevator) {
+        int index = (int)(distanceToAprilTag / CONVERSIONS.METERS_TO_FEET);
+        double[] vals = SHOOTER.RANGE_TABLE[index];
+        double angle = vals[0];
+        double targetSpeed = vals[1];
+        setShootVelocity(targetSpeed);
+        elevator.setAngle(angle);
     }
+
     /**
-     * checks if flywheels are at target speed to shoot
+     * checks if flywheels are at target speed to shoot!!!!!!!
      */
     public boolean isReady() {
         if (leftShooterMotor.getVelocity() == targetSpeed && rightShooterMotor.getVelocity() == targetSpeed){
             return true;
         }
         return false;
-    }
-    /**
-     * sets the alliance to blue or red!!
-     * @param alliance
-     */
-    public void setAlliance(Alliance alliance) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setAlliance'");
     }
 }

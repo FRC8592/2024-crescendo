@@ -1,73 +1,84 @@
 package frc.robot;
-
-import com.revrobotics.CANSparkFlex;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.SparkRelativeEncoder;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import frc.robot.Constants.*;
 
 public class Elevator {
-    private static final int ELEVATOR_MOTOR_CAN_ID = 0;
-    private CANSparkFlex elevatorMotor;
-    private SparkPIDController elevatorPID;
-    private RelativeEncoder elevatorEncoder;
-    private final double POSITION_START = 0;
-    private final double POSITION_AMP= 0;
+    private SparkFlexControl elevatorMotor;
+    private SparkFlexControl pivotMotor;
+
 
     public Elevator(){
-        elevatorMotor = new CANSparkFlex(ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
-        elevatorPID = elevatorMotor.getPIDController();
-        elevatorEncoder = elevatorMotor.getEncoder();
-        
-        elevatorPID.setP(0, 0);
-        elevatorPID.setI(0, 0);
-        elevatorPID.setD(0, 0);
-        elevatorPID.setFF(0, 0);
-
-        elevatorEncoder.setPosition(0);
-    }
-    
-
-    public void percentOutputElevator(double speed){
-        elevatorMotor.set(speed);
-    }
-
-    public void setPosition(double position){
-        elevatorPID.setReference(position, ControlType.kPosition);
-    }
-
-    public void setPositionAmp(){
-        elevatorPID.setReference(POSITION_AMP ,ControlType.kPosition);
-    }
-
-    public void setPositionStart(double position){
-        elevatorPID.setReference(POSITION_START, ControlType.kPosition);
+        elevatorMotor = new SparkFlexControl(ELEVATOR.ELEVATOR_MOTOR_CAN_ID);
+        pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID);
     }
     
     /**
-     * sets angle of elevator to base of robot
+     * sets the speed of
+     * @param speed
+     */
+    public void percentOutputElevator(double speed){
+        elevatorMotor.setPercentOutput(speed);
+    }
+
+    /** 
+     * sets the position
+    */
+    public void setPosition(double position){
+        elevatorMotor.setVelocity(position);
+    }
+
+    /**
+     * sets the position of the elevator and pivot to shoot in amp
+     */
+    public void setPositionAmp(){
+        elevatorMotor.setVelocity(ELEVATOR.POSITION_AMP);
+    }
+
+    /**
+     * sets elevator and pivot position to shooting from stowed position
+     * @param position 
+     * */
+    
+     public void setPositionStart(double position){
+        elevatorMotor.setVelocity(ELEVATOR.POSITION_START);
+    }
+    
+    /**
+     * sets angle of pivot to base of robot
      * @param angle units: degrees
      */
-    public void setAngle(double angle) {
-        
+    public void setPivotAngle(double angle) {
+        double angleConverted = CONVERSIONS.ANGLE_DEGREES_TO_TICKS * angle;
+        pivotMotor.setPosition(angleConverted);
     }
 
     /**
      * stows elevator and pivot 
      */
     public void stow() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stow'");
+        elevatorMotor.setPosition(0);
+        if (Math.abs(elevatorMotor.getPosition()) <= 100){
+            pivotMotor.setPosition(0);
+        }
     }
 
     /**
-     * gets position of  elevator
+     * gets position of elevator
      * @return
      */
-    public double getPosition() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPosition'");
+    public double getElevatorPosition() {
+        return elevatorMotor.getPosition();
+    }
+
+    /**
+     * gets position of pivot
+     * @return
+     */
+    public double getPivotPosition() {
+        return pivotMotor.getPosition();
+    }
+
+    public void setPivotAmp() {
+        setPivotAngle(ELEVATOR.PIVOT_ANGLE_AMP);
     }
 
 }

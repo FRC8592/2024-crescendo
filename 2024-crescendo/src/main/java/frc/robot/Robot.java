@@ -261,7 +261,7 @@ public class Robot extends LoggedRobot {
         else if (autoShoot) { //Aim at the speaker and shoot into it
             poseGetter.turnToAprilTag();
             //TODO range table
-            elevator.setAngle(poseGetter.distanceToAprilTag(-1));
+            elevator.setPivotAngle(poseGetter.distanceToAprilTag(-1));
             shooter.setSpeedRangeTable(poseGetter.distanceToAprilTag(-1));
             if (shooter.isReady()) {//isReady returns whether the shooter angle and 
                 //flywheel speeds are within a threshhold  of where we asked them to be
@@ -291,7 +291,7 @@ public class Robot extends LoggedRobot {
         else if (prepareForShoot) {
             poseGetter.turnToAprilTag();
             // TODO range table
-            elevator.setAngle(poseGetter.distanceToAprilTag(-1));
+            elevator.setPivotAngle(poseGetter.distanceToAprilTag(-1));
             if (manualShoot) {
                 shooter.shootVelocityMode(-1);
                 if (shooter.isReady()) {// isReady returns whether the shooter angle and
@@ -306,7 +306,7 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (ampPrep) {
-            elevator.setAngle(-1); // set angle
+            elevator.setPivotAmp(); // set angle
             elevator.setPositionAmp();
             if (manualAmpScore) {
                 shooter.shootVelocityMode(-1); // flywheels at low speed
@@ -315,7 +315,7 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (preStage) {
-            double currentElevatorPos = elevator.getPosition();
+            double currentElevatorPos = elevator.getElevatorPosition();
             if (elevatorControl == 1.0) {
                 double targetPosition = currentElevatorPos + 0.01; // TODO: set constant
                 elevator.setPosition(targetPosition);
@@ -324,7 +324,7 @@ public class Robot extends LoggedRobot {
                 double targetPosition = currentElevatorPos - 0.01; // TODO:
                 elevator.setPosition(targetPosition);
             }
-            elevator.setAngle(90); // set to 90 degrees
+            elevator.setPivotAngle(90); // set to 90 degrees
         }
         else if (regurgitateBack) {
             shooter.setFeederSpeed(-1); // backwards

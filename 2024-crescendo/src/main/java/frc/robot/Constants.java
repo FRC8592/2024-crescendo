@@ -68,26 +68,26 @@ public final class Constants {
 
     public final class SWERVE {
        /****************************************************************************************
-        * TEAL is front-left
+        * BLACK is front-left
         * ORANGE is front-right
-        * BLACK is back-right
+        * TEAL is back-right
         * WHITE is back-left
         *****************************************************************************************/
-        public static final int TEAL_FRONT_LEFT_DRIVE_CAN = 7; 
-        public static final int TEAL_FRONT_LEFT_STEER_CAN = 6; 
-        public static final int TEAL_FRONT_LEFT_ENCODER_CAN = 8; 
+        public static final int BLACK_FRONT_LEFT_DRIVE_CAN = 14; 
+        public static final int BLACK_FRONT_LEFT_STEER_CAN = 13; 
+        public static final int BLACK_FRONT_LEFT_ENCODER_CAN = 15; 
 
-        public static final int ORANGE_FRONT_RIGHT_DRIVE_CAN = 4;
-        public static final int ORANGE_FRONT_RIGHT_STEER_CAN = 3;
-        public static final int ORANGE_FRONT_RIGHT_ENCODER_CAN = 5;
+        public static final int ORANGE_FRONT_RIGHT_DRIVE_CAN = 20;
+        public static final int ORANGE_FRONT_RIGHT_STEER_CAN = 19;
+        public static final int ORANGE_FRONT_RIGHT_ENCODER_CAN = 21;
 
-        public static final int BLACK_BACK_LEFT_DRIVE_CAN = 10;
-        public static final int BLACK_BACK_LEFT_STEER_CAN = 9;
-        public static final int BLACK_BACK_LEFT_ENCODER_CAN = 11;
+        public static final int TEAL_BACK_LEFT_DRIVE_CAN = 11;
+        public static final int TEAL_BACK_LEFT_STEER_CAN = 10;
+        public static final int TEAL_BACK_LEFT_ENCODER_CAN = 12;
 
-        public static final int WHITE_BACK_RIGHT_DRIVE_CAN = 13;
-        public static final int WHITE_BACK_RIGHT_STEER_CAN = 12;
-        public static final int WHITE_BACK_RIGHT_ENCODER_CAN = 14;
+        public static final int WHITE_BACK_RIGHT_DRIVE_CAN = 17;
+        public static final int WHITE_BACK_RIGHT_STEER_CAN = 16;
+        public static final int WHITE_BACK_RIGHT_ENCODER_CAN = 18;
 
         public static final double THROTTLE_kP = 0.02;
         public static final double THROTTLE_kI = 0.0;
@@ -97,14 +97,14 @@ public final class Constants {
         public static final double STEER_kI = 0.0;
         public static final double STEER_kD = 0.1;
 
-        public static final double DRIVE_TRAIN_WIDTH = 0.498; // meters
-        public static final double DRIVE_TRAIN_LENGTH = 0.52; // meters 
-        public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI; // TODO: Check that this is accurate
+        public static final double DRIVE_TRAIN_WIDTH = 0.527; // meters
+        public static final double DRIVE_TRAIN_LENGTH = 0.478; // meters 
+        public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI;
 
-        public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(233.525); 
-        public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(133.77); 
-        public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(78.75); 
-        public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(147.041); 
+        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(145.898); // 354.639
+        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(343.213); // 0
+        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(67.500);    // 69.434
+        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(355.166); // 6.768
 
         public static final double TRANSLATE_POWER_FAST = 1.0; // Scaling for teleop driving. 1.0 is maximum
         public static final double ROTATE_POWER_FAST = 0.75; // Scaling for teleop driving. 1.0 is maximum
@@ -117,7 +117,7 @@ public final class Constants {
     }
 
     public final class PIGEON {
-        public static final int CAN_ID = 34;
+        public static final int CAN_ID = 17;
     }
     public class ROBOT {
         public static final double JOYSTICK_DEADBAND = 0.01;

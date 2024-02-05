@@ -7,8 +7,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.NewtonSwerve.Gyro.NewtonPigeon;
-import com.ctre.phoenix.sensors.PigeonIMU;
+import com.NewtonSwerve.Gyro.NewtonPigeon2;
+import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -41,7 +41,7 @@ public class Robot extends LoggedRobot {
     private AutonomousSelector autoSelect;
 
     //Subsystem and hardware objects
-    private NewtonPigeon pigeon;
+    private NewtonPigeon2 pigeon;
     private Swerve swerve;
     private Shooter shooter;
     private Intake intake;
@@ -74,7 +74,7 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
-        pigeon = new NewtonPigeon(new PigeonIMU(PIGEON.CAN_ID));
+        pigeon = new NewtonPigeon2(new Pigeon2(PIGEON.CAN_ID));
         swerve = new Swerve(pigeon);
         power = new Power();
         leds = new LED();
@@ -202,8 +202,8 @@ public class Robot extends LoggedRobot {
          * 
          */
         //Basic driving controls
-        double driveTranslateY = driverController.getLeftY();
-        double driveTranslateX = driverController.getLeftX();
+        double driveTranslateY = -driverController.getLeftY();
+        double driveTranslateX = -driverController.getLeftX();
         double driveRotate = driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
         

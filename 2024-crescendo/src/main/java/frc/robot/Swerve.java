@@ -2,7 +2,7 @@ package frc.robot;
 
 import com.NewtonSwerve.NewtonSwerve;
 import com.NewtonSwerve.SwerveModule;
-import com.NewtonSwerve.Gyro.NewtonPigeon2;
+// import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.NewtonSwerve.Gyro.Gyro;
 import com.NewtonSwerve.Gyro.NewtonPigeon;
 import com.NewtonSwerve.Mk4.Mk4ModuleConfiguration;
@@ -140,5 +140,9 @@ public class Swerve {
 
     public ChassisSpeeds getCurrentSpeeds() {
         return lastSpeeds;
+    }
+    
+    public void zeroGyroscope() {
+        swerve.zeroGyroscope();
     }
 }

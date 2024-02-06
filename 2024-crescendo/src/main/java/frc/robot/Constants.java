@@ -23,9 +23,17 @@ public final class Constants {
         public static final double LOCK_ERROR = -1; // TODO: Not set yet
         public static final double CLOSE_ERROR = -1; // TODO: Not set yet
         public static final double CAMERA_HEIGHT = -1; // TODO: Not set yet
-        public static final double kP = -1; // TODO: Not set yet
-        public static final double kI = -1; // TODO: Not set yet
-        public static final double kD = -1; // TODO: Not set yet
+        public static final double DRIVE_TO_TARGET_ANGLE = -24;
+        
+        // Turn-to PID constants for the drive-to-note function
+        public static final double DRIVE_TO_TURN_kP = 0.1;
+        public static final double DRIVE_TO_TURN_kI = 0;
+        public static final double DRIVE_TO_TURN_kD = 0;
+
+        // Drive PID constants for the drive-to-note function
+        public static final double DRIVE_TO_DRIVE_kP = 0.13;
+        public static final double DRIVE_TO_DRIVE_kI = 0;
+        public static final double DRIVE_TO_DRIVE_kD = 0;
     }
 
     public final class INTAKE {
@@ -114,13 +122,17 @@ public final class Constants {
         public static final double MAX_VOLTAGE = 12.0;
         public static final double TELEOP_CURRENT_LIMIT = 15.0; 
         public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.5;
+
+        public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND / // 6.0
+                Math.hypot(SWERVE.DRIVE_TRAIN_WIDTH / 2.0, DRIVE_TRAIN_LENGTH / 2.0);
     }
 
     public final class PIGEON {
         public static final int CAN_ID = 34;
     }
+
     public class ROBOT {
         public static final double JOYSTICK_DEADBAND = 0.01;
-        private static final String LOG_PATH = SHARED.LOG_FOLDER + "/Robot/";
+        public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Robot/";
     }
 }

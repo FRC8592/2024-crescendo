@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.NewtonSwerve.Gyro.NewtonPigeon;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -50,6 +51,8 @@ public class Robot extends LoggedRobot {
     private PoseVision poseGetter;
     private LED leds;
     private Power power;
+    private PIDController turnPID;
+    private PIDController drivePID;
 
 
     @Override
@@ -81,16 +84,15 @@ public class Robot extends LoggedRobot {
         // shooter = new Shooter();
         poseGetter = new PoseVision();
         intake = new Intake();
-        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
-                NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
+        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT, NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
         // elevator = new Elevator();
-        
+        turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
+        drivePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
     }
 
     @Override
     public void robotPeriodic() {
         
-
     }
 
     @Override
@@ -350,6 +352,49 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
+        double translatePower;
+        double translateX;
+        double translateY;
+        double rotate;
+        double rotateToAngle;
+        translatePower = SWERVE.TRANSLATE_POWER_SLOW;
+        double rotatePower = SWERVE.ROTATE_POWER_SLOW;
+
+        if (driverController.getBackButton()) {
+            swerve.zeroGyroscope();
+        }
+
+        ChassisSpeeds driveSpeeds = new ChassisSpeeds();
+
+        swerve.getCurrentPos();
+        LimelightTargeting gameObjectVision = null; //TODO: Replace with the real limelight
+        gameObjectVision.updateVision();
+
+        double driveTranslateY = driverController.getLeftY();
+        double driveTranslateX = driverController.getLeftX();
+        double driveRotate = driverController.getRightX();
+        if (driverController.getBButton()) {
+            swerve.drive(gameObjectVision.moveTowardsTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE));
+            // double rotateSpeed = gameObjectVision.turnRobot(0, turnPID, "tx",
+            //         SWERVE.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
+            // rotate = -rotateSpeed;
+
+            // double driveToSpeed = gameObjectVision.turnRobot(0, drivePID, "ty", 4.5, -24.0); // -20 means its
+            //                                                                                  // sorta close and
+            //                                                                                  // the decimal being
+            //                                                                                  // added is the
+            //                                                                                  // FeedForward
+            // translateX = driveToSpeed; // go forwards at driveToSpeed towards the target
+            // SmartDashboard.putNumber("pid based forward vel", driveToSpeed);
+            // driveSpeeds = new ChassisSpeeds(translateX, 0, rotate);
+        } else {
+            ChassisSpeeds smoothedRobotRelative = smoothingFilter.smooth(new ChassisSpeeds(translateX, translateY, 0));
+            driveSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
+                    smoothedRobotRelative.vxMetersPerSecond,
+                    smoothedRobotRelative.vyMetersPerSecond,
+                    rotate), swerve.getGyroscopeRotation());
+        }
+        swerve.drive(driveSpeeds);
     }
 
     @Override

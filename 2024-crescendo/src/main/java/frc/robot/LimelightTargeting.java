@@ -6,9 +6,13 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.*;
 
 import java.util.LinkedList;
+
+import org.littletonrobotics.junction.Logger;
 
 public class LimelightTargeting {
     // constants passed in during initilization
@@ -239,22 +243,13 @@ public class LimelightTargeting {
         return turnSpeed;
     }
 
-    //
-    // Drive towards the target. We move forward before fully locked
-    // This should probably be updated to base speed on distance from the target
-    //
-    public double moveTowardsTarget(double targetLockedSpeed, double targetCloseSpeed) {
-        double moveSpeed = 0.0; // Default is 0 speed
-
-        if (targetLocked == true) {
-            moveSpeed = targetLockedSpeed;
-        } else if (targetClose == true) {
-            moveSpeed = targetCloseSpeed;
-        }
-
-        // SmartDashboard.putNumber(limelightName + "/Move Speed", moveSpeed);
-
-        return moveSpeed;
+    
+    public ChassisSpeeds moveTowardsTarget(PIDController turnPID, PIDController drivePID, double targetAngle) {
+        double rotateSpeed = this.turnRobot(0, turnPID, "tx", SWERVE.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
+        double driveToSpeed = this.turnRobot(0, drivePID, "ty", 4.5, targetAngle);
+        SmartDashboard.putNumber("Drive-to velocity", driveToSpeed);
+        Logger.recordOutput(NOTELOCK.LOG_PATH+"Drive-to Velocity", driveToSpeed);
+        return new ChassisSpeeds(driveToSpeed, 0, rotateSpeed);
     }
 
     /**

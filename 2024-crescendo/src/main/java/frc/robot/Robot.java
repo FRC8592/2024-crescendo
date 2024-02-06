@@ -53,6 +53,7 @@ public class Robot extends LoggedRobot {
     private Power power;
     private PIDController turnPID;
     private PIDController drivePID;
+    private SmoothingFilter smoothingFilter;
 
 
     @Override
@@ -84,15 +85,16 @@ public class Robot extends LoggedRobot {
         // shooter = new Shooter();
         poseGetter = new PoseVision();
         intake = new Intake();
-        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT, NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
+        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT, 0,0,0); //TODO: The last three values are for getting distance. We don't need that for now.
         // elevator = new Elevator();
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
         drivePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
+        smoothingFilter = new SmoothingFilter(1, 1, 1); //TODO: Currently does nothing. Tune later
     }
 
     @Override
     public void robotPeriodic() {
-        
+        Logger.recordOutput(ROBOT.LOG_PATH+"Robot Position", swerve.getCurrentPos());
     }
 
     @Override
@@ -208,53 +210,48 @@ public class Robot extends LoggedRobot {
         double driveTranslateX = driverController.getLeftX();
         double driveRotate = driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
-        
+
         //Intakes TODO: Revise with drivers
         boolean autoIntake = driverController.getLeftTriggerAxis() > 0.1;
         boolean intaking = operatorController.getAButton();
-        
+
         //Shooting TODO: Revise with drivers
         boolean prepareForShoot = operatorController.getLeftTriggerAxis() > 0.1;
         boolean manualShoot = operatorController.getBButton();
         boolean autoShoot = driverController.getRightTriggerAxis() > 0.1;
-        
+
         //Amp TODO: Revise with drivers
         boolean ampPrep = operatorController.getXButton();
         boolean autoAmpScore = driverController.getRightTriggerAxis() > 0.1;
         boolean manualAmpScore = operatorController.getLeftBumper();
-        
+
         //Stage TODO: Revise with drivers
         boolean preStage = operatorController.getYButton();
         double elevatorControl = operatorController.getPOV() == 0 ? 1 : (operatorController.getPOV() == 180 ? -1 : 0);
-        
+
         //Other TODO: Revise with drivers
         boolean regurgitateBack = operatorController.getLeftBumper();
         boolean regurgitateFront = operatorController.getRightBumper();
         boolean stow = operatorController.getAButton();
-        
+
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
         if (slowMode) { //Slow Mode slows down the robot for better precision & control
-            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    new ChassisSpeeds(
-                            driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
-                    swerve.getGyroscopeRotation());
+            currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
+                    driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                    driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                    driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()));
         }
         else {
-            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    new ChassisSpeeds(
-                            driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
-                    swerve.getGyroscopeRotation());
+            currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
+                    driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                    driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                    driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
         }
+        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, swerve.getGyroscopeRotation());
+
         if (autoIntake) { //Drive to the nearest note and intake it
-            double turnSpeed = noteLock.turnRobot(0, null /*pid  controller */, "tx", driveRotate,
-                    elevatorControl);
-            double forwardSpeed = noteLock.turnRobot(0, null /* pid controller */, "ty", driveRotate,
-                    elevatorControl);
+            currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
             intake.intakeNote(0, 0); //TODO  test intake with robotSpeed and real values in intakeNote
             if (intake.hasNote()) {
                 intake.intakeNote(0, 0);
@@ -374,7 +371,7 @@ public class Robot extends LoggedRobot {
         double driveTranslateX = driverController.getLeftX();
         double driveRotate = driverController.getRightX();
         if (driverController.getBButton()) {
-            swerve.drive(gameObjectVision.moveTowardsTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE));
+            swerve.drive(gameObjectVision.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE));
             // double rotateSpeed = gameObjectVision.turnRobot(0, turnPID, "tx",
             //         SWERVE.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
             // rotate = -rotateSpeed;
@@ -388,11 +385,11 @@ public class Robot extends LoggedRobot {
             // SmartDashboard.putNumber("pid based forward vel", driveToSpeed);
             // driveSpeeds = new ChassisSpeeds(translateX, 0, rotate);
         } else {
-            ChassisSpeeds smoothedRobotRelative = smoothingFilter.smooth(new ChassisSpeeds(translateX, translateY, 0));
+            ChassisSpeeds smoothedRobotRelative = smoothingFilter.smooth(new ChassisSpeeds(driveTranslateX, driveTranslateY, 0));
             driveSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
                     smoothedRobotRelative.vxMetersPerSecond,
                     smoothedRobotRelative.vyMetersPerSecond,
-                    rotate), swerve.getGyroscopeRotation());
+                    driveRotate), swerve.getGyroscopeRotation());
         }
         swerve.drive(driveSpeeds);
     }

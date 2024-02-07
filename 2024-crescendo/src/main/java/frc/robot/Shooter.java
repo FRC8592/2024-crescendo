@@ -18,8 +18,8 @@ public class Shooter {
     // private final NetworkTable table;
     // private NetworkTableEntry shooterSpeedRPS;
 
-    SparkFlexControl leftShooterMotor;
-    SparkFlexControl rightShooterMotor;
+    SparkFlexControl topShooterMotor;
+    SparkFlexControl bottomShooterMotor;
     // SparkPIDController leftShooterControl;
     // SparkPIDController rightShooterControl;
 
@@ -31,16 +31,18 @@ public class Shooter {
      * Shooter object constructor
      */
     public Shooter() {
-        leftShooterMotor = new SparkFlexControl(SHOOTER.LEFT_SHOOTER_MOTOR_CAN_ID);
-        leftShooterMotor.setInverted();
-        rightShooterMotor = new SparkFlexControl(SHOOTER.RIGHT_SHOOTER_MOTOR_CAN_ID);
+        topShooterMotor = new SparkFlexControl(SHOOTER.TOP_SHOOTER_MOTOR_CAN_ID);
+        topShooterMotor.setInverted();
+        bottomShooterMotor = new SparkFlexControl(SHOOTER.BOTTOM_SHOOTER_MOTOR_CAN_ID);
+        feederMotor = new SparkFlexControl(SHOOTER.FEEDER_MOTOR_CAN_ID); 
 
         // table = NetworkTableInstance.getDefault().getTable(shooterTableName);
-        leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP, SHOOTER.LEFT_SHOOTER_MOTOR_kI, SHOOTER.LEFT_SHOOTER_MOTOR_kD, 0);
-        rightShooterMotor.setPIDF(SHOOTER.RIGHT_SHOOTER_MOTOR_kP, SHOOTER.RIGHT_SHOOTER_MOTOR_kI, SHOOTER.RIGHT_SHOOTER_MOTOR_kD, 0);
+        topShooterMotor.setPIDF(SHOOTER.TOP_SHOOTER_MOTOR_kP, SHOOTER.TOP_SHOOTER_MOTOR_kI, SHOOTER.TOP_SHOOTER_MOTOR_kD, 0);
+        bottomShooterMotor.setPIDF(SHOOTER.BOTTOM_SHOOTER_MOTOR_kP, SHOOTER.BOTTOM_SHOOTER_MOTOR_kI, SHOOTER.BOTTOM_SHOOTER_MOTOR_kD, 0);
 
-        rightShooterMotor.setPercentOutput(0);
-        leftShooterMotor.setPercentOutput(0);
+        bottomShooterMotor.setPercentOutput(0);
+        topShooterMotor.setPercentOutput(0);
+        feederMotor.setPercentOutput(0);
     }
 
     /**
@@ -48,8 +50,8 @@ public class Shooter {
      * @param speedRPM
      */
     public void setShootVelocity(double speedRPM){
-        leftShooterMotor.setVelocity(speedRPM);
-        rightShooterMotor.setVelocity(speedRPM);
+        topShooterMotor.setVelocity(speedRPM);
+        bottomShooterMotor.setVelocity(speedRPM);
     }
 
     /**
@@ -57,16 +59,16 @@ public class Shooter {
      * @param power
      */
     public void setShootPercentOutput(double power){
-        leftShooterMotor.setPercentOutput(power);
-        rightShooterMotor.setPercentOutput(power);
+        topShooterMotor.setPercentOutput(power);
+        bottomShooterMotor.setPercentOutput(power);
     }
 
     /**
      * Stops the flywheels
      */
     public void stop() {
-        leftShooterMotor.stop();
-        rightShooterMotor.stop();
+        topShooterMotor.stop();
+        bottomShooterMotor.stop();
     }
 
     /**
@@ -109,7 +111,7 @@ public class Shooter {
      * checks if flywheels are at target speed to shoot!!!!!!!
      */
     public boolean isReady() {
-        if (leftShooterMotor.getVelocity() == targetSpeed && rightShooterMotor.getVelocity() == targetSpeed){
+        if (topShooterMotor.getVelocity() == targetSpeed && bottomShooterMotor.getVelocity() == targetSpeed){
             return true;
         }
         return false;

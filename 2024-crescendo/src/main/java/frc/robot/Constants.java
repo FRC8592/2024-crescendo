@@ -46,18 +46,19 @@ public final class Constants {
     public final class SHOOTER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Shooter/";
 
-        public static final int LEFT_SHOOTER_MOTOR_CAN_ID = 31;
-        public static final int RIGHT_SHOOTER_MOTOR_CAN_ID = 29;
+        public static final int TOP_SHOOTER_MOTOR_CAN_ID = 29;
+        public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 28;
+        public static final int FEEDER_MOTOR_CAN_ID = 31;
 
         //Change right motor to inverted using documentation
-        public static final double LEFT_SHOOTER_MOTOR_SPEED = 0.25;
-        public static final double RIGHT_SHOOTER_MOTOR_SPEED = LEFT_SHOOTER_MOTOR_SPEED;
-        public static final double LEFT_SHOOTER_MOTOR_kP = 0.0; //PID
-        public static final double LEFT_SHOOTER_MOTOR_kI = 0.0; //PID
-        public static final double LEFT_SHOOTER_MOTOR_kD = 0.0; //PID
-        public static final double RIGHT_SHOOTER_MOTOR_kP = 0.0; //PID
-        public static final double RIGHT_SHOOTER_MOTOR_kI = 0.0; //PID
-        public static final double RIGHT_SHOOTER_MOTOR_kD = 0.0; //PID
+        public static final double TOP_SHOOTER_MOTOR_SPEED = 0.25;
+        public static final double BOTTOM_SHOOTER_MOTOR_SPEED = TOP_SHOOTER_MOTOR_SPEED;
+        public static final double TOP_SHOOTER_MOTOR_kP = 0.0; //PID
+        public static final double TOP_SHOOTER_MOTOR_kI = 0.0; //PID
+        public static final double TOP_SHOOTER_MOTOR_kD = 0.0; //PID
+        public static final double BOTTOM_SHOOTER_MOTOR_kP = 0.0; //PID
+        public static final double BOTTOM_SHOOTER_MOTOR_kI = 0.0; //PID
+        public static final double BOTTOM_SHOOTER_MOTOR_kD = 0.0; //PID
 
         //Lookup table
         public static final double[][] RANGE_TABLE = {

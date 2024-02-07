@@ -7,8 +7,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.NewtonSwerve.Gyro.NewtonPigeon;
-import com.ctre.phoenix.sensors.PigeonIMU;
+import com.NewtonSwerve.Gyro.NewtonPigeon2;
+import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -42,7 +42,7 @@ public class Robot extends LoggedRobot {
     private AutonomousSelector autoSelect;
 
     //Subsystem and hardware objects
-    private NewtonPigeon pigeon;
+    private NewtonPigeon2 pigeon;
     private Swerve swerve;
     private Shooter shooter;
     private Intake intake;
@@ -54,6 +54,7 @@ public class Robot extends LoggedRobot {
     private PIDController turnPID;
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
+    private LimelightTargeting gameObjectVision;
 
 
     @Override
@@ -78,18 +79,19 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
-        pigeon = new NewtonPigeon(new PigeonIMU(PIGEON.CAN_ID));
+        pigeon = new NewtonPigeon2(new Pigeon2(PIGEON.CAN_ID));
         swerve = new Swerve(pigeon);
-        power = new Power();
+        // power = new Power();
         leds = new LED();
         // shooter = new Shooter();
         poseGetter = new PoseVision();
-        intake = new Intake();
+        // intake = new Intake();
         noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT, 0,0,0); //TODO: The last three values are for getting distance. We don't need that for now.
         // elevator = new Elevator();
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
         drivePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
         smoothingFilter = new SmoothingFilter(1, 1, 1); //TODO: Currently does nothing. Tune later
+        gameObjectVision = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, 3.0, 7.0, 0, 0, 0);
     }
 
     @Override
@@ -252,10 +254,10 @@ public class Robot extends LoggedRobot {
 
         if (autoIntake) { //Drive to the nearest note and intake it
             currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
-            intake.intakeNote(0, 0); //TODO  test intake with robotSpeed and real values in intakeNote
-            if (intake.hasNote()) {
-                intake.intakeNote(0, 0);
-            }
+            // intake.intakeNote(0, 0); //TODO  test intake with robotSpeed and real values in intakeNote
+            // if (intake.hasNote()) {
+            //     intake.intakeNote(0, 0);
+            // }
         }
         else if (autoShoot) { //Aim at the speaker and shoot into it
             poseGetter.turnToAprilTag();
@@ -364,14 +366,13 @@ public class Robot extends LoggedRobot {
         ChassisSpeeds driveSpeeds = new ChassisSpeeds();
 
         swerve.getCurrentPos();
-        LimelightTargeting gameObjectVision = null; //TODO: Replace with the real limelight
         gameObjectVision.updateVision();
 
-        double driveTranslateY = driverController.getLeftY();
-        double driveTranslateX = driverController.getLeftX();
+        double driveTranslateY = driverController.getLeftY() * SWERVE.MAX_VELOCITY_METERS_PER_SECOND;
+        double driveTranslateX = driverController.getLeftX() * SWERVE.MAX_VELOCITY_METERS_PER_SECOND;
         double driveRotate = driverController.getRightX();
         if (driverController.getBButton()) {
-            swerve.drive(gameObjectVision.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE));
+            driveSpeeds = gameObjectVision.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
             // double rotateSpeed = gameObjectVision.turnRobot(0, turnPID, "tx",
             //         SWERVE.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
             // rotate = -rotateSpeed;

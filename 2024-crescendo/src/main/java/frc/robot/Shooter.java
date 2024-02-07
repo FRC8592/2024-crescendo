@@ -9,6 +9,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.SparkPIDController;
 
@@ -49,9 +50,10 @@ public class Shooter {
      * set shooter motors speeds in terms of RPM
      * @param speedRPM
      */
-    public void setShootVelocity(double speedRPM){
+    public void setShootVelocity(int speedRPM){
         topShooterMotor.setVelocity(speedRPM);
         bottomShooterMotor.setVelocity(speedRPM);
+        targetSpeed = speedRPM;
     }
 
     /**
@@ -73,9 +75,9 @@ public class Shooter {
 
     /**
      * Sets speed of the feeder wheels
-     * @param speed speed in rpm
+     * @param speed power
      */
-    public void setFeederSpeed(int speed) {
+    public void setFeederSpeed(double speed) {
         feederMotor.setPercentOutput(speed);
     }
 
@@ -102,16 +104,19 @@ public class Shooter {
         int index = (int)(distanceToAprilTag / CONVERSIONS.METERS_TO_FEET);
         double[] vals = SHOOTER.RANGE_TABLE[index];
         double angle = vals[0];
-        double targetSpeed = vals[1];
+        int targetSpeed = (int)vals[1];
         setShootVelocity(targetSpeed);
         elevator.setAngle(angle);
     }
 
     /**
-     * checks if flywheels are at target speed to shoot!!!!!!!
+     * checks if flywheels are at target speed to shoot
      */
     public boolean isReady() {
-        if (topShooterMotor.getVelocity() == targetSpeed && bottomShooterMotor.getVelocity() == targetSpeed){
+        SmartDashboard.putNumber("leftShooterRPM", topShooterMotor.getVelocity());
+        SmartDashboard.putNumber("rightShooterRPM", bottomShooterMotor.getVelocity());
+        if (Math.abs(topShooterMotor.getVelocity() - targetSpeed) < SHOOTER.ACCEPTABLE_RANGE &&
+                Math.abs(bottomShooterMotor.getVelocity() - targetSpeed) < SHOOTER.ACCEPTABLE_RANGE){
             return true;
         }
         return false;

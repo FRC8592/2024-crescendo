@@ -53,13 +53,14 @@ public final class Constants {
         //Change right motor to inverted using documentation
         public static final double TOP_SHOOTER_MOTOR_SPEED = 0.25;
         public static final double BOTTOM_SHOOTER_MOTOR_SPEED = TOP_SHOOTER_MOTOR_SPEED;
-        public static final double TOP_SHOOTER_MOTOR_kP = 0.0; //PID
-        public static final double TOP_SHOOTER_MOTOR_kI = 0.0; //PID
-        public static final double TOP_SHOOTER_MOTOR_kD = 0.0; //PID
-        public static final double BOTTOM_SHOOTER_MOTOR_kP = 0.0; //PID
-        public static final double BOTTOM_SHOOTER_MOTOR_kI = 0.0; //PID
-        public static final double BOTTOM_SHOOTER_MOTOR_kD = 0.0; //PID
+        public static final double TOP_SHOOTER_MOTOR_kP = 0.00007; //PID
+        public static final double TOP_SHOOTER_MOTOR_kI = 0.0000005; //PID
+        public static final double TOP_SHOOTER_MOTOR_kD = 0.0000035; //PID
+        public static final double BOTTOM_SHOOTER_MOTOR_kP = 0.00007; //PID
+        public static final double BOTTOM_SHOOTER_MOTOR_kI = 0.0000005;//PID
+        public static final double BOTTOM_SHOOTER_MOTOR_kD = 0.0000035; //PID
 
+        public static final int ACCEPTABLE_RANGE = 50;
         //Lookup table
         public static final double[][] RANGE_TABLE = {
             {0,3000}

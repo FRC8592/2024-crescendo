@@ -74,16 +74,16 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
-        pigeon = new NewtonPigeon(new Pigeon2(PIGEON.CAN_ID));
-        swerve = new Swerve(pigeon);
+        // pigeon = new NewtonPigeon(new Pigeon2(PIGEON.CAN_ID));
+        // swerve = new Swerve(pigeon);
         power = new Power();
-        leds = new LED();
+        // leds = new LED();
         shooter = new Shooter();
-        poseGetter = new PoseVision();
-        intake = new Intake();
-        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
-                NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
-        elevator = new Elevator();
+        // poseGetter = new PoseVision();
+        // intake = new Intake();
+        // noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
+                // NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
+        // elevator = new Elevator();
         
     }
 
@@ -345,11 +345,25 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        poseGetter.setAlliance(DriverStation.getAlliance().get());
+        // poseGetter.setAlliance(DriverStation.getAlliance().get());
+        SmartDashboard.putNumber("shootSpeed", 0);
+        SmartDashboard.putNumber("feederSpeed", 0);
     }
 
     @Override
     public void testPeriodic() {
+        if (driverController.getRightTriggerAxis()>0.1) {
+            shooter.setShootVelocity((int)SmartDashboard.getNumber("shootSpeed", 0));
+            if (shooter.isReady()) {// isReady returns whether the shooter angle and
+                // flywheel speeds are within a threshhold of where we asked them to be
+                shooter.setFeederSpeed(SmartDashboard.getNumber("feederSpeed", 0)); // runs the feeder wheels
+                // if (!shooter.hasNote()) {
+                //     shooter.stop();
+                //     shooter.stopFeeders();
+                //     elevator.stow()
+                // }
+            }
+        }
     }
 
     @Override

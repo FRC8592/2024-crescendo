@@ -28,20 +28,31 @@ public class Elevator {
         elevatorEncoder.setPosition(0);
     }
     
-
+    /**
+     * Sets the speed of the elevator to the speed given
+     * @param speed
+     */
     public void percentOutputElevator(double speed){
         elevatorMotor.set(speed);
     }
-
+    /**
+     * Sets the position of the elevator based on the ticks it is given
+     * @param position
+     */
     public void setPosition(double position){
         elevatorPID.setReference(position, ControlType.kPosition);
     }
-
+    /**
+     * sets the position of the elevator and pivot to be able to shoot from the amp
+     */
     public void setPositionAmp(){
         elevatorPID.setReference(POSITION_AMP ,ControlType.kPosition);
     }
-
-    public void setPositionStart(double position){
+    /**
+     * Sets the position of the elevator and pivot to be able to shoot from the lowest position
+     * @param
+     */
+    public void setPositionStart(){
         elevatorPID.setReference(POSITION_START, ControlType.kPosition);
     }
     

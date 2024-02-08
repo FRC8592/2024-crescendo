@@ -79,7 +79,7 @@ public class Robot extends LoggedRobot {
         power = new Power();
         leds = new LED();
         // shooter = new Shooter();
-        poseGetter = new PoseVision();
+        poseGetter = new PoseVision(0.05, 0, 0, 0);
         intake = new Intake();
         noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
                 NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
@@ -345,7 +345,44 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        // shooter.setAlliance(DriverStation.getAlliance().get());
+        //Basic driving controls
+        double driveTranslateY = driverController.getLeftY();
+        double driveTranslateX = driverController.getLeftX();
+        double driveRotate = driverController.getRightX();
+        boolean slowMode = driverController.getRightBumper();
+        
+        //Intakes TODO: Revise with drivers
+        boolean lineUp = driverController.getLeftTriggerAxis() > 0.1;
+        
+        //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
+        ChassisSpeeds currentSpeeds;
+        if (slowMode) { //Slow Mode slows down the robot for better precision & control
+            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                            driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
+                    swerve.getGyroscopeRotation());
+        }
+        else {
+            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                            driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
+                    swerve.getGyroscopeRotation());
+        }
+
+       if (lineUp) {
+            double newOmega = poseGetter.visual_servo(3, 1.0);
+            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                newOmega,
+            swerve.getGyroscopeRotation());
+       }
+
+        swerve.drive(currentSpeeds);
     }
 
     @Override

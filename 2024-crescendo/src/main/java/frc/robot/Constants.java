@@ -44,10 +44,13 @@ public final class Constants {
 
     public final class SHOOTER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Shooter/";
+        public static final double AMP_SPEED = 0;
     }
 
     public final class ELEVATOR {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
+        public static final double AMP_ANGLE = 0;
+        public static final double AMP_LENGTH = 0;
     }
 
     public final class POWER {

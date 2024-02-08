@@ -274,10 +274,10 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (autoAmpScore) {
-            elevator.setPositionAmp();
+            elevator.setLength(ELEVATOR.AMP_LENGTH);
             double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
             double xVelocity = poseGetter.strafeToAprilTag();
-            shooter.shootVelocityMode(-1);
+            shooter.setVelocity(-1);
             double yVelocity = poseGetter.driveToAprilTag();
             currentSpeeds = new ChassisSpeeds(xVelocity, yVelocity, rotationSpeed);
             if (poseGetter.distanceToAprilTag(-1) < -1) {
@@ -293,7 +293,7 @@ public class Robot extends LoggedRobot {
             // TODO range table
             elevator.setAngle(poseGetter.distanceToAprilTag(-1));
             if (manualShoot) {
-                shooter.shootVelocityMode(-1);
+                shooter.setVelocity(-1);
                 if (shooter.isReady()) {// isReady returns whether the shooter angle and
                     // flywheel speeds are within a threshhold of where we asked them to be
                     shooter.shoot(); // runs the feeder wheels
@@ -306,10 +306,12 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (ampPrep) {
-            elevator.setAngle(-1); // set angle
-            elevator.setPositionAmp();
+            elevator.setAngle(ELEVATOR.AMP_ANGLE); // set angle
+            elevator.setLength(ELEVATOR.AMP_LENGTH);
+            //elevator.stow()
+            //elevator.setPositionAmp()
             if (manualAmpScore) {
-                shooter.shootVelocityMode(-1); // flywheels at low speed
+                shooter.setVelocity(SHOOTER.AMP_SPEED); // flywheels at low speed
                 shooter.shoot(); // feeder wheels
                 elevator.stow();
             }

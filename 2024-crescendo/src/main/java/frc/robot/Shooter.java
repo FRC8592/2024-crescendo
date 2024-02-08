@@ -59,7 +59,7 @@ public class Shooter {
         leftShooterMotor.set(0);
     }
 
-    public void shootVelocityMode(double speedRPM){
+    public void setVelocity(double speedRPM){
         leftShooterControl.setReference(speedRPM, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
         rightShooterControl.setReference(speedRPM, com.revrobotics.CANSparkBase.ControlType.kVelocity);
     }

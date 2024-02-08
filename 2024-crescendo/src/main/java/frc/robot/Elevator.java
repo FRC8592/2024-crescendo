@@ -8,7 +8,7 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class Elevator {
-    private static final int ELEVATOR_MOTOR_CAN_ID = 0;
+    private static final int ELEVATOR_MOTOR_CAN_ID = -1;
     private CANSparkFlex elevatorMotor;
     private SparkPIDController elevatorPID;
     private RelativeEncoder elevatorEncoder;
@@ -37,8 +37,8 @@ public class Elevator {
         elevatorPID.setReference(position, ControlType.kPosition);
     }
 
-    public void setPositionAmp(){
-        elevatorPID.setReference(POSITION_AMP ,ControlType.kPosition);
+    public void setLength(double length){
+        elevatorPID.setReference(length, ControlType.kPosition);
     }
 
     public void setPositionStart(double position){

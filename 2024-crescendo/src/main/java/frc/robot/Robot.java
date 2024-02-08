@@ -84,7 +84,9 @@ public class Robot extends LoggedRobot {
         // noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
                 // NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
         // elevator = new Elevator();
-        
+        SmartDashboard.putNumber("topShootSpeed", 0);
+        SmartDashboard.putNumber("bottomShootSpeed", 0);
+        SmartDashboard.putNumber("feederSpeed", 0);
     }
 
     @Override
@@ -277,11 +279,11 @@ public class Robot extends LoggedRobot {
             elevator.setPositionAmp();
             double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
             double xVelocity = poseGetter.strafeToAprilTag();
-            shooter.setShootVelocity(-1);
+            // shooter.setShootVelocity(-1);
             double yVelocity = poseGetter.driveToAprilTag();
             currentSpeeds = new ChassisSpeeds(xVelocity, yVelocity, rotationSpeed);
             if (poseGetter.distanceToAprilTag(-1) < -1) {
-                shooter.setShootVelocity(-1);
+                // shooter.setShootVelocity(-1);
                 currentSpeeds = new ChassisSpeeds();
                 if (! shooter.hasNote()) {
                     elevator.stow();
@@ -293,7 +295,7 @@ public class Robot extends LoggedRobot {
             // TODO range table
             elevator.setAngle(poseGetter.distanceToAprilTag(-1));
             if (manualShoot) {
-                shooter.setShootVelocity(-1);
+                // shooter.setShootVelocity(-1);
                 if (shooter.isReady()) {// isReady returns whether the shooter angle and
                     // flywheel speeds are within a threshhold of where we asked them to be
                     shooter.setShootPercentOutput(-1); // runs the feeder wheels
@@ -309,8 +311,8 @@ public class Robot extends LoggedRobot {
             elevator.setAngle(-1); // set angle
             elevator.setPositionAmp();
             if (manualAmpScore) {
-                shooter.setShootVelocity(-1); // flywheels at low speed
-                shooter.setShootVelocity(-1); // feeder wheels
+                // shooter.setShootVelocity(-1); // flywheels at low speed
+                // shooter.setShootVelocity(-1); // feeder wheels
                 elevator.stow();
             }
         }
@@ -346,14 +348,14 @@ public class Robot extends LoggedRobot {
     @Override
     public void testInit() {
         // poseGetter.setAlliance(DriverStation.getAlliance().get());
-        SmartDashboard.putNumber("shootSpeed", 0);
-        SmartDashboard.putNumber("feederSpeed", 0);
+        
     }
 
     @Override
     public void testPeriodic() {
-        if (driverController.getRightTriggerAxis()>0.1) {
-            shooter.setShootVelocity((int)SmartDashboard.getNumber("shootSpeed", 0));
+        if (driverController.getRightTriggerAxis() > 0.1) {
+            shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 0), 
+                    (int) SmartDashboard.getNumber("bottomShootSpeed", 0));
             if (shooter.isReady()) {// isReady returns whether the shooter angle and
                 // flywheel speeds are within a threshhold of where we asked them to be
                 shooter.setFeederSpeed(SmartDashboard.getNumber("feederSpeed", 0)); // runs the feeder wheels
@@ -363,6 +365,10 @@ public class Robot extends LoggedRobot {
                 //     elevator.stow()
                 // }
             }
+        }
+        else {
+            shooter.setShootVelocity(0, 0);
+            shooter.setFeederSpeed(0);
         }
     }
 

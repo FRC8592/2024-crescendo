@@ -26,7 +26,8 @@ public class Shooter {
 
     SparkFlexControl feederMotor;
 
-    int targetSpeed = 0;
+    int toptargetSpeed = 0;
+    int bottomTargetSpeed = 0;
 
     /**
      * Shooter object constructor
@@ -50,10 +51,11 @@ public class Shooter {
      * set shooter motors speeds in terms of RPM
      * @param speedRPM
      */
-    public void setShootVelocity(int speedRPM){
-        topShooterMotor.setVelocity(speedRPM);
-        bottomShooterMotor.setVelocity(speedRPM);
-        targetSpeed = speedRPM;
+    public void setShootVelocity(int topspeedRPM, int bottomspeedRPM){
+        topShooterMotor.setVelocity(topspeedRPM);
+        bottomShooterMotor.setVelocity(bottomspeedRPM);
+        toptargetSpeed = topspeedRPM;
+        bottomTargetSpeed = bottomspeedRPM;
     }
 
     /**
@@ -105,7 +107,7 @@ public class Shooter {
         double[] vals = SHOOTER.RANGE_TABLE[index];
         double angle = vals[0];
         int targetSpeed = (int)vals[1];
-        setShootVelocity(targetSpeed);
+        // setShootVelocity(targetSpeed);/
         elevator.setAngle(angle);
     }
 
@@ -115,8 +117,8 @@ public class Shooter {
     public boolean isReady() {
         SmartDashboard.putNumber("leftShooterRPM", topShooterMotor.getVelocity());
         SmartDashboard.putNumber("rightShooterRPM", bottomShooterMotor.getVelocity());
-        if (Math.abs(topShooterMotor.getVelocity() - targetSpeed) < SHOOTER.ACCEPTABLE_RANGE &&
-                Math.abs(bottomShooterMotor.getVelocity() - targetSpeed) < SHOOTER.ACCEPTABLE_RANGE){
+        if (Math.abs(topShooterMotor.getVelocity() - toptargetSpeed) < SHOOTER.ACCEPTABLE_RANGE&&
+                Math.abs(bottomShooterMotor.getVelocity() - bottomTargetSpeed) < SHOOTER.ACCEPTABLE_RANGE) {
             return true;
         }
         return false;

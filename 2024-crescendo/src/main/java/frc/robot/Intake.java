@@ -19,6 +19,14 @@ public class Intake {
     private TalonFX topMotor;
     private TalonFX bottomMotor;
 
+    private enum States {
+        INTAKE_PREP,
+        INTAKING,
+        STOP
+    }
+    
+    private States state;
+
     public Intake() {
         topMotor = new TalonFX(INTAKE.TOP_MOTOR_CAN_ID);
         topMotor.setInverted(true);
@@ -30,6 +38,37 @@ public class Intake {
         bottomMotor.config_kP(0, INTAKE.BOTTOM_MOTOR_kP);
         bottomMotor.config_kI(0, INTAKE.BOTTOM_MOTOR_kI);
         bottomMotor.config_kD(0, INTAKE.BOTTOM_MOTOR_kD);
+    }
+
+    public void update(Swerve swerve, Shooter shooter) {
+        switch (state) {
+            case INTAKE_PREP:
+                robotSpeedIntake(swerve);
+                if (this.hasNote()) {
+                    this.state = States.INTAKING;
+                }
+                break;
+            case INTAKING:
+                intakeNote(INTAKE.SPEED_TOP, INTAKE.SPEED_BOTTOM);
+                if (shooter.hasNote()) {
+                    this.state = States.STOP;
+                }
+                break;
+            case STOP:
+            default:
+                intakeNote(0, 0);
+                break;
+        }
+    }
+
+    public void intake() {
+        if (state == States.STOP) {
+            this.state = States.INTAKE_PREP;
+        }
+    }
+
+    public void stop() {
+        this.state = States.STOP;
     }
 
     /**

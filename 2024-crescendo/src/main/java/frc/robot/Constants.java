@@ -30,16 +30,22 @@ public final class Constants {
 
     public final class INTAKE {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Intake/";
+
         public static final int TOP_MOTOR_CAN_ID = 15;
         public static final int BOTTOM_MOTOR_CAN_ID = 18;
+
         public static final double TOP_MOTOR_kP = 0.01;
         public static final double TOP_MOTOR_kI = 0.001;
         public static final double TOP_MOTOR_kD = 0.001;
         public static final double BOTTOM_MOTOR_kP = 0.01;
         public static final double BOTTOM_MOTOR_kI = 0.001;
         public static final double BOTTOM_MOTOR_kD = 0.001;
+
         public static final double MINIMUM_ROLLER_SPEED = 0;
         public static final double ROBOT_SPEED_MULTIPLIER = 100;
+
+        public static final int SPEED_TOP = 0; //TODO: Set later
+        public static final int SPEED_BOTTOM = 0; //TODO: Set this later
     }
 
     public final class SHOOTER {

@@ -79,19 +79,19 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
-        pigeon = new NewtonPigeon2(new Pigeon2(PIGEON.CAN_ID));
-        swerve = new Swerve(pigeon);
-        // power = new Power();
-        leds = new LED();
-        // shooter = new Shooter();
-        poseGetter = new PoseVision();
+        // pigeon = new NewtonPigeon(new Pigeon2(PIGEON.CAN_ID));
+        // swerve = new Swerve(pigeon);
+        power = new Power();
+        // leds = new LED();
+        shooter = new Shooter();
+        // poseGetter = new PoseVision();
         // intake = new Intake();
-        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT, 0,0,0); //TODO: The last three values are for getting distance. We don't need that for now.
+        // noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
+                // NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
         // elevator = new Elevator();
-        turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
-        drivePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
-        smoothingFilter = new SmoothingFilter(1, 1, 1); //TODO: Currently does nothing. Tune later
-        gameObjectVision = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, 3.0, 7.0, 0, 0, 0);
+        SmartDashboard.putNumber("topShootSpeed", 0);
+        SmartDashboard.putNumber("bottomShootSpeed", 0);
+        SmartDashboard.putNumber("feederSpeed", 0);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
-        // shooter.setAlliance(DriverStation.getAlliance().get());
+        poseGetter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
         currentAuto.addModules(swerve, elevator, intake, shooter, noteLock);
         currentAuto.initialize();
@@ -118,7 +118,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        // shooter.setAlliance(DriverStation.getAlliance().get());
+        poseGetter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
     }
@@ -262,13 +262,13 @@ public class Robot extends LoggedRobot {
         else if (autoShoot) { //Aim at the speaker and shoot into it
             poseGetter.turnToAprilTag();
             //TODO range table
-            elevator.setPivotAngle(poseGetter.distanceToAprilTag(-1));
-            shooter.setSpeedRangeTable(poseGetter.distanceToAprilTag(-1));
+            elevator.setAngle(poseGetter.distanceToAprilTag(-1));
+            shooter.setSpeedRangeTable(poseGetter.distanceToAprilTag(-1), elevator);
             if (shooter.isReady()) {//isReady returns whether the shooter angle and 
                 //flywheel speeds are within a threshhold  of where we asked them to be
-                shooter.shoot(); //runs the feeder wheels
+                shooter.setFeederSpeed(0); //runs the feeder wheels
                 if (! shooter.hasNote()) {
-                    shooter.stopFlywheels();
+                    shooter.stop();
                     shooter.stopFeeders();
                     elevator.stow();
                 }
@@ -278,11 +278,11 @@ public class Robot extends LoggedRobot {
             elevator.setLength(ELEVATOR.AMP_LENGTH);
             double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
             double xVelocity = poseGetter.strafeToAprilTag();
-            shooter.setVelocity(-1);
+            // shooter.setShootVelocity(-1);
             double yVelocity = poseGetter.driveToAprilTag();
             currentSpeeds = new ChassisSpeeds(xVelocity, yVelocity, rotationSpeed);
             if (poseGetter.distanceToAprilTag(-1) < -1) {
-                shooter.shoot();
+                // shooter.setShootVelocity(-1);
                 currentSpeeds = new ChassisSpeeds();
                 if (! shooter.hasNote()) {
                     elevator.stow();
@@ -294,12 +294,12 @@ public class Robot extends LoggedRobot {
             // TODO range table
             elevator.setPivotAngle(poseGetter.distanceToAprilTag(-1));
             if (manualShoot) {
-                shooter.setVelocity(-1);
+                // shooter.setShootVelocity(-1);
                 if (shooter.isReady()) {// isReady returns whether the shooter angle and
                     // flywheel speeds are within a threshhold of where we asked them to be
-                    shooter.shoot(); // runs the feeder wheels
+                    shooter.setShootPercentOutput(-1); // runs the feeder wheels
                     if (!shooter.hasNote()) {
-                        shooter.stopFlywheels();
+                        shooter.stop();
                         shooter.stopFeeders();
                         elevator.stow();
                     }
@@ -310,8 +310,8 @@ public class Robot extends LoggedRobot {
             elevator.setPivotAmp(); // set angle
             elevator.setPositionAmp();
             if (manualAmpScore) {
-                shooter.setVelocity(SHOOTER.AMP_SPEED); // flywheels at low speed
-                shooter.shoot(); // feeder wheels
+                // shooter.setShootVelocity(-1); // flywheels at low speed
+                // shooter.setShootVelocity(-1); // feeder wheels
                 elevator.stow();
             }
         }
@@ -347,52 +347,29 @@ public class Robot extends LoggedRobot {
     @Override
     public void testInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
+        // poseGetter.setAlliance(DriverStation.getAlliance().get());
+        
     }
 
     @Override
     public void testPeriodic() {
-        double translatePower;
-        double translateX;
-        double translateY;
-        double rotate;
-        double rotateToAngle;
-        translatePower = SWERVE.TRANSLATE_POWER_SLOW;
-        double rotatePower = SWERVE.ROTATE_POWER_SLOW;
-
-        if (driverController.getBackButton()) {
-            swerve.zeroGyroscope();
+        if (driverController.getRightTriggerAxis() > 0.1) {
+            shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 0), 
+                    (int) SmartDashboard.getNumber("bottomShootSpeed", 0));
+            if (shooter.isReady()) {// isReady returns whether the shooter angle and
+                // flywheel speeds are within a threshhold of where we asked them to be
+                shooter.setFeederSpeed(SmartDashboard.getNumber("feederSpeed", 0)); // runs the feeder wheels
+                // if (!shooter.hasNote()) {
+                //     shooter.stop();
+                //     shooter.stopFeeders();
+                //     elevator.stow()
+                // }
+            }
         }
-
-        ChassisSpeeds driveSpeeds = new ChassisSpeeds();
-
-        swerve.getCurrentPos();
-        gameObjectVision.updateVision();
-
-        double driveTranslateY = driverController.getLeftY() * SWERVE.MAX_VELOCITY_METERS_PER_SECOND;
-        double driveTranslateX = driverController.getLeftX() * SWERVE.MAX_VELOCITY_METERS_PER_SECOND;
-        double driveRotate = driverController.getRightX();
-        if (driverController.getBButton()) {
-            driveSpeeds = gameObjectVision.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
-            // double rotateSpeed = gameObjectVision.turnRobot(0, turnPID, "tx",
-            //         SWERVE.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
-            // rotate = -rotateSpeed;
-
-            // double driveToSpeed = gameObjectVision.turnRobot(0, drivePID, "ty", 4.5, -24.0); // -20 means its
-            //                                                                                  // sorta close and
-            //                                                                                  // the decimal being
-            //                                                                                  // added is the
-            //                                                                                  // FeedForward
-            // translateX = driveToSpeed; // go forwards at driveToSpeed towards the target
-            // SmartDashboard.putNumber("pid based forward vel", driveToSpeed);
-            // driveSpeeds = new ChassisSpeeds(translateX, 0, rotate);
-        } else {
-            ChassisSpeeds smoothedRobotRelative = smoothingFilter.smooth(new ChassisSpeeds(driveTranslateX, driveTranslateY, 0));
-            driveSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
-                    smoothedRobotRelative.vxMetersPerSecond,
-                    smoothedRobotRelative.vyMetersPerSecond,
-                    driveRotate), swerve.getGyroscopeRotation());
+        else {
+            shooter.setShootVelocity(0, 0);
+            shooter.setFeederSpeed(0);
         }
-        swerve.drive(driveSpeeds);
     }
 
     @Override

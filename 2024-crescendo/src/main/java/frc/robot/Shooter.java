@@ -2,93 +2,92 @@ package frc.robot;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import frc.robot.Constants.*;
 //import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.SparkPIDController;
 
 public class Shooter {
-    // Constants
-    public static final int LEFT_MOTOR_CAN_ID = 31;
-    public static final int RIGHT_MOTOR_CAN_ID = 29;
-
+    
     // private final String shooterTableName = "shooter_table"; TODO: What are these three lines?
     // private final NetworkTable table;
     // private NetworkTableEntry shooterSpeedRPS;
 
-    //Change right motor to inverted using documentation
-    public static double LEFT_MOTOR_SPEED = 0.25;
-    public static double RIGHT_MOTOR_SPEED = LEFT_MOTOR_SPEED;
-    public static double LEFT_MOTOR_kP = 0.0; //PID
-    public static double LEFT_MOTOR_kI = 0.0; //PID
-    public static double LEFT_MOTOR_kD = 0.0; //PID
-    public static double RIGHT_MOTOR_kP = 0.0; //PID
-    public static double RIGHT_MOTOR_kI = 0.0; //PID
-    public static double RIGHT_MOTOR_kD = 0.0; //PID
+    SparkFlexControl topShooterMotor;
+    SparkFlexControl bottomShooterMotor;
+    // SparkPIDController leftShooterControl;
+    // SparkPIDController rightShooterControl;
 
+    SparkFlexControl feederMotor;
 
-    CANSparkFlex leftShooterMotor;
-    CANSparkFlex rightShooterMotor;
-    RelativeEncoder leftShooterEncoder;
-    RelativeEncoder rightShooterEncoder;
-    SparkPIDController leftShooterControl;
-    SparkPIDController rightShooterControl;
+    int toptargetSpeed = 0;
+    int bottomTargetSpeed = 0;
 
-    public Shooter(){
-        leftShooterMotor = new CANSparkFlex(LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
-        leftShooterMotor.setInverted(true);
-        rightShooterMotor = new CANSparkFlex(RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
-        leftShooterEncoder = leftShooterMotor.getEncoder();
-        rightShooterEncoder = rightShooterMotor.getEncoder();
+    /**
+     * Shooter object constructor
+     */
+    public Shooter() {
+        topShooterMotor = new SparkFlexControl(SHOOTER.TOP_SHOOTER_MOTOR_CAN_ID);
+        topShooterMotor.setInverted();
+        bottomShooterMotor = new SparkFlexControl(SHOOTER.BOTTOM_SHOOTER_MOTOR_CAN_ID);
+        feederMotor = new SparkFlexControl(SHOOTER.FEEDER_MOTOR_CAN_ID); 
 
         // table = NetworkTableInstance.getDefault().getTable(shooterTableName);
-        leftShooterControl =  leftShooterMotor.getPIDController();
-        rightShooterControl = rightShooterMotor.getPIDController();
-        leftShooterControl.setP(LEFT_MOTOR_kP); //PID
-        leftShooterControl.setI(LEFT_MOTOR_kI); //PID
-        leftShooterControl.setD(LEFT_MOTOR_kD); //PID
-        rightShooterControl.setP(RIGHT_MOTOR_kP); //PID
-        rightShooterControl.setI(RIGHT_MOTOR_kI); //PID
-        rightShooterControl.setD(RIGHT_MOTOR_kD); //PID
+        topShooterMotor.setPIDF(SHOOTER.TOP_SHOOTER_MOTOR_kP, SHOOTER.TOP_SHOOTER_MOTOR_kI, SHOOTER.TOP_SHOOTER_MOTOR_kD, 0);
+        bottomShooterMotor.setPIDF(SHOOTER.BOTTOM_SHOOTER_MOTOR_kP, SHOOTER.BOTTOM_SHOOTER_MOTOR_kI, SHOOTER.BOTTOM_SHOOTER_MOTOR_kD, 0);
 
-        rightShooterMotor.set(0);
-        leftShooterMotor.set(0);
+        bottomShooterMotor.setPercentOutput(0);
+        topShooterMotor.setPercentOutput(0);
+        feederMotor.setPercentOutput(0);
     }
 
-    public void setVelocity(double speedRPM){
-        leftShooterControl.setReference(speedRPM, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
-        rightShooterControl.setReference(speedRPM, com.revrobotics.CANSparkBase.ControlType.kVelocity);
+    /**
+     * set shooter motors speeds in terms of RPM
+     * @param speedRPM
+     */
+    public void setShootVelocity(int topspeedRPM, int bottomspeedRPM){
+        topShooterMotor.setVelocity(topspeedRPM);
+        bottomShooterMotor.setVelocity(bottomspeedRPM);
+        toptargetSpeed = topspeedRPM;
+        bottomTargetSpeed = bottomspeedRPM;
     }
 
-    public void shootPercentOutput(double power){
-        leftShooterMotor.set(Math.min(Math.max(power,-0.5),0.5)); 
-        rightShooterMotor.set(Math.min(Math.max(power,-0.5),0.5));
+    /**
+     * set shooter motors speeds in terms of percent output
+     * @param power
+     */
+    public void setShootPercentOutput(double power){
+        topShooterMotor.setPercentOutput(power);
+        bottomShooterMotor.setPercentOutput(power);
     }
 
-    public void stop(){
-        leftShooterMotor.set(0);
-        rightShooterMotor.set(0);
+    /**
+     * Stops the flywheels
+     */
+    public void stop() {
+        topShooterMotor.stop();
+        bottomShooterMotor.stop();
     }
 
     /**
      * Sets speed of the feeder wheels
-     * @param speed speed in rpm
+     * @param speed power
      */
-    public void setFeederSpeed(int speed) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+    public void setFeederSpeed(double speed) {
+        feederMotor.setPercentOutput(speed);
     }
-    
+
     /**
-     * Spins feeder motors to shoot note
+     * stops feeder wheels from moving
      */
-    public void shoot() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+    public void stopFeeders() {
+        feederMotor.stop();
     }
 
     /**
@@ -96,47 +95,32 @@ public class Shooter {
      * @return 
      */
     public boolean hasNote() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
+        return true;
     }
-    
+
     /**
-     * stops flywheels from moving!
-     */
-    public void stopFlywheels() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
-    }
-    
-    /**
-     * stops feeder wheels from moving uwu
-     */
-    public void stopFeeders() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopFeeders'");
-    }
-    /**
-     * sets speed based on range table!!!
+     * sets speed and angle based on range table
      * @param distanceToAprilTag
      */
-    public void setSpeedRangeTable(double distanceToAprilTag) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setSpeedRangeTable'");
+    public void setSpeedRangeTable(double distanceToAprilTag, Elevator elevator) {
+        int index = (int)(distanceToAprilTag / CONVERSIONS.METERS_TO_FEET);
+        double[] vals = SHOOTER.RANGE_TABLE[index];
+        double angle = vals[0];
+        int targetSpeed = (int)vals[1];
+        // setShootVelocity(targetSpeed);/
+        elevator.setAngle(angle);
     }
+
     /**
      * checks if flywheels are at target speed to shoot
-     * @return
      */
     public boolean isReady() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isReady'");
-    }
-    /**
-     * sets the alliance to blue or red!!
-     * @param alliance
-     */
-    public void setAlliance(Alliance alliance) {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'setAlliance'");
+        SmartDashboard.putNumber("leftShooterRPM", topShooterMotor.getVelocity());
+        SmartDashboard.putNumber("rightShooterRPM", bottomShooterMotor.getVelocity());
+        if (Math.abs(topShooterMotor.getVelocity() - toptargetSpeed) < SHOOTER.ACCEPTABLE_RANGE&&
+                Math.abs(bottomShooterMotor.getVelocity() - bottomTargetSpeed) < SHOOTER.ACCEPTABLE_RANGE) {
+            return true;
+        }
+        return false;
     }
 }

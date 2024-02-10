@@ -3,6 +3,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
 
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 public class PoseVision {
     private double tag_x;
     private double tag_y;
@@ -116,5 +118,15 @@ public class PoseVision {
      */
     public double distanceToAprilTag(int id) {
         return 0.0;
+    }
+    
+    /**
+     * sets the alliance to blue or red!!
+     * Manav plz fix this
+     * @param alliance
+     */
+    public void setAlliance(Alliance alliance) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setAlliance'");
     }
 }

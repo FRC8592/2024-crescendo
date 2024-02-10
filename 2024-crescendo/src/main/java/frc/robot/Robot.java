@@ -262,7 +262,7 @@ public class Robot extends LoggedRobot {
         else if (autoShoot) { //Aim at the speaker and shoot into it
             poseGetter.turnToAprilTag();
             //TODO range table
-            elevator.setAngle(poseGetter.distanceToAprilTag(-1));
+            elevator.setPivotAngle(poseGetter.distanceToAprilTag(-1));
             shooter.setSpeedRangeTable(poseGetter.distanceToAprilTag(-1), elevator);
             if (shooter.isReady()) {//isReady returns whether the shooter angle and 
                 //flywheel speeds are within a threshhold  of where we asked them to be
@@ -275,7 +275,7 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (autoAmpScore) {
-            elevator.setLength(ELEVATOR.AMP_LENGTH);
+            elevator.setPosition(ELEVATOR.LENGTH_AMP);
             double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
             double xVelocity = poseGetter.strafeToAprilTag();
             // shooter.setShootVelocity(-1);

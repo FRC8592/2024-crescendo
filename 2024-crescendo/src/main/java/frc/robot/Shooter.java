@@ -108,7 +108,7 @@ public class Shooter {
         double angle = vals[0];
         int targetSpeed = (int)vals[1];
         // setShootVelocity(targetSpeed);/
-        elevator.setAngle(angle);
+        elevator.setPivotAngle(angle);
     }
 
     /**

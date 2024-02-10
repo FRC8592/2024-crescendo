@@ -17,6 +17,10 @@ public final class Constants {
         public static final int DRIVER_PORT = 0;
         public static final int OPERATOR_PORT = 1;
     }
+    
+    public final class CAN {
+        
+    }
 
     public final class NOTELOCK {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/NoteLock/";
@@ -48,12 +52,26 @@ public final class Constants {
     }
 
     public final class ELEVATOR {
-        public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
         public static final int ELEVATOR_MOTOR_CAN_ID = -1;
-        public static final double POSITION_START = -1;
-        public static final double POSITION_AMP= -1;
-        public static final int PIVOT_MOTOR_CAN_ID = -1;    
-        public static final int PIVOT_ANGLE_AMP = -1;
+        public static final int PIVOT_MOTOR_CAN_ID = -1;
+            
+        public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
+        
+        public static final int PIVOT_ANGLE_AMP = -1; //TODO: Find the units for this and the next four
+        public static final int LENGTH_AMP = -1;
+        
+        public static final int PIVOT_ANGLE_STOWED = 0;
+        public static final int LENGTH_STOWED = 0;
+        
+        public static final double ELEVATOR_MOTOR_kP = 0;
+        public static final double ELEVATOR_MOTOR_kI = 0;
+        public static final double ELEVATOR_MOTOR_kD = 0;
+        public static final double BASE_ELEVATOR_MOTOR_kF = 0;
+        
+        public static final double PIVOT_MOTOR_kP = 0;
+        public static final double PIVOT_MOTOR_kI = 0;
+        public static final double PIVOT_MOTOR_kD = 0;
+        public static final double BASE_PIVOT_MOTOR_kF = 0;
     }
 
     public final class POWER {

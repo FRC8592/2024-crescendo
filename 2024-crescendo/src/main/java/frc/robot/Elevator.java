@@ -30,7 +30,7 @@ public class Elevator {
      * sets the position of the elevator and pivot to shoot in amp
      */
     public void setPositionAmp(){
-        elevatorMotor.setVelocity(ELEVATOR.POSITION_AMP);
+        elevatorMotor.setVelocity(ELEVATOR.LENGTH_AMP);
     }
 
     /**
@@ -39,7 +39,7 @@ public class Elevator {
      * */
     
      public void setPositionStart(double position){
-        elevatorMotor.setVelocity(ELEVATOR.POSITION_START);
+        elevatorMotor.setVelocity(ELEVATOR.LENGTH_STOWED);
     }
     
     /**

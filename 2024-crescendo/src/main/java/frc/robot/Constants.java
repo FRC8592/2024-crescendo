@@ -24,13 +24,21 @@ public final class Constants {
 
     public final class NOTELOCK {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/NoteLock/";
-        public static final String LIMELIGHT_NAME = ""; // TODO: Not set yet
+        public static final String LIMELIGHT_NAME = "limelight-vision"; // TODO: Not set yet
         public static final double LOCK_ERROR = -1; // TODO: Not set yet
         public static final double CLOSE_ERROR = -1; // TODO: Not set yet
         public static final double CAMERA_HEIGHT = -1; // TODO: Not set yet
-        public static final double kP = -1; // TODO: Not set yet
-        public static final double kI = -1; // TODO: Not set yet
-        public static final double kD = -1; // TODO: Not set yet
+        public static final double DRIVE_TO_TARGET_ANGLE = -24;
+        
+        // Turn-to PID constants for the drive-to-note function
+        public static final double DRIVE_TO_TURN_kP = 0.1;
+        public static final double DRIVE_TO_TURN_kI = 0;
+        public static final double DRIVE_TO_TURN_kD = 0;
+
+        // Drive PID constants for the drive-to-note function
+        public static final double DRIVE_TO_DRIVE_kP = 0.13;
+        public static final double DRIVE_TO_DRIVE_kI = 0;
+        public static final double DRIVE_TO_DRIVE_kD = 0;
     }
 
     public final class INTAKE {
@@ -104,21 +112,46 @@ public final class Constants {
         * BLACK is back-right
         * WHITE is back-left
         *****************************************************************************************/
-        public static final int TEAL_FRONT_LEFT_DRIVE_CAN = 7; 
-        public static final int TEAL_FRONT_LEFT_STEER_CAN = 6; 
-        public static final int TEAL_FRONT_LEFT_ENCODER_CAN = 8; 
+        // public static final int TEAL_FRONT_LEFT_DRIVE_CAN = 7; 
+        // public static final int TEAL_FRONT_LEFT_STEER_CAN = 6; 
+        // public static final int TEAL_FRONT_LEFT_ENCODER_CAN = 8; 
 
-        public static final int ORANGE_FRONT_RIGHT_DRIVE_CAN = 4;
-        public static final int ORANGE_FRONT_RIGHT_STEER_CAN = 3;
-        public static final int ORANGE_FRONT_RIGHT_ENCODER_CAN = 5;
+        // public static final int ORANGE_FRONT_RIGHT_DRIVE_CAN = 4;
+        // public static final int ORANGE_FRONT_RIGHT_STEER_CAN = 3;
+        // public static final int ORANGE_FRONT_RIGHT_ENCODER_CAN = 5;
 
-        public static final int BLACK_BACK_LEFT_DRIVE_CAN = 10;
-        public static final int BLACK_BACK_LEFT_STEER_CAN = 9;
-        public static final int BLACK_BACK_LEFT_ENCODER_CAN = 11;
+        // public static final int BLACK_BACK_LEFT_DRIVE_CAN = 10;
+        // public static final int BLACK_BACK_LEFT_STEER_CAN = 9;
+        // public static final int BLACK_BACK_LEFT_ENCODER_CAN = 11;
 
-        public static final int WHITE_BACK_RIGHT_DRIVE_CAN = 13;
-        public static final int WHITE_BACK_RIGHT_STEER_CAN = 12;
-        public static final int WHITE_BACK_RIGHT_ENCODER_CAN = 14;
+        // public static final int WHITE_BACK_RIGHT_DRIVE_CAN = 13;
+        // public static final int WHITE_BACK_RIGHT_STEER_CAN = 12;
+        // public static final int WHITE_BACK_RIGHT_ENCODER_CAN = 14;
+
+        // public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(233.525);
+        // public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(133.77);
+        // public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(78.75);
+        // public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(147.041);
+        
+        public static final int TEAL_FRONT_LEFT_DRIVE_CAN = 2; // Named Green in Electronics
+        public static final int TEAL_FRONT_LEFT_STEER_CAN = 3;
+        public static final int TEAL_FRONT_LEFT_ENCODER_CAN = 10;
+        public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(90.7);
+
+        public static final int ORANGE_FRONT_RIGHT_DRIVE_CAN = 8; // Named Black in Electronics
+        public static final int ORANGE_FRONT_RIGHT_STEER_CAN = 9;
+        public static final int ORANGE_FRONT_RIGHT_ENCODER_CAN = 13;
+        public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(66.3);
+
+        public static final int BLACK_BACK_LEFT_DRIVE_CAN = 6; // Named Orange in Electronics
+        public static final int BLACK_BACK_LEFT_STEER_CAN = 7;
+        public static final int BLACK_BACK_LEFT_ENCODER_CAN = 12;
+        public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(136.7);
+
+        public static final int WHITE_BACK_RIGHT_DRIVE_CAN = 4; // Named White in Electronics
+        public static final int WHITE_BACK_RIGHT_STEER_CAN = 5;
+        public static final int WHITE_BACK_RIGHT_ENCODER_CAN = 11;
+        public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(285.0);
 
         public static final double THROTTLE_kP = 0.02;
         public static final double THROTTLE_kI = 0.0;
@@ -132,11 +165,6 @@ public final class Constants {
         public static final double DRIVE_TRAIN_LENGTH = 0.52; // meters 
         public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI; // TODO: Check that this is accurate
 
-        public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(233.525); 
-        public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(133.77); 
-        public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(78.75); 
-        public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(147.041); 
-
         public static final double TRANSLATE_POWER_FAST = 1.0; // Scaling for teleop driving. 1.0 is maximum
         public static final double ROTATE_POWER_FAST = 0.75; // Scaling for teleop driving. 1.0 is maximum
         public static final double TRANSLATE_POWER_SLOW = 0.15; // Scaling for teleop driving. 1.0 is maximum
@@ -145,13 +173,17 @@ public final class Constants {
         public static final double MAX_VOLTAGE = 12.0;
         public static final double TELEOP_CURRENT_LIMIT = 15.0; 
         public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.5;
+
+        public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND / // 6.0
+                Math.hypot(SWERVE.DRIVE_TRAIN_WIDTH / 2.0, DRIVE_TRAIN_LENGTH / 2.0);
     }
 
     public final class PIGEON {
-        public static final int CAN_ID = 34;
+        public static final int CAN_ID = 20;
     }
+
     public class ROBOT {
         public static final double JOYSTICK_DEADBAND = 0.01;
-        private static final String LOG_PATH = SHARED.LOG_FOLDER + "/Robot/";
+        public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Robot/";
     }
 }

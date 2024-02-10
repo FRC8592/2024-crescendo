@@ -184,9 +184,9 @@ public final class Constants {
     public static double CLOSE_DRIVE_TO_ROTATE_KD  = 0.0;  
 
     // Vision constants for the TURN_TO camera
-    public static double TURN_TO_ROTATE_KP        = 0.1; //0.15;           // Proportional constant for turret rotate speed
+    public static double TURN_TO_ROTATE_KP        = 0.05; //0.15;           // Proportional constant for turret rotate speed
     public static double TURN_TO_ROTATE_KI        = 0.0;
-    public static double TURN_TO_ROTATE_KD        = 0.0;   
+    public static double TURN_TO_ROTATE_KD        = 0.005;   
 
 
     // Common vision constants

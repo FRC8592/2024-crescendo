@@ -4,11 +4,19 @@ import frc.robot.Constants.*;
 public class Elevator {
     private SparkFlexControl elevatorMotor;
     private SparkFlexControl pivotMotor;
+    private SparkFlexControl pivotFollowMotor;
 
 
     public Elevator(){
         elevatorMotor = new SparkFlexControl(ELEVATOR.ELEVATOR_MOTOR_CAN_ID);
         pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID);
+        pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID);
+
+        pivotFollowMotor.setFollower(pivotMotor);
+    }
+
+    public void elevatorPeriodic(double setTicks, double setAngle){
+        double currAngle = elevatorMotor.getPosition();
     }
     
     /**
@@ -73,8 +81,9 @@ public class Elevator {
      * gets position of pivot
      * @return
      */
-    public double getPivotPosition() {
-        return pivotMotor.getPosition();
+    public double getPivotAngle() {
+        double ticksConverted = CONVERSIONS.TICKS_TO_ANGLE_DEGREES*pivotMotor.getTicks();
+        return ticksConverted;
     }
 
     public void setPivotAmp() {

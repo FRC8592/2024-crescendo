@@ -275,7 +275,7 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (autoAmpScore) {
-            elevator.setPosition(ELEVATOR.LENGTH_AMP);
+            elevator.setElevatorPositionAmp();
             double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
             double xVelocity = poseGetter.strafeToAprilTag();
             // shooter.setShootVelocity(-1);
@@ -307,8 +307,8 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (ampPrep) {
-            elevator.setPivotAmp(); // set angle
-            elevator.setPositionAmp();
+            elevator.setPivotAngleAmp(); // set angle
+            elevator.setElevatorPositionAmp();
             if (manualAmpScore) {
                 // shooter.setShootVelocity(-1); // flywheels at low speed
                 // shooter.setShootVelocity(-1); // feeder wheels
@@ -319,11 +319,11 @@ public class Robot extends LoggedRobot {
             double currentElevatorPos = elevator.getElevatorPosition();
             if (elevatorControl == 1.0) {
                 double targetPosition = currentElevatorPos + 0.01; // TODO: set constant
-                elevator.setPosition(targetPosition);
+                elevator.setElevatorPosition(targetPosition);
             }
             else if (elevatorControl == -1.0) {
                 double targetPosition = currentElevatorPos - 0.01; // TODO:
-                elevator.setPosition(targetPosition);
+                elevator.setElevatorPosition(targetPosition);
             }
             elevator.setPivotAngle(90); // set to 90 degrees
         }

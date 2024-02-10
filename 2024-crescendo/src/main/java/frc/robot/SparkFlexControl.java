@@ -1,13 +1,14 @@
 package frc.robot;
 import com.revrobotics.CANSparkFlex;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkPIDController;
 
 public class SparkFlexControl {
-    CANSparkFlex motor;
-    RelativeEncoder motorEncoder;
-    SparkPIDController motorControl;
+    public CANSparkFlex motor;
+    public RelativeEncoder motorEncoder;
+    public SparkPIDController motorControl;
 
 
     public SparkFlexControl(int MOTOR_CAN_ID){
@@ -48,5 +49,13 @@ public class SparkFlexControl {
 
     public void setInverted(){
         motor.setInverted(true);
+    }
+
+    public double getTicks(){
+        return motorEncoder.getPosition()*42;
+    }
+
+    public void setFollower(SparkFlexControl motorToFollow){
+        motor.follow(motorToFollow.motor);
     }
 }

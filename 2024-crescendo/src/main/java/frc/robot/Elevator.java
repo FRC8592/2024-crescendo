@@ -4,13 +4,47 @@ import frc.robot.Constants.*;
 public class Elevator {
     private SparkFlexControl elevatorMotor;
     private SparkFlexControl pivotMotor;
+    private SparkFlexControl pivotFollowMotor;
 
 
     public Elevator(){
         elevatorMotor = new SparkFlexControl(ELEVATOR.ELEVATOR_MOTOR_CAN_ID);
         pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID);
+        pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID);
+
+        pivotFollowMotor.setFollower(pivotMotor);
     }
-    
+
+    private double setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
+    private double setTicks = ELEVATOR.POSITION_STOWED;
+
+    public void elevatorPeriodic(){
+        double currAngle = getPivotAngle();
+        double currTicks = getElevatorPosition();
+        boolean up = true;
+
+
+        if(currAngle > setAngle){
+            up = false;
+        } else{
+            up = true;
+        }
+
+        if (currAngle > 30 || currTicks < 5){
+            setPivotAngle(setAngle);
+            setElevatorPosition(setTicks);
+        } else if(currAngle<30 && up == true){
+            setPivotAngle(setAngle);
+            setElevatorPosition(setTicks);
+        } else{
+            elevatorMotor.stop();
+            pivotMotor.stop();
+        }
+        
+    }
+
+    //-------ELEVATOR CODE-------//
+
     /**
      * sets the speed of
      * @param speed
@@ -22,15 +56,15 @@ public class Elevator {
     /** 
      * sets the position
     */
-    public void setPosition(double position){
-        elevatorMotor.setVelocity(position);
+    public void setElevatorPosition(double position){
+        elevatorMotor.setPosition(position);
     }
 
     /**
      * sets the position of the elevator and pivot to shoot in amp
      */
-    public void setPositionAmp(){
-        elevatorMotor.setVelocity(ELEVATOR.LENGTH_AMP);
+    public void setElevatorPositionAmp(){
+        setElevatorPosition(ELEVATOR.POSITION_AMP);
     }
 
     /**
@@ -38,8 +72,26 @@ public class Elevator {
      * @param position 
      * */
     
-     public void setPositionStart(double position){
-        elevatorMotor.setVelocity(ELEVATOR.LENGTH_STOWED);
+     public void setElevatorPositionStowed(){
+        setElevatorPosition(ELEVATOR.POSITION_STOWED);
+    }
+
+    /**
+     * gets position of elevator
+     * @return
+     */
+    public double getElevatorPosition() {
+        return elevatorMotor.getTicks();
+    }
+
+    //-------PIVOT CODE-------//
+
+    /**
+     * sets the speed of
+     * @param speed
+     */
+    public void percentOutputPivot(double speed){
+        pivotMotor.setPercentOutput(speed);
     }
     
     /**
@@ -52,33 +104,40 @@ public class Elevator {
     }
 
     /**
-     * stows elevator and pivot 
+     * Sets the position of the pivot to the correct angle to stow it
      */
-    public void stow() {
-        elevatorMotor.setPosition(0);
-        if (Math.abs(elevatorMotor.getPosition()) <= 100){
-            pivotMotor.setPosition(0);
-        }
+
+     public void setPivotAngleStowed() {
+        setPivotAngle(ELEVATOR.PIVOT_ANGLE_STOWED);
     }
 
     /**
-     * gets position of elevator
-     * @return
+     * Sets the position of the pivot to the correct angle to score in the amp
      */
-    public double getElevatorPosition() {
-        return elevatorMotor.getPosition();
+
+    public void setPivotAngleAmp() {
+        setPivotAngle(ELEVATOR.PIVOT_ANGLE_AMP);
     }
 
     /**
      * gets position of pivot
      * @return
      */
-    public double getPivotPosition() {
-        return pivotMotor.getPosition();
+    public double getPivotAngle() {
+        double ticksConverted = CONVERSIONS.TICKS_TO_ANGLE_DEGREES*pivotMotor.getTicks();
+        return ticksConverted;
     }
 
-    public void setPivotAmp() {
-        setPivotAngle(ELEVATOR.PIVOT_ANGLE_AMP);
+    //-------COMBINED CODE-------//
+
+    /**
+     * stows elevator and pivot 
+     */
+    public void stow() {
+        setElevatorPositionStowed();;
+        if (Math.abs(elevatorMotor.getPosition()) <= 100){
+            setPivotAngleStowed();
+        }
     }
 
 }

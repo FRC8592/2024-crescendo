@@ -51,11 +51,12 @@ public final class Constants {
     public final class ELEVATOR {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
         public static final int ELEVATOR_MOTOR_CAN_ID = -1;
-        public static final double POSITION_START = -1;
+        public static final double POSITION_STOWED = -1;
         public static final double POSITION_AMP= -1;
         public static final int PIVOT_MOTOR_CAN_ID = -1;    
         public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = -1;    
         public static final int PIVOT_ANGLE_AMP = -1;
+        public static final int PIVOT_ANGLE_STOWED = -1;
     }
 
     public final class POWER {

@@ -58,4 +58,8 @@ public class SparkFlexControl {
     public void setFollower(SparkFlexControl motorToFollow){
         motor.follow(motorToFollow.motor);
     }
+    
+    public double getPosition() {
+        return motorEncoder.getPosition();
+    }
 }

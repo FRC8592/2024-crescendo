@@ -131,4 +131,9 @@ public class Elevator {
         setAngle = ELEVATOR.PIVOT_ANGLE_AMP;
     }
 
+    public void climbPosition(){
+        setLengthTicks = ELEVATOR.POSITION_CLIMB;
+        setAngle = ELEVATOR.PIVOT_ANGLE_CLIMB;
+    }
+
 }

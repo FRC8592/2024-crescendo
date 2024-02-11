@@ -261,7 +261,7 @@ public class Robot extends LoggedRobot {
         else if (autoShoot) { //Aim at the speaker and shoot into it
             poseGetter.turnToAprilTag();
             //TODO range table
-            elevator.setPivotAngle(poseGetter.distanceToAprilTag(-1));
+            elevator.setPivotAngleCustom(poseGetter.distanceToAprilTag(-1));
             shooter.setSpeedRangeTable(poseGetter.distanceToAprilTag(-1));
             if (shooter.isReady()) {//isReady returns whether the shooter angle and 
                 //flywheel speeds are within a threshhold  of where we asked them to be
@@ -274,7 +274,7 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (autoAmpScore) {
-            elevator.setElevatorLengthAmp();
+            elevator.setElevatorLengthCustom(ELEVATOR.POSITION_AMP);
             double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
             double xVelocity = poseGetter.strafeToAprilTag();
             shooter.shootVelocityMode(-1);
@@ -291,7 +291,7 @@ public class Robot extends LoggedRobot {
         else if (prepareForShoot) {
             poseGetter.turnToAprilTag();
             // TODO range table
-            elevator.setPivotAngle(poseGetter.distanceToAprilTag(-1));
+            elevator.setPivotAngleCustom(poseGetter.distanceToAprilTag(-1));
             if (manualShoot) {
                 shooter.shootVelocityMode(-1);
                 if (shooter.isReady()) {// isReady returns whether the shooter angle and
@@ -306,8 +306,7 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (ampPrep) {
-            elevator.setPivotAngleAmp(); // set angle
-            elevator.setElevatorLengthAmp();
+            elevator.ampPosition();
             if (manualAmpScore) {
                 shooter.shootVelocityMode(-1); // flywheels at low speed
                 shooter.shoot(); // feeder wheels
@@ -318,13 +317,13 @@ public class Robot extends LoggedRobot {
             double currentElevatorPos = elevator.getElevatorLength();
             if (elevatorControl == 1.0) {
                 double targetPosition = currentElevatorPos + 0.01; // TODO: set constant
-                elevator.setElevatorLength(targetPosition);
+                elevator.setElevatorLengthCustom(targetPosition);
             }
             else if (elevatorControl == -1.0) {
                 double targetPosition = currentElevatorPos - 0.01; // TODO:
-                elevator.setElevatorLength(targetPosition);
+                elevator.setElevatorLengthCustom(targetPosition);
             }
-            elevator.setPivotAngle(90); // set to 90 degrees
+            elevator.setPivotAngleCustom(90); // set to 90 degrees
         }
         else if (regurgitateBack) {
             shooter.setFeederSpeed(-1); // backwards
@@ -350,6 +349,38 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
+        if (operatorController.getXButton()){
+            elevator.percentOutputElevator(0.1);
+        } else if (operatorController.getAButton()){
+            elevator.percentOutputElevator(-0.1);
+        }else{
+            elevator.percentOutputElevator(0.0);
+        }
+
+        if(operatorController.getYButton()){
+            elevator.percentOutputPivot(0.1);
+        } else if (operatorController.getBButton()){
+            elevator.percentOutputPivot(-0.1);
+        }else{
+            elevator.percentOutputPivot(0.0);
+        }
+
+        //Once Chain is Added
+        /*elevator.update();
+        if (operatorController.getXButton()){
+            elevator.setPivotAngleCustom(20);
+        }
+
+        if (operatorController.getYButton()){
+            elevator.setElevatorLengthCustom(4096);
+        }*/
+
+        SmartDashboard.putNumber("elevator position in ticks", elevator.getElevatorLength());
+        SmartDashboard.putNumber("elevator position in rotations", elevator.getElevatorLength()*42);
+
+        SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
+        SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS);
+        SmartDashboard.putNumber("elevator position in Rotations", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS/42);
     }
 
     @Override

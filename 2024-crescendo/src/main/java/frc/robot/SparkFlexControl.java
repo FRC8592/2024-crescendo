@@ -24,7 +24,7 @@ public class SparkFlexControl {
     }
 
     public void setPosition(double ticks){
-        motorControl.setReference(ticks, com.revrobotics.CANSparkBase.ControlType.kPosition); 
+        motorControl.setReference(ticks/42, com.revrobotics.CANSparkBase.ControlType.kPosition); 
     }
 
     public void setPercentOutput(double power){

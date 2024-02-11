@@ -53,10 +53,12 @@ public final class Constants {
         public static final int EXTENSION_MOTOR_CAN_ID = -1;
         public static final double POSITION_STOWED = -1;
         public static final double POSITION_AMP= -1;
+        public static final double POSITION_CLIMB= -1;
         public static final int PIVOT_MOTOR_CAN_ID = -1;    
         public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = -1;    
         public static final int PIVOT_ANGLE_AMP = -1;
         public static final int PIVOT_ANGLE_STOWED = -1;
+        public static final int PIVOT_ANGLE_CLIMB = -1;
     }
 
     public final class POWER {

@@ -57,6 +57,8 @@ public final class Constants {
         public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = -1;    
         public static final int PIVOT_ANGLE_AMP = -1;
         public static final int PIVOT_ANGLE_STOWED = -1;
+        public static final int RETRACTED = 5; //Ticks TODO: Change to new unit once we know the gearing
+        public static final int LIFTED = 30; //Degrees
     }
 
     public final class POWER {

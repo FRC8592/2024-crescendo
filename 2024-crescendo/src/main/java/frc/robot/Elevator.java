@@ -30,7 +30,7 @@ public class Elevator {
             up = true;
         }
 
-        if (currAngle > 30 || currTicks < 5){
+        if (currAngle > 30 || currTicks < 5){ //30 = the angle we need to stop and retract at, 5 = if the elvator is almost fully retracted or not
             setPivotAngle(setAngle);
             setElevatorPosition(setTicks);
         } else if(currAngle<30 && up == true){
@@ -58,6 +58,10 @@ public class Elevator {
     */
     public void setElevatorPosition(double position){
         elevatorMotor.setPosition(position);
+    }
+
+    public void setElevatorPositionCustom(double position){
+        setTicks = position;
     }
 
     /**
@@ -101,6 +105,10 @@ public class Elevator {
     public void setPivotAngle(double angle) {
         double angleConverted = CONVERSIONS.ANGLE_DEGREES_TO_TICKS * angle;
         pivotMotor.setPosition(angleConverted);
+    }
+
+    public void setPivotAngleCustom(double angle) {
+        setAngle = angle;
     }
 
     /**

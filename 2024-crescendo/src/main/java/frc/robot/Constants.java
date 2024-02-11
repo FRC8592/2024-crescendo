@@ -89,13 +89,16 @@ public final class Constants {
     }
 
     public final class ELEVATOR {
-        public static final int ELEVATOR_MOTOR_CAN_ID = -1;
+        public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
+        public static final int EXTENSION_MOTOR_CAN_ID = -1;
         public static final double POSITION_STOWED = -1;
         public static final double POSITION_AMP= -1;
         public static final int PIVOT_MOTOR_CAN_ID = -1;    
         public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = -1;    
         public static final int PIVOT_ANGLE_AMP = -1;
         public static final int PIVOT_ANGLE_STOWED = -1;
+        public static final int RETRACTED = 5; //Ticks TODO: Change to new unit once we know the gearing
+        public static final int LIFTED = 30; //Degrees
     }
 
     public final class POWER {

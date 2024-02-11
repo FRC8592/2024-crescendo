@@ -2,45 +2,56 @@ package frc.robot;
 import frc.robot.Constants.*;
 
 public class Elevator {
-    private SparkFlexControl elevatorMotor;
+    private SparkFlexControl extensionMotor;
     private SparkFlexControl pivotMotor;
     private SparkFlexControl pivotFollowMotor;
 
+    private double setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
+    private double setLengthTicks = ELEVATOR.POSITION_STOWED;
+
 
     public Elevator(){
-        elevatorMotor = new SparkFlexControl(ELEVATOR.ELEVATOR_MOTOR_CAN_ID);
+        extensionMotor = new SparkFlexControl(ELEVATOR.EXTENSION_MOTOR_CAN_ID);
         pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID);
         pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID);
 
         pivotFollowMotor.setFollower(pivotMotor);
     }
 
-    private double setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
-    private double setTicks = ELEVATOR.POSITION_STOWED;
 
-    public void elevatorPeriodic(){
-        double currAngle = getPivotAngle();
-        double currTicks = getElevatorPosition();
-        boolean up = true;
+    public void update(){
+        double currentAngle = getPivotAngle(); // In degrees
+        double currentLengthTicks = getElevatorLength(); // In ticks
+        boolean pivotUp = false;
+        boolean pivotDown = false;
 
-
-        if(currAngle > setAngle){
-            up = false;
-        } else{
-            up = true;
+        pivotUp = currentAngle < setAngle;
+        pivotDown = currentAngle > setAngle;
+        if (pivotUp) {
+            if (currentAngle > ELEVATOR.LIFTED) { //30° is clear of all obstacles in the robot
+                setElevatorLength(setLengthTicks); //Position == length
+            }
+            else {
+                extensionMotor.stop();
+            }
+            setPivotAngle(setAngle);
         }
-
-        if (currAngle > 30 || currTicks < 5){
-            setPivotAngle(setAngle);
-            setElevatorPosition(setTicks);
-        } else if(currAngle<30 && up == true){
-            setPivotAngle(setAngle);
-            setElevatorPosition(setTicks);
-        } else{
-            elevatorMotor.stop();
+        else if (pivotDown) { //Moving down
+            if (currentAngle > ELEVATOR.LIFTED) { //Angle greater than 30° (no reference to elevator length)
+                setPivotAngle(setAngle);
+            }
+            else if (currentLengthTicks > ELEVATOR.RETRACTED) { // Elevator angle less than 30° and extended too far (more than 5 ticks)
+                pivotMotor.stop();
+            }
+            else { // elevator length <= 5 ticks AND angle less than 30°
+                setPivotAngle(setAngle);
+            }
+            setElevatorLength(setLengthTicks);
+        }
+        else { // Stopped
+            extensionMotor.stop();
             pivotMotor.stop();
         }
-        
     }
 
     //-------ELEVATOR CODE-------//
@@ -50,38 +61,26 @@ public class Elevator {
      * @param speed
      */
     public void percentOutputElevator(double speed){
-        elevatorMotor.setPercentOutput(speed);
+        extensionMotor.setPercentOutput(speed);
     }
 
     /** 
      * sets the position
     */
-    public void setElevatorPosition(double position){
-        elevatorMotor.setPosition(position);
+    private void setElevatorLength(double position){
+        extensionMotor.setPosition(position);
     }
 
-    /**
-     * sets the position of the elevator and pivot to shoot in amp
-     */
-    public void setElevatorPositionAmp(){
-        setElevatorPosition(ELEVATOR.POSITION_AMP);
-    }
-
-    /**
-     * sets elevator and pivot position to shooting from stowed position
-     * @param position 
-     * */
-    
-     public void setElevatorPositionStowed(){
-        setElevatorPosition(ELEVATOR.POSITION_STOWED);
+    public void setElevatorLengthCustom(double position){
+        setLengthTicks = position;
     }
 
     /**
      * gets position of elevator
      * @return
      */
-    public double getElevatorPosition() {
-        return elevatorMotor.getTicks();
+    public double getElevatorLength() {
+        return extensionMotor.getTicks();
     }
 
     //-------PIVOT CODE-------//
@@ -98,25 +97,13 @@ public class Elevator {
      * sets angle of pivot to base of robot
      * @param angle units: degrees
      */
-    public void setPivotAngle(double angle) {
+    private void setPivotAngle(double angle) {
         double angleConverted = CONVERSIONS.ANGLE_DEGREES_TO_TICKS * angle;
         pivotMotor.setPosition(angleConverted);
     }
 
-    /**
-     * Sets the position of the pivot to the correct angle to stow it
-     */
-
-     public void setPivotAngleStowed() {
-        setPivotAngle(ELEVATOR.PIVOT_ANGLE_STOWED);
-    }
-
-    /**
-     * Sets the position of the pivot to the correct angle to score in the amp
-     */
-
-    public void setPivotAngleAmp() {
-        setPivotAngle(ELEVATOR.PIVOT_ANGLE_AMP);
+    public void setPivotAngleCustom(double angle) {
+        setAngle = angle;
     }
 
     /**
@@ -134,10 +121,13 @@ public class Elevator {
      * stows elevator and pivot 
      */
     public void stow() {
-        setElevatorPositionStowed();;
-        if (Math.abs(elevatorMotor.getPosition()) <= 100){
-            setPivotAngleStowed();
-        }
+        setLengthTicks = ELEVATOR.POSITION_STOWED;
+        setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
+    }
+
+    public void ampPosition() {
+        setLengthTicks = ELEVATOR.POSITION_AMP;
+        setAngle = ELEVATOR.PIVOT_ANGLE_AMP;
     }
 
 }

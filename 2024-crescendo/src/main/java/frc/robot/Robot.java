@@ -51,6 +51,8 @@ public class Robot extends LoggedRobot {
     private LED leds;
     private Power power;
 
+    private double targetAngle = 0;
+
 
     @Override
     public void robotInit() {
@@ -74,15 +76,15 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
-        pigeon = new NewtonPigeon(new Pigeon2(PIGEON.CAN_ID));
-        swerve = new Swerve(pigeon);
-        power = new Power();
-        leds = new LED();
-        shooter = new Shooter();
-        poseGetter = new PoseVision();
-        intake = new Intake();
-        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
-                NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
+        //pigeon = new NewtonPigeon(new Pigeon2(PIGEON.CAN_ID));
+        //swerve = new Swerve(pigeon);
+        //power = new Power();
+        //leds = new LED();
+        //shooter = new Shooter();
+        //poseGetter = new PoseVision();
+        //intake = new Intake();
+        //noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
+        //        NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
         elevator = new Elevator();
         
     }
@@ -90,12 +92,18 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         
+        SmartDashboard.putNumber("elevator position in ticks", elevator.getElevatorLength());
+        SmartDashboard.putNumber("elevator position in rotations", elevator.getElevatorLength()*42);
+
+        SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
+        SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS);
+        SmartDashboard.putNumber("elevator position in Rotations", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS/42);
 
     }
 
     @Override
     public void autonomousInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
         currentAuto.addModules(swerve, elevator, intake, shooter, noteLock);
         currentAuto.initialize();
@@ -112,7 +120,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
     }
@@ -344,43 +352,41 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        shooter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
     }
 
     @Override
     public void testPeriodic() {
-        if (operatorController.getXButton()){
-            elevator.percentOutputElevator(0.1);
+        elevator.update();
+        if (operatorController.getXButtonPressed()){
+            targetAngle += 2;
+            elevator.setPivotAngleCustom(targetAngle);
         } else if (operatorController.getAButton()){
-            elevator.percentOutputElevator(-0.1);
+            targetAngle -= 2;
+            elevator.setPivotAngleCustom(targetAngle);
         }else{
             elevator.percentOutputElevator(0.0);
-        }
-
-        if(operatorController.getYButton()){
-            elevator.percentOutputPivot(0.1);
-        } else if (operatorController.getBButton()){
-            elevator.percentOutputPivot(-0.1);
-        }else{
-            elevator.percentOutputPivot(0.0);
         }
 
         //Once Chain is Added
         /*elevator.update();
         if (operatorController.getXButton()){
-            elevator.setPivotAngleCustom(20);
+            elevator.setPivotAngleCustom(35);
         }
 
         if (operatorController.getYButton()){
             elevator.setElevatorLengthCustom(4096);
+        }
+
+        if(operatorController.getAButtonPressed()){
+            elevator.stow();
+        }
+
+        if(operatorController.getBButtonPressed()){
+            elevator.zero();
         }*/
 
-        SmartDashboard.putNumber("elevator position in ticks", elevator.getElevatorLength());
-        SmartDashboard.putNumber("elevator position in rotations", elevator.getElevatorLength()*42);
-
-        SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
-        SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS);
-        SmartDashboard.putNumber("elevator position in Rotations", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS/42);
+        
     }
 
     @Override

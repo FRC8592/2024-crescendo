@@ -1,10 +1,13 @@
 package frc.robot;
+
+import com.revrobotics.AbsoluteEncoder;
 import frc.robot.Constants.*;
 
 public class Elevator {
     private SparkFlexControl extensionMotor;
     private SparkFlexControl pivotMotor;
     private SparkFlexControl pivotFollowMotor;
+    private AbsoluteEncoder pivotEncoder;
 
     private double setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
     private double setLengthTicks = ELEVATOR.POSITION_STOWED;
@@ -15,7 +18,10 @@ public class Elevator {
         pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID);
         pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID);
 
-        pivotFollowMotor.setFollower(pivotMotor);
+        pivotMotor.setInverted();
+        
+        //pivotFollowMotor.setInverted();
+        
     }
 
 
@@ -91,6 +97,7 @@ public class Elevator {
      */
     public void percentOutputPivot(double speed){
         pivotMotor.setPercentOutput(speed);
+        pivotFollowMotor.setPercentOutput(speed);
     }
     
     /**
@@ -98,8 +105,9 @@ public class Elevator {
      * @param angle units: degrees
      */
     private void setPivotAngle(double angle) {
-        double angleConverted = CONVERSIONS.ANGLE_DEGREES_TO_TICKS * angle;
+        double angleConverted = CONVERSIONS.ANGLE_DEGREES_TO_TICKS * CONVERSIONS.PIVOT_GEAR_RATIO * angle;
         pivotMotor.setPosition(angleConverted);
+        pivotFollowMotor.setPosition(angleConverted);
     }
 
     public void setPivotAngleCustom(double angle) {
@@ -133,6 +141,11 @@ public class Elevator {
     public void climbPosition(){
         setLengthTicks = ELEVATOR.POSITION_CLIMB;
         setAngle = ELEVATOR.PIVOT_ANGLE_CLIMB;
+    }
+
+    public void zero(){
+        pivotEncoder.setZeroOffset(pivotEncoder.getPosition());
+
     }
 
 }

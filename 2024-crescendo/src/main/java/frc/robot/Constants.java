@@ -12,6 +12,7 @@ public final class Constants {
         public static final double IN_TO_METERS = 0.0254;
         public static final double ANGLE_DEGREES_TO_TICKS = 4096/360.0;
         public static final double TICKS_TO_ANGLE_DEGREES = 360.0/4096.0;
+        public static final double PIVOT_GEAR_RATIO = (12.0/5.0) * 75.0;
     }
 
     public final class CONTROLLERS {
@@ -50,15 +51,15 @@ public final class Constants {
 
     public final class ELEVATOR {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
-        public static final int EXTENSION_MOTOR_CAN_ID = -1;
+        public static final int EXTENSION_MOTOR_CAN_ID = 37;
         public static final double POSITION_STOWED = -1;
         public static final double POSITION_AMP= -1;
         public static final double POSITION_CLIMB= -1;
-        public static final int PIVOT_MOTOR_CAN_ID = -1;    
-        public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = -1;    
+        public static final int PIVOT_MOTOR_CAN_ID = 36;    
+        public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = 38;    
         public static final int PIVOT_ANGLE_AMP = -1;
-        public static final int PIVOT_ANGLE_STOWED = -1;
-        public static final int PIVOT_ANGLE_CLIMB = -1;
+        public static final int PIVOT_ANGLE_STOWED = 0;
+        public static final int PIVOT_ANGLE_CLIMB = 0;
         public static final int RETRACTED = 5; //Ticks TODO: Change to new unit once we know the gearing
         public static final int LIFTED = 30; //Degrees
     }

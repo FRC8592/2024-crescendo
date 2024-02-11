@@ -47,7 +47,8 @@ public class Robot extends LoggedRobot {
     private Intake intake;
     private Elevator elevator;
     private LimelightTargeting noteLock;
-    private PoseVision poseGetter;
+    private PoseVision apriltagLockYaw;
+    private PoseVision apriltagLockY;
     private LED leds;
     private Power power;
 
@@ -79,7 +80,8 @@ public class Robot extends LoggedRobot {
         power = new Power();
         leds = new LED();
         // shooter = new Shooter();
-        poseGetter = new PoseVision(0.05, 0, 0, 0);
+        apriltagLockY = new PoseVision(5.0, 0, 0, 0);
+        apriltagLockYaw = new PoseVision(5.0, 0, 0, 0);
         intake = new Intake();
         noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
                 NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
@@ -259,10 +261,10 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (autoShoot) { //Aim at the speaker and shoot into it
-            poseGetter.turnToAprilTag();
+            apriltagLockY.turnToAprilTag();
             //TODO range table
-            elevator.setAngle(poseGetter.distanceToAprilTag(-1));
-            shooter.setSpeedRangeTable(poseGetter.distanceToAprilTag(-1));
+            elevator.setAngle(apriltagLockY.distanceToAprilTag(-1));
+            shooter.setSpeedRangeTable(apriltagLockY.distanceToAprilTag(-1));
             if (shooter.isReady()) {//isReady returns whether the shooter angle and 
                 //flywheel speeds are within a threshhold  of where we asked them to be
                 shooter.shoot(); //runs the feeder wheels
@@ -275,12 +277,12 @@ public class Robot extends LoggedRobot {
         }
         else if (autoAmpScore) {
             elevator.setPositionAmp();
-            double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
-            double xVelocity = poseGetter.strafeToAprilTag();
+            double rotationSpeed = apriltagLockY.turnToAprilTag(); //amp aprilTag
+            double xVelocity = apriltagLockY.strafeToAprilTag();
             shooter.shootVelocityMode(-1);
-            double yVelocity = poseGetter.driveToAprilTag();
+            double yVelocity = apriltagLockY.driveToAprilTag();
             currentSpeeds = new ChassisSpeeds(xVelocity, yVelocity, rotationSpeed);
-            if (poseGetter.distanceToAprilTag(-1) < -1) {
+            if (apriltagLockY.distanceToAprilTag(-1) < -1) {
                 shooter.shoot();
                 currentSpeeds = new ChassisSpeeds();
                 if (! shooter.hasNote()) {
@@ -289,9 +291,9 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (prepareForShoot) {
-            poseGetter.turnToAprilTag();
+            apriltagLockY.turnToAprilTag();
             // TODO range table
-            elevator.setAngle(poseGetter.distanceToAprilTag(-1));
+            elevator.setAngle(apriltagLockY.distanceToAprilTag(-1));
             if (manualShoot) {
                 shooter.shootVelocityMode(-1);
                 if (shooter.isReady()) {// isReady returns whether the shooter angle and
@@ -345,13 +347,18 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
+        
+    }
+
+    @Override
+    public void testPeriodic() {
         //Basic driving controls
         double driveTranslateY = driverController.getLeftY();
         double driveTranslateX = driverController.getLeftX();
         double driveRotate = driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
         
-        //Intakes TODO: Revise with drivers
+        // for testing purposes
         boolean lineUp = driverController.getLeftTriggerAxis() > 0.1;
         
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
@@ -374,19 +381,18 @@ public class Robot extends LoggedRobot {
         }
 
        if (lineUp) {
-            double newOmega = poseGetter.visual_servo(3, 1.0);
+            double newOmega = -apriltagLockYaw.visual_servo(3, 1.0, 4, 1); // line up with the tag
+            double newVy = apriltagLockY.visual_servo(0, 1.0, 4, 1); // align with the tag
+            System.out.println("New Omega: " + newOmega);
+            System.out.println("New V_y: " + newVy);
             currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                0, // newVy
                 newOmega,
             swerve.getGyroscopeRotation());
        }
 
         swerve.drive(currentSpeeds);
-    }
-
-    @Override
-    public void testPeriodic() {
     }
 
     @Override

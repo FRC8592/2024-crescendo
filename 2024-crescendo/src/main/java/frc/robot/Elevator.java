@@ -5,6 +5,7 @@ public class Elevator {
     private SparkFlexControl extensionMotor;
     private SparkFlexControl pivotMotor;
     private SparkFlexControl pivotFollowMotor;
+
     private double setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
     private double setLengthTicks = ELEVATOR.POSITION_STOWED;
 
@@ -26,7 +27,6 @@ public class Elevator {
 
         pivotUp = currentAngle < setAngle;
         pivotDown = currentAngle > setAngle;
-
         if (pivotUp) {
             if (currentAngle > ELEVATOR.LIFTED) { //30° is clear of all obstacles in the robot
                 setElevatorLength(setLengthTicks); //Position == length
@@ -67,28 +67,12 @@ public class Elevator {
     /** 
      * sets the position
     */
-    public void setElevatorLength(double position){
+    private void setElevatorLength(double position){
         extensionMotor.setPosition(position);
     }
 
     public void setElevatorLengthCustom(double position){
         setLengthTicks = position;
-    }
-
-    /**
-     * sets the position of the elevator and pivot to shoot in amp
-     */
-    public void setElevatorLengthAmp(){
-        setElevatorLength(ELEVATOR.POSITION_AMP);
-    }
-
-    /**
-     * sets elevator and pivot position to shooting from stowed position
-     * @param position 
-     * */
-    
-     public void setElevatorPositionStowed(){
-        setElevatorLength(ELEVATOR.POSITION_STOWED);
     }
 
     /**
@@ -123,22 +107,6 @@ public class Elevator {
     }
 
     /**
-     * Sets the position of the pivot to the correct angle to stow it
-     */
-
-    public void setPivotAngleStowed() {
-        setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
-    }
-
-    /**
-     * Sets the position of the pivot to the correct angle to score in the amp
-     */
-
-    public void setPivotAngleAmp() {
-        setAngle = ELEVATOR.PIVOT_ANGLE_AMP;
-    }
-
-    /**
      * gets position of pivot
      * @return
      */
@@ -153,10 +121,13 @@ public class Elevator {
      * stows elevator and pivot 
      */
     public void stow() {
-        setElevatorPositionStowed();;
-        if (Math.abs(extensionMotor.getPosition()) <= 100){
-            setPivotAngleStowed();
-        }
+        setLengthTicks = ELEVATOR.POSITION_STOWED;
+        setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
+    }
+
+    public void ampPosition() {
+        setLengthTicks = ELEVATOR.POSITION_AMP;
+        setAngle = ELEVATOR.PIVOT_ANGLE_AMP;
     }
 
 }

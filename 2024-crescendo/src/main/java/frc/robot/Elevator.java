@@ -2,45 +2,72 @@ package frc.robot;
 import frc.robot.Constants.*;
 
 public class Elevator {
-    private SparkFlexControl elevatorMotor;
+    private SparkFlexControl extensionMotor;
     private SparkFlexControl pivotMotor;
     private SparkFlexControl pivotFollowMotor;
+    private double setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
+    private double setLengthTicks = ELEVATOR.POSITION_STOWED;
 
 
     public Elevator(){
-        elevatorMotor = new SparkFlexControl(ELEVATOR.ELEVATOR_MOTOR_CAN_ID);
+        extensionMotor = new SparkFlexControl(ELEVATOR.EXTENSION_MOTOR_CAN_ID);
         pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID);
         pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID);
 
         pivotFollowMotor.setFollower(pivotMotor);
     }
 
-    private double setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
-    private double setTicks = ELEVATOR.POSITION_STOWED;
 
     public void elevatorPeriodic(){
-        double currAngle = getPivotAngle();
-        double currTicks = getElevatorPosition();
-        boolean up = true;
+        double currentAngle = getPivotAngle();
+        double currentLengthTicks = getElevatorLength();
+        boolean pivotUp = false;
+        boolean pivotDown = false;
 
+        pivotUp = currentAngle < setAngle;
+        pivotDown = currentAngle > setAngle;
 
-        if(currAngle > setAngle){
-            up = false;
-        } else{
-            up = true;
+        // if (currentAngle > 30 || currTicks < 5) { //30 = the angle we need to stop and retract at, 5 = if the elvator is almost fully retracted or not
+        //     setPivotAngle(setAngle);
+        //     setElevatorPosition(setTicks);
+        // }
+        // else if (currentAngle < 30 && pivotUp == true) {
+        //     setPivotAngle(setAngle);
+        // }
+        // else if (currentAngle < 30) { // If angle less than 30 AND ticks greater than 5 (because of the OR statement above)
+        //     pivotMotor.stop();
+        //     setElevatorPosition(setAngle);
+        // }
+        // else {
+        //     elevatorMotor.stop();
+        //     pivotMotor.stop();
+        // }
+        
+        if (pivotUp) {
+            if (currentAngle > 30) { //30° is clear of all obstacles in the robot
+                setElevatorLength(setLengthTicks); //Position == length
+            }
+            else {
+                extensionMotor.stop();
+            }
+            setPivotAngle(setAngle);
         }
-
-        if (currAngle > 30 || currTicks < 5){ //30 = the angle we need to stop and retract at, 5 = if the elvator is almost fully retracted or not
-            setPivotAngle(setAngle);
-            setElevatorPosition(setTicks);
-        } else if(currAngle<30 && up == true){
-            setPivotAngle(setAngle);
-            setElevatorPosition(setTicks);
-        } else{
-            elevatorMotor.stop();
+        else if (pivotDown) { //Moving down
+            if (currentAngle > 30) { //Angle greater than 30° (no reference to elevator length)
+                setPivotAngle(setAngle);
+            } 
+            else if (currentLengthTicks > 5) { // Elevator angle less than 30° and extended too far (more than 5 ticks)
+                pivotMotor.stop();
+            }
+            else { // elevator length <= 5 ticks AND angle less than 30°
+                setPivotAngle(setAngle);
+            }
+            setElevatorLength(setLengthTicks);
+        }
+        else { // Stopped
+            extensionMotor.stop();
             pivotMotor.stop();
         }
-        
     }
 
     //-------ELEVATOR CODE-------//
@@ -50,25 +77,25 @@ public class Elevator {
      * @param speed
      */
     public void percentOutputElevator(double speed){
-        elevatorMotor.setPercentOutput(speed);
+        extensionMotor.setPercentOutput(speed);
     }
 
     /** 
      * sets the position
     */
-    public void setElevatorPosition(double position){
-        elevatorMotor.setPosition(position);
+    public void setElevatorLength(double position){
+        extensionMotor.setPosition(position);
     }
 
-    public void setElevatorPositionCustom(double position){
-        setTicks = position;
+    public void setElevatorLengthCustom(double position){
+        setLengthTicks = position;
     }
 
     /**
      * sets the position of the elevator and pivot to shoot in amp
      */
-    public void setElevatorPositionAmp(){
-        setElevatorPosition(ELEVATOR.POSITION_AMP);
+    public void setElevatorLengthAmp(){
+        setElevatorLength(ELEVATOR.POSITION_AMP);
     }
 
     /**
@@ -77,15 +104,15 @@ public class Elevator {
      * */
     
      public void setElevatorPositionStowed(){
-        setElevatorPosition(ELEVATOR.POSITION_STOWED);
+        setElevatorLength(ELEVATOR.POSITION_STOWED);
     }
 
     /**
      * gets position of elevator
      * @return
      */
-    public double getElevatorPosition() {
-        return elevatorMotor.getTicks();
+    public double getElevatorLength() {
+        return extensionMotor.getTicks();
     }
 
     //-------PIVOT CODE-------//
@@ -102,7 +129,7 @@ public class Elevator {
      * sets angle of pivot to base of robot
      * @param angle units: degrees
      */
-    public void setPivotAngle(double angle) {
+    private void setPivotAngle(double angle) {
         double angleConverted = CONVERSIONS.ANGLE_DEGREES_TO_TICKS * angle;
         pivotMotor.setPosition(angleConverted);
     }
@@ -115,8 +142,8 @@ public class Elevator {
      * Sets the position of the pivot to the correct angle to stow it
      */
 
-     public void setPivotAngleStowed() {
-        setPivotAngle(ELEVATOR.PIVOT_ANGLE_STOWED);
+    public void setPivotAngleStowed() {
+        setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
     }
 
     /**
@@ -124,7 +151,7 @@ public class Elevator {
      */
 
     public void setPivotAngleAmp() {
-        setPivotAngle(ELEVATOR.PIVOT_ANGLE_AMP);
+        setAngle = ELEVATOR.PIVOT_ANGLE_AMP;
     }
 
     /**
@@ -143,7 +170,7 @@ public class Elevator {
      */
     public void stow() {
         setElevatorPositionStowed();;
-        if (Math.abs(elevatorMotor.getPosition()) <= 100){
+        if (Math.abs(extensionMotor.getPosition()) <= 100){
             setPivotAngleStowed();
         }
     }

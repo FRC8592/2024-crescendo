@@ -62,6 +62,10 @@ public final class Constants {
         public static final int PIVOT_ANGLE_CLIMB = 0;
         public static final int RETRACTED = 5; //Ticks TODO: Change to new unit once we know the gearing
         public static final int LIFTED = 30; //Degrees
+        public static final double PIVOT_kP = 0.00005;
+        public static final double PIVOT_kI = 0;
+        public static final double PIVOT_kD = 0;
+        public static final double PIVOT_kFF = 0;
     }
 
     public final class POWER {

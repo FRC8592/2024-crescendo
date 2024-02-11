@@ -91,13 +91,15 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
+
+        SmartDashboard.putNumber("target angle", targetAngle);
         
         SmartDashboard.putNumber("elevator position in ticks", elevator.getElevatorLength());
-        SmartDashboard.putNumber("elevator position in rotations", elevator.getElevatorLength()*42);
+        SmartDashboard.putNumber("elevator position in rotations", elevator.getElevatorLength());
 
         SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
-        SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS/CONVERSIONS.PIVOT_GEAR_RATIO);
-        SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS/42)/CONVERSIONS.PIVOT_GEAR_RATIO);
+        SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS*CONVERSIONS.PIVOT_GEAR_RATIO);
+        SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*CONVERSIONS.PIVOT_GEAR_RATIO)/360);
 
     }
 
@@ -361,11 +363,9 @@ public class Robot extends LoggedRobot {
         if (operatorController.getXButtonPressed()){
             targetAngle += 2;
             elevator.setPivotAngleCustom(targetAngle);
-        } else if (operatorController.getAButton()){
+        } else if (operatorController.getAButtonPressed()){
             targetAngle -= 2;
             elevator.setPivotAngleCustom(targetAngle);
-        }else{
-            elevator.percentOutputElevator(0.0);
         }
 
         //Once Chain is Added

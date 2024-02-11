@@ -18,6 +18,9 @@ public class Elevator {
         pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID);
         pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID);
 
+        pivotMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF);
+        pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF);
+
         pivotMotor.setInverted();
         
         //pivotFollowMotor.setInverted();
@@ -31,7 +34,6 @@ public class Elevator {
         boolean pivotUp = false;
         boolean pivotDown = false;
 
-        pivotMotor.motorEncoder.setPosition(pivotEncoder.getPosition());
 
         pivotUp = currentAngle < setAngle;
         pivotDown = currentAngle > setAngle;
@@ -121,7 +123,7 @@ public class Elevator {
      * @return
      */
     public double getPivotAngle() {
-        double ticksConverted = CONVERSIONS.TICKS_TO_ANGLE_DEGREES*pivotMotor.getTicks()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS;
+        double ticksConverted = (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES)/CONVERSIONS.PIVOT_GEAR_RATIO;
         return ticksConverted;
     }
 
@@ -147,6 +149,12 @@ public class Elevator {
 
     public void zero(){
         pivotEncoder.setZeroOffset(pivotEncoder.getPosition());
+    }
+
+    public void resetEncoders(){
+        pivotMotor.motorEncoder.setPosition(0);
+        pivotFollowMotor.motorEncoder.setPosition(0);
+        extensionMotor.motorEncoder.setPosition(0);
     }
 
 }

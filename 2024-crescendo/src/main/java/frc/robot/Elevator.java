@@ -31,6 +31,8 @@ public class Elevator {
         boolean pivotUp = false;
         boolean pivotDown = false;
 
+        pivotMotor.motorEncoder.setPosition(pivotEncoder.getPosition());
+
         pivotUp = currentAngle < setAngle;
         pivotDown = currentAngle > setAngle;
         if (pivotUp) {
@@ -119,7 +121,7 @@ public class Elevator {
      * @return
      */
     public double getPivotAngle() {
-        double ticksConverted = CONVERSIONS.TICKS_TO_ANGLE_DEGREES*pivotMotor.getTicks();
+        double ticksConverted = CONVERSIONS.TICKS_TO_ANGLE_DEGREES*pivotMotor.getTicks()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS;
         return ticksConverted;
     }
 
@@ -145,7 +147,6 @@ public class Elevator {
 
     public void zero(){
         pivotEncoder.setZeroOffset(pivotEncoder.getPosition());
-
     }
 
 }

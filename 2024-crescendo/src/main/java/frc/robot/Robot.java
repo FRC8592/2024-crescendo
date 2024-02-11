@@ -96,8 +96,8 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("elevator position in rotations", elevator.getElevatorLength()*42);
 
         SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
-        SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS);
-        SmartDashboard.putNumber("elevator position in Rotations", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS/42);
+        SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS/CONVERSIONS.PIVOT_GEAR_RATIO);
+        SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS/42)/CONVERSIONS.PIVOT_GEAR_RATIO);
 
     }
 

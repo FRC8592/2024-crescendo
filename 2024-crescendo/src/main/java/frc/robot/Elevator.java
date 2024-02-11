@@ -20,16 +20,15 @@ public class Elevator {
 
 
     public void update(){
-        double currentAngle = getPivotAngle();
-        double currentLengthTicks = getElevatorLength();
+        double currentAngle = getPivotAngle(); // In degrees
+        double currentLengthTicks = getElevatorLength(); // In ticks
         boolean pivotUp = false;
         boolean pivotDown = false;
 
         pivotUp = currentAngle < setAngle;
         pivotDown = currentAngle > setAngle;
-        
         if (pivotUp) {
-            if (currentAngle > 30) { //30° is clear of all obstacles in the robot
+            if (currentAngle > ELEVATOR.LIFTED) { //30° is clear of all obstacles in the robot
                 setElevatorLength(setLengthTicks); //Position == length
             }
             else {
@@ -38,10 +37,10 @@ public class Elevator {
             setPivotAngle(setAngle);
         }
         else if (pivotDown) { //Moving down
-            if (currentAngle > 30) { //Angle greater than 30° (no reference to elevator length)
+            if (currentAngle > ELEVATOR.LIFTED) { //Angle greater than 30° (no reference to elevator length)
                 setPivotAngle(setAngle);
-            } 
-            else if (currentLengthTicks > 5) { // Elevator angle less than 30° and extended too far (more than 5 ticks)
+            }
+            else if (currentLengthTicks > ELEVATOR.RETRACTED) { // Elevator angle less than 30° and extended too far (more than 5 ticks)
                 pivotMotor.stop();
             }
             else { // elevator length <= 5 ticks AND angle less than 30°

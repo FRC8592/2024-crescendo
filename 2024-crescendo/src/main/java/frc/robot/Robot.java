@@ -54,21 +54,23 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotInit() {
-        //AdvantageKit
+        // AdvantageKit
         Logger.recordMetadata("Crescendo", "MyProject"); // Set a metadata value
 
         if (isReal()) { // If running on a real robot
             Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
             new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+            Logger.start();
         }
         else { // If simulated
-            setUseTiming(false); // Run as fast as possible
-            String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-            Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+            // setUseTiming(false); // Run as fast as possible
+            // String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+            // Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+            // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+            SmartDashboard.putData(FIELD);
         }
-        Logger.start();
+
 
         
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
@@ -97,7 +99,7 @@ public class Robot extends LoggedRobot {
     public void autonomousInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
-        currentAuto.addModules(swerve, elevator, intake, shooter, noteLock);
+        currentAuto.addModules(swerve);
         currentAuto.initialize();
         swerve.resetEncoder();
         swerve.resetPose(currentAuto.getStartPose());

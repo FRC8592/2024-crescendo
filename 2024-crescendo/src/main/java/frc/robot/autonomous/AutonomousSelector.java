@@ -12,11 +12,15 @@ public class AutonomousSelector {
     private GenericEntry delayEntry;
 
     public Class<?>[] autos = {
-        SixNoteAuto.class
+        SixNoteAuto.class,
+        NoteStealAuto.class,
+        ThreeWingNoteAuto.class,
+        SevenNoteAuto.class,
+        IWillNameThisLaterAuto.class,
     };
 
     public AutonomousSelector() {
-        autonChooser.setDefaultOption("DEFAULT - DO NOTHING", BaseAuto.class);
+        autonChooser.setDefaultOption("DEFAULT - DO NOTHING", DoNothingAuto.class);
         for (Class<?> auto : autos) {
             autonChooser.addOption(auto.getSimpleName(), auto);
         }

@@ -104,4 +104,9 @@ public enum AutonomousPositions {
 
         return new SwerveTrajectory(traj).setTrajectoryConfiguration(config).addRotation(rotation, 2 * Math.PI, turnDelay);
     }
+
+    public static SwerveTrajectory generate(TrajectoryConfig setReversed, Pose2d pose, AutonomousPositions wingNote1) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'generate'");
+    }
 }

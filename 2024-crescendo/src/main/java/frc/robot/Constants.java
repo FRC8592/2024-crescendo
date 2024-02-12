@@ -56,7 +56,7 @@ public final class Constants {
         public static final double EXTENSION_METERS_STOWED = 0;
         public static final double EXTENSION_METERS_AMP = 0.15;
         public static final double EXTENSION_METERS_CLIMB= 0.26;
-        public static final double EXTENSION_METERS_MAX = 0.26;
+        public static final double EXTENSION_METERS_MAX = 0.21;
 
         public static final int PIVOT_MOTOR_CAN_ID = 36;    
         public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = 38; 

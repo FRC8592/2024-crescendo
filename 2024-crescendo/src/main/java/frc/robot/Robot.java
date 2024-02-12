@@ -369,8 +369,7 @@ public class Robot extends LoggedRobot {
         else if (operatorController.getYButtonPressed()){
             elevator.climbPosition();
         } else if(operatorController.getBButtonPressed()){
-            elevator.setElevatorLengthCustom(1);
-            elevator.setPivotAngleCustom(90);
+            elevator.testLimits();
         }
 
         // if (operatorController.getBButtonPressed()){

@@ -4,6 +4,7 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
 
 public class SparkFlexControl {
@@ -17,6 +18,7 @@ public class SparkFlexControl {
         motor.restoreFactoryDefaults();
         motorControl = motor.getPIDController();
         motorEncoder = motor.getEncoder();
+        motor.setIdleMode(IdleMode.kBrake);
         motor.set(0);
     }
 

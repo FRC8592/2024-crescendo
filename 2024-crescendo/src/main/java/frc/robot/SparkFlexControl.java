@@ -23,8 +23,8 @@ public class SparkFlexControl {
         motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
     }
 
-    public void setPosition(double ticks){
-        motorControl.setReference(ticks/4096, com.revrobotics.CANSparkBase.ControlType.kPosition); 
+    public void setPosition(double rotations){
+        motorControl.setReference(rotations, com.revrobotics.CANSparkBase.ControlType.kPosition); 
     }
 
     public void setPercentOutput(double power){

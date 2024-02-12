@@ -51,7 +51,7 @@ public class Robot extends LoggedRobot {
     private LED leds;
     private Power power;
 
-    private double targetAngle = 0;
+    //private double targetAngle = 0;
 
 
     @Override
@@ -92,13 +92,13 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
 
-        SmartDashboard.putNumber("target angle", targetAngle);
+        //SmartDashboard.putNumber("target angle", targetAngle);
         
         SmartDashboard.putNumber("elevator position in ticks", elevator.getElevatorLength());
         SmartDashboard.putNumber("elevator position in rotations", elevator.getElevatorLength());
 
         SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
-        SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS*CONVERSIONS.PIVOT_GEAR_RATIO);
+        //SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS*CONVERSIONS.PIVOT_GEAR_RATIO);
         SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*CONVERSIONS.PIVOT_GEAR_RATIO)/360);
 
     }
@@ -354,18 +354,23 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        // shooter.setAlliance(DriverStation.getAlliance().get());
+        elevator.resetEncoders();
     }
 
     @Override
     public void testPeriodic() {
         elevator.update();
         if (operatorController.getXButtonPressed()){
-            targetAngle += 2;
-            elevator.setPivotAngleCustom(targetAngle);
+            elevator.stow();
         } else if (operatorController.getAButtonPressed()){
-            targetAngle -= 2;
-            elevator.setPivotAngleCustom(targetAngle);
+            elevator.ampPosition();
+        }
+        else if (operatorController.getYButtonPressed()){
+            elevator.climbPosition();
+        }
+
+        if (operatorController.getBButtonPressed()){
+            elevator.resetEncoders();
         }
 
         //Once Chain is Added

@@ -1,6 +1,8 @@
 package frc.robot;
 
 import com.revrobotics.AbsoluteEncoder;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.*;
 
 public class Elevator {
@@ -37,6 +39,7 @@ public class Elevator {
 
         pivotUp = currentAngle < setAngle;
         pivotDown = currentAngle > setAngle;
+
         if (pivotUp) {
             if (currentAngle > ELEVATOR.LIFTED) { //30° is clear of all obstacles in the robot
                 setElevatorLength(setLengthTicks); //Position == length
@@ -75,9 +78,10 @@ public class Elevator {
     }
 
     /** 
-     * sets the position
+     * sets the position in rotations
+     * @param position
     */
-    private void setElevatorLength(double position){
+    private void setElevatorLength(double position){ 
         extensionMotor.setPosition(position);
     }
 
@@ -86,11 +90,11 @@ public class Elevator {
     }
 
     /**
-     * gets position of elevator
+     * gets length of elevator in meters
      * @return
      */
     public double getElevatorLength() {
-        return extensionMotor.getTicks();
+        return extensionMotor.getPosition();
     }
 
     //-------PIVOT CODE-------//
@@ -108,10 +112,11 @@ public class Elevator {
      * sets angle of pivot to base of robot
      * @param angle units: degrees
      */
-    private void setPivotAngle(double angle) {
-        double angleConverted = CONVERSIONS.ANGLE_DEGREES_TO_TICKS * CONVERSIONS.PIVOT_GEAR_RATIO * angle;
-        pivotMotor.setPosition(angleConverted);
-        pivotFollowMotor.setPosition(angleConverted);
+    public void setPivotAngle(double angle) {
+        double rotations = (CONVERSIONS.PIVOT_GEAR_RATIO * angle)/360;
+        pivotMotor.setPosition(rotations);
+        pivotFollowMotor.setPosition(rotations);
+        SmartDashboard.putNumber("rotations in setPivotAngle", rotations);
     }
 
     public void setPivotAngleCustom(double angle) {

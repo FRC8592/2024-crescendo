@@ -346,10 +346,50 @@ public class Robot extends LoggedRobot {
     @Override
     public void testInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
+        swerve.setSteerAnglesToAbsEncoder();
+        swerve.setTeleopCurrentLimit();
+        SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
+        SmartDashboard.putNumber("Intake Bottom RPM", INTAKE.SPEED_BOTTOM);
     }
 
     @Override
     public void testPeriodic() {
+        //Basic driving controls
+        double driveTranslateY = -driverController.getLeftY();
+        double driveTranslateX = -driverController.getLeftX();
+        double driveRotate = driverController.getRightX();
+        boolean slowMode = driverController.getRightBumper();
+        
+        //Intakes TODO: Revise with drivers
+        boolean intaking = operatorController.getAButton();
+            
+        //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
+        ChassisSpeeds currentSpeeds;
+        if (slowMode) { //Slow Mode slows down the robot for better precision & control
+            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                            driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
+                    swerve.getGyroscopeRotation());
+        }
+        else {
+            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                            driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
+                    swerve.getGyroscopeRotation());
+        }
+        swerve.drive(currentSpeeds);
+
+        // intaking
+        if (intaking) {
+            intake.intakeNote(SmartDashboard.getNumber("Intake Bottom RPM", 0), SmartDashboard.getNumber("Intake Top RPM", 0));
+        }
+        else {
+            intake.stop();
+        }
     }
 
     @Override

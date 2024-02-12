@@ -56,6 +56,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotInit() {
+
         //AdvantageKit
         Logger.recordMetadata("Crescendo", "MyProject"); // Set a metadata value
 
@@ -86,6 +87,8 @@ public class Robot extends LoggedRobot {
         //noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
         //        NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
         elevator = new Elevator();
+
+        elevator.resetEncoders();
         
     }
 
@@ -94,12 +97,12 @@ public class Robot extends LoggedRobot {
 
         //SmartDashboard.putNumber("target angle", targetAngle);
         
-        SmartDashboard.putNumber("elevator position in ticks", elevator.getElevatorLength());
-        SmartDashboard.putNumber("elevator position in rotations", elevator.getElevatorLength());
+        SmartDashboard.putNumber("elevator position in meters", elevator.getElevatorLength());
+        SmartDashboard.putNumber("elevator position in rotations", elevator.getElevatorLength()/ELEVATOR.ELEVATOR_GEAR_RATIO);
 
         SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
         //SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS*CONVERSIONS.PIVOT_GEAR_RATIO);
-        SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*CONVERSIONS.PIVOT_GEAR_RATIO)/360);
+        SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*ELEVATOR.PIVOT_GEAR_RATIO)/360);
 
     }
 
@@ -284,7 +287,7 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (autoAmpScore) {
-            elevator.setElevatorLengthCustom(ELEVATOR.POSITION_AMP);
+            elevator.setElevatorLengthCustom(ELEVATOR.EXTENSION_METERS_AMP);
             double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
             double xVelocity = poseGetter.strafeToAprilTag();
             shooter.shootVelocityMode(-1);
@@ -354,24 +357,27 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        elevator.resetEncoders();
     }
 
     @Override
     public void testPeriodic() {
-        elevator.update();
-        if (operatorController.getXButtonPressed()){
+        if (operatorController.getAButtonPressed()){
             elevator.stow();
-        } else if (operatorController.getAButtonPressed()){
+        } else if (operatorController.getXButtonPressed()){
             elevator.ampPosition();
         }
         else if (operatorController.getYButtonPressed()){
             elevator.climbPosition();
+        } else if(operatorController.getBButtonPressed()){
+            elevator.setElevatorLengthCustom(1);
+            elevator.setPivotAngleCustom(90);
         }
 
-        if (operatorController.getBButtonPressed()){
-            elevator.resetEncoders();
-        }
+        // if (operatorController.getBButtonPressed()){
+        //     elevator.resetEncoders();
+        // }
+
+        elevator.update();
 
         //Once Chain is Added
         /*elevator.update();

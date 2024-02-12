@@ -12,8 +12,7 @@ public final class Constants {
         public static final double IN_TO_METERS = 0.0254;
         public static final double ANGLE_DEGREES_TO_TICKS = 4096/360.0;
         public static final double TICKS_TO_ANGLE_DEGREES = 360.0/4096.0;
-        public static final double PIVOT_GEAR_RATIO = (12.0/5.0) * 75.0;
-        public static final double ELEVATOR_GEAR_RATIO = 48.0;
+        
     }
 
     public final class CONTROLLERS {
@@ -53,20 +52,39 @@ public final class Constants {
     public final class ELEVATOR {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
         public static final int EXTENSION_MOTOR_CAN_ID = 37;
-        public static final double POSITION_STOWED = 0;
-        public static final double POSITION_AMP = 30;
-        public static final double POSITION_CLIMB= -1;
+
+        public static final double EXTENSION_METERS_STOWED = 0;
+        public static final double EXTENSION_METERS_AMP = 0.15;
+        public static final double EXTENSION_METERS_CLIMB= 0.26;
+        public static final double EXTENSION_METERS_MAX = 0.26;
+
         public static final int PIVOT_MOTOR_CAN_ID = 36;    
-        public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = 38;    
-        public static final int PIVOT_ANGLE_AMP = 60;
+        public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = 38; 
+
+        public static final int PIVOT_ANGLE_AMP = 50; // TODO FIND PIVOT ANGLES (ALL OF THEM)
         public static final int PIVOT_ANGLE_STOWED = 0;
-        public static final int PIVOT_ANGLE_CLIMB = 0;
-        public static final int RETRACTED = 5; //Ticks TODO: Change to new unit once we know the gearing
-        public static final int LIFTED = 30; //Degrees
+        public static final int PIVOT_ANGLE_CLIMB = 55;
+        public static final int PIVOT_ANGLE_MAX = 60;
+
+        public static final double RETRACTED = 0.001; //Meters TODO: Change to new unit once we know the gearing
+        public static final double EXTENSION_ALLOWED_ANGLE = 30; //Degrees
+
         public static final double PIVOT_kP = 0.05;
         public static final double PIVOT_kI = 0;
         public static final double PIVOT_kD = 0;
         public static final double PIVOT_kFF = 0;
+
+        public static final double EXTENSION_kP = 0.05;
+        public static final double EXTENSION_kI = 0.0;
+        public static final double EXTENSION_kD = 0.0;
+        public static final double EXTENSION_kFF = 0.0;
+
+        public static final double PIVOT_GEAR_RATIO = (12.0/5.0) * 75.0;
+        public static final double DIAMETER_OF_ELEVATOR_SPROCKET = 1.885; //inches
+        public static final double ELEVATOR_GEAR_RATIO = (1/48.0)*(DIAMETER_OF_ELEVATOR_SPROCKET*CONVERSIONS.IN_TO_METERS);
+
+        public static final double MAX_PIVOT_ROTATIONS = (PIVOT_ANGLE_MAX*PIVOT_GEAR_RATIO)/360;
+        public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX/ELEVATOR_GEAR_RATIO;
     }
 
     public final class POWER {

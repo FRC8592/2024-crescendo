@@ -4,6 +4,7 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 
 public class SparkFlexControl {
     public CANSparkFlex motor;
@@ -55,11 +56,16 @@ public class SparkFlexControl {
         return motorEncoder.getPosition()*4096;
     }
 
+
     public void setFollower(SparkFlexControl motorToFollow){
         motor.follow(motorToFollow.motor);
     }
 
     public void setInverted(){
         motor.setInverted(true);
+    }
+
+    public void setSoftLimit(SoftLimitDirection direction, double rotations){
+        motor.setSoftLimit(direction, (float)rotations);
     }
 }

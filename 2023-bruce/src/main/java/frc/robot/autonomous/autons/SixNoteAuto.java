@@ -1,5 +1,7 @@
 package frc.robot.autonomous.autons;
 
+import javax.security.auth.kerberos.DelegationPermission;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,26 +17,29 @@ import frc.robot.FRCLogger;
 import frc.robot.commands.FollowerCommand;
 import frc.robot.Constants;
 
-public class ThreeNoteAuto extends BaseAuto {
-    private TrajectoryConfig config = new TrajectoryConfig(4, 2);
+public class SixNoteAuto extends BaseAuto {
+    private TrajectoryConfig config = new TrajectoryConfig(3, 2);
     private TrajectoryConfig slowConfig = new TrajectoryConfig(2, 2);
+    
     private SwerveTrajectory pathOne = AutonomousPositions.generate(slowConfig, 
             AutonomousPositions.SUBWOOFER_MIDDLE.getPose(), 
-            AutonomousPositions.WING_NOTE_3.translate(0, 0.5, Rotation2d.fromDegrees(-45)));
+            AutonomousPositions.WING_NOTE_3.translate(0.2, 0.5, Rotation2d.fromDegrees(-45)));
 
-    private SwerveTrajectory pathTwo = AutonomousPositions.generate(slowConfig.setReversed(false).setEndVelocity(0.5), 
-            AutonomousPositions.WING_NOTE_3.translate(0, 0.5, Rotation2d.fromDegrees(180)),
+    private SwerveTrajectory pathTwo = AutonomousPositions.generate(slowConfig.setReversed(false).setEndVelocity(0), 
+            AutonomousPositions.WING_NOTE_3.translate(0.2, 0.5, Rotation2d.fromDegrees(180)),
             AutonomousPositions.WING_NOTE_2.rotate(Rotation2d.fromDegrees(0))).addRotation(Rotation2d.fromDegrees(0));
 
-    private SwerveTrajectory pathThree = AutonomousPositions.generate(slowConfig.setReversed(true).setEndVelocity(0), 
+    private SwerveTrajectory pathThree = AutonomousPositions.generate(slowConfig.setReversed(true).setEndVelocity(1), 
             AutonomousPositions.WING_NOTE_2.rotate(Rotation2d.fromDegrees(0)),
-            AutonomousPositions.WING_NOTE_1.rotate(Rotation2d.fromDegrees(215))).addRotation(Rotation2d.fromDegrees(0));
+            AutonomousPositions.WING_NOTE_1.getPose(),
+            AutonomousPositions.WING_NOTE_1.translate(1.0,0.2,Rotation2d.fromDegrees(180)));
+        
 
-    private SwerveTrajectory pathFour = AutonomousPositions.generate(config.setReversed(false).setStartVelocity(0.0).setEndVelocity(0), 
-            AutonomousPositions.WING_NOTE_1.getPose(), 
+    private SwerveTrajectory pathFour = AutonomousPositions.generate(config.setReversed(false).setStartVelocity(1).setEndVelocity(1.5), 
+            AutonomousPositions.WING_NOTE_1.translate(1.0, 0.2), 
             AutonomousPositions.MID_NOTE_1.translate(0, 0.3));
 
-    private SwerveTrajectory pathFive = AutonomousPositions.generate(config.setReversed(true).setStartVelocity(0), 
+    private SwerveTrajectory pathFive = AutonomousPositions.generate(config.setReversed(true).setStartVelocity(1.5), 
             AutonomousPositions.MID_NOTE_1.translate(0, 0.3),
             AutonomousPositions.WING_NOTE_1.translate(3.0, -0.2));
 
@@ -55,19 +60,16 @@ public class ThreeNoteAuto extends BaseAuto {
     @Override
     public void initialize() {
         queue = new CommandQueue(
-            new FollowerCommand(drive, pathOne, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
-            new DelayCommand(0.25),
-            new FollowerCommand(drive,pathTwo, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
-            new DelayCommand(0.25),
-            new FollowerCommand(drive, pathThree, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
-            // new DelayCommand(0.25),
-            new FollowerCommand(drive, pathFour, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
-            // new DelayCommand(0.75),
-            new FollowerCommand(drive, pathFive, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
-            new DelayCommand(0.25),
-            new FollowerCommand(drive, pathSix, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision),
-            // new DelayCommand(0.75),
-            new FollowerCommand(drive, pathSeven, AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(), lockToSpeakerVision)
+            new FollowerCommand(drive, pathOne),
+            new FollowerCommand(drive,pathTwo),
+            new FollowerCommand(drive, pathThree),
+            new FollowerCommand(drive, pathFour),
+            new FollowerCommand(drive, pathFive),
+            new DelayCommand(0.5),
+            new FollowerCommand(drive, pathSix),
+            new DelayCommand(0.1),
+            new FollowerCommand(drive, pathSeven),
+            new DelayCommand(0.5)
 
         );
         // TODO Auto-generated method stub

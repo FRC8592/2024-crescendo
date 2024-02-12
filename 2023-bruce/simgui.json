@@ -4,6 +4,11 @@
       "window": {
         "visible": false
       }
+    },
+    "Timing": {
+      "window": {
+        "visible": false
+      }
     }
   },
   "NTProvider": {
@@ -20,6 +25,7 @@
         }
       },
       "/SmartDashboard/Field": {
+        "image": "C:\\Users\\Hisha\\Documents\\Robotix\\2024-field.png",
         "window": {
           "visible": true
         }
@@ -37,9 +43,6 @@
         "open": true
       }
     }
-  },
-  "NetworkTables Info": {
-    "visible": true
   },
   "NetworkTables View": {
     "visible": false

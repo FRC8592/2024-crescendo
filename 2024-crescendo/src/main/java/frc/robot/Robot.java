@@ -81,7 +81,7 @@ public class Robot extends LoggedRobot {
         //swerve = new Swerve(pigeon);
         //power = new Power();
         //leds = new LED();
-        //shooter = new Shooter();
+        shooter = new Shooter();
         //poseGetter = new PoseVision();
         //intake = new Intake();
         //noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
@@ -94,6 +94,7 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("bottomShootSpeed", 4500);
         SmartDashboard.putNumber("feederSpeed", -0.2);
         
+        elevator.resetEncoders();
     }
 
     @Override
@@ -361,7 +362,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        elevator.resetEncoders();
+        
     }
 
     @Override

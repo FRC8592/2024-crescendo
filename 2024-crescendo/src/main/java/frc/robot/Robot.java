@@ -350,6 +350,9 @@ public class Robot extends LoggedRobot {
         swerve.setTeleopCurrentLimit();
         SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
         SmartDashboard.putNumber("Intake Bottom RPM", INTAKE.SPEED_BOTTOM);
+
+        SmartDashboard.putNumber("Measured Intake Top RPM", 0);
+        SmartDashboard.putNumber("Measured Intake Bottom RPM", 0);
     }
 
     @Override
@@ -360,8 +363,8 @@ public class Robot extends LoggedRobot {
         double driveRotate = driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
         
-        //Intakes TODO: Revise with drivers
-        boolean intaking = operatorController.getAButton();
+        //Intake
+        boolean intaking = driverController.getLeftTriggerAxis() > 0.01; // TODO: use dedicated deadband function
             
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
@@ -385,10 +388,12 @@ public class Robot extends LoggedRobot {
 
         // intaking
         if (intaking) {
+            System.out.println("intaking");
+            // intake.spinPercentOutput(0.5);
             intake.intakeNote(SmartDashboard.getNumber("Intake Bottom RPM", 0), SmartDashboard.getNumber("Intake Top RPM", 0));
         }
         else {
-            intake.stop();
+            intake.halt();
         }
     }
 

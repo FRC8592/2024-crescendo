@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake {
-    private TalonFX topMotor;
-    private TalonFX bottomMotor;
+    private SparkFlexControl topMotor;
+    private SparkFlexControl bottomMotor;
 
     private enum States {
         INTAKE_PREP,
@@ -28,16 +28,23 @@ public class Intake {
     private States state;
 
     public Intake() {
-        topMotor = new TalonFX(INTAKE.TOP_MOTOR_CAN_ID);
-        topMotor.setInverted(true);
-        bottomMotor = new TalonFX(INTAKE.BOTTOM_MOTOR_CAN_ID);
+        // topMotor = new TalonFX(INTAKE.TOP_MOTOR_CAN_ID);
+        // topMotor.setInverted(true);
+        // bottomMotor = new TalonFX(INTAKE.BOTTOM_MOTOR_CAN_ID);
+// 
+        // topMotor.config_kP(0, INTAKE.TOP_MOTOR_kP);
+        // topMotor.config_kI(0, INTAKE.TOP_MOTOR_kI);
+        // topMotor.config_kD(0, INTAKE.TOP_MOTOR_kD);
+        // bottomMotor.config_kP(0, INTAKE.BOTTOM_MOTOR_kP);
+        // bottomMotor.config_kI(0, INTAKE.BOTTOM_MOTOR_kI);
+        // bottomMotor.config_kD(0, INTAKE.BOTTOM_MOTOR_kD);
+        topMotor = new SparkFlexControl(INTAKE.TOP_MOTOR_CAN_ID);
+        topMotor.setPIDF(INTAKE.TOP_MOTOR_kP, INTAKE.TOP_MOTOR_kI, INTAKE.TOP_MOTOR_kD, 0);
+        
+        bottomMotor = new SparkFlexControl(INTAKE.BOTTOM_MOTOR_CAN_ID);
+        bottomMotor.setPIDF(INTAKE.BOTTOM_MOTOR_kP, INTAKE.BOTTOM_MOTOR_kI, INTAKE.BOTTOM_MOTOR_kD, 0);
 
-        topMotor.config_kP(0, INTAKE.TOP_MOTOR_kP);
-        topMotor.config_kI(0, INTAKE.TOP_MOTOR_kI);
-        topMotor.config_kD(0, INTAKE.TOP_MOTOR_kD);
-        bottomMotor.config_kP(0, INTAKE.BOTTOM_MOTOR_kP);
-        bottomMotor.config_kI(0, INTAKE.BOTTOM_MOTOR_kI);
-        bottomMotor.config_kD(0, INTAKE.BOTTOM_MOTOR_kD);
+
     }
 
     public void update(Swerve swerve, Shooter shooter) {
@@ -71,13 +78,18 @@ public class Intake {
         this.state = States.STOP;
     }
 
+    public void halt() {
+        topMotor.setPercentOutput(0);
+        bottomMotor.setPercentOutput(0);
+    }
+
     /**
      * Spins the intake motors at the given power ({@code PercentOutput})
      * @param speed the power to send to the motors
      */
     public void spinPercentOutput(double speed) {
-        topMotor.set(ControlMode.PercentOutput, speed);
-        bottomMotor.set(ControlMode.PercentOutput, speed);
+        topMotor.setPercentOutput(speed);
+        bottomMotor.setPercentOutput(speed);
     }
 
     /**
@@ -85,11 +97,9 @@ public class Intake {
      * @return topMotorVelocityMetersPerSecond
      */
     public double getTopMotorVelocityRPM() {
-        double topMotorVelocity = topMotor.getSelectedSensorVelocity();
-        double topMotorVelocityRPM = UnitUtil.ticksToRPM(topMotorVelocity);
-        SmartDashboard.putNumber("Top Vel Ticks", topMotorVelocity);
-        SmartDashboard.putNumber("Top Motor Velocity (RPM)", topMotorVelocityRPM);
-        return topMotorVelocityRPM;
+        double topMotorVelocity = topMotor.getVelocity();
+        SmartDashboard.putNumber("Measured Intake Top RPM", topMotorVelocity);
+        return topMotorVelocity;
     }
 
     /**
@@ -97,11 +107,9 @@ public class Intake {
      * @return bottomMotorVelocityMetersPerSecond
      */
     public double getBottomMotorVelocityRPM() {
-        double bottomMotorVelocity = bottomMotor.getSelectedSensorVelocity();
-        double bottomMotorVelocityRPM = UnitUtil.ticksToRPM(bottomMotorVelocity);
-        SmartDashboard.putNumber("Bottom Vel Ticks", bottomMotorVelocity);
-        SmartDashboard.putNumber("Bottom Motor Velocity (RPM)", bottomMotorVelocityRPM);
-        return bottomMotorVelocityRPM;
+        double bottomMotorVelocity = bottomMotor.getVelocity();
+        SmartDashboard.putNumber("Measured Intake Bottom RPM", bottomMotorVelocity);
+        return bottomMotorVelocity;
     }
 
     /**
@@ -110,11 +118,8 @@ public class Intake {
      * @param top Velocity for top motor (RPM)
      */
     public void intakeNote(double bottom, double top) {
-        double topVelocity = UnitUtil.RPMToTicks(top); // Convert RPM to ticks (100ms)
-        double bottomVelocity = UnitUtil.RPMToTicks(bottom); // Convert RPM to ticks (100ms)
-
-        topMotor.set(ControlMode.Velocity, topVelocity);
-        bottomMotor.set(ControlMode.Velocity, bottomVelocity);
+        topMotor.setVelocity(top);
+        bottomMotor.setVelocity(bottom);
 
         getTopMotorVelocityRPM();
         getBottomMotorVelocityRPM();
@@ -126,9 +131,8 @@ public class Intake {
     public void robotSpeedIntake (Swerve swerve) {
         double robotSpeed = swerve.getCurrentSpeeds().vyMetersPerSecond;
         double rollerSpeed = Math.max(INTAKE.MINIMUM_ROLLER_SPEED, robotSpeed * INTAKE.ROBOT_SPEED_MULTIPLIER);
-        topMotor.set(ControlMode.Velocity, rollerSpeed );
-        bottomMotor.set(ControlMode.Velocity, rollerSpeed);
-
+        topMotor.setVelocity(rollerSpeed);
+        bottomMotor.setVelocity(rollerSpeed);
     }
 
     /**TODO:WRITE THIS METHOD PLS 

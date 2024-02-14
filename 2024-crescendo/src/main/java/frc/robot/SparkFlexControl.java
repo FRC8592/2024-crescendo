@@ -41,4 +41,8 @@ public class SparkFlexControl {
     public double getVelocity(){
         return motorEncoder.getVelocity();
     }
+
+    public void setInverted() {
+        motor.setInverted(true);
+    }
 }

@@ -19,16 +19,26 @@ public class Elevator {
     boolean pivotDown = false;
 
     public Elevator(){
-        extensionMotor = new SparkFlexControl(ELEVATOR.EXTENSION_MOTOR_CAN_ID);
-        pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID);
-        pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID);
+        extensionMotor = new SparkFlexControl(ELEVATOR.EXTENSION_MOTOR_CAN_ID, true);
+        pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID, false);
+        pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID, false);
 
-        pivotMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF);
-        pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF);
+        pivotMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
+        pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
 
-        extensionMotor.setPIDF(ELEVATOR.EXTENSION_kP, ELEVATOR.EXTENSION_kI, ELEVATOR.EXTENSION_kD, ELEVATOR.EXTENSION_kFF);
+        extensionMotor.setPIDF(ELEVATOR.EXTENSION_kP, ELEVATOR.EXTENSION_kI, ELEVATOR.EXTENSION_kD, ELEVATOR.EXTENSION_kFF, 0);
 
         pivotMotor.setInverted();
+
+        pivotMotor.setMaxVelocity(5000, 0);
+        pivotFollowMotor.setMaxVelocity(5000, 0);
+
+        extensionMotor.setMaxVelocity(5000, 0);
+
+        pivotMotor.setMaxAcceleration(5000, 0);
+        pivotFollowMotor.setMaxAcceleration(5000, 0);
+
+        extensionMotor.setMaxAcceleration(5000, 0);
         
     }
 
@@ -36,7 +46,7 @@ public class Elevator {
 
     public void update(){
         double currentAngle = getPivotAngle(); // In degrees
-        double currentLengthMeters = getElevatorLength(); // In ticks   
+        double currentLengthMeters = getExtensionLength(); // In ticks   
         
         boolean pivotIsRunning = false;
         boolean extensionIsRunning = false;
@@ -64,15 +74,15 @@ public class Elevator {
             setPivotAngle(setAngle);
         }
         else {
-            pivotMotor.stop();
-            pivotFollowMotor.stop();
+            pivotMotor.stopSmartVelocity();
+            pivotFollowMotor.stopSmartVelocity();
         }
 
         if (setExtend) {
-            setElevatorLength(setLengthMeters);
+            setExtensionLength(setLengthMeters);
         }
         else {
-            extensionMotor.stop();
+            extensionMotor.stopSmartVelocity();
         }
 
         // if(currentAngle<ELEVATOR.PIVOT_ANGLE_MAX && currentAngle>0){
@@ -154,7 +164,7 @@ public class Elevator {
      * sets the speed of
      * @param speed
      */
-    public void percentOutputElevator(double speed){
+    public void percentOutputExtension(double speed){
         extensionMotor.setPercentOutput(speed);
     }
 
@@ -162,13 +172,12 @@ public class Elevator {
      * sets the position in rotations
      * @param position
     */
-    private void setElevatorLength(double meters){ 
-        double newMeters = meters/ELEVATOR.ELEVATOR_GEAR_RATIO;
-        extensionMotor.setPosition(newMeters);
-        SmartDashboard.putNumber("rotations in setElevatorLength", newMeters);
+    private void setExtensionLength(double meters){ 
+        double rotations = meters/ELEVATOR.ELEVATOR_GEAR_RATIO;
+        extensionMotor.setPositionSmartMotion(rotations);
     }
 
-    public void setElevatorLengthCustom(double position){
+    public void setExtensionLengthCustom(double position){
         setLengthMeters = position;
     }
 
@@ -176,7 +185,7 @@ public class Elevator {
      * gets length of elevator in meters
      * @return
      */
-    public double getElevatorLength() {
+    public double getExtensionLength() {
         return (extensionMotor.getPosition()*ELEVATOR.ELEVATOR_GEAR_RATIO);
     }
 
@@ -195,11 +204,10 @@ public class Elevator {
      * sets angle of pivot to base of robot
      * @param angle units: degrees
      */
-    public void setPivotAngle(double angle) {
+    private void setPivotAngle(double angle) {
         double rotations = (ELEVATOR.PIVOT_GEAR_RATIO * angle)/360;
-        pivotMotor.setPosition(rotations);
-        pivotFollowMotor.setPosition(rotations);
-        SmartDashboard.putNumber("rotations in setPivotAngle", rotations);
+        pivotMotor.setPositionSmartMotion(rotations);
+        pivotFollowMotor.setPositionSmartMotion(rotations);
     }
 
     public void setPivotAngleCustom(double angle) {

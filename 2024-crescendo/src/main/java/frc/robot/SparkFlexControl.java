@@ -3,7 +3,12 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.SparkPIDController.AccelStrategy;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
 
@@ -13,12 +18,16 @@ public class SparkFlexControl {
     public SparkPIDController motorControl;
 
 
-    public SparkFlexControl(int MOTOR_CAN_ID){
+    public SparkFlexControl(int MOTOR_CAN_ID, boolean coastMode){
         motor = new CANSparkFlex(MOTOR_CAN_ID, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motorControl = motor.getPIDController();
         motorEncoder = motor.getEncoder();
-        motor.setIdleMode(IdleMode.kBrake);
+        if (coastMode){
+            motor.setIdleMode(IdleMode.kCoast);
+        } else{
+            motor.setIdleMode(IdleMode.kBrake);
+        }
         motor.set(0);
     }
 
@@ -38,12 +47,18 @@ public class SparkFlexControl {
         motor.set(0);
     }
 
-    public void setPIDF(double P, double I, double D, double FF){
+    public void stopSmartVelocity(){
+        motorControl.setReference(0, ControlType.kSmartVelocity, 0);
+    }
+
+    public void setPIDF(double P, double I, double D, double FF, int slotID){
         motorControl =  motor.getPIDController();
-        motorControl.setP(P);
-        motorControl.setI(I);
-        motorControl.setD(D);
-        motorControl.setFF(FF);
+        motorControl.setP(P,slotID);
+        motorControl.setI(I, slotID);
+        motorControl.setD(D, slotID);
+        motorControl.setFF(FF, slotID);
+        motorControl.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal,slotID);
+        motorControl.setSmartMotionAllowedClosedLoopError(0.25, slotID);
     }
 
     public double getVelocity(){
@@ -69,5 +84,17 @@ public class SparkFlexControl {
 
     public void setSoftLimit(SoftLimitDirection direction, double rotations){
         motor.setSoftLimit(direction, (float)rotations);
+    }
+
+    public void setPositionSmartMotion(double rotations){
+        motorControl.setReference(rotations, ControlType.kSmartMotion, 0);
+        SmartDashboard.putNumber("smart motion", rotations);
+    }
+
+    public void setMaxVelocity(double maxVelocity, int slotID){
+        motorControl.setSmartMotionMaxVelocity(maxVelocity, slotID);
+    }
+    public void setMaxAcceleration(double maxAccel, int slotID){
+        motorControl.setSmartMotionMaxAccel(maxAccel, slotID);
     }
 }

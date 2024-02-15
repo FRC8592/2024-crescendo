@@ -48,6 +48,15 @@ public class Shooter {
     }
 
     /**
+     * set i-zone for accumulator for both motors
+     * @param izone
+     */
+    public void setMotorsIZone(double izone) {
+        topShooterMotor.motorControl.setIZone(izone);
+        bottomShooterMotor.motorControl.setIZone(izone);
+    }
+
+    /**
      * set shooter motors speeds in terms of RPM
      * @param speedRPM
      */
@@ -115,8 +124,8 @@ public class Shooter {
      * checks if flywheels are at target speed to shoot
      */
     public boolean isReady() {
-        SmartDashboard.putNumber("leftShooterRPM", topShooterMotor.getVelocity());
-        SmartDashboard.putNumber("rightShooterRPM", bottomShooterMotor.getVelocity());
+        SmartDashboard.putNumber("topShooterRPM", topShooterMotor.getVelocity());
+        SmartDashboard.putNumber("bottomShooterRPM", bottomShooterMotor.getVelocity());
         if (Math.abs(topShooterMotor.getVelocity() - toptargetSpeed) < SHOOTER.ACCEPTABLE_RANGE&&
                 Math.abs(bottomShooterMotor.getVelocity() - bottomTargetSpeed) < SHOOTER.ACCEPTABLE_RANGE) {
             return true;

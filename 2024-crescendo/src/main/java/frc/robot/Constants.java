@@ -56,23 +56,24 @@ public final class Constants {
         public static final double TOP_SHOOTER_MOTOR_SPEED = 0.25;
         public static final double BOTTOM_SHOOTER_MOTOR_SPEED = TOP_SHOOTER_MOTOR_SPEED;
 
-        public static final double TOP_SHOOTER_MOTOR_kP = 0.00007; //PID
-        public static final double TOP_SHOOTER_MOTOR_kI = 0.0000005; //PID
-        public static final double TOP_SHOOTER_MOTOR_kD = 0.0000035; //PID
+        public static final double TOP_SHOOTER_MOTOR_kP = 0.0000825; //PID
+        public static final double TOP_SHOOTER_MOTOR_kI = 0.0000001; //PID
+        public static final double TOP_SHOOTER_MOTOR_kD = 0.0000001; //PID
+        public static final double TOP_SHOOTER_MOTOR_kF = 0.000149; // feedforward
 
-        public static final double BOTTOM_SHOOTER_MOTOR_kP = 0.00007; //PID
-        public static final double BOTTOM_SHOOTER_MOTOR_kI = 0.0000005;//PID
-        public static final double BOTTOM_SHOOTER_MOTOR_kD = 0.0000035; //PID
+        public static final double SHOOTER_MOTOR_IZONE = 100; // within 100 rpm
 
-        public static final int ACCEPTABLE_RANGE = 50;
+        public static final double BOTTOM_SHOOTER_MOTOR_kP = TOP_SHOOTER_MOTOR_kP;
+        public static final double BOTTOM_SHOOTER_MOTOR_kI = TOP_SHOOTER_MOTOR_kI;
+        public static final double BOTTOM_SHOOTER_MOTOR_kD = TOP_SHOOTER_MOTOR_kD;
+        public static final double BOTTOM_SHOOTER_MOTOR_kF = TOP_SHOOTER_MOTOR_kF;
+
+
+        public static final int ACCEPTABLE_RANGE = 10;
         //Lookup table
         public static final double[][] RANGE_TABLE = {
             {0,3000}
         };
-
-        public static final double TOP_SHOOTER_MOTOR_kF = 0.000145;
-
-        public static final double BOTTOM_SHOOTER_MOTOR_kF = 0.000145;
     }
 
 

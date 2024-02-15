@@ -19,7 +19,7 @@ public class Elevator {
     boolean pivotDown = false;
 
     public Elevator(){
-        extensionMotor = new SparkFlexControl(ELEVATOR.EXTENSION_MOTOR_CAN_ID, true);
+        extensionMotor = new SparkFlexControl(ELEVATOR.EXTENSION_MOTOR_CAN_ID, false);
         pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID, false);
         pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID, false);
 
@@ -63,7 +63,8 @@ public class Elevator {
         }
         else if (pivotDown){
             setExtend = currentLengthMeters > 0;
-            setPivot = (currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE || currentLengthMeters < 0.01) && currentAngle>0;
+            // setPivot = (currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE || currentLengthMeters < 0.01) && currentAngle>0;
+            setPivot = (currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE) && currentAngle>0; // NOTE: this is for testing
         }
         else {
             setPivot = false;

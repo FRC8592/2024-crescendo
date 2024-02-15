@@ -82,6 +82,7 @@ public class Robot extends LoggedRobot {
         //power = new Power();
         //leds = new LED();
         shooter = new Shooter();
+        shooter.setMotorsIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         //poseGetter = new PoseVision();
         //intake = new Intake();
         //noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
@@ -92,7 +93,15 @@ public class Robot extends LoggedRobot {
 
         SmartDashboard.putNumber("topShootSpeed", 4500);
         SmartDashboard.putNumber("bottomShootSpeed", 4500);
-        SmartDashboard.putNumber("feederSpeed", -0.2);
+        SmartDashboard.putNumber("feederSpeed", -0.1);
+        SmartDashboard.putNumber("feederSpeedShoot", -0.4);
+
+        SmartDashboard.putNumber("PIVOT CUSTOM ANGLE", 45);
+
+        SmartDashboard.putNumber("ShooterKp", SHOOTER.BOTTOM_SHOOTER_MOTOR_kP);
+        SmartDashboard.putNumber("ShooterKi", SHOOTER.BOTTOM_SHOOTER_MOTOR_kI);
+        SmartDashboard.putNumber("ShooterKd", SHOOTER.BOTTOM_SHOOTER_MOTOR_kD);
+        SmartDashboard.putNumber("ShooterKff", SHOOTER.BOTTOM_SHOOTER_MOTOR_kF);
         
         elevator.resetEncoders();
     }
@@ -362,7 +371,19 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        
+        shooter.bottomShooterMotor.setPIDF(
+            SmartDashboard.getNumber("ShooterKp",  0),
+            SmartDashboard.getNumber("ShooterKi",  0),
+            SmartDashboard.getNumber("ShooterKd",  0),
+            SmartDashboard.getNumber("ShooterKff", 0), 0
+        );
+
+        shooter.topShooterMotor.setPIDF(
+            SmartDashboard.getNumber("ShooterKp",  0),
+            SmartDashboard.getNumber("ShooterKi",  0),
+            SmartDashboard.getNumber("ShooterKd",  0),
+            SmartDashboard.getNumber("ShooterKff", 0), 0
+        );
     }
 
     @Override
@@ -370,7 +391,8 @@ public class Robot extends LoggedRobot {
         if (operatorController.getAButtonPressed()){
             elevator.setPivotAngleCustom(ELEVATOR.PIVOT_ANGLE_STOWED);
         } else if (operatorController.getXButtonPressed()){
-            elevator.setPivotAngleCustom(45);
+            elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 45));
+
         }
         else if (operatorController.getYButtonPressed()){
             elevator.setPivotAngleCustom(ELEVATOR.PIVOT_ANGLE_AMP);
@@ -383,7 +405,7 @@ public class Robot extends LoggedRobot {
                     (int) SmartDashboard.getNumber("bottomShootSpeed", 0));
             if (shooter.isReady()) {// isReady returns whether the shooter angle and
                 // flywheel speeds are within a threshhold of where we asked them to be
-                shooter.setFeederSpeed(SmartDashboard.getNumber("feederSpeed", 0)); // runs the feeder wheels
+                shooter.setFeederSpeed(SmartDashboard.getNumber("feederSpeedShoot", 0)); // runs the feeder wheels
                 // if (!shooter.hasNote()) {
                 //     shooter.stop();
                 //     shooter.stopFeeders();
@@ -391,7 +413,7 @@ public class Robot extends LoggedRobot {
                 // }
             }
         } else if (operatorController.getLeftTriggerAxis() > 0.1){
-            shooter.setFeederSpeed(-0.2);
+            shooter.setFeederSpeed(SmartDashboard.getNumber("feederSpeed", 0));
         }
         else {
             shooter.setShootVelocity(0, 0);

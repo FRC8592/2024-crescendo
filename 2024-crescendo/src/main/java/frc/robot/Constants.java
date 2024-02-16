@@ -68,6 +68,11 @@ public final class Constants {
         public static final double BOTTOM_SHOOTER_MOTOR_kD = TOP_SHOOTER_MOTOR_kD;
         public static final double BOTTOM_SHOOTER_MOTOR_kF = TOP_SHOOTER_MOTOR_kF;
 
+        public static final double FEEDER_MOTOR_kP = 0.0;
+        public static final double FEEDER_MOTOR_kI = 0.0;
+        public static final double FEEDER_MOTOR_kD = 0.0;
+        public static final double FEEDER_MOTOR_kF = 0.0001;
+
 
         public static final int ACCEPTABLE_RANGE = 10;
         //Lookup table

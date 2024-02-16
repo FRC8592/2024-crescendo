@@ -93,8 +93,8 @@ public class Robot extends LoggedRobot {
 
         SmartDashboard.putNumber("topShootSpeed", 4500);
         SmartDashboard.putNumber("bottomShootSpeed", 4500);
-        SmartDashboard.putNumber("feederSpeed", -0.1);
-        SmartDashboard.putNumber("feederSpeedShoot", -0.4);
+        SmartDashboard.putNumber("feederSpeedRPM", -500);
+        SmartDashboard.putNumber("feederSpeedShootRPM", -1000);
 
         SmartDashboard.putNumber("PIVOT CUSTOM ANGLE", 45);
 
@@ -405,7 +405,7 @@ public class Robot extends LoggedRobot {
                     (int) SmartDashboard.getNumber("bottomShootSpeed", 0));
             if (shooter.isReady()) {// isReady returns whether the shooter angle and
                 // flywheel speeds are within a threshhold of where we asked them to be
-                shooter.setFeederSpeed(SmartDashboard.getNumber("feederSpeedShoot", 0)); // runs the feeder wheels
+                shooter.setFeederVelocity(SmartDashboard.getNumber("feederSpeedShootRPM", 0)); // runs the feeder wheels
                 // if (!shooter.hasNote()) {
                 //     shooter.stop();
                 //     shooter.stopFeeders();
@@ -413,7 +413,7 @@ public class Robot extends LoggedRobot {
                 // }
             }
         } else if (operatorController.getLeftTriggerAxis() > 0.1){
-            shooter.setFeederSpeed(SmartDashboard.getNumber("feederSpeed", 0));
+            shooter.setFeederVelocity(SmartDashboard.getNumber("feederSpeedRPM", 0));
         }
         else {
             shooter.setShootVelocity(0, 0);

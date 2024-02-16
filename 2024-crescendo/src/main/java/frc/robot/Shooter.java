@@ -42,6 +42,8 @@ public class Shooter {
         topShooterMotor.setPIDF(SHOOTER.TOP_SHOOTER_MOTOR_kP, SHOOTER.TOP_SHOOTER_MOTOR_kI, SHOOTER.TOP_SHOOTER_MOTOR_kD, SHOOTER.TOP_SHOOTER_MOTOR_kF, 0);
         bottomShooterMotor.setPIDF(SHOOTER.BOTTOM_SHOOTER_MOTOR_kP, SHOOTER.BOTTOM_SHOOTER_MOTOR_kI, SHOOTER.BOTTOM_SHOOTER_MOTOR_kD, SHOOTER.BOTTOM_SHOOTER_MOTOR_kF, 0);
 
+        feederMotor.setPIDF(SHOOTER.FEEDER_MOTOR_kP, SHOOTER.FEEDER_MOTOR_kI, SHOOTER.FEEDER_MOTOR_kD, SHOOTER.FEEDER_MOTOR_kF, 0);
+
         bottomShooterMotor.setPercentOutput(0);
         topShooterMotor.setPercentOutput(0);
         feederMotor.setPercentOutput(0);
@@ -85,11 +87,19 @@ public class Shooter {
     }
 
     /**
-     * Sets speed of the feeder wheels
+     * Sets speed of the feeder wheels in terms of percent output
      * @param speed power
      */
     public void setFeederSpeed(double speed) {
         feederMotor.setPercentOutput(speed);
+    }
+
+    /**
+     * Sets velocity of the feeder wheels
+     * @param feeder_velocity feeder velocity in RPM
+    */
+    public void setFeederVelocity(double feeder_velocity) {
+        feederMotor.setVelocity(feeder_velocity);
     }
 
     /**

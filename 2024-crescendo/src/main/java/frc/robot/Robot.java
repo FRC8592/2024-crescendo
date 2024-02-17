@@ -49,7 +49,8 @@ public class Robot extends LoggedRobot {
     private Intake intake;
     private Elevator elevator;
     private LimelightTargeting noteLock;
-    private PoseVision poseGetter;
+    private PoseVision apriltagLockYaw;
+    private PoseVision apriltagLockY;
     private LED leds;
     private Power power;
     private PIDController turnPID;
@@ -286,7 +287,7 @@ public class Robot extends LoggedRobot {
             // }
         }
         else if (autoShoot) { //Aim at the speaker and shoot into it
-            poseGetter.turnToAprilTag();
+            apriltagLockY.turnToAprilTag();
             //TODO range table
             RangeTable.RangeEntry shootParameters = RangeTable.get(poseGetter.distanceToAprilTag(0));
             elevator.setPivotAngleCustom(shootParameters.pivotAngle);
@@ -317,7 +318,7 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (prepareForShoot) {
-            poseGetter.turnToAprilTag();
+            apriltagLockY.turnToAprilTag();
             // TODO range table
             elevator.setPivotAngleCustom(poseGetter.distanceToAprilTag(-1));
             if (manualShoot) {

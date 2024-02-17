@@ -56,13 +56,24 @@ public class PoseVision {
         return tag_yaw;
     }
 
+    public boolean getTagInView() {
+        boolean tagInView = SmartDashboard.getBoolean("jetson_tag_visible", false);
+        return tagInView;
+    }
+
     /**
      * Assume we have a tag in view. 
      * 
      * @param servoTarget Refer to `VISUAL_SERVO_TARGETS` for index of the thing u want
      * @return Variable of interest (e.g. v_x, v_y, omega, ...)
      */
-    public double visual_servo(int servoTarget, double limit) {
+    public double visual_servo(int servoTarget, double limit, int tag_id, double defaultValue) {
+        // check to see if we're looking at the tag and if it's the right one
+        if (getCurrTagID() != tag_id || !getTagInView()) {
+            // not looking at tag
+            return defaultValue;
+        }
+
         double curr_value;
         if (servoTarget == 0) {
             curr_value = getCurrTagX();

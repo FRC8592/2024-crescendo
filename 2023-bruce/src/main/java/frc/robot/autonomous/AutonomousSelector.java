@@ -13,7 +13,8 @@ public class AutonomousSelector {
 
     public Class<?>[] autos = {
         SixNoteAuto.class,
-        SevenNoteAuto.class
+        SevenNoteAuto.class,
+        UnderStageAuto.class,
     };
 
     public AutonomousSelector() {

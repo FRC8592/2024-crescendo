@@ -119,6 +119,8 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
 
         //SmartDashboard.putNumber("target angle", targetAngle);
+        elevator.update();
+
         
         SmartDashboard.putNumber("elevator position in meters", elevator.getExtensionLength());
         SmartDashboard.putNumber("elevator position in rotations", elevator.getExtensionLength()/ELEVATOR.ELEVATOR_GEAR_RATIO);
@@ -126,7 +128,7 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
         //SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS*CONVERSIONS.PIVOT_GEAR_RATIO);
         SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*ELEVATOR.PIVOT_GEAR_RATIO)/360);
-
+        
     }
 
     @Override
@@ -401,19 +403,26 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
-        if (operatorController.getAButtonPressed()){
-            elevator.setPivotAngleCustom(ELEVATOR.PIVOT_ANGLE_STOWED);
-        } else if (operatorController.getXButtonPressed()){
+        boolean stowed = operatorController.getAButtonPressed();
+        boolean customAngle = operatorController.getBButtonPressed();
+        boolean climbPosition = operatorController.getYButtonPressed();
+        boolean ampPosition = operatorController.getXButtonPressed();
+        boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
+        boolean runFeeder = operatorController.getLeftBumper();
+
+        if (stowed){
+            elevator.stow();
+        } else if (customAngle){
             elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 45));
-
         }
-        else if (operatorController.getYButtonPressed()){
-            elevator.setPivotAngleCustom(ELEVATOR.PIVOT_ANGLE_AMP);
+        else if (ampPosition){
+            elevator.ampPosition();
+        }
+        else if (climbPosition) {
+            elevator.climbPosition();
         }
 
-        elevator.update();
-
-        if (operatorController.getRightTriggerAxis() > 0.1) {
+        if (shoot) {
             shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 0), 
                     (int) SmartDashboard.getNumber("bottomShootSpeed", 0));
             if (shooter.isReady()) {// isReady returns whether the shooter angle and
@@ -425,7 +434,7 @@ public class Robot extends LoggedRobot {
                 //     elevator.stow()
                 // }
             }
-        } else if (operatorController.getLeftTriggerAxis() > 0.1){
+        } else if (runFeeder){
             shooter.setFeederVelocity(SmartDashboard.getNumber("feederSpeedRPM", 0));
         }
         else {

@@ -14,7 +14,7 @@ import frc.robot.commands.FollowerCommand;
  */
 //IN PROGRESS, CHANGE CONFIG TO 4 SPEED AND 2 ACC
 public class NoteStealAuto extends BaseAuto {
-    private TrajectoryConfig config = new TrajectoryConfig(4.5, 4.5);
+    private TrajectoryConfig config = new TrajectoryConfig(4, 2);
     private TrajectoryConfig slowConfig = new TrajectoryConfig(2, 2);
     
     private SwerveTrajectory noteOne = AutonomousPositions.generate(config.setReversed(false), 

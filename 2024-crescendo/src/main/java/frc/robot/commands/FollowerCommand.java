@@ -26,6 +26,7 @@ public class FollowerCommand extends Command {
     // private Rotation2d endRotation;
     private Pose2d targetPose;
     // private SmoothingFilter omegaSmoothing;
+    private Rotation2d simulatedRotation = new Rotation2d();
 
     public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj) {
         drive = pDrive;
@@ -165,6 +166,8 @@ public class FollowerCommand extends Command {
                                                                                                              // from the
                                                                                                              // trajectory
                             targetRotation); // Rotation
+
+                    simulatedRotation = targetRotation;
                 }
                 omegaVision = speeds.omegaRadiansPerSecond; // if we don't have vision, just
                 // use the trajectory's omega
@@ -200,7 +203,11 @@ public class FollowerCommand extends Command {
 
     private void simulateRobotPose(Pose2d pose, ChassisSpeeds desiredSpeeds) {
         Trajectory traj = trajectory.trajectory();
-        Robot.FIELD.setRobotPose(new Pose2d(pose.getTranslation(), trajectory.getRotation()));
+        Rotation2d rotation = trajectory.getRotation();
+        if (targetPose != null) {
+            rotation = simulatedRotation;
+        }
+        Robot.FIELD.setRobotPose(new Pose2d(pose.getTranslation(), rotation));
 
         // SmartDashboard.putNumber("Field Relative X Velocity",
         // desiredSpeeds.vxMetersPerSecond);

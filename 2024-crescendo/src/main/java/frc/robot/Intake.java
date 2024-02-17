@@ -26,14 +26,7 @@ public class Intake {
     }
     
     private States state;
-
-    private enum States {
-        INTAKE_PREP,
-        INTAKING,
-        STOP
-    }
     
-    private States state;
 
     public Intake() {
         // topMotor = new TalonFX(INTAKE.TOP_MOTOR_CAN_ID);
@@ -89,37 +82,6 @@ public class Intake {
     public void halt() {
         topMotor.setPercentOutput(0);
         bottomMotor.setPercentOutput(0);
-    }
-
-    public void update(Swerve swerve, Shooter shooter) {
-        switch (state) {
-            case INTAKE_PREP:
-                robotSpeedIntake(swerve);
-                if (this.hasNote()) {
-                    this.state = States.INTAKING;
-                }
-                break;
-            case INTAKING:
-                intakeNote(INTAKE.SPEED_TOP, INTAKE.SPEED_BOTTOM);
-                if (shooter.hasNote()) {
-                    this.state = States.STOP;
-                }
-                break;
-            case STOP:
-            default:
-                intakeNote(0, 0);
-                break;
-        }
-    }
-
-    public void intake() {
-        if (state == States.STOP) {
-            this.state = States.INTAKE_PREP;
-        }
-    }
-
-    public void stop() {
-        this.state = States.STOP;
     }
 
     /**

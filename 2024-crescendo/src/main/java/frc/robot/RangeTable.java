@@ -2,10 +2,10 @@ package frc.robot;
 
 
 public class RangeTable {
-    public final RangeEntry[] RANGE_TABLE = {
+    public final static RangeEntry[] RANGE_TABLE = {
             new RangeEntry(0, 0) //TODO: Fill this out with real data
     };
-    public boolean valid;
+    public static boolean valid;
 
     public RangeTable() {
     }
@@ -15,7 +15,7 @@ public class RangeTable {
      * @param distance the distance to the target IN INCHES
      * @return a RangeEntry with flywheel speed in RPM and pivot angle in degrees. If the distance is too far, returns {@code null}; MAKE SURE TO CHECK FOR THIS
      */
-    public RangeEntry get(double distance) {
+    public static RangeEntry get(double distance) {
         valid = true;
         int index = (int) (distance / 12);
         int inchesPastLastFoot = (int) (distance) % 12;
@@ -45,7 +45,7 @@ public class RangeTable {
     }
 
 
-    public class RangeEntry {
+    public static class RangeEntry {
         int flywheelSpeed;
         int pivotAngle;
 

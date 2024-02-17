@@ -64,6 +64,10 @@ public class SparkFlexControl {
     public double getVelocity(){
         return motorEncoder.getVelocity();
     }
+    
+    public double getPosition(){
+        return motorEncoder.getPosition();
+    }
 
     public void setInverted(){
         motor.setInverted(true);
@@ -76,10 +80,6 @@ public class SparkFlexControl {
 
     public void setFollower(SparkFlexControl motorToFollow){
         motor.follow(motorToFollow.motor);
-    }
-
-    public void setInverted(){
-        motor.setInverted(true);
     }
 
     public void setSoftLimit(SoftLimitDirection direction, double rotations){
@@ -97,4 +97,6 @@ public class SparkFlexControl {
     public void setMaxAcceleration(double maxAccel, int slotID){
         motorControl.setSmartMotionMaxAccel(maxAccel, slotID);
     }
+
+
 }

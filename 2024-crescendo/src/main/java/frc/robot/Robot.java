@@ -1,5 +1,6 @@
 package frc.robot;
 
+import org.ejml.equation.IntegerSequence.Range;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -55,7 +56,6 @@ public class Robot extends LoggedRobot {
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
     private LimelightTargeting gameObjectVision;
-
     //private double targetAngle = 0;
 
 
@@ -288,8 +288,9 @@ public class Robot extends LoggedRobot {
         else if (autoShoot) { //Aim at the speaker and shoot into it
             poseGetter.turnToAprilTag();
             //TODO range table
-            elevator.setPivotAngle(poseGetter.distanceToAprilTag(-1));
-            shooter.setSpeedRangeTable(poseGetter.distanceToAprilTag(-1), elevator);
+            RangeTable.RangeEntry shootParameters = RangeTable.get(poseGetter.distanceToAprilTag(0));
+            elevator.setPivotAngleCustom(shootParameters.pivotAngle);
+            shooter.setShootVelocity(shootParameters.flywheelSpeed, shootParameters.flywheelSpeed);
             if (shooter.isReady()) {//isReady returns whether the shooter angle and 
                 //flywheel speeds are within a threshhold  of where we asked them to be
                 shooter.setFeederSpeed(0); //runs the feeder wheels
@@ -301,7 +302,7 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (autoAmpScore) {
-            elevator.setElevatorLengthAmp();
+            elevator.ampPosition();
             double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
             double xVelocity = poseGetter.strafeToAprilTag();
             // shooter.setShootVelocity(-1);
@@ -318,7 +319,7 @@ public class Robot extends LoggedRobot {
         else if (prepareForShoot) {
             poseGetter.turnToAprilTag();
             // TODO range table
-            elevator.setPivotAngle(poseGetter.distanceToAprilTag(-1));
+            elevator.setPivotAngleCustom(poseGetter.distanceToAprilTag(-1));
             if (manualShoot) {
                 // shooter.setShootVelocity(-1);
                 if (shooter.isReady()) {// isReady returns whether the shooter angle and
@@ -333,8 +334,7 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (ampPrep) {
-            elevator.setPivotAngleAmp(); // set angle
-            elevator.setElevatorLengthAmp();
+            elevator.ampPosition(); // set to amp position
             if (manualAmpScore) {
                 // shooter.setShootVelocity(-1); // flywheels at low speed
                 // shooter.setShootVelocity(-1); // feeder wheels
@@ -342,16 +342,16 @@ public class Robot extends LoggedRobot {
             }
         }
         else if (preStage) {
-            double currentElevatorPos = elevator.getElevatorLength();
+            double currentElevatorPos = elevator.getExtensionLength();
             if (elevatorControl == 1.0) {
                 double targetPosition = currentElevatorPos + 0.01; // TODO: set constant
-                elevator.setElevatorLength(targetPosition);
+                elevator.setExtensionLengthCustom(targetPosition);
             }
             else if (elevatorControl == -1.0) {
                 double targetPosition = currentElevatorPos - 0.01; // TODO:
-                elevator.setElevatorLength(targetPosition);
+                elevator.setExtensionLengthCustom(targetPosition);
             }
-            elevator.setPivotAngle(90); // set to 90 degrees
+            elevator.setPivotAngleCustom(90); // set to 90 degrees
         }
         else if (regurgitateBack) {
             shooter.setFeederSpeed(-1); // backwards

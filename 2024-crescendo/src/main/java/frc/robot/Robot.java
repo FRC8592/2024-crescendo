@@ -56,9 +56,12 @@ public class Robot extends LoggedRobot {
     private SmoothingFilter smoothingFilter;
     private LimelightTargeting gameObjectVision;
 
+    //private double targetAngle = 0;
+
 
     @Override
     public void robotInit() {
+
         //AdvantageKit
         Logger.recordMetadata("Crescendo", "MyProject"); // Set a metadata value
 
@@ -84,24 +87,47 @@ public class Robot extends LoggedRobot {
         power = new Power();
         // leds = new LED();
         shooter = new Shooter();
-        // poseGetter = new PoseVision();
-        // intake = new Intake();
-        // noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
-                // NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
-        // elevator = new Elevator();
-        SmartDashboard.putNumber("topShootSpeed", 0);
-        SmartDashboard.putNumber("bottomShootSpeed", 0);
-        SmartDashboard.putNumber("feederSpeed", 0);
+        shooter.setMotorsIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
+        //poseGetter = new PoseVision();
+        //intake = new Intake();
+        //noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
+        //        NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
+        elevator = new Elevator();
+
+        elevator.resetEncoders();
+
+        SmartDashboard.putNumber("topShootSpeed", 4500);
+        SmartDashboard.putNumber("bottomShootSpeed", 4500);
+        SmartDashboard.putNumber("feederSpeedRPM", -500);
+        SmartDashboard.putNumber("feederSpeedShootRPM", -1000);
+
+        SmartDashboard.putNumber("PIVOT CUSTOM ANGLE", 45);
+
+        SmartDashboard.putNumber("ShooterKp", SHOOTER.BOTTOM_SHOOTER_MOTOR_kP);
+        SmartDashboard.putNumber("ShooterKi", SHOOTER.BOTTOM_SHOOTER_MOTOR_kI);
+        SmartDashboard.putNumber("ShooterKd", SHOOTER.BOTTOM_SHOOTER_MOTOR_kD);
+        SmartDashboard.putNumber("ShooterKff", SHOOTER.BOTTOM_SHOOTER_MOTOR_kF);
+        
+        elevator.resetEncoders();
     }
 
     @Override
     public void robotPeriodic() {
-        Logger.recordOutput(ROBOT.LOG_PATH+"Robot Position", swerve.getCurrentPos());
+
+        //SmartDashboard.putNumber("target angle", targetAngle);
+        
+        SmartDashboard.putNumber("elevator position in meters", elevator.getExtensionLength());
+        SmartDashboard.putNumber("elevator position in rotations", elevator.getExtensionLength()/ELEVATOR.ELEVATOR_GEAR_RATIO);
+
+        SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
+        //SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS*CONVERSIONS.PIVOT_GEAR_RATIO);
+        SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*ELEVATOR.PIVOT_GEAR_RATIO)/360);
+
     }
 
     @Override
     public void autonomousInit() {
-        poseGetter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
         currentAuto.addModules(swerve, elevator, intake, shooter, noteLock);
         currentAuto.initialize();
@@ -118,7 +144,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        poseGetter.setAlliance(DriverStation.getAlliance().get());
+        // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
     }
@@ -346,6 +372,19 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
+        shooter.bottomShooterMotor.setPIDF(
+            SmartDashboard.getNumber("ShooterKp",  0),
+            SmartDashboard.getNumber("ShooterKi",  0),
+            SmartDashboard.getNumber("ShooterKd",  0),
+            SmartDashboard.getNumber("ShooterKff", 0), 0
+        );
+
+        shooter.topShooterMotor.setPIDF(
+            SmartDashboard.getNumber("ShooterKp",  0),
+            SmartDashboard.getNumber("ShooterKi",  0),
+            SmartDashboard.getNumber("ShooterKd",  0),
+            SmartDashboard.getNumber("ShooterKff", 0), 0
+        );
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
@@ -358,6 +397,52 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
+        if (operatorController.getAButtonPressed()){
+            elevator.setPivotAngleCustom(ELEVATOR.PIVOT_ANGLE_STOWED);
+        } else if (operatorController.getXButtonPressed()){
+            elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 45));
+
+        }
+        else if (operatorController.getYButtonPressed()){
+            elevator.setPivotAngleCustom(ELEVATOR.PIVOT_ANGLE_AMP);
+        }
+
+        elevator.update();
+
+        if (operatorController.getRightTriggerAxis() > 0.1) {
+            shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 0), 
+                    (int) SmartDashboard.getNumber("bottomShootSpeed", 0));
+            if (shooter.isReady()) {// isReady returns whether the shooter angle and
+                // flywheel speeds are within a threshhold of where we asked them to be
+                shooter.setFeederVelocity(SmartDashboard.getNumber("feederSpeedShootRPM", 0)); // runs the feeder wheels
+                // if (!shooter.hasNote()) {
+                //     shooter.stop();
+                //     shooter.stopFeeders();
+                //     elevator.stow()
+                // }
+            }
+        } else if (operatorController.getLeftTriggerAxis() > 0.1){
+            shooter.setFeederVelocity(SmartDashboard.getNumber("feederSpeedRPM", 0));
+        }
+        else {
+            shooter.setShootVelocity(0, 0);
+            shooter.setFeederSpeed(0);
+        }
+
+        // if (operatorController.getXButton()){
+        //     elevator.percentOutputExtension(0.1);
+        // } else if (operatorController.getAButton()){
+        //     elevator.percentOutputExtension(-0.1);
+        // }
+        // else if (operatorController.getYButton()){
+        //     elevator.percentOutputPivot(0.1);
+        // } else if(operatorController.getBButton()){
+        //     elevator.percentOutputPivot(-0.1);
+        // } else{
+        //     elevator.percentOutputPivot(0);
+        //     elevator.percentOutputExtension(0);
+        // }
+        
         //Basic driving controls
         double driveTranslateY = -driverController.getLeftY();
         double driveTranslateX = -driverController.getLeftX();

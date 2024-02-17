@@ -79,8 +79,8 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
-        // pigeon = new NewtonPigeon(new Pigeon2(PIGEON.CAN_ID));
-        // swerve = new Swerve(pigeon);
+        pigeon = new NewtonPigeon2(new Pigeon2(PIGEON.CAN_ID));
+        swerve = new Swerve(pigeon);
         power = new Power();
         // leds = new LED();
         shooter = new Shooter();
@@ -208,8 +208,8 @@ public class Robot extends LoggedRobot {
          * 
          */
         //Basic driving controls
-        double driveTranslateY = driverController.getLeftY();
-        double driveTranslateX = driverController.getLeftX();
+        double driveTranslateY = -driverController.getLeftY();
+        double driveTranslateX = -driverController.getLeftX();
         double driveRotate = driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
 
@@ -347,28 +347,54 @@ public class Robot extends LoggedRobot {
     @Override
     public void testInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
-        // poseGetter.setAlliance(DriverStation.getAlliance().get());
-        
+        swerve.setSteerAnglesToAbsEncoder();
+        swerve.setTeleopCurrentLimit();
+        SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
+        SmartDashboard.putNumber("Intake Bottom RPM", INTAKE.SPEED_BOTTOM);
+
+        SmartDashboard.putNumber("Measured Intake Top RPM", 0);
+        SmartDashboard.putNumber("Measured Intake Bottom RPM", 0);
     }
 
     @Override
     public void testPeriodic() {
-        if (driverController.getRightTriggerAxis() > 0.1) {
-            shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 0), 
-                    (int) SmartDashboard.getNumber("bottomShootSpeed", 0));
-            if (shooter.isReady()) {// isReady returns whether the shooter angle and
-                // flywheel speeds are within a threshhold of where we asked them to be
-                shooter.setFeederSpeed(SmartDashboard.getNumber("feederSpeed", 0)); // runs the feeder wheels
-                // if (!shooter.hasNote()) {
-                //     shooter.stop();
-                //     shooter.stopFeeders();
-                //     elevator.stow()
-                // }
-            }
+        //Basic driving controls
+        double driveTranslateY = -driverController.getLeftY();
+        double driveTranslateX = -driverController.getLeftX();
+        double driveRotate = driverController.getRightX();
+        boolean slowMode = driverController.getRightBumper();
+        
+        //Intake
+        boolean intaking = driverController.getLeftTriggerAxis() > 0.01; // TODO: use dedicated deadband function
+            
+        //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
+        ChassisSpeeds currentSpeeds;
+        if (slowMode) { //Slow Mode slows down the robot for better precision & control
+            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                            driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
+                    swerve.getGyroscopeRotation());
         }
         else {
-            shooter.setShootVelocity(0, 0);
-            shooter.setFeederSpeed(0);
+            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                            driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
+                    swerve.getGyroscopeRotation());
+        }
+        swerve.drive(currentSpeeds);
+
+        // intaking
+        if (intaking) {
+            System.out.println("intaking");
+            // intake.spinPercentOutput(0.5);
+            intake.intakeNote(SmartDashboard.getNumber("Intake Bottom RPM", 0), SmartDashboard.getNumber("Intake Top RPM", 0));
+        }
+        else {
+            intake.halt();
         }
     }
 

@@ -51,6 +51,7 @@ public class Robot extends LoggedRobot {
     private LimelightTargeting noteLock;
     private PoseVision apriltagLockYaw;
     private PoseVision apriltagLockY;
+    private PoseVision poseGetter;
     private LED leds;
     private Power power;
     private PIDController turnPID;
@@ -89,7 +90,7 @@ public class Robot extends LoggedRobot {
         // leds = new LED();
         shooter = new Shooter();
         shooter.setMotorsIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
-        //poseGetter = new PoseVision();
+        poseGetter = new PoseVision(APRILTAG_VISION.kP,APRILTAG_VISION.kI,APRILTAG_VISION.kD,0);
         //intake = new Intake();
         //noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
         //        NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);

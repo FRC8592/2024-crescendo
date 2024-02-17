@@ -213,8 +213,14 @@ public final class Constants {
         public static final int CAN_ID = 17;
     }
 
-    public class ROBOT {
+    public final class ROBOT {
         public static final double JOYSTICK_DEADBAND = 0.01;
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Robot/";
+    }
+
+    public class APRILTAG_VISION {
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
     }
 }

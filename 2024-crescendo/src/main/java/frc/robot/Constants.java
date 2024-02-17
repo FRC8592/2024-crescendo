@@ -35,9 +35,11 @@ public final class Constants {
         public static final double TOP_MOTOR_kP = 0.0001;
         public static final double TOP_MOTOR_kI = 0.000;
         public static final double TOP_MOTOR_kD = 0.000;
+        public static final double TOP_MOTOR_kF = 0.000;
         public static final double BOTTOM_MOTOR_kP = 0.0001;
         public static final double BOTTOM_MOTOR_kI = 0.000;
         public static final double BOTTOM_MOTOR_kD = 0.000;
+        public static final double BOTTOM_MOTOR_kF = 0.000;
         public static final double MINIMUM_ROLLER_SPEED = 0;
         public static final double ROBOT_SPEED_MULTIPLIER = 100;
         public static final double SPEED_TOP = 1000;

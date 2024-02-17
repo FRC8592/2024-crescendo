@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 import com.revrobotics.SparkPIDController;
 
@@ -23,11 +24,14 @@ public class Shooter {
     SparkFlexControl bottomShooterMotor;
     // SparkPIDController leftShooterControl;
     // SparkPIDController rightShooterControl;
+    DigitalInput noteBeamBreak; // beam break sensor top/bottom mounted
 
     SparkFlexControl feederMotor;
 
     int toptargetSpeed = 0;
     int bottomTargetSpeed = 0;
+
+    boolean hasNote; 
 
     /**
      * Shooter object constructor
@@ -47,6 +51,8 @@ public class Shooter {
         bottomShooterMotor.setPercentOutput(0);
         topShooterMotor.setPercentOutput(0);
         feederMotor.setPercentOutput(0);
+
+        noteBeamBreak = new DigitalInput(SHOOTER.NOTE_BEAM_BREAK_PORT);
     }
 
     /**
@@ -114,7 +120,11 @@ public class Shooter {
      * @return 
      */
     public boolean hasNote() {
-        return true;
+        boolean currentlyHasNote = !noteBeamBreak.get(); // true if beam is BROKEN! thus note beam is not broken, no note
+        if (currentlyHasNote) {
+            hasNote = true;
+        }
+        return hasNote;
     }
 
     // /**
@@ -132,12 +142,16 @@ public class Shooter {
 
     /**
      * checks if flywheels are at target speed to shoot
+     * and resets hasNote cuz that means we're gonna shoot
+     * 
+     * @apiNote You must call this method before shooting
      */
     public boolean isReady() {
         SmartDashboard.putNumber("topShooterRPM", topShooterMotor.getVelocity());
         SmartDashboard.putNumber("bottomShooterRPM", bottomShooterMotor.getVelocity());
         if (Math.abs(topShooterMotor.getVelocity() - toptargetSpeed) < SHOOTER.ACCEPTABLE_RANGE&&
                 Math.abs(bottomShooterMotor.getVelocity() - bottomTargetSpeed) < SHOOTER.ACCEPTABLE_RANGE) {
+            hasNote = false;
             return true;
         }
         return false;

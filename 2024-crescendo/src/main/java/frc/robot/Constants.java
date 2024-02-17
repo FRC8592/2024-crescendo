@@ -94,6 +94,8 @@ public final class Constants {
         public static final double[][] RANGE_TABLE = {
             {0,3000}
         };
+
+        public static final int NOTE_BEAM_BREAK_PORT = 2; // TODO VERIFY
     }
 
 

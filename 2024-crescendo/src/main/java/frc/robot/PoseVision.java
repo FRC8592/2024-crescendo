@@ -64,7 +64,7 @@ public class PoseVision {
     /**
      * Assume we have a tag in view. 
      * 
-     * @param servoTarget Refer to `VISUAL_SERVO_TARGETS` for index of the thing u want
+     * @param servoTarget 1 for x, 2 for y, 3 for z, 4 for yaw, see {@code VISUAL_SERVO_TARGETS}
      * @return Variable of interest (e.g. v_x, v_y, omega, ...)
      */
     public double visual_servo(int servoTarget, double limit, int tag_id, double defaultValue) {
@@ -99,7 +99,7 @@ public class PoseVision {
     }
 
     /**
-     * DEPRECATED: USE visual_servo()
+     * DEPRECATED: USE visual_servo() w/ input 3
      * @return
      */
     public double turnToAprilTag() {
@@ -107,7 +107,7 @@ public class PoseVision {
     }
 
     /**
-     * DEPRECATED: USE visual_servo()
+     * DEPRECATED: USE visual_servo() w/ input 0
      * @return
      */
     public double strafeToAprilTag() {
@@ -115,7 +115,7 @@ public class PoseVision {
     }
 
     /**
-     * DEPRECATED: USE visual_servo()
+     * DEPRECATED: USE visual_servo() w/ input 2
      * @return
      */
     public double driveToAprilTag() {

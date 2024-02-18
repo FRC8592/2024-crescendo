@@ -9,9 +9,6 @@ import frc.robot.Constants.*;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 // Pneumatic control classes
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 // import packages
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 

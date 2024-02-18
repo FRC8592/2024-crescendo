@@ -43,7 +43,9 @@ public class Elevator {
     }
 
     
-
+    /**
+     * Called in robot periodic - checks variables and updates motors
+     */
     public void update(){
         double currentAngle = getPivotAngle(); // In degrees
         double currentLengthMeters = getExtensionLength(); // In ticks   
@@ -257,10 +259,16 @@ public class Elevator {
         pivotDown = getPivotAngle() > setAngle;
     }
 
+    /**
+     * zeros the pivot encoder by setting the offset to the current position
+     */
     public void zero(){
         pivotEncoder.setZeroOffset(pivotEncoder.getPosition());
     }
-
+    
+    /**
+     * resets the encoders for pivot motor, pivot follow motor, extension motor
+    */
     public void resetEncoders() {
         pivotMotor.motorEncoder.setPosition(0);
         pivotFollowMotor.motorEncoder.setPosition(0);

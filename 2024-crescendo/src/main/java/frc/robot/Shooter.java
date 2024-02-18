@@ -117,7 +117,7 @@ public class Shooter {
 
     /**
      * Checks whether note is in shooter
-     * @return 
+     * @return hasNote (boolean)
      */
     public boolean hasNote() {
         boolean currentlyHasNote = !noteBeamBreak.get(); // true if beam is BROKEN! thus note beam is not broken, no note

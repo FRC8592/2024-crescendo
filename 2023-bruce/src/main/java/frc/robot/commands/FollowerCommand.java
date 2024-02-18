@@ -208,6 +208,7 @@ public class FollowerCommand extends Command {
         // drive.setWheelLock();
         // } else {
         drive.drive(new ChassisSpeeds());
+        // drive.drive(trajectory.sample(trajectory.trajectory().getTotalTimeSeconds()-0.02,drive.getCurrentPos()));
         // }
         // drive.drive(trajectory.sample(trajectory.trajectory().getTotalTimeSeconds() -
         // 0.02, drive.getCurrentPos()));

@@ -10,7 +10,7 @@ import frc.robot.commands.FollowerCommand;
 public class UnderStageAuto extends BaseAuto{
 
 
-    private TrajectoryConfig config = new TrajectoryConfig(3, 2);
+    private TrajectoryConfig config = new TrajectoryConfig(1, 2);
     private TrajectoryConfig slowConfig = new TrajectoryConfig(2, 1);
 
     private SwerveTrajectory pathOne = AutonomousPositions.generate(slowConfig,

@@ -18,8 +18,8 @@ import frc.robot.commands.FollowerCommand;
 import frc.robot.Constants;
 
 public class SixNoteAuto extends BaseAuto {
-    private TrajectoryConfig config = new TrajectoryConfig(2, 2);
-    private TrajectoryConfig slowConfig = new TrajectoryConfig(2, 2);
+    private TrajectoryConfig config = new TrajectoryConfig(3, 2);
+    private TrajectoryConfig slowConfig = new TrajectoryConfig(2, 1);
     
         private SwerveTrajectory pathOne = AutonomousPositions.generate(slowConfig, 
             AutonomousPositions.SUBWOOFER_MIDDLE.getPose(), 
@@ -40,18 +40,18 @@ public class SixNoteAuto extends BaseAuto {
 
         private SwerveTrajectory pathFour = AutonomousPositions.generate(config.setReversed(false).setStartVelocity(1).setEndVelocity(0), 
             AutonomousPositions.WING_NOTE_1.translate(2.5, 0), 
-            AutonomousPositions.MID_NOTE_1.translate(0, 0.3));
+            AutonomousPositions.MID_NOTE_1.translate(0, -0.3));
 
         private SwerveTrajectory pathFive = AutonomousPositions.generate(config.setReversed(true).setStartVelocity(0), 
-            AutonomousPositions.MID_NOTE_1.translate(0, 0.3),
+            AutonomousPositions.MID_NOTE_1.translate(0, -0.3),
             AutonomousPositions.WING_NOTE_1.translate(3.0, -0.2));
 
     private SwerveTrajectory pathSix = AutonomousPositions.generate(config.setReversed(false),
             AutonomousPositions.WING_NOTE_1.translate(3.0, -0.2),
-            AutonomousPositions.MID_NOTE_2.getPose());
+            AutonomousPositions.MID_NOTE_2.translate(0, -0.5));
 
     private SwerveTrajectory pathSeven = AutonomousPositions.generate(config.setReversed(true),
-            AutonomousPositions.MID_NOTE_2.getPose(),
+            AutonomousPositions.MID_NOTE_2.translate(0, -0.5),
             AutonomousPositions.WING_NOTE_1.translate(3.0,0.2));
 
     private FRCLogger logger = new FRCLogger(true, "ThreeNoteAutoLog");
@@ -63,16 +63,16 @@ public class SixNoteAuto extends BaseAuto {
     @Override
     public void initialize() {
         queue = new CommandQueue(
-            new FollowerCommand(drive, pathOne),
-            new FollowerCommand(drive,pathTwo),
-            new FollowerCommand(drive, pathThree),
-            new FollowerCommand(drive, dumbPosition),
-            new FollowerCommand(drive, pathFour),
-            new FollowerCommand(drive, pathFive),
+            new FollowerCommand(drive, pathOne,  AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(),lockToSpeakerVision),
+            new FollowerCommand(drive,pathTwo,  AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(),lockToSpeakerVision),
+            new FollowerCommand(drive, pathThree,  AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(),lockToSpeakerVision),
+            new FollowerCommand(drive, dumbPosition,  AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(),lockToSpeakerVision),
+            new FollowerCommand(drive, pathFour,  AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(),lockToSpeakerVision),
+            new FollowerCommand(drive, pathFive,  AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(),lockToSpeakerVision),
             new DelayCommand(0.5),
-            new FollowerCommand(drive, pathSix),
+            new FollowerCommand(drive, pathSix,  AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(),lockToSpeakerVision),
             new DelayCommand(0.1),
-            new FollowerCommand(drive, pathSeven),
+            new FollowerCommand(drive, pathSeven,  AutonomousPositions.SUBWOOFER_MIDDLE_2.getPose(),lockToSpeakerVision),
             new DelayCommand(0.5)
 
         );

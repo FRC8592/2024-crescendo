@@ -15,6 +15,7 @@ public class AutonomousSelector {
         SixNoteAuto.class,
         SevenNoteAuto.class,
         UnderStageAuto.class,
+        RightSideWallHuggerAuto.class,
     };
 
     public AutonomousSelector() {

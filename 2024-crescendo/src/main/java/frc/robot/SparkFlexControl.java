@@ -97,6 +97,9 @@ public class SparkFlexControl {
     public void setMaxAcceleration(double maxAccel, int slotID){
         motorControl.setSmartMotionMaxAccel(maxAccel, slotID);
     }
+    public void follow(SparkFlexControl sfc){
+        this.motor.follow(sfc.motor);
+    }
 
 
 }

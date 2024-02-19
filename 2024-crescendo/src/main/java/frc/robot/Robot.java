@@ -12,6 +12,7 @@ import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.autons.*;
@@ -58,6 +60,8 @@ public class Robot extends LoggedRobot {
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
     private LimelightTargeting gameObjectVision;
+    private double manualExtensionLength = 0;
+    private double manualPivotAngle = 0;
     //private double targetAngle = 0;
 
 
@@ -93,10 +97,11 @@ public class Robot extends LoggedRobot {
         shooter = new Shooter();
         shooter.setMotorsIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         poseGetter = new PoseVision(APRILTAG_VISION.kP,APRILTAG_VISION.kI,APRILTAG_VISION.kD,0);
-        //intake = new Intake();
+        intake = new Intake();
         //noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
         //        NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
         elevator = new Elevator();
+        smoothingFilter = new SmoothingFilter(1, 1, 1);
 
         elevator.resetEncoders();
 
@@ -111,12 +116,16 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("ShooterKi", SHOOTER.BOTTOM_SHOOTER_MOTOR_kI);
         SmartDashboard.putNumber("ShooterKd", SHOOTER.BOTTOM_SHOOTER_MOTOR_kD);
         SmartDashboard.putNumber("ShooterKff", SHOOTER.BOTTOM_SHOOTER_MOTOR_kF);
-        
+
+        SmartDashboard.putBoolean("hasNote()", false);
+
         elevator.resetEncoders();
     }
 
     @Override
     public void robotPeriodic() {
+
+        SmartDashboard.putBoolean("hasNote()", shooter.hasNote());
 
         //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();
@@ -403,26 +412,81 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
-        boolean stowed = operatorController.getAButtonPressed();
-        boolean customAngle = operatorController.getBButtonPressed();
-        boolean climbPosition = operatorController.getYButtonPressed();
-        boolean ampPosition = operatorController.getXButtonPressed();
+        
+        // testDrivetrain();
+        testIntake();
+        testElevator();
+        testShoot();
+    }
+
+    public void testDrivetrain(){
+        
+        //driver controls
+        double driveTranslateY = -driverController.getLeftX();
+        double driveTranslateX = -driverController.getLeftY();
+        double driveRotate = driverController.getRightX();
+        boolean slowMode = driverController.getRightBumper();
+        boolean resetGyro = driverController.getBackButtonPressed();
+        boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
+        // boolean driveToNote = driverController.getLeftTriggerAxis() >0.1;
+
+        // Resets the gyroscope to 0 once b button is pressed
+        if(resetGyro){
+            swerve.zeroGyroscope();
+        }
+
+        //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
+        ChassisSpeeds currentSpeeds;
+        if (slowMode) { //Slow Mode slows down the robot for better precision & control
+            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                            driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
+                            driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
+                    !robotOriented?swerve.getGyroscopeRotation():new Rotation2d());
+        }
+        else {
+            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                            driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                            driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
+                    !robotOriented?swerve.getGyroscopeRotation():new Rotation2d());
+        }
+        currentSpeeds = smoothingFilter.smooth(currentSpeeds);
+        swerve.drive(currentSpeeds);
+
+    }
+
+    public void testIntake(){
+        
+        //Intaking and Outaking controls
+        boolean outake = operatorController.getLeftBumper();
+        boolean intaking = operatorController.getLeftTriggerAxis() > 0.1; // TODO: use dedicated deadband function
+
+         // intaking
+        if (intaking) {
+            // intake.spinPercentOutput(0.5);
+            intake.intakeNote(SmartDashboard.getNumber("Intake Bottom RPM", 0), SmartDashboard.getNumber("Intake Top RPM", 0));
+        }
+        else if(outake){
+            intake.intakeNote(-2000, -2000);
+            shooter.setFeederVelocity(2000);
+            shooter.setShootVelocity(-2000, -2000);
+
+        }
+        else {
+            intake.halt();
+
+        }
+
+    }
+
+    public void testShoot(){
         boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
         boolean runFeeder = operatorController.getLeftBumper();
 
-        if (stowed){
-            elevator.stow();
-        } else if (customAngle){
-            elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 45));
-        }
-        else if (ampPosition){
-            elevator.ampPosition();
-        }
-        else if (climbPosition) {
-            elevator.climbPosition();
-        }
-
-        if (shoot) {
+         if (shoot) {
             shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 0), 
                     (int) SmartDashboard.getNumber("bottomShootSpeed", 0));
             if (shooter.isReady()) {// isReady returns whether the shooter angle and
@@ -441,60 +505,51 @@ public class Robot extends LoggedRobot {
             shooter.setShootVelocity(0, 0);
             shooter.setFeederSpeed(0);
         }
-
-        // if (operatorController.getXButton()){
-        //     elevator.percentOutputExtension(0.1);
-        // } else if (operatorController.getAButton()){
-        //     elevator.percentOutputExtension(-0.1);
-        // }
-        // else if (operatorController.getYButton()){
-        //     elevator.percentOutputPivot(0.1);
-        // } else if(operatorController.getBButton()){
-        //     elevator.percentOutputPivot(-0.1);
-        // } else{
-        //     elevator.percentOutputPivot(0);
-        //     elevator.percentOutputExtension(0);
-        // }
-        
-        //Basic driving controls
-        double driveTranslateY = -driverController.getLeftY();
-        double driveTranslateX = -driverController.getLeftX();
-        double driveRotate = driverController.getRightX();
-        boolean slowMode = driverController.getRightBumper();
-        
-        //Intake
-        boolean intaking = driverController.getLeftTriggerAxis() > 0.01; // TODO: use dedicated deadband function
-            
-        //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
-        ChassisSpeeds currentSpeeds;
-        if (slowMode) { //Slow Mode slows down the robot for better precision & control
-            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    new ChassisSpeeds(
-                            driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
-                    swerve.getGyroscopeRotation());
-        }
-        else {
-            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    new ChassisSpeeds(
-                            driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
-                    swerve.getGyroscopeRotation());
-        }
-        swerve.drive(currentSpeeds);
-
-        // intaking
-        if (intaking) {
-            System.out.println("intaking");
-            // intake.spinPercentOutput(0.5);
-            intake.intakeNote(SmartDashboard.getNumber("Intake Bottom RPM", 0), SmartDashboard.getNumber("Intake Top RPM", 0));
-        }
-        else {
-            intake.halt();
-        }
     }
+
+    public void testElevator(){
+        
+        //elevator controls
+        boolean stowed = operatorController.getAButtonPressed();
+        boolean ampPosition = operatorController.getXButtonPressed();
+        boolean maxClimbPosition = operatorController.getYButtonPressed();
+        boolean prime = operatorController.getBButtonPressed();
+        boolean manualRaiseClimber = operatorController.getPOV() == 0;
+        boolean manualLowerClimber = operatorController.getPOV() == 180;
+        boolean manualPivotUp = operatorController.getPOV() == 90;
+        boolean manualPivotDown = operatorController.getPOV() == 270;
+       
+
+        if (stowed){
+            elevator.stow();
+        }
+        else if (prime){
+            elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 0));
+        }
+        else if (ampPosition){
+            elevator.ampPosition();
+        }
+        else if (maxClimbPosition) {
+            elevator.climbPosition();
+        }
+        else if (manualRaiseClimber){
+            manualExtensionLength += 0.0001; //meters
+            elevator.setExtensionLengthCustom(manualExtensionLength);
+        }
+        else if (manualLowerClimber){
+            manualExtensionLength -= 0.0001; //meters
+            elevator.setExtensionLengthCustom(manualExtensionLength);
+        }
+        else if (manualPivotUp){
+            manualPivotAngle += 0.1; //degrees
+            elevator.setPivotAngleCustom(manualPivotAngle);
+        }
+        else if (manualPivotDown){
+            manualPivotAngle -= 0.1; //degrees
+            elevator.setPivotAngleCustom(manualPivotAngle);
+        }
+        
+        }
 
     @Override
     public void simulationInit() {

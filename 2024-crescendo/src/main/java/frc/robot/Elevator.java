@@ -65,8 +65,7 @@ public class Elevator {
         }
         else if (pivotDown){
             setExtend = currentLengthMeters > 0;
-            // setPivot = (currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE || currentLengthMeters < 0.01) && currentAngle>0;
-            setPivot = (currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE) && currentAngle>0; // NOTE: this is for testing
+            setPivot = (currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE || currentLengthMeters < 0.01) && currentAngle>0;
         }
         else {
             setPivot = false;

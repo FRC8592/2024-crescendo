@@ -111,7 +111,7 @@ public final class Constants {
         public static final int PIVOT_MOTOR_CAN_ID = 36;    
         public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = 38; 
 
-        public static final int PIVOT_ANGLE_AMP = 50; // TODO FIND PIVOT ANGLES (ALL OF THEM)
+        public static final int PIVOT_ANGLE_AMP = 40; // TODO FIND PIVOT ANGLES (ALL OF THEM)
         public static final int PIVOT_ANGLE_STOWED = 0;
         public static final int PIVOT_ANGLE_CLIMB = 55;
         public static final int PIVOT_ANGLE_MAX = 60;

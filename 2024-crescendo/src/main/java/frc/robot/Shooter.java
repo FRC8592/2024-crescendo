@@ -53,6 +53,8 @@ public class Shooter {
         feederMotor.setPercentOutput(0);
 
         noteBeamBreak = new DigitalInput(SHOOTER.NOTE_BEAM_BREAK_PORT);
+
+        bottomShooterMotor.follow(topShooterMotor);
     }
 
     /**

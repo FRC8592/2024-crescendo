@@ -125,6 +125,14 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
 
+        Logger.recordOutput(SHOOTER.LOG_PATH+"TopMotorRPM", shooter.topShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"BottomMotorRPM", shooter.bottomShooterMotor.getVelocity());
+
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"ExtensionMeters", elevator.getExtensionLength());
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"AngleDegrees", elevator.getPivotAngle());
+
+        Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterSpeedDifference (Bottom - Top)", shooter.bottomShooterMotor.getVelocity()-shooter.topShooterMotor.getVelocity());
+
         SmartDashboard.putBoolean("hasNote()", shooter.hasNote());
 
         //SmartDashboard.putNumber("target angle", targetAngle);

@@ -469,7 +469,7 @@ public class Robot extends LoggedRobot {
     public void testIntake(){
         
         //Intaking and Outaking controls
-        boolean outake = operatorController.getLeftBumper();
+        boolean outake = operatorController.getRightBumper();
         boolean intaking = operatorController.getLeftTriggerAxis() > 0.1; // TODO: use dedicated deadband function
 
          // intaking

@@ -54,7 +54,7 @@ public class Shooter {
 
         noteBeamBreak = new DigitalInput(SHOOTER.NOTE_BEAM_BREAK_PORT);
 
-        // bottomShooterMotor.follow(topShooterMotor);
+        bottomShooterMotor.follow(topShooterMotor, true);
         // bottomShooterMotor.setInverted();
     }
 

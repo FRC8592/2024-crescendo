@@ -48,12 +48,17 @@ public final class Constants {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Intake/";
         public static final int TOP_MOTOR_CAN_ID = 35;
         public static final int BOTTOM_MOTOR_CAN_ID = 34;
-        public static final double TOP_MOTOR_kP = 0.0001;
-        public static final double TOP_MOTOR_kI = 0.000;
-        public static final double TOP_MOTOR_kD = 0.000;
-        public static final double BOTTOM_MOTOR_kP = 0.0001;
-        public static final double BOTTOM_MOTOR_kI = 0.000;
-        public static final double BOTTOM_MOTOR_kD = 0.000;
+
+        public static final double TOP_MOTOR_kP = 0.0007;
+        public static final double TOP_MOTOR_kI = 0.00;
+        public static final double TOP_MOTOR_kD = 0.01;
+        public static final double TOP_MOTOR_kFF = 0.000175;
+
+        // NOTE: only one motor on now
+        // public static final double BOTTOM_MOTOR_kP = 0.0001;
+        // public static final double BOTTOM_MOTOR_kI = 0.000;
+        // public static final double BOTTOM_MOTOR_kD = 0.000;
+
         public static final double MINIMUM_ROLLER_SPEED = 0;
         public static final double ROBOT_SPEED_MULTIPLIER = 100;
         public static final double SPEED_TOP = 1000;
@@ -89,7 +94,7 @@ public final class Constants {
         public static final double FEEDER_MOTOR_kF = 0.0001;
 
 
-        public static final int ACCEPTABLE_RANGE = 10;
+        public static final int ACCEPTABLE_RANGE = 35;
         //Lookup table
         public static final double[][] RANGE_TABLE = {
             {0,3000}

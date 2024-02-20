@@ -117,6 +117,13 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("ShooterKd", SHOOTER.BOTTOM_SHOOTER_MOTOR_kD);
         SmartDashboard.putNumber("ShooterKff", SHOOTER.BOTTOM_SHOOTER_MOTOR_kF);
 
+        SmartDashboard.putNumber("IntakeKp", INTAKE.TOP_MOTOR_kP);
+        SmartDashboard.putNumber("IntakeKi", INTAKE.TOP_MOTOR_kI);
+        SmartDashboard.putNumber("IntakeKd", INTAKE.TOP_MOTOR_kD);
+        SmartDashboard.putNumber("IntakeKff",INTAKE.TOP_MOTOR_kFF);
+        SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
+        SmartDashboard.putNumber("Intake Bottom RPM", INTAKE.SPEED_BOTTOM);
+
         SmartDashboard.putBoolean("hasNote()", false);
 
         elevator.resetEncoders();
@@ -408,11 +415,17 @@ public class Robot extends LoggedRobot {
             SmartDashboard.getNumber("ShooterKd",  0),
             SmartDashboard.getNumber("ShooterKff", 0), 0
         );
+
+        intake.topMotor.setPIDF(
+            SmartDashboard.getNumber("IntakeKp",  0),
+            SmartDashboard.getNumber("IntakeKi",  0),
+            SmartDashboard.getNumber("IntakeKd",  0),
+            SmartDashboard.getNumber("IntakeKff", 0), 0
+        );        
+
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
-        SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
-        SmartDashboard.putNumber("Intake Bottom RPM", INTAKE.SPEED_BOTTOM);
 
         SmartDashboard.putNumber("Measured Intake Top RPM", 0);
         SmartDashboard.putNumber("Measured Intake Bottom RPM", 0);
@@ -420,12 +433,18 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
+
+        // re-zero
+        boolean reZero = driverController.getBackButton();
+        if(reZero) {
+            swerve.zeroGyroscope();
+        }
         
-        // testDrivetrain();
+        testDrivetrain();
         testIntake();
         testElevator();
         testShoot();
-    }
+    } 
 
     public void testDrivetrain(){
         
@@ -471,6 +490,7 @@ public class Robot extends LoggedRobot {
         //Intaking and Outaking controls
         boolean outake = operatorController.getRightBumper();
         boolean intaking = operatorController.getLeftTriggerAxis() > 0.1; // TODO: use dedicated deadband function
+        boolean fullPowerIntake = operatorController.getLeftBumper();
 
          // intaking
         if (intaking) {
@@ -483,9 +503,11 @@ public class Robot extends LoggedRobot {
             shooter.setShootVelocity(-2000, -2000);
 
         }
+        // else if (fullPowerIntake) {
+        //     intake.spinPercentOutput(1.0);
+        // }
         else {
             intake.halt();
-
         }
 
     }

@@ -118,8 +118,8 @@ public final class Constants {
         public static final double EXTENSION_kD = 0.0;
         public static final double EXTENSION_kFF = 0.00025;
 
-        public static final double EXTENSION_METERS_MAX = 0.26;
-        public static final int PIVOT_ANGLE_MAX = 60; // TODO: Adjust this angle
+        public static final double EXTENSION_METERS_MAX = 0.26; // TODO: Figure out what this should be
+        public static final int PIVOT_ANGLE_MAX = 60; // TODO: Figure out what this should be
 
         public static final double EXTENSION_METERS_STOWED = 0;
         public static final int PIVOT_ANGLE_STOWED = 0;
@@ -137,7 +137,7 @@ public final class Constants {
 
         public static final double DIAMETER_OF_ELEVATOR_SPROCKET = 1.885; //inches
         public static final double ELEVATOR_GEAR_RATIO =
-                (1 / 48.0) *                                //Multiply by the gearbox radio,
+                (1 / 48.0) *                                //Multiply by the gearbox ratio,
                 DIAMETER_OF_ELEVATOR_SPROCKET * Math.PI *   //then multiply by πd (same as 2πr) to get circumference in inches,
                 CONVERSIONS.IN_TO_METERS;                   //then convert to meters.
 

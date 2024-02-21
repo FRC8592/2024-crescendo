@@ -62,7 +62,7 @@ public class Robot extends LoggedRobot {
     private LimelightTargeting gameObjectVision;
     private double manualExtensionLength = 0;
     private double manualPivotAngle = 0;
-    //private double targetAngle = 0;
+    private boolean intaking;
 
 
     @Override
@@ -85,8 +85,6 @@ public class Robot extends LoggedRobot {
             SmartDashboard.putData(FIELD);
         }
 
-
-        
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
@@ -124,8 +122,6 @@ public class Robot extends LoggedRobot {
         // SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
 
         SmartDashboard.putBoolean("hasNote()", false);
-
-        elevator.resetEncoders();
     }
 
     @Override
@@ -176,6 +172,8 @@ public class Robot extends LoggedRobot {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
+
+        intaking = false;
     }
 
     @Override
@@ -275,7 +273,7 @@ public class Robot extends LoggedRobot {
         boolean runFeeder = operatorController.getLeftBumper(); // TODO: What is this?
 
         boolean outake = operatorController.getRightBumper();
-        boolean intaking = operatorController.getLeftTriggerAxis() > 0.1;
+        boolean intakeToggle = operatorController.getLeftTriggerAxis() > 0.1;
 
         boolean stowed = operatorController.getAButtonPressed();
         boolean ampPosition = operatorController.getXButton();
@@ -285,6 +283,10 @@ public class Robot extends LoggedRobot {
         boolean manualLowerClimber = operatorController.getPOV() == 180;
         boolean manualPivotUp = operatorController.getPOV() == 90;
         boolean manualPivotDown = operatorController.getPOV() == 270;
+
+        if (intakeToggle) {
+            intaking = !intaking;
+        }
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
@@ -309,7 +311,10 @@ public class Robot extends LoggedRobot {
         if(intaking){
             intake.spinPercentOutput(INTAKE.INTAKE_POWER);
             elevator.stow();
-            if(!shooter.hasNote()){
+            if (shooter.hasNote()) {
+                intaking = false;
+            }
+            else {
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
             }
         }
@@ -344,7 +349,6 @@ public class Robot extends LoggedRobot {
             }
             else if (ampPosition){
                 elevator.ampPosition();
-
             }
             else if (maxClimbPosition) {
                 elevator.climbPosition();

@@ -67,9 +67,11 @@ public final class Constants {
         public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 28;
         public static final int FEEDER_MOTOR_CAN_ID = 31;
 
+
         //Change right motor to inverted using documentation
         public static final double TOP_SHOOTER_MOTOR_SPEED = 0.25;
         public static final double BOTTOM_SHOOTER_MOTOR_SPEED = TOP_SHOOTER_MOTOR_SPEED;
+        public static final int AMP_SHOOTER_SPEED = 3000;
 
         public static final double TOP_SHOOTER_MOTOR_kP = 0.0000825; //PID
         public static final double TOP_SHOOTER_MOTOR_kI = 0.0000001; //PID
@@ -96,6 +98,10 @@ public final class Constants {
         };
 
         public static final int NOTE_BEAM_BREAK_PORT = 0;
+
+        public static final double SHOOTING_FEEDER_SPEED = 1500;
+        public static final double INTAKE_FEEDER_SPEED = 4000;
+
     }
 
 
@@ -104,14 +110,14 @@ public final class Constants {
         public static final int EXTENSION_MOTOR_CAN_ID = 37;
 
         public static final double EXTENSION_METERS_STOWED = 0;
-        public static final double EXTENSION_METERS_AMP = 0.15;
+        public static final double EXTENSION_METERS_AMP = 0.26;
         public static final double EXTENSION_METERS_CLIMB= 0.26;
-        public static final double EXTENSION_METERS_MAX = 0.21;
+        public static final double EXTENSION_METERS_MAX = 0.26;
 
         public static final int PIVOT_MOTOR_CAN_ID = 36;    
         public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = 38; 
 
-        public static final int PIVOT_ANGLE_AMP = 40; // TODO FIND PIVOT ANGLES (ALL OF THEM)
+        public static final int PIVOT_ANGLE_AMP = 48; // TODO FIND PIVOT ANGLES (ALL OF THEM)
         public static final int PIVOT_ANGLE_STOWED = 0;
         public static final int PIVOT_ANGLE_CLIMB = 55;
         public static final int PIVOT_ANGLE_MAX = 60;
@@ -134,8 +140,7 @@ public final class Constants {
         public static final double ELEVATOR_GEAR_RATIO = (1/48.0)*(DIAMETER_OF_ELEVATOR_SPROCKET*CONVERSIONS.IN_TO_METERS*Math.PI);
 
         public static final double MAX_PIVOT_ROTATIONS = (PIVOT_ANGLE_MAX*PIVOT_GEAR_RATIO)/360;
-        public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX/ELEVATOR_GEAR_RATIO;
-    }
+        public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX/ELEVATOR_GEAR_RATIO;    }
 
     public final class POWER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Power/";

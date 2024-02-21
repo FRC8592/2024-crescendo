@@ -54,14 +54,14 @@ public class Intake {
                 }
                 break;
             case INTAKING:
-                intakeNote(INTAKE.SPEED_TOP, INTAKE.SPEED_BOTTOM);
+                setIntakeVelocity(INTAKE.SPEED_TOP, INTAKE.SPEED_BOTTOM);
                 if (shooter.hasNote()) {
                     this.state = States.STOP;
                 }
                 break;
             case STOP:
             default:
-                intakeNote(0, 0);
+                setIntakeVelocity(0, 0);
                 break;
         }
     }
@@ -115,12 +115,17 @@ public class Intake {
      * @param bottom Velocity for bottom motor (RPM)
      * @param top Velocity for top motor (RPM)
      */
-    public void intakeNote(double bottom, double top) {
+    public void setIntakeVelocity(double bottom, double top) {
         topMotor.setVelocity(top);
         bottomMotor.setVelocity(bottom);
 
         getTopMotorVelocityRPM();
         getBottomMotorVelocityRPM();
+    }
+
+    public void setIntakePercentOutput(double bottom, double top){
+        topMotor.setPercentOutput(top);
+        bottomMotor.setPercentOutput(bottom);
     }
     /**
      * Run the motors proportionally to the drivetrain speed

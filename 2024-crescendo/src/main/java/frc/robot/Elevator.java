@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,6 +41,7 @@ public class Elevator {
 
         extensionMotor.setMaxAcceleration(2000, 0);
         
+        pivotMotor.motorControl.setReference(0,ControlType.kVoltage);
     }
 
     

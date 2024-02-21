@@ -13,8 +13,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake {
-    private SparkFlexControl topMotor;
-    private SparkFlexControl bottomMotor;
+    public SparkFlexControl topMotor;
+    // private SparkFlexControl bottomMotor;
 
     private enum States {
         INTAKE_PREP,
@@ -39,8 +39,8 @@ public class Intake {
         topMotor = new SparkFlexControl(INTAKE.TOP_MOTOR_CAN_ID, true);
         topMotor.setPIDF(INTAKE.TOP_MOTOR_kP, INTAKE.TOP_MOTOR_kI, INTAKE.TOP_MOTOR_kD, 0, 0);
         
-        bottomMotor = new SparkFlexControl(INTAKE.BOTTOM_MOTOR_CAN_ID,true);
-        bottomMotor.setPIDF(INTAKE.BOTTOM_MOTOR_kP, INTAKE.BOTTOM_MOTOR_kI, INTAKE.BOTTOM_MOTOR_kD, 0, 0);
+        // bottomMotor = new SparkFlexControl(INTAKE.BOTTOM_MOTOR_CAN_ID,true);
+        // bottomMotor.setPIDF(INTAKE.BOTTOM_MOTOR_kP, INTAKE.BOTTOM_MOTOR_kI, INTAKE.BOTTOM_MOTOR_kD, 0, 0);
 
 
     }
@@ -78,7 +78,7 @@ public class Intake {
 
     public void halt() {
         topMotor.setPercentOutput(0);
-        bottomMotor.setPercentOutput(0);
+        // bottomMotor.setPercentOutput(0);
     }
 
     /**
@@ -87,7 +87,7 @@ public class Intake {
      */
     public void spinPercentOutput(double speed) {
         topMotor.setPercentOutput(speed);
-        bottomMotor.setPercentOutput(speed);
+        // bottomMotor.setPercentOutput(speed);
     }
 
     /**
@@ -104,11 +104,13 @@ public class Intake {
      * Gets the velocity of the bottom motor in meters per second
      * @return bottomMotorVelocityMetersPerSecond
      */
+    /*
     public double getBottomMotorVelocityRPM() {
         double bottomMotorVelocity = bottomMotor.getVelocity();
         SmartDashboard.putNumber("Measured Intake Bottom RPM", bottomMotorVelocity);
         return bottomMotorVelocity;
     }
+    */
 
     /**
      * Run the motors with velocity control
@@ -117,15 +119,15 @@ public class Intake {
      */
     public void setIntakeVelocity(double bottom, double top) {
         topMotor.setVelocity(top);
-        bottomMotor.setVelocity(bottom);
+        // bottomMotor.setVelocity(bottom);
 
         getTopMotorVelocityRPM();
-        getBottomMotorVelocityRPM();
+        // getBottomMotorVelocityRPM();
     }
 
     public void setIntakePercentOutput(double bottom, double top){
-        topMotor.setPercentOutput(top);
-        bottomMotor.setPercentOutput(bottom);
+        // topMotor.setPercentOutput(top);
+        // bottomMotor.setPercentOutput(bottom);
     }
     /**
      * Run the motors proportionally to the drivetrain speed
@@ -135,7 +137,7 @@ public class Intake {
         double robotSpeed = swerve.getCurrentSpeeds().vyMetersPerSecond;
         double rollerSpeed = Math.max(INTAKE.MINIMUM_ROLLER_SPEED, robotSpeed * INTAKE.ROBOT_SPEED_MULTIPLIER);
         topMotor.setVelocity(rollerSpeed);
-        bottomMotor.setVelocity(rollerSpeed);
+        // bottomMotor.setVelocity(rollerSpeed);
     }
 
     /**TODO:WRITE THIS METHOD PLS 

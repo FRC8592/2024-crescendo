@@ -63,11 +63,11 @@ public class Elevator {
 
         if (pivotUp) {
             setPivot = currentAngle < ELEVATOR.PIVOT_ANGLE_MAX;
-            setExtend = currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE && currentLengthMeters < ELEVATOR.EXTENSION_METERS_MAX;
+            setExtend = currentAngle > ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD && currentLengthMeters < ELEVATOR.EXTENSION_METERS_MAX;
         }
         else if (pivotDown){
             setExtend = currentLengthMeters > 0;
-            setPivot = (currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE || currentLengthMeters < 0.01) && currentAngle>0;
+            setPivot = (currentAngle > ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD || currentLengthMeters < 0.01) && currentAngle>0;
         }
         else {
             setPivot = false;

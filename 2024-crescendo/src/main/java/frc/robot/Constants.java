@@ -49,31 +49,20 @@ public final class Constants {
         public static final double TOP_MOTOR_kD = 0.01;
         public static final double TOP_MOTOR_kFF = 0.000175;
 
+        // public static final double SPEED_TOP = 1000; TODO: Currently in power mode. We should change back to velocity mode before our first regional
+        public static final double INTAKE_POWER = 0.75; //TODO: Delete this once we have velocity mode working
+        public static final int OUTAKE_VELOCITY = -2000;
+
         // NOTE: only one motor on now
         // public static final double BOTTOM_MOTOR_kP = 0.0001;
         // public static final double BOTTOM_MOTOR_kI = 0.000;
         // public static final double BOTTOM_MOTOR_kD = 0.000;
 
-        public static final double SPEED_TOP = 1000;
     }
 
     public final class SHOOTER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Shooter/";
-
-        public static final int TOP_SHOOTER_MOTOR_CAN_ID = 29;
-        public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 28;
-        public static final int FEEDER_MOTOR_CAN_ID = 31;
-        public static final int NOTE_BEAM_BREAK_DIO_PORT = 0;
-
-        public static final int AMP_SHOOTER_SPEED = 3000;
-        public static final int AMP_FEEDER_SPEED = -1; //TODO: Figure out what this should actually be
-
-        public static final int INTAKE_SHOOTER_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 4000;
-
-        //No shooter speed because we use the range table
-        public static final int SHOOTING_FEEDER_SPEED = 1500;
-
+        
         public static final double FEEDER_MOTOR_kP = 0; //TODO: Tune this; start with 0.00001;
         public static final double FEEDER_MOTOR_kI = 0.0;
         public static final double FEEDER_MOTOR_kD = 0.0;
@@ -92,6 +81,23 @@ public final class Constants {
         public static final double SHOOTER_MOTOR_IZONE = 100; // RPM for the range within which the I term will be effective
 
         public static final int FHYWHEEL_SPEED_ACCEPTABLE_RANGE = 10; // RPM
+
+        public static final int TOP_SHOOTER_MOTOR_CAN_ID = 29;
+        public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 28;
+        public static final int FEEDER_MOTOR_CAN_ID = 31;
+        public static final int NOTE_BEAM_BREAK_DIO_PORT = 0;
+
+        public static final int AMP_SHOOTER_SPEED = 3000;
+        public static final int AMP_FEEDER_SPEED = -1; //TODO: Figure out what this should actually be
+
+        public static final int INTAKE_SHOOTER_SPEED = 0;
+        public static final int INTAKE_FEEDER_SPEED = 4000;
+
+        //No shooter speed because we use the range table
+        public static final int SHOOTING_FEEDER_SPEED = 1500;
+
+        public static final int OUTAKE_SHOOTER_VELOCITY = -1; //TODO: Figure out what this should be.
+        public static final double OUTAKE_FEEDER_VELOCITY = -2000;
     }
 
 
@@ -124,7 +130,7 @@ public final class Constants {
         public static final double EXTENSION_METERS_CLIMB = 0.26;
         public static final int PIVOT_ANGLE_CLIMB = 55; // TODO: Adjust this angle
 
-        public static final double EXTENSION_RETRACTED = 0.001; //Meters
+        public static final double EXTENSION_FULLY_RETRACTED = 0.001; //Meters
         public static final double EXTENSION_FORCE_RETRACT_THRESHOLD = 30; //Degrees
 
         public static final double PIVOT_GEAR_RATIO = (12.0 / 5.0) * 75.0; // 12/5 is the radio of the large pulley to small pulley. 75 is from the gearbox.
@@ -137,6 +143,8 @@ public final class Constants {
 
         public static final double MAX_PIVOT_ROTATIONS = (PIVOT_ANGLE_MAX*PIVOT_GEAR_RATIO)/360;
         public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX / ELEVATOR_GEAR_RATIO;
+
+        public static final double MANUAL_EXTENSION_SPEED = 0.0001; //TODO: Adjust this
     }
 
     public final class POWER {

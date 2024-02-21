@@ -75,7 +75,7 @@ public class Intake {
      * @param bottom Velocity for bottom motor (RPM)
      * @param top Velocity for top motor (RPM)
      */
-    public void setIntakeVelocity(double bottom, double top) {
+    public void setIntakeVelocity(/*double bottom, */double top) {
         topMotor.setVelocity(top);
         // bottomMotor.setVelocity(bottom);
 

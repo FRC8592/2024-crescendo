@@ -121,7 +121,7 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("IntakeKi", INTAKE.TOP_MOTOR_kI);
         SmartDashboard.putNumber("IntakeKd", INTAKE.TOP_MOTOR_kD);
         SmartDashboard.putNumber("IntakeKff",INTAKE.TOP_MOTOR_kFF);
-        SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
+        // SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
 
         SmartDashboard.putBoolean("hasNote()", false);
 
@@ -272,7 +272,7 @@ public class Robot extends LoggedRobot {
 
         //operator controls
         boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
-        boolean runFeeder = operatorController.getLeftBumper();
+        boolean runFeeder = operatorController.getLeftBumper(); // TODO: What is this?
 
         boolean outake = operatorController.getRightBumper();
         boolean intaking = operatorController.getLeftTriggerAxis() > 0.1;
@@ -307,16 +307,16 @@ public class Robot extends LoggedRobot {
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, swerve.getGyroscopeRotation());
 
         if(intaking){
-            intake.spinPercentOutput(0.75);
+            intake.spinPercentOutput(INTAKE.INTAKE_POWER);
             elevator.stow();
             if(!shooter.hasNote()){
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
             }
         }
         else if(outake){
-            intake.setIntakeVelocity(-2000, -2000);
-            shooter.setFeederVelocity(-2000);
-            shooter.setShootVelocity(-2000, -2000);
+            intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
+            shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
+            shooter.setShootVelocity(SHOOTER.OUTAKE_SHOOTER_VELOCITY, -SHOOTER.OUTAKE_SHOOTER_VELOCITY);
         }
 
         else if (shoot) {
@@ -330,7 +330,7 @@ public class Robot extends LoggedRobot {
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
             }
         }
-        else if (runFeeder) {
+        else if (runFeeder) { // TODO: What is this?
             shooter.setShootVelocity(-2000, -2000);
             shooter.setFeederSpeed(-500);
         }
@@ -350,11 +350,11 @@ public class Robot extends LoggedRobot {
                 elevator.climbPosition();
             }
             else if (manualRaiseClimber){
-                manualExtensionLength += 0.0001; //meters
+                manualExtensionLength += ELEVATOR.MANUAL_EXTENSION_SPEED; //meters
                 elevator.setExtensionLengthCustom(manualExtensionLength);
             }
             else if (manualLowerClimber){
-                manualExtensionLength -= 0.0001; //meters
+                manualExtensionLength -= ELEVATOR.MANUAL_EXTENSION_SPEED; //meters
                 elevator.setExtensionLengthCustom(manualExtensionLength);
             }
             else if (manualPivotUp){
@@ -469,10 +469,10 @@ public class Robot extends LoggedRobot {
          // intaking
         if (intaking) {
             // intake.spinPercentOutput(0.5);
-            intake.setIntakeVelocity(SmartDashboard.getNumber("Intake Bottom RPM", 0), SmartDashboard.getNumber("Intake Top RPM", 0));
+            intake.setIntakeVelocity(SmartDashboard.getNumber("Intake Top RPM", 0));
         }
         else if(outake){
-            intake.setIntakeVelocity(-2000, -2000);
+            intake.setIntakeVelocity(-2000);
             shooter.setFeederVelocity(2000);
             shooter.setShootVelocity(-2000, -2000);
 

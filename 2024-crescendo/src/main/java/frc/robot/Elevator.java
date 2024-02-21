@@ -1,73 +1,287 @@
 package frc.robot;
 
-import com.revrobotics.CANSparkFlex;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.SparkRelativeEncoder;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.*;
 
 public class Elevator {
-    private static final int ELEVATOR_MOTOR_CAN_ID = 0;
-    private CANSparkFlex elevatorMotor;
-    private SparkPIDController elevatorPID;
-    private RelativeEncoder elevatorEncoder;
-    private final double POSITION_START = 0;
-    private final double POSITION_AMP= 0;
+    private SparkFlexControl extensionMotor;
+    private SparkFlexControl pivotMotor;
+    private SparkFlexControl pivotFollowMotor;
+    private AbsoluteEncoder pivotEncoder;
+
+    private double setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
+    private double setLengthMeters = ELEVATOR.EXTENSION_METERS_STOWED;
+
+    boolean pivotUp = false;
+    boolean pivotDown = false;
 
     public Elevator(){
-        elevatorMotor = new CANSparkFlex(ELEVATOR_MOTOR_CAN_ID, MotorType.kBrushless);
-        elevatorPID = elevatorMotor.getPIDController();
-        elevatorEncoder = elevatorMotor.getEncoder();
+        extensionMotor = new SparkFlexControl(ELEVATOR.EXTENSION_MOTOR_CAN_ID, false);
+        pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID, false);
+        pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID, false);
+
+        pivotMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
+        pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
+
+        extensionMotor.setPIDF(ELEVATOR.EXTENSION_kP, ELEVATOR.EXTENSION_kI, ELEVATOR.EXTENSION_kD, ELEVATOR.EXTENSION_kFF, 0);
+
+        pivotMotor.setInverted();
+
+        pivotMotor.setMaxVelocity(5000, 0);
+        pivotFollowMotor.setMaxVelocity(5000, 0);
+
+        extensionMotor.setMaxVelocity(5000, 0);
+
+        pivotMotor.setMaxAcceleration(5000, 0);
+        pivotFollowMotor.setMaxAcceleration(5000, 0);
+
+        extensionMotor.setMaxAcceleration(5000, 0);
         
-        elevatorPID.setP(0, 0);
-        elevatorPID.setI(0, 0);
-        elevatorPID.setD(0, 0);
-        elevatorPID.setFF(0, 0);
-
-        elevatorEncoder.setPosition(0);
+        pivotMotor.motorControl.setReference(0,ControlType.kVoltage);
     }
+
     
+    /**
+     * Called in robot periodic - checks variables and updates motors
+     */
+    public void update(){
+        double currentAngle = getPivotAngle(); // In degrees
+        double currentLengthMeters = getExtensionLength(); // In ticks   
+        
+        boolean pivotIsRunning = false;
+        boolean extensionIsRunning = false;
 
-    public void percentOutputElevator(double speed){
-        elevatorMotor.set(speed);
+        SmartDashboard.putBoolean("Pivot down", pivotDown);
+        SmartDashboard.putBoolean("Pivot up", pivotUp);
+        
+        boolean setPivot = false;
+        boolean setExtend = false;
+
+        if (pivotUp) {
+            setPivot = currentAngle < ELEVATOR.PIVOT_ANGLE_MAX;
+            setExtend = currentAngle > ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD && currentLengthMeters < ELEVATOR.EXTENSION_METERS_MAX;
+        }
+        else if (pivotDown){
+            setExtend = currentLengthMeters > 0;
+            setPivot = (currentAngle > ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD || currentLengthMeters < 0.01) && currentAngle>0;
+        }
+        else {
+            setPivot = false;
+            setExtend = false;
+        }
+
+        if (setPivot) {
+            setPivotAngle(setAngle);
+        }
+        else {
+            pivotMotor.stopSmartVelocity();
+            pivotFollowMotor.stopSmartVelocity();
+        }
+
+        if (setExtend) {
+            setExtensionLength(setLengthMeters);
+        }
+        else {
+            extensionMotor.stopSmartVelocity();
+        }
+
+        // if(currentAngle<ELEVATOR.PIVOT_ANGLE_MAX && currentAngle>0){
+        //     if(currentLengthMeters<ELEVATOR.EXTENSION_METERS_MAX && currentLengthMeters>0){
+        //         pivotIsRunning = true;
+        //         extensionIsRunning = true;
+        //     } else{
+        //         pivotIsRunning = true;
+        //         extensionIsRunning = false;
+        //     }
+        // } else{
+        //     if(currentLengthMeters<ELEVATOR.EXTENSION_METERS_MAX && currentLengthMeters>0){
+        //         pivotIsRunning = false;
+        //         extensionIsRunning = true;
+        //     } else{
+        //         pivotIsRunning = false;
+        //         extensionIsRunning = false;
+        //     }
+        // }
+
+        // if (pivotUp) {
+        //     if (currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE /*&& currentLengthMeters<ELEVATOR.EXTENSION_METERS_MAX*/) { //30° is clear of all obstacles in the robot
+        //         if(extensionIsRunning){
+        //             setElevatorLength(setLengthMeters);
+        //         } else{
+        //             extensionMotor.stop();
+        //         }
+        //     }
+        //     else {
+        //         extensionMotor.stop();
+        //     }
+
+        //     if (pivotIsRunning){
+        //         setPivotAngle(setAngle);
+        //         } else{
+        //             pivotMotor.stop();
+        //             pivotFollowMotor.stop();
+        //         }
+            
+        // }
+        // else if (pivotDown) { //Moving down
+        //     if (currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE /*&& currentAngle>0*/) { //Angle greater than 30° (no reference to elevator length)
+        //         if (pivotIsRunning){
+        //         setPivotAngle(setAngle);
+        //         } else{
+        //             pivotMotor.stop();
+        //             pivotFollowMotor.stop();
+        //         }
+        //     }
+        //     else if (currentLengthMeters > ELEVATOR.RETRACTED /*&& currentAngle>0*/) { // Elevator angle less than 30° and extended too far (more than 5 ticks)
+        //         pivotMotor.stop();
+        //         pivotFollowMotor.stop();
+        //     }
+        //     else { // elevator length <= 5 ticks AND angle less than 30°
+        //         if (pivotIsRunning){
+        //             setPivotAngle(setAngle);
+        //             } else{
+        //                 pivotMotor.stop();
+        //                 pivotFollowMotor.stop();
+        //             }
+        //     }
+
+        //     if(extensionIsRunning){
+        //     setElevatorLength(setLengthMeters);
+        //     } else{
+        //         extensionMotor.stop();
+        //     }
+        // }
+        // else { // Stopped
+        //     extensionMotor.stop();
+        //     pivotMotor.stop();
+        //     pivotFollowMotor.stop();
+        // }
     }
 
-    public void setPosition(double position){
-        elevatorPID.setReference(position, ControlType.kPosition);
+    //-------ELEVATOR CODE-------//
+
+    /**
+     * sets the speed of
+     * @param speed
+     */
+    public void percentOutputExtension(double speed){
+        extensionMotor.setPercentOutput(speed);
     }
 
-    public void setPositionAmp(){
-        elevatorPID.setReference(POSITION_AMP ,ControlType.kPosition);
+    /** 
+     * sets the position in rotations
+     * @param position
+    */
+    private void setExtensionLength(double meters){ 
+        double rotations = meters/ELEVATOR.ELEVATOR_GEAR_RATIO;
+        extensionMotor.setPositionSmartMotion(rotations);
     }
 
-    public void setPositionStart(double position){
-        elevatorPID.setReference(POSITION_START, ControlType.kPosition);
+    public void setExtensionLengthCustom(double position){
+        setLengthMeters = position;
+    }
+
+    /**
+     * gets length of elevator in meters
+     * @return
+     */
+    public double getExtensionLength() {
+        return (extensionMotor.getPosition()*ELEVATOR.ELEVATOR_GEAR_RATIO);
+    }
+
+    //-------PIVOT CODE-------//
+
+    /**
+     * sets the speed of
+     * @param speed
+     */
+    public void percentOutputPivot(double speed){
+        pivotMotor.setPercentOutput(speed);
+        pivotFollowMotor.setPercentOutput(speed);
     }
     
     /**
-     * sets angle of elevator to base of robot
+     * sets angle of pivot to base of robot
      * @param angle units: degrees
      */
-    public void setAngle(double angle) {
-        
+    private void setPivotAngle(double angle) {
+        double rotations = (ELEVATOR.PIVOT_GEAR_RATIO * angle)/360;
+        pivotMotor.setPositionSmartMotion(rotations);
+        pivotFollowMotor.setPositionSmartMotion(rotations);
     }
+
+    public void setPivotAngleCustom(double angle) {
+        setAngle = angle;
+        
+        pivotUp = getPivotAngle() < setAngle;
+        pivotDown = getPivotAngle() > setAngle;
+    }
+
+    /**
+     * gets position of pivot
+     * @return
+     */
+    public double getPivotAngle() {
+        double ticksConverted = (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES)/ELEVATOR.PIVOT_GEAR_RATIO;
+        return ticksConverted;
+    }
+
+    //-------COMBINED CODE-------//
 
     /**
      * stows elevator and pivot 
      */
     public void stow() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stow'");
+        setLengthMeters = ELEVATOR.EXTENSION_METERS_STOWED;
+        setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
+
+        pivotUp = getPivotAngle() < setAngle;
+        pivotDown = getPivotAngle() > setAngle;
+    }
+
+    public void ampPosition() {
+        setLengthMeters = ELEVATOR.EXTENSION_METERS_AMP;
+        setAngle = ELEVATOR.PIVOT_ANGLE_AMP;
+
+        pivotUp = getPivotAngle() < setAngle;
+        pivotDown = getPivotAngle() > setAngle;
+    }
+
+    public void climbPosition(){
+        setLengthMeters = ELEVATOR.EXTENSION_METERS_CLIMB;
+        setAngle = ELEVATOR.PIVOT_ANGLE_CLIMB;
+
+
+        pivotUp = getPivotAngle() < setAngle;
+        pivotDown = getPivotAngle() > setAngle;
     }
 
     /**
-     * gets position of  elevator
-     * @return
+     * zeros the pivot encoder by setting the offset to the current position
      */
-    public double getPosition() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPosition'");
+    public void zero(){
+        pivotEncoder.setZeroOffset(pivotEncoder.getPosition());
+    }
+    
+    /**
+     * resets the encoders for pivot motor, pivot follow motor, extension motor
+    */
+    public void resetEncoders() {
+        pivotMotor.motorEncoder.setPosition(0);
+        pivotFollowMotor.motorEncoder.setPosition(0);
+        extensionMotor.motorEncoder.setPosition(0);
+    }
+    
+    public void testLimits(){
+        setLengthMeters = 2;
+        setAngle = 100;
+
+        pivotUp = getPivotAngle() < setAngle;
+        pivotDown = getPivotAngle() > setAngle;
     }
 
 }

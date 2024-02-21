@@ -19,12 +19,12 @@ public abstract class BaseAuto {
      * Add all running subsystems for use for all autonomous routines
      * @param pDrive {@code Swerve} object
      */
-    public void addModules(Swerve pDrive, Elevator pLift, Intake pIntake, Shooter pShooter, LimelightTargeting pTargeting) {
+    public void addModules(Swerve pDrive/*, Elevator pLift, Intake pIntake, Shooter pShooter, LimelightTargeting pTargeting*/) {
         drive = pDrive;
-        elevator = pLift;
-        intake = pIntake;
-        targeting = pTargeting;
-        shooter = pShooter;
+        // elevator = pLift;
+        // intake = pIntake;
+        // targeting = pTargeting;
+        // shooter = pShooter;
     }
 
     /**

@@ -330,7 +330,7 @@ public class Robot extends LoggedRobot {
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
             }
         }
-        else if (runFeeder) { // TODO: What is this?
+        else if (runFeeder) { // TODO: What is this? Why does it try to drive the feeder motors at -50,000% power?
             shooter.setShootVelocity(-2000, -2000);
             shooter.setFeederSpeed(-500);
         }

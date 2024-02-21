@@ -13,16 +13,11 @@ public final class Constants {
         public static final double ANGLE_DEGREES_TO_TICKS = 4096/360.0;
         public static final double METERS_TO_FEET = 3.28084;
         public static final double TICKS_TO_ANGLE_DEGREES = 360.0/4096.0;
-        
     }
 
     public final class CONTROLLERS {
         public static final int DRIVER_PORT = 0;
         public static final int OPERATOR_PORT = 1;
-    }
-    
-    public final class CAN {
-        
     }
 
     public final class NOTELOCK {
@@ -118,16 +113,16 @@ public final class Constants {
         public static final double EXTENSION_kFF = 0.00025;
 
         public static final double EXTENSION_METERS_MAX = 0.26;
-        public static final int PIVOT_ANGLE_MAX = 60;
+        public static final int PIVOT_ANGLE_MAX = 60; // TODO: Adjust this angle
 
         public static final double EXTENSION_METERS_STOWED = 0;
         public static final int PIVOT_ANGLE_STOWED = 0;
 
         public static final double EXTENSION_METERS_AMP = 0.26;
-        public static final int PIVOT_ANGLE_AMP = 48; // TODO FIND PIVOT ANGLES (ALL OF THEM)
+        public static final int PIVOT_ANGLE_AMP = 48; // TODO: Adjust this angle
 
         public static final double EXTENSION_METERS_CLIMB = 0.26;
-        public static final int PIVOT_ANGLE_CLIMB = 55;
+        public static final int PIVOT_ANGLE_CLIMB = 55; // TODO: Adjust this angle
 
         public static final double EXTENSION_RETRACTED = 0.001; //Meters
         public static final double EXTENSION_FORCE_RETRACT_THRESHOLD = 30; //Degrees

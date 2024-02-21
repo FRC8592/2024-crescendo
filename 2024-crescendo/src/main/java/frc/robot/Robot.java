@@ -269,15 +269,14 @@ public class Robot extends LoggedRobot {
         boolean slowMode = driverController.getRightBumper();
         boolean resetGyro = driverController.getBackButtonPressed();
         // boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
-    
+
         //operator controls
-        
         boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
         boolean runFeeder = operatorController.getLeftBumper();
-        
+
         boolean outake = operatorController.getRightBumper();
         boolean intaking = operatorController.getLeftTriggerAxis() > 0.1;
-        
+
         boolean stowed = operatorController.getAButtonPressed();
         boolean ampPosition = operatorController.getXButton();
         boolean maxClimbPosition = operatorController.getYButtonPressed();
@@ -289,14 +288,10 @@ public class Robot extends LoggedRobot {
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
-        
-        //driver logic
-        
-
-        if( resetGyro){
+        if(resetGyro){
             swerve.zeroGyroscope();
         }
-        
+
         if (slowMode) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
                     driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
@@ -322,31 +317,24 @@ public class Robot extends LoggedRobot {
             intake.setIntakeVelocity(-2000, -2000);
             shooter.setFeederVelocity(-2000);
             shooter.setShootVelocity(-2000, -2000);
-
         }
-    
+
         else if (shoot) {
-            if(ampPosition){
+            if (ampPosition) {
                 shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
+            } else {
+                shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 3500),
+                        (int) SmartDashboard.getNumber("bottomShootSpeed", 3500)); //TODO: Replace these once the range table is done
             }
-            else{
-                shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 3500), 
-                    (int) SmartDashboard.getNumber("bottomShootSpeed", 3500));
-            }
-            if (shooter.isReady()) {// isReady returns whether the shooter angle and
-                // flywheel speeds are within a threshhold of where we asked them to be
+            if (shooter.isReady()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
-                // if (!shooter.hasNote()) {
-                //     shooter.stop();
-                //     shooter.stopFeeders();
-                //     elevator.stow()
-                // }
             }
-        } else if (runFeeder){
-            shooter.setShootVelocity(-2000,-2000);
+        }
+        else if (runFeeder) {
+            shooter.setShootVelocity(-2000, -2000);
             shooter.setFeederSpeed(-500);
         }
-          
+
         else{
             if (stowed){
                 elevator.stow();
@@ -383,14 +371,6 @@ public class Robot extends LoggedRobot {
                 shooter.stop();
             }
         }
-    
-        
-        
-
-       
-        
-        
-        
         swerve.drive(currentSpeeds);
     }
 

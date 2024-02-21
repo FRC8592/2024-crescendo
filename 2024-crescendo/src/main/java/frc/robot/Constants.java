@@ -140,6 +140,7 @@ public final class Constants {
 
         public static final double MAX_PIVOT_ROTATIONS = (PIVOT_ANGLE_MAX*PIVOT_GEAR_RATIO)/360;
         public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX/ELEVATOR_GEAR_RATIO;
+        public static final int DIGITAL_INPUT_PORT_ABSOLUTE_ENCODER = 0;
     }
 
     public final class POWER {

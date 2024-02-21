@@ -3,6 +3,8 @@ package frc.robot;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.*;
 
@@ -10,7 +12,9 @@ public class Elevator {
     private SparkFlexControl extensionMotor;
     private SparkFlexControl pivotMotor;
     private SparkFlexControl pivotFollowMotor;
-    private AbsoluteEncoder pivotEncoder;
+    private DigitalInput input;
+    private DutyCycleEncoder absoluteEncoder;
+    
 
     private double setAngle = ELEVATOR.PIVOT_ANGLE_STOWED;
     private double setLengthMeters = ELEVATOR.EXTENSION_METERS_STOWED;
@@ -22,6 +26,9 @@ public class Elevator {
         extensionMotor = new SparkFlexControl(ELEVATOR.EXTENSION_MOTOR_CAN_ID, false);
         pivotMotor = new SparkFlexControl(ELEVATOR.PIVOT_MOTOR_CAN_ID, false);
         pivotFollowMotor = new SparkFlexControl(ELEVATOR.PIVOT_FOLLOW_MOTOR_CAN_ID, false);
+
+        input = new DigitalInput(ELEVATOR.DIGITAL_INPUT_PORT_ABSOLUTE_ENCODER);
+        absoluteEncoder = new DutyCycleEncoder(input);
 
         pivotMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
         pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
@@ -259,10 +266,18 @@ public class Elevator {
     }
 
     /**
-     * zeros the pivot encoder by setting the offset to the current position
+     * gets the value of the absolute encoder
+     * @return position
      */
-    public void zero(){
-        pivotEncoder.setZeroOffset(pivotEncoder.getPosition());
+    public double getAbsoluteValueEncoderPosition(){
+        return absoluteEncoder.getAbsolutePosition();
+    }
+
+    /**
+     * gets the value of the absolute encoder
+     */
+    public void zeroAbsoluteValueEncoder(){
+        absoluteEncoder.reset();
     }
     
     /**

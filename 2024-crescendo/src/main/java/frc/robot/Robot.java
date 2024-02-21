@@ -122,7 +122,6 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("IntakeKd", INTAKE.TOP_MOTOR_kD);
         SmartDashboard.putNumber("IntakeKff",INTAKE.TOP_MOTOR_kFF);
         SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
-        SmartDashboard.putNumber("Intake Bottom RPM", INTAKE.SPEED_BOTTOM);
 
         SmartDashboard.putBoolean("hasNote()", false);
 

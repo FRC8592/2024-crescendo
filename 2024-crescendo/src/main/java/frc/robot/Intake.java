@@ -8,22 +8,11 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import frc.robot.Constants.*;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-// Pneumatic control classes
-// import packages
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake {
     public SparkFlexControl topMotor;
     // private SparkFlexControl bottomMotor;
-
-    private enum States {
-        INTAKE_PREP,
-        INTAKING,
-        STOP
-    }
-    
-    private States state;
-    
 
     public Intake() {
         // topMotor = new TalonFX(INTAKE.TOP_MOTOR_CAN_ID);
@@ -43,37 +32,6 @@ public class Intake {
         // bottomMotor.setPIDF(INTAKE.BOTTOM_MOTOR_kP, INTAKE.BOTTOM_MOTOR_kI, INTAKE.BOTTOM_MOTOR_kD, 0, 0);
 
 
-    }
-
-    public void update(Swerve swerve, Shooter shooter) {
-        switch (state) {
-            case INTAKE_PREP:
-                robotSpeedIntake(swerve);
-                if (this.hasNote()) {
-                    this.state = States.INTAKING;
-                }
-                break;
-            case INTAKING:
-                setIntakeVelocity(INTAKE.SPEED_TOP, INTAKE.SPEED_BOTTOM);
-                if (shooter.hasNote()) {
-                    this.state = States.STOP;
-                }
-                break;
-            case STOP:
-            default:
-                setIntakeVelocity(0, 0);
-                break;
-        }
-    }
-
-    public void intake() {
-        if (state == States.STOP) {
-            this.state = States.INTAKE_PREP;
-        }
-    }
-
-    public void stop() {
-        this.state = States.STOP;
     }
 
     public void halt() {
@@ -123,27 +81,5 @@ public class Intake {
 
         getTopMotorVelocityRPM();
         // getBottomMotorVelocityRPM();
-    }
-
-    public void setIntakePercentOutput(double bottom, double top){
-        // topMotor.setPercentOutput(top);
-        // bottomMotor.setPercentOutput(bottom);
-    }
-    /**
-     * Run the motors proportionally to the drivetrain speed
-     * @param swerve Drivetrain object to get speed from
-     */
-    public void robotSpeedIntake (Swerve swerve) {
-        double robotSpeed = swerve.getCurrentSpeeds().vyMetersPerSecond;
-        double rollerSpeed = Math.max(INTAKE.MINIMUM_ROLLER_SPEED, robotSpeed * INTAKE.ROBOT_SPEED_MULTIPLIER);
-        topMotor.setVelocity(rollerSpeed);
-        // bottomMotor.setVelocity(rollerSpeed);
-    }
-
-    /**TODO:WRITE THIS METHOD PLS 
-     * @return if intake has note
-     */
-    public boolean hasNote() {
-        return false;
     }
 }

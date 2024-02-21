@@ -362,11 +362,11 @@ public class Robot extends LoggedRobot {
                 elevator.setExtensionLengthCustom(manualExtensionLength);
             }
             else if (manualPivotUp){
-                manualPivotAngle += 0.1; //degrees
+                manualPivotAngle += ELEVATOR.MANUAL_PIVOT_SPEED; //degrees
                 elevator.setPivotAngleCustom(manualPivotAngle);
             }
             else if (manualPivotDown){
-                manualPivotAngle -= 0.1; //degrees
+                manualPivotAngle -= ELEVATOR.MANUAL_PIVOT_SPEED; //degrees
                 elevator.setPivotAngleCustom(manualPivotAngle);
             }
             else{

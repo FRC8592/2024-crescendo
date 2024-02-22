@@ -119,8 +119,6 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("IntakeKi", INTAKE.TOP_MOTOR_kI);
         SmartDashboard.putNumber("IntakeKd", INTAKE.TOP_MOTOR_kD);
         SmartDashboard.putNumber("IntakeKff",INTAKE.TOP_MOTOR_kFF);
-        SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
-        SmartDashboard.putNumber("Intake Bottom RPM", INTAKE.SPEED_BOTTOM);
 
         SmartDashboard.putBoolean("hasNote()", false);
 
@@ -317,16 +315,14 @@ public class Robot extends LoggedRobot {
             elevator.stow();
             if (shooter.hasNote()) {
                 intaking = false;
+                shooter.setFeederSpeed(0);
             }
             else {
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
             }
-            else{
-                shooter.setFeederVelocity(0);
-            }
         }
         else if(outake){
-            intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
+            intake.spinPercentOutput(INTAKE.OUTAKE_POWER);
             shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
             shooter.setShootVelocity(SHOOTER.OUTAKE_SHOOTER_VELOCITY, -SHOOTER.OUTAKE_SHOOTER_VELOCITY);
         }
@@ -342,10 +338,10 @@ public class Robot extends LoggedRobot {
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
             }
         }
-        else if (runFeeder) { // TODO: What is this? Why does it try to drive the feeder motors at -50,000% power?
-            shooter.setShootVelocity(-2000, -2000);
-            shooter.setFeederSpeed(-500);
-        }
+        // else if (runFeeder) { // TODO: What is this? Why does it try to drive the feeder motors at -50,000% power?
+        //     shooter.setShootVelocity(-2000, -2000);
+        //     shooter.setFeederSpeed(-500);
+        // }
 
         else{
             if (stowed){

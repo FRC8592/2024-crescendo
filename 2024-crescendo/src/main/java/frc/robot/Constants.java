@@ -51,7 +51,7 @@ public final class Constants {
 
         // public static final double SPEED_TOP = 1000; TODO: Currently in power mode. We should change back to velocity mode before our first regional
         public static final double INTAKE_POWER = 0.75; //TODO: Delete this once we have velocity mode working
-        public static final int OUTAKE_VELOCITY = -2000;
+        public static final double OUTAKE_POWER = -0.75;
 
         // NOTE: only one motor on now
         // public static final double BOTTOM_MOTOR_kP = 0.0001;

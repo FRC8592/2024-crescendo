@@ -8,6 +8,7 @@ public class RangeTable {
     public static boolean valid;
 
     public RangeTable() {
+        new RangeEntry(3000, 5);
     }
 
     /**
@@ -20,7 +21,7 @@ public class RangeTable {
         int index = (int) (distance / 12);
         int inchesPastLastFoot = (int) (distance) % 12;
         if (RANGE_TABLE.length > 0) {
-            if (index < RANGE_TABLE.length) { // Too far for the range table
+            if (index < RANGE_TABLE.length) {
                 if ((int) (distance) % 12 == 0) {// If we're at a whole foot number
                     return RANGE_TABLE[index];
                 } else if (index < RANGE_TABLE.length - 1) {
@@ -29,7 +30,7 @@ public class RangeTable {
                     valid = false;
                     return RANGE_TABLE[RANGE_TABLE.length - 1];
                 }
-            } else {
+            } else { // Too far for the range table
                 valid = false;
                 return RANGE_TABLE[RANGE_TABLE.length - 1];
             }

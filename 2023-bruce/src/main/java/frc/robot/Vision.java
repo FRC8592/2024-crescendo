@@ -51,8 +51,8 @@ public class Vision {
 
 
   //constants for averaging limelight averages
-  private int MIN_LOCKS = 3;
-  private int STAT_SIZE = 5; 
+  private int MIN_LOCKS = 1;
+  private int STAT_SIZE = 8; 
 
   private LinkedList<LimelightData> previousCoordinates;
 

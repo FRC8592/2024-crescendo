@@ -9,6 +9,9 @@ import com.NewtonSwerve.Gyro.NewtonPigeon;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
+import java.util.ArrayList;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -16,10 +19,12 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,6 +35,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 import frc.robot.BunnyDropper.States;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -67,6 +73,15 @@ public class Robot extends LoggedRobot {
     private boolean isAiming = false;
     public static Field2d FIELD = new Field2d();
 
+    private double currentBatteryVoltage;
+    private ArrayList<Double> voltages;
+    private static final int VOLTAGE_SMOOTHING_LENGTH = 50;
+    private static final double DISABLED_LOW_BATTERY_VOLTAGE = 11.5;
+    private static final double TELEOP_LOW_BATTERY_VOLTAGE = 10.5;
+    private boolean isBatteryLow = false;
+
+    private static final String LOG_PATH = "CustomLogs/Robot/";
+
     /**
      * This function is run when the robot is first started up and should be used
      * for any
@@ -87,6 +102,7 @@ public class Robot extends LoggedRobot {
         Logger.getInstance().start();
         SmartDashboard.putData("Auto choices", m_chooser);
 
+        voltages = new ArrayList<Double>();
         pigeon = new NewtonPigeon(new Pigeon2(Constants.SWERVE_PIGEON_CAN_ID));
         swerve = new Swerve(pigeon);
         shooter = new Shooter();
@@ -115,6 +131,31 @@ public class Robot extends LoggedRobot {
             SmartDashboard.putData(FIELD);
         }
         Logger.getInstance().recordOutput("Robot Pose", swerve.getCurrentPos());
+
+        voltages.add(0, RobotController.getBatteryVoltage());
+        if (voltages.size() > VOLTAGE_SMOOTHING_LENGTH) {
+            voltages.remove(VOLTAGE_SMOOTHING_LENGTH);
+        }
+        double x = 0.0;
+        for (double i: voltages){
+            x += i;
+        }
+        currentBatteryVoltage = x/VOLTAGE_SMOOTHING_LENGTH;
+
+        if (DriverStation.isDisabled() || DriverStation.isAutonomous() || DriverStation.isTest()) {
+            if (currentBatteryVoltage < DISABLED_LOW_BATTERY_VOLTAGE) {
+                isBatteryLow = true;
+            }
+        }
+
+        if (DriverStation.isTeleop()) {
+            if (currentBatteryVoltage < TELEOP_LOW_BATTERY_VOLTAGE) {
+                isBatteryLow = true;
+            }
+        }
+
+        Logger.recordOutput(LOG_PATH+"Is Battery Low", isBatteryLow);
+        SmartDashboard.putBoolean("Is Battery Low", isBatteryLow);
     }
 
     /**

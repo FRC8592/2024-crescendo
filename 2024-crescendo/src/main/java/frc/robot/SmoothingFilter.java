@@ -1,4 +1,5 @@
-package frc.robot.autonomous;
+
+package frc.robot;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
@@ -12,10 +13,10 @@ public class SmoothingFilter {
     int index = 0;
 
     /**
-     * Create smoothing object, will slowly and smoothly adjust speed values until
-     * target is hit
-     * 
-     * @param size Size for smoothing array, bigger will be smoothed slower
+     * Create smoothing object, will slowly and smoothly adjust speed values until target is hit
+     * @param sizeX Size for X velocity smoothing array, bigger will be smoothed slower
+     * @param sizeY Size for Y velocity smoothing array, bigger will be smoothed slower
+     * @param sizeOmegas Size for Omega velocity smoothing array, bigger will be smoothed slower
      */
     public SmoothingFilter(int sizeX, int sizeY, int sizeOmegas) {
         this.sizeX = sizeX;
@@ -27,16 +28,14 @@ public class SmoothingFilter {
     }
 
     /**
-     * Take an array of zeros and fill each slot with a speed value until the value
-     * is hit
-     * 
+     * Take an array of zeros and fill each slot with a speed value until the value is hit
      * @param desiredSpeed Speed to accelerate towards
      */
     public ChassisSpeeds smooth(ChassisSpeeds desiredSpeed) {
         double smoothedX = 0;
         double smoothedY = 0;
         double smoothedOmegas = 0;
-        if (!desiredSpeed.equals(null)) {
+        if(!desiredSpeed.equals(null)) {
             smoothedX = smoothX(desiredSpeed.vxMetersPerSecond);
             smoothedY = smoothY(desiredSpeed.vyMetersPerSecond);
             smoothedOmegas = smoothOmega(desiredSpeed.omegaRadiansPerSecond);
@@ -48,7 +47,7 @@ public class SmoothingFilter {
     public double smoothX(double desiredSpeedX) {
         double sum = 0;
         velocityXValues[index % sizeX] = desiredSpeedX;
-        for (int i = 0; i < velocityXValues.length; i++) {
+        for(int i = 0; i < velocityXValues.length; i++) {
             sum += velocityXValues[i];
         }
         return sum / sizeX;
@@ -57,7 +56,7 @@ public class SmoothingFilter {
     public double smoothY(double desiredSpeedY) {
         double sum = 0;
         velocityYValues[index % sizeY] = desiredSpeedY;
-        for (int i = 0; i < velocityYValues.length; i++) {
+        for(int i = 0; i < velocityYValues.length; i++) {
             sum += velocityYValues[i];
         }
         return sum / sizeY;
@@ -66,7 +65,7 @@ public class SmoothingFilter {
     public double smoothOmega(double desiredSpeedOmega) {
         double sum = 0;
         velocityOmegaValues[index % sizeOmegas] = desiredSpeedOmega;
-        for (int i = 0; i < velocityOmegaValues.length; i++) {
+        for(int i = 0; i < velocityOmegaValues.length; i++) {
             sum += velocityOmegaValues[i];
         }
         return sum / sizeOmegas;

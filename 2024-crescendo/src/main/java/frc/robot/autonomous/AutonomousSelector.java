@@ -12,23 +12,27 @@ public class AutonomousSelector {
     private GenericEntry delayEntry;
 
     public Class<?>[] autos = {
-            TestAuto.class,
+        SixNoteAuto.class,
+        NoteStealAuto.class,
+        ThreeWingNoteAuto.class,
+        SevenNoteAuto.class,
+        IWillNameThisLaterAuto.class,
     };
 
     public AutonomousSelector() {
-        autonChooser.setDefaultOption("DEFAULT - NO AUTO", DoNothingAuto.class);
+        autonChooser.setDefaultOption("DEFAULT - DO NOTHING", DoNothingAuto.class);
         for (Class<?> auto : autos) {
             autonChooser.addOption(auto.getSimpleName(), auto);
         }
 
         autonTab.add("Choose Autonomous", autonChooser)
-                .withPosition(3, 2)
-                .withSize(4, 2);
+            .withPosition(3, 2)
+            .withSize(4, 2);
 
         delayEntry = autonTab.add("Autonomous Delay", 0d)
-                .withPosition(4, 1)
-                .withSize(2, 1)
-                .getEntry();
+            .withPosition(4, 1)
+            .withSize(2, 1)
+            .getEntry();
     }
 
     public double getDelay() {

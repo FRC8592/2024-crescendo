@@ -62,7 +62,7 @@ public class Robot extends LoggedRobot {
     private LimelightTargeting gameObjectVision;
     private double manualExtensionLength = 0;
     private double manualPivotAngle = 0;
-    //private double targetAngle = 0;
+    private boolean intaking;
 
 
     @Override
@@ -85,8 +85,6 @@ public class Robot extends LoggedRobot {
             SmartDashboard.putData(FIELD);
         }
 
-
-        
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
@@ -126,7 +124,7 @@ public class Robot extends LoggedRobot {
 
         SmartDashboard.putBoolean("hasNote()", false);
 
-        elevator.resetEncoders();
+        SmartDashboard.putBoolean("hasNote()", false);
     }
 
     @Override
@@ -177,6 +175,8 @@ public class Robot extends LoggedRobot {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
+
+        intaking = false;
     }
 
     @Override
@@ -264,36 +264,39 @@ public class Robot extends LoggedRobot {
          * 
          */
         //Basic driving controls
-        double driveTranslateY = -driverController.getLeftY();
-        double driveTranslateX = -driverController.getLeftX();
+        double driveTranslateY = driverController.getLeftY();
+        double driveTranslateX = driverController.getLeftX();
         double driveRotate = driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
+        boolean resetGyro = driverController.getBackButtonPressed();
+        // boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
 
-        //Intakes TODO: Revise with drivers
-        boolean autoIntake = driverController.getLeftTriggerAxis() > 0.1;
-        boolean intaking = operatorController.getAButton();
+        //operator controls
+        boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
+        boolean runFeeder = operatorController.getLeftBumper(); // TODO: What is this?
 
-        //Shooting TODO: Revise with drivers
-        boolean prepareForShoot = operatorController.getLeftTriggerAxis() > 0.1;
-        boolean manualShoot = operatorController.getBButton();
-        boolean autoShoot = driverController.getRightTriggerAxis() > 0.1;
+        boolean outake = operatorController.getRightBumper();
+        boolean intakeToggle = operatorController.getLeftTriggerAxis() > 0.1;
 
-        //Amp TODO: Revise with drivers
-        boolean ampPrep = operatorController.getXButton();
-        boolean autoAmpScore = driverController.getRightTriggerAxis() > 0.1;
-        boolean manualAmpScore = operatorController.getLeftBumper();
+        boolean stowed = operatorController.getAButtonPressed();
+        boolean ampPosition = operatorController.getXButton();
+        boolean maxClimbPosition = operatorController.getYButtonPressed();
+        boolean prime = operatorController.getBButtonPressed();
+        boolean manualRaiseClimber = operatorController.getPOV() == 0;
+        boolean manualLowerClimber = operatorController.getPOV() == 180;
+        boolean manualPivotUp = operatorController.getPOV() == 90;
+        boolean manualPivotDown = operatorController.getPOV() == 270;
 
-        //Stage TODO: Revise with drivers
-        boolean preStage = operatorController.getYButton();
-        double elevatorControl = operatorController.getPOV() == 0 ? 1 : (operatorController.getPOV() == 180 ? -1 : 0);
-
-        //Other TODO: Revise with drivers
-        boolean regurgitateBack = operatorController.getLeftBumper();
-        boolean regurgitateFront = operatorController.getRightBumper();
-        boolean stow = operatorController.getAButton();
+        if (intakeToggle) {
+            intaking = !intaking;
+        }
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
+        if(resetGyro){
+            swerve.zeroGyroscope();
+        }
+
         if (slowMode) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
                     driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
@@ -308,86 +311,72 @@ public class Robot extends LoggedRobot {
         }
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, swerve.getGyroscopeRotation());
 
-        if (autoIntake) { //Drive to the nearest note and intake it
-            currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
-            // intake.intakeNote(0, 0); //TODO  test intake with robotSpeed and real values in intakeNote
-            // if (intake.hasNote()) {
-            //     intake.intakeNote(0, 0);
-            // }
-        }
-        else if (autoShoot) { //Aim at the speaker and shoot into it
-            apriltagLockY.turnToAprilTag();
-            //TODO range table
-            RangeTable.RangeEntry shootParameters = RangeTable.get(poseGetter.distanceToAprilTag(0));
-            elevator.setPivotAngleCustom(shootParameters.pivotAngle);
-            shooter.setShootVelocity(shootParameters.flywheelSpeed, shootParameters.flywheelSpeed);
-            if (shooter.isReady()) {//isReady returns whether the shooter angle and 
-                //flywheel speeds are within a threshhold  of where we asked them to be
-                shooter.setFeederSpeed(0); //runs the feeder wheels
-                if (! shooter.hasNote()) {
-                    shooter.stop();
-                    shooter.stopFeeders();
-                    elevator.stow();
-                }
+        if(intaking){
+            intake.spinPercentOutput(INTAKE.INTAKE_POWER);
+            elevator.stow();
+            if (shooter.hasNote()) {
+                intaking = false;
+            }
+            else {
+                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
             }
         }
-        else if (autoAmpScore) {
-            elevator.ampPosition();
-            double rotationSpeed = poseGetter.turnToAprilTag(); //amp aprilTag
-            double xVelocity = poseGetter.strafeToAprilTag();
-            // shooter.setShootVelocity(-1);
-            double yVelocity = poseGetter.driveToAprilTag();
-            currentSpeeds = new ChassisSpeeds(xVelocity, yVelocity, rotationSpeed);
-            if (poseGetter.distanceToAprilTag(-1) < -1) {
-                // shooter.setShootVelocity(-1);
-                currentSpeeds = new ChassisSpeeds();
-                if (! shooter.hasNote()) {
-                    elevator.stow();
-                }
+        else if(outake){
+            intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
+            shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
+            shooter.setShootVelocity(SHOOTER.OUTAKE_SHOOTER_VELOCITY, -SHOOTER.OUTAKE_SHOOTER_VELOCITY);
+        }
+
+        else if (shoot) {
+            if (ampPosition) {
+                shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
+            } else {
+                shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 3500),
+                        (int) SmartDashboard.getNumber("bottomShootSpeed", 3500)); //TODO: Replace these once the range table is done
+            }
+            if (shooter.isReady()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
+                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
             }
         }
-        else if (prepareForShoot) {
-            apriltagLockY.turnToAprilTag();
-            // TODO range table
-            elevator.setPivotAngleCustom(poseGetter.distanceToAprilTag(-1));
-            if (manualShoot) {
-                // shooter.setShootVelocity(-1);
-                if (shooter.isReady()) {// isReady returns whether the shooter angle and
-                    // flywheel speeds are within a threshhold of where we asked them to be
-                    shooter.setShootPercentOutput(-1); // runs the feeder wheels
-                    if (!shooter.hasNote()) {
-                        shooter.stop();
-                        shooter.stopFeeders();
-                        elevator.stow();
-                    }
-                }
-            }
+        else if (runFeeder) { // TODO: What is this? Why does it try to drive the feeder motors at -50,000% power?
+            shooter.setShootVelocity(-2000, -2000);
+            shooter.setFeederSpeed(-500);
         }
-        else if (ampPrep) {
-            elevator.ampPosition(); // set to amp position
-            if (manualAmpScore) {
-                // shooter.setShootVelocity(-1); // flywheels at low speed
-                // shooter.setShootVelocity(-1); // feeder wheels
+
+        else{
+            if (stowed){
                 elevator.stow();
             }
-        }
-        else if (preStage) {
-            double currentElevatorPos = elevator.getExtensionLength();
-            if (elevatorControl == 1.0) {
-                double targetPosition = currentElevatorPos + 0.01; // TODO: set constant
-                elevator.setExtensionLengthCustom(targetPosition);
+            else if (prime){
+                elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 5));
             }
-            else if (elevatorControl == -1.0) {
-                double targetPosition = currentElevatorPos - 0.01; // TODO:
-                elevator.setExtensionLengthCustom(targetPosition);
+            else if (ampPosition){
+                elevator.ampPosition();
             }
-            elevator.setPivotAngleCustom(90); // set to 90 degrees
-        }
-        else if (regurgitateBack) {
-            shooter.setFeederSpeed(-1); // backwards
-        }
-        else if (regurgitateFront) {
-            shooter.setFeederSpeed(-1); // forwards
+            else if (maxClimbPosition) {
+                elevator.climbPosition();
+            }
+            else if (manualRaiseClimber){
+                manualExtensionLength += ELEVATOR.MANUAL_EXTENSION_SPEED; //meters
+                elevator.setExtensionLengthCustom(manualExtensionLength);
+            }
+            else if (manualLowerClimber){
+                manualExtensionLength -= ELEVATOR.MANUAL_EXTENSION_SPEED; //meters
+                elevator.setExtensionLengthCustom(manualExtensionLength);
+            }
+            else if (manualPivotUp){
+                manualPivotAngle += ELEVATOR.MANUAL_PIVOT_SPEED; //degrees
+                elevator.setPivotAngleCustom(manualPivotAngle);
+            }
+            else if (manualPivotDown){
+                manualPivotAngle -= ELEVATOR.MANUAL_PIVOT_SPEED; //degrees
+                elevator.setPivotAngleCustom(manualPivotAngle);
+            }
+            else{
+                intake.halt();
+                shooter.stopFeeders();
+                shooter.stop();
+            }
         }
         swerve.drive(currentSpeeds);
     }
@@ -449,8 +438,8 @@ public class Robot extends LoggedRobot {
     public void testDrivetrain(){
         
         //driver controls
-        double driveTranslateY = -driverController.getLeftX();
-        double driveTranslateX = -driverController.getLeftY();
+        double driveTranslateY = -driverController.getLeftY();
+        double driveTranslateX = -driverController.getLeftX();
         double driveRotate = driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
         boolean resetGyro = driverController.getBackButtonPressed();
@@ -495,10 +484,10 @@ public class Robot extends LoggedRobot {
          // intaking
         if (intaking) {
             // intake.spinPercentOutput(0.5);
-            intake.intakeNote(SmartDashboard.getNumber("Intake Bottom RPM", 0), SmartDashboard.getNumber("Intake Top RPM", 0));
+            intake.setIntakeVelocity(SmartDashboard.getNumber("Intake Top RPM", 0));
         }
         else if(outake){
-            intake.intakeNote(-2000, -2000);
+            intake.setIntakeVelocity(-2000);
             shooter.setFeederVelocity(2000);
             shooter.setShootVelocity(-2000, -2000);
 

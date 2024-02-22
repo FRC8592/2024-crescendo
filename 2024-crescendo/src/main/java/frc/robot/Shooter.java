@@ -47,12 +47,13 @@ public class Shooter {
         bottomShooterMotor.setPIDF(SHOOTER.BOTTOM_SHOOTER_MOTOR_kP, SHOOTER.BOTTOM_SHOOTER_MOTOR_kI, SHOOTER.BOTTOM_SHOOTER_MOTOR_kD, SHOOTER.BOTTOM_SHOOTER_MOTOR_kF, 0);
 
         feederMotor.setPIDF(SHOOTER.FEEDER_MOTOR_kP, SHOOTER.FEEDER_MOTOR_kI, SHOOTER.FEEDER_MOTOR_kD, SHOOTER.FEEDER_MOTOR_kF, 0);
+        feederMotor.setInverted();
 
         bottomShooterMotor.setPercentOutput(0);
         topShooterMotor.setPercentOutput(0);
         feederMotor.setPercentOutput(0);
 
-        noteBeamBreak = new DigitalInput(SHOOTER.NOTE_BEAM_BREAK_PORT);
+        noteBeamBreak = new DigitalInput(SHOOTER.NOTE_BEAM_BREAK_DIO_PORT);
 
         bottomShooterMotor.follow(topShooterMotor, true);
         // bottomShooterMotor.setInverted();
@@ -152,8 +153,8 @@ public class Shooter {
     public boolean isReady() {
         SmartDashboard.putNumber("topShooterRPM", topShooterMotor.getVelocity());
         SmartDashboard.putNumber("bottomShooterRPM", bottomShooterMotor.getVelocity());
-        if (Math.abs(topShooterMotor.getVelocity() - toptargetSpeed) < SHOOTER.ACCEPTABLE_RANGE&&
-                Math.abs(bottomShooterMotor.getVelocity() - bottomTargetSpeed) < SHOOTER.ACCEPTABLE_RANGE) {
+        if (Math.abs(topShooterMotor.getVelocity() - toptargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE&&
+                Math.abs(bottomShooterMotor.getVelocity() - bottomTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE) {
             hasNote = false;
             return true;
         }

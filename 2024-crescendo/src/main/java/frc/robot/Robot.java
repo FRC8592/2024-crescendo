@@ -328,8 +328,9 @@ public class Robot extends LoggedRobot {
             if (ampPosition) {
                 shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
             } else {
-                shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 3500),
-                        (int) SmartDashboard.getNumber("bottomShootSpeed", 3500)); //TODO: Replace these once the range table is done
+                RangeTable.RangeEntry entry = RangeTable.get(0);
+                shooter.setShootVelocity(entry.flywheelSpeed,entry.flywheelSpeed); //TODO: Replace these once the range table is done
+                elevator.setPivotAngleCustom(entry.pivotAngle);
             }
             if (shooter.isReady()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels

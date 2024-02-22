@@ -10,7 +10,7 @@ import com.NewtonSwerve.Mk4.Mk4SwerveModuleHelper;
 import com.NewtonSwerve.Mk4.Mk4iSwerveModuleHelper;
 import com.ctre.phoenix.sensors.Pigeon2;
 import frc.robot.Constants.*;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -19,6 +19,7 @@ public class Swerve {
     private Mk4ModuleConfiguration swerveConfig;
     private NewtonSwerve swerve;
     private ChassisSpeeds lastSpeeds;
+    private PIDController turnPidController;
 
     public Swerve(Gyro gyro) {
         lastSpeeds = new ChassisSpeeds();
@@ -102,6 +103,7 @@ public class Swerve {
         this.swerve = new NewtonSwerve(config, gyro, m_frontLeftModule, m_frontRightModule, m_backLeftModule,
                 m_backRightModule);
 
+        turnPidController = new PIDController(Constants.SWERVE.TURN_kP, Constants.SWERVE.TURN_kI, Constants.SWERVE.TURN_kD);
     }
 
     public void drive(ChassisSpeeds speeds) {
@@ -155,5 +157,10 @@ public class Swerve {
     
     public void zeroGyroscope() {
         swerve.zeroGyroscope();
+    }
+
+    public double turnToAngle(double angle) {
+        return turnPidController.calculate(swerve.getYaw(), angle);
+
     }
 }

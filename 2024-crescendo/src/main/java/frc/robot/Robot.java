@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.NewtonSwerve.DriveController;
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
 
@@ -310,6 +311,10 @@ public class Robot extends LoggedRobot {
                     driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
         }
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, swerve.getGyroscopeRotation());
+
+        if(driverController.getPOV() != -1){
+            currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, swerve.turnToAngle(driverController.getPOV()));
+        }
 
         if(intaking){
             intake.spinPercentOutput(INTAKE.INTAKE_POWER);

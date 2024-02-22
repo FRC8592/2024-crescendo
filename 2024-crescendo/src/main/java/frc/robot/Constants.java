@@ -205,6 +205,10 @@ public final class Constants {
         public static final double STEER_kI = 0.0;
         public static final double STEER_kD = 0.1;
 
+        public static final double TURN_kP = 0.0;
+        public static final double TURN_kI = 0.0;
+        public static final double TURN_kD = 0.0;
+
         public static final double DRIVE_TRAIN_WIDTH = 0.527; // meters
         public static final double DRIVE_TRAIN_LENGTH = 0.478; // meters 
         public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI;

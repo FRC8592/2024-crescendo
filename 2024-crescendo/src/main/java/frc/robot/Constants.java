@@ -82,6 +82,11 @@ public final class Constants {
 
         public static final int FHYWHEEL_SPEED_ACCEPTABLE_RANGE = 10; // RPM
 
+        public static final int ACCEPTABLE_RANGE = 35;
+        //Lookup table
+        public static final double[][] RANGE_TABLE = {
+            {0,3000}
+        };
         public static final int TOP_SHOOTER_MOTOR_CAN_ID = 29;
         public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 28;
         public static final int FEEDER_MOTOR_CAN_ID = 31;

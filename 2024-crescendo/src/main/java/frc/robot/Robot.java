@@ -119,7 +119,10 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("IntakeKi", INTAKE.TOP_MOTOR_kI);
         SmartDashboard.putNumber("IntakeKd", INTAKE.TOP_MOTOR_kD);
         SmartDashboard.putNumber("IntakeKff",INTAKE.TOP_MOTOR_kFF);
-        // SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
+        SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
+        SmartDashboard.putNumber("Intake Bottom RPM", INTAKE.SPEED_BOTTOM);
+
+        SmartDashboard.putBoolean("hasNote()", false);
 
         SmartDashboard.putBoolean("hasNote()", false);
     }
@@ -407,7 +410,7 @@ public class Robot extends LoggedRobot {
             SmartDashboard.getNumber("IntakeKi",  0),
             SmartDashboard.getNumber("IntakeKd",  0),
             SmartDashboard.getNumber("IntakeKff", 0), 0
-        );
+        );        
 
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
@@ -419,11 +422,18 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
+
+        // re-zero
+        boolean reZero = driverController.getBackButton();
+        if(reZero) {
+            swerve.zeroGyroscope();
+        }
+        
         testDrivetrain();
         testIntake();
         testElevator();
         testShoot();
-    }
+    } 
 
     public void testDrivetrain(){
         
@@ -469,6 +479,7 @@ public class Robot extends LoggedRobot {
         //Intaking and Outaking controls
         boolean outake = operatorController.getRightBumper();
         boolean intaking = operatorController.getLeftTriggerAxis() > 0.1; // TODO: use dedicated deadband function
+        boolean fullPowerIntake = operatorController.getLeftBumper();
 
          // intaking
         if (intaking) {
@@ -481,6 +492,9 @@ public class Robot extends LoggedRobot {
             shooter.setShootVelocity(-2000, -2000);
 
         }
+        // else if (fullPowerIntake) {
+        //     intake.spinPercentOutput(1.0);
+        // }
         else {
             intake.halt();
         }

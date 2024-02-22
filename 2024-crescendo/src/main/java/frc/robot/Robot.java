@@ -152,7 +152,7 @@ public class Robot extends LoggedRobot {
     public void autonomousInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
-        currentAuto.addModules(swerve);
+        currentAuto.addModules(swerve, elevator, intake, shooter, noteLock);
         currentAuto.initialize();
         swerve.resetEncoder();
         swerve.resetPose(currentAuto.getStartPose());
@@ -266,12 +266,15 @@ public class Robot extends LoggedRobot {
     
         //operator controls
         
+        // shooter/feeder functions
         boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
         boolean runFeeder = operatorController.getLeftBumper();
         
+        // intake/outake functions
         boolean outake = operatorController.getRightBumper();
         boolean intaking = operatorController.getLeftTriggerAxis() > 0.1;
         
+        // elevator functions
         boolean stowed = operatorController.getAButtonPressed();
         boolean ampPosition = operatorController.getXButton();
         boolean maxClimbPosition = operatorController.getYButtonPressed();
@@ -305,18 +308,20 @@ public class Robot extends LoggedRobot {
         }
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, swerve.getGyroscopeRotation());
 
-        if(intaking){
+        if(intaking){ //Change to velocity mode when do
             intake.spinPercentOutput(0.75);
             elevator.stow();
             if(!shooter.hasNote()){
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+            }
+            else{
+                shooter.setFeederVelocity(0);
             }
         }
         else if(outake){
             intake.setIntakeVelocity(-2000, -2000);
             shooter.setFeederVelocity(-2000);
             shooter.setShootVelocity(-2000, -2000);
-
         }
     
         else if (shoot) {

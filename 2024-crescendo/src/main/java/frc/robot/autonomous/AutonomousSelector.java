@@ -12,11 +12,14 @@ public class AutonomousSelector {
     private GenericEntry delayEntry;
 
     public Class<?>[] autos = {
-        SixNoteAuto.class,
-        NoteStealAuto.class,
+        //putting all created autos in auto selector
+        
+        OneNoteAuto.class,
         ThreeWingNoteAuto.class,
-        SevenNoteAuto.class,
-        IWillNameThisLaterAuto.class,
+        SixNoteAuto.class,
+        NoteStealAuto.class
+        // SevenNoteAuto.class,
+        // IWillNameThisLaterAuto.class,
     };
 
     public AutonomousSelector() {

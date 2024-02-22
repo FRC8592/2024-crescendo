@@ -13,16 +13,11 @@ public final class Constants {
         public static final double ANGLE_DEGREES_TO_TICKS = 4096/360.0;
         public static final double METERS_TO_FEET = 3.28084;
         public static final double TICKS_TO_ANGLE_DEGREES = 360.0/4096.0;
-        
     }
 
     public final class CONTROLLERS {
         public static final int DRIVER_PORT = 0;
         public static final int OPERATOR_PORT = 1;
-    }
-    
-    public final class CAN {
-        
     }
 
     public final class NOTELOCK {
@@ -48,82 +43,75 @@ public final class Constants {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Intake/";
         public static final int TOP_MOTOR_CAN_ID = 35;
         public static final int BOTTOM_MOTOR_CAN_ID = 34;
-        public static final double TOP_MOTOR_kP = 0.0001;
-        public static final double TOP_MOTOR_kI = 0.000;
-        public static final double TOP_MOTOR_kD = 0.000;
-        public static final double BOTTOM_MOTOR_kP = 0.0001;
-        public static final double BOTTOM_MOTOR_kI = 0.000;
-        public static final double BOTTOM_MOTOR_kD = 0.000;
-        public static final double MINIMUM_ROLLER_SPEED = 0;
-        public static final double ROBOT_SPEED_MULTIPLIER = 100;
-        public static final double SPEED_TOP = 1000;
-        public static final double SPEED_BOTTOM = 1000;
+
+        public static final double TOP_MOTOR_kP = 0.0007;
+        public static final double TOP_MOTOR_kI = 0.00;
+        public static final double TOP_MOTOR_kD = 0.01;
+        public static final double TOP_MOTOR_kFF = 0.000175;
+
+        // public static final double SPEED_TOP = 1000; TODO: Currently in power mode. We should change back to velocity mode before our first regional
+        public static final double INTAKE_POWER = 0.75; //TODO: Delete this once we have velocity mode working
+        public static final int OUTAKE_VELOCITY = -2000;
+
+        // NOTE: only one motor on now
+        // public static final double BOTTOM_MOTOR_kP = 0.0001;
+        // public static final double BOTTOM_MOTOR_kI = 0.000;
+        // public static final double BOTTOM_MOTOR_kD = 0.000;
+
     }
 
     public final class SHOOTER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Shooter/";
+        
+        public static final double FEEDER_MOTOR_kP = 0; //TODO: Tune this; start with 0.00001;
+        public static final double FEEDER_MOTOR_kI = 0.0;
+        public static final double FEEDER_MOTOR_kD = 0.0;
+        public static final double FEEDER_MOTOR_kF = 0.0001;
 
-        public static final int TOP_SHOOTER_MOTOR_CAN_ID = 29;
-        public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 28;
-        public static final int FEEDER_MOTOR_CAN_ID = 31;
-
-
-        //Change right motor to inverted using documentation
-        public static final double TOP_SHOOTER_MOTOR_SPEED = 0.25;
-        public static final double BOTTOM_SHOOTER_MOTOR_SPEED = TOP_SHOOTER_MOTOR_SPEED;
-        public static final int AMP_SHOOTER_SPEED = 3000;
-
-        public static final double TOP_SHOOTER_MOTOR_kP = 0.0000825; //PID
-        public static final double TOP_SHOOTER_MOTOR_kI = 0.0000001; //PID
-        public static final double TOP_SHOOTER_MOTOR_kD = 0.0000001; //PID
-        public static final double TOP_SHOOTER_MOTOR_kF = 0.000149; // feedforward
-
-        public static final double SHOOTER_MOTOR_IZONE = 100; // within 100 rpm
+        public static final double TOP_SHOOTER_MOTOR_kP = 0.0000825;
+        public static final double TOP_SHOOTER_MOTOR_kI = 0.0000001;
+        public static final double TOP_SHOOTER_MOTOR_kD = 0.0000001;
+        public static final double TOP_SHOOTER_MOTOR_kF = 0.000149; // feed-forward
 
         public static final double BOTTOM_SHOOTER_MOTOR_kP = TOP_SHOOTER_MOTOR_kP;
         public static final double BOTTOM_SHOOTER_MOTOR_kI = TOP_SHOOTER_MOTOR_kI;
         public static final double BOTTOM_SHOOTER_MOTOR_kD = TOP_SHOOTER_MOTOR_kD;
         public static final double BOTTOM_SHOOTER_MOTOR_kF = TOP_SHOOTER_MOTOR_kF;
 
-        public static final double FEEDER_MOTOR_kP = 0.0;
-        public static final double FEEDER_MOTOR_kI = 0.0;
-        public static final double FEEDER_MOTOR_kD = 0.0;
-        public static final double FEEDER_MOTOR_kF = 0.0001;
+        public static final double SHOOTER_MOTOR_IZONE = 100; // RPM for the range within which the I term will be effective
 
+        public static final int FHYWHEEL_SPEED_ACCEPTABLE_RANGE = 10; // RPM
 
-        public static final int ACCEPTABLE_RANGE = 10;
+        public static final int ACCEPTABLE_RANGE = 35;
         //Lookup table
         public static final double[][] RANGE_TABLE = {
             {0,3000}
         };
+        public static final int TOP_SHOOTER_MOTOR_CAN_ID = 29;
+        public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 28;
+        public static final int FEEDER_MOTOR_CAN_ID = 31;
+        public static final int NOTE_BEAM_BREAK_DIO_PORT = 0;
 
-        public static final int NOTE_BEAM_BREAK_PORT = 0;
+        public static final int AMP_SHOOTER_SPEED = 3000;
+        public static final int AMP_FEEDER_SPEED = -1; //TODO: Figure out what this should actually be
 
-        public static final double SHOOTING_FEEDER_SPEED = 1500;
-        public static final double INTAKE_FEEDER_SPEED = 4000;
+        public static final int INTAKE_SHOOTER_SPEED = 0;
+        public static final int INTAKE_FEEDER_SPEED = 4000;
 
+        //No shooter speed because we use the range table
+        public static final int SHOOTING_FEEDER_SPEED = 1500;
+
+        public static final int OUTAKE_SHOOTER_VELOCITY = -1; //TODO: Figure out what this should be.
+        public static final double OUTAKE_FEEDER_VELOCITY = -2000;
     }
 
 
     public final class ELEVATOR {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
+
         public static final int EXTENSION_MOTOR_CAN_ID = 37;
-
-        public static final double EXTENSION_METERS_STOWED = 0;
-        public static final double EXTENSION_METERS_AMP = 0.26;
-        public static final double EXTENSION_METERS_CLIMB= 0.26;
-        public static final double EXTENSION_METERS_MAX = 0.26;
-
-        public static final int PIVOT_MOTOR_CAN_ID = 36;    
+        public static final int PIVOT_MOTOR_CAN_ID = 36;
         public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = 38; 
-
-        public static final int PIVOT_ANGLE_AMP = 48; // TODO FIND PIVOT ANGLES (ALL OF THEM)
-        public static final int PIVOT_ANGLE_STOWED = 0;
-        public static final int PIVOT_ANGLE_CLIMB = 55;
-        public static final int PIVOT_ANGLE_MAX = 60;
-
-        public static final double RETRACTED = 0.001; //Meters TODO: Change to new unit once we know the gearing
-        public static final double EXTENSION_ALLOWED_ANGLE = 30; //Degrees
 
         public static final double PIVOT_kP = 0.000001;
         public static final double PIVOT_kI = 0;
@@ -135,12 +123,35 @@ public final class Constants {
         public static final double EXTENSION_kD = 0.0;
         public static final double EXTENSION_kFF = 0.00025;
 
-        public static final double PIVOT_GEAR_RATIO = (12.0/5.0) * 75.0;
+        public static final double EXTENSION_METERS_MAX = 0.26; // TODO: Figure out what this should be
+        public static final int PIVOT_ANGLE_MAX = 60; // TODO: Figure out what this should be
+
+        public static final double EXTENSION_METERS_STOWED = 0;
+        public static final int PIVOT_ANGLE_STOWED = 0;
+
+        public static final double EXTENSION_METERS_AMP = 0.26;
+        public static final int PIVOT_ANGLE_AMP = 48; // TODO: Adjust this angle
+
+        public static final double EXTENSION_METERS_CLIMB = 0.26;
+        public static final int PIVOT_ANGLE_CLIMB = 55; // TODO: Adjust this angle
+
+        public static final double EXTENSION_FULLY_RETRACTED = 0.001; //Meters
+        public static final double EXTENSION_FORCE_RETRACT_THRESHOLD = 30; //Degrees
+
+        public static final double PIVOT_GEAR_RATIO = (12.0 / 5.0) * 75.0; // 12/5 is the radio of the large pulley to small pulley. 75 is from the gearbox.
+
         public static final double DIAMETER_OF_ELEVATOR_SPROCKET = 1.885; //inches
-        public static final double ELEVATOR_GEAR_RATIO = (1/48.0)*(DIAMETER_OF_ELEVATOR_SPROCKET*CONVERSIONS.IN_TO_METERS*Math.PI);
+        public static final double ELEVATOR_GEAR_RATIO =
+                (1 / 48.0) *                                //Multiply by the gearbox ratio,
+                DIAMETER_OF_ELEVATOR_SPROCKET * Math.PI *   //then multiply by πd (same as 2πr) to get circumference in inches,
+                CONVERSIONS.IN_TO_METERS;                   //then convert to meters.
 
         public static final double MAX_PIVOT_ROTATIONS = (PIVOT_ANGLE_MAX*PIVOT_GEAR_RATIO)/360;
-        public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX/ELEVATOR_GEAR_RATIO;    }
+        public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX / ELEVATOR_GEAR_RATIO;
+
+        public static final double MANUAL_EXTENSION_SPEED = 0.001; //TODO: Adjust this
+        public static final double MANUAL_PIVOT_SPEED = 0;
+    }
 
     public final class POWER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Power/";

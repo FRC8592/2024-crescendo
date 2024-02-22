@@ -62,7 +62,7 @@ public class Robot extends LoggedRobot {
     private LimelightTargeting gameObjectVision;
     private double manualExtensionLength = 0;
     private double manualPivotAngle = 0;
-    //private double targetAngle = 0;
+    private boolean intaking;
 
 
     @Override
@@ -85,8 +85,6 @@ public class Robot extends LoggedRobot {
             SmartDashboard.putData(FIELD);
         }
 
-
-        
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
@@ -117,9 +115,16 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("ShooterKd", SHOOTER.BOTTOM_SHOOTER_MOTOR_kD);
         SmartDashboard.putNumber("ShooterKff", SHOOTER.BOTTOM_SHOOTER_MOTOR_kF);
 
+        SmartDashboard.putNumber("IntakeKp", INTAKE.TOP_MOTOR_kP);
+        SmartDashboard.putNumber("IntakeKi", INTAKE.TOP_MOTOR_kI);
+        SmartDashboard.putNumber("IntakeKd", INTAKE.TOP_MOTOR_kD);
+        SmartDashboard.putNumber("IntakeKff",INTAKE.TOP_MOTOR_kFF);
+        SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
+        SmartDashboard.putNumber("Intake Bottom RPM", INTAKE.SPEED_BOTTOM);
+
         SmartDashboard.putBoolean("hasNote()", false);
 
-        elevator.resetEncoders();
+        SmartDashboard.putBoolean("hasNote()", false);
     }
 
     @Override
@@ -170,6 +175,8 @@ public class Robot extends LoggedRobot {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
+
+        intaking = false;
     }
 
     @Override
@@ -263,18 +270,15 @@ public class Robot extends LoggedRobot {
         boolean slowMode = driverController.getRightBumper();
         boolean resetGyro = driverController.getBackButtonPressed();
         // boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
-    
+
         //operator controls
-        
         // shooter/feeder functions
         boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
-        boolean runFeeder = operatorController.getLeftBumper();
-        
-        // intake/outake functions
+        boolean runFeeder = operatorController.getLeftBumper(); // TODO: What is this?
+
         boolean outake = operatorController.getRightBumper();
-        boolean intaking = operatorController.getLeftTriggerAxis() > 0.1;
-        
-        // elevator functions
+        boolean intakeToggle = operatorController.getLeftTriggerAxis() > 0.1;
+
         boolean stowed = operatorController.getAButtonPressed();
         boolean ampPosition = operatorController.getXButton();
         boolean maxClimbPosition = operatorController.getYButtonPressed();
@@ -284,16 +288,16 @@ public class Robot extends LoggedRobot {
         boolean manualPivotUp = operatorController.getPOV() == 90;
         boolean manualPivotDown = operatorController.getPOV() == 270;
 
+        if (intakeToggle) {
+            intaking = !intaking;
+        }
+
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
-        
-        //driver logic
-        
-
-        if( resetGyro){
+        if(resetGyro){
             swerve.zeroGyroscope();
         }
-        
+
         if (slowMode) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
                     driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
@@ -308,10 +312,13 @@ public class Robot extends LoggedRobot {
         }
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, swerve.getGyroscopeRotation());
 
-        if(intaking){ //Change to velocity mode when do
-            intake.spinPercentOutput(0.75);
+        if(intaking){
+            intake.spinPercentOutput(INTAKE.INTAKE_POWER);
             elevator.stow();
-            if(!shooter.hasNote()){
+            if (shooter.hasNote()) {
+                intaking = false;
+            }
+            else {
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
             }
             else{
@@ -319,33 +326,27 @@ public class Robot extends LoggedRobot {
             }
         }
         else if(outake){
-            intake.setIntakeVelocity(-2000, -2000);
-            shooter.setFeederVelocity(-2000);
-            shooter.setShootVelocity(-2000, -2000);
+            intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
+            shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
+            shooter.setShootVelocity(SHOOTER.OUTAKE_SHOOTER_VELOCITY, -SHOOTER.OUTAKE_SHOOTER_VELOCITY);
         }
-    
+
         else if (shoot) {
-            if(ampPosition){
+            if (ampPosition) {
                 shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
+            } else {
+                shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 3500),
+                        (int) SmartDashboard.getNumber("bottomShootSpeed", 3500)); //TODO: Replace these once the range table is done
             }
-            else{
-                shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 3500), 
-                    (int) SmartDashboard.getNumber("bottomShootSpeed", 3500));
-            }
-            if (shooter.isReady()) {// isReady returns whether the shooter angle and
-                // flywheel speeds are within a threshhold of where we asked them to be
+            if (shooter.isReady()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
-                // if (!shooter.hasNote()) {
-                //     shooter.stop();
-                //     shooter.stopFeeders();
-                //     elevator.stow()
-                // }
             }
-        } else if (runFeeder){
-            shooter.setShootVelocity(-2000,-2000);
+        }
+        else if (runFeeder) { // TODO: What is this? Why does it try to drive the feeder motors at -50,000% power?
+            shooter.setShootVelocity(-2000, -2000);
             shooter.setFeederSpeed(-500);
         }
-          
+
         else{
             if (stowed){
                 elevator.stow();
@@ -355,25 +356,24 @@ public class Robot extends LoggedRobot {
             }
             else if (ampPosition){
                 elevator.ampPosition();
-
             }
             else if (maxClimbPosition) {
                 elevator.climbPosition();
             }
             else if (manualRaiseClimber){
-                manualExtensionLength += 0.0001; //meters
+                manualExtensionLength += ELEVATOR.MANUAL_EXTENSION_SPEED; //meters
                 elevator.setExtensionLengthCustom(manualExtensionLength);
             }
             else if (manualLowerClimber){
-                manualExtensionLength -= 0.0001; //meters
+                manualExtensionLength -= ELEVATOR.MANUAL_EXTENSION_SPEED; //meters
                 elevator.setExtensionLengthCustom(manualExtensionLength);
             }
             else if (manualPivotUp){
-                manualPivotAngle += 0.1; //degrees
+                manualPivotAngle += ELEVATOR.MANUAL_PIVOT_SPEED; //degrees
                 elevator.setPivotAngleCustom(manualPivotAngle);
             }
             else if (manualPivotDown){
-                manualPivotAngle -= 0.1; //degrees
+                manualPivotAngle -= ELEVATOR.MANUAL_PIVOT_SPEED; //degrees
                 elevator.setPivotAngleCustom(manualPivotAngle);
             }
             else{
@@ -382,14 +382,6 @@ public class Robot extends LoggedRobot {
                 shooter.stop();
             }
         }
-    
-        
-        
-
-       
-        
-        
-        
         swerve.drive(currentSpeeds);
     }
 
@@ -416,11 +408,17 @@ public class Robot extends LoggedRobot {
             SmartDashboard.getNumber("ShooterKd",  0),
             SmartDashboard.getNumber("ShooterKff", 0), 0
         );
+
+        intake.topMotor.setPIDF(
+            SmartDashboard.getNumber("IntakeKp",  0),
+            SmartDashboard.getNumber("IntakeKi",  0),
+            SmartDashboard.getNumber("IntakeKd",  0),
+            SmartDashboard.getNumber("IntakeKff", 0), 0
+        );        
+
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
-        SmartDashboard.putNumber("Intake Top RPM", INTAKE.SPEED_TOP);
-        SmartDashboard.putNumber("Intake Bottom RPM", INTAKE.SPEED_BOTTOM);
 
         SmartDashboard.putNumber("Measured Intake Top RPM", 0);
         SmartDashboard.putNumber("Measured Intake Bottom RPM", 0);
@@ -428,12 +426,18 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
+
+        // re-zero
+        boolean reZero = driverController.getBackButton();
+        if(reZero) {
+            swerve.zeroGyroscope();
+        }
         
-        // testDrivetrain();
+        testDrivetrain();
         testIntake();
         testElevator();
         testShoot();
-    }
+    } 
 
     public void testDrivetrain(){
         
@@ -479,21 +483,24 @@ public class Robot extends LoggedRobot {
         //Intaking and Outaking controls
         boolean outake = operatorController.getRightBumper();
         boolean intaking = operatorController.getLeftTriggerAxis() > 0.1; // TODO: use dedicated deadband function
+        boolean fullPowerIntake = operatorController.getLeftBumper();
 
          // intaking
         if (intaking) {
             // intake.spinPercentOutput(0.5);
-            intake.setIntakeVelocity(SmartDashboard.getNumber("Intake Bottom RPM", 0), SmartDashboard.getNumber("Intake Top RPM", 0));
+            intake.setIntakeVelocity(SmartDashboard.getNumber("Intake Top RPM", 0));
         }
         else if(outake){
-            intake.setIntakeVelocity(-2000, -2000);
+            intake.setIntakeVelocity(-2000);
             shooter.setFeederVelocity(2000);
             shooter.setShootVelocity(-2000, -2000);
 
         }
+        // else if (fullPowerIntake) {
+        //     intake.spinPercentOutput(1.0);
+        // }
         else {
             intake.halt();
-
         }
 
     }

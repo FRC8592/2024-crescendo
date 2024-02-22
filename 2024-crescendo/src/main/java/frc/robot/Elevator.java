@@ -31,15 +31,15 @@ public class Elevator {
 
         pivotMotor.setInverted();
 
-        pivotMotor.setMaxVelocity(2000, 0);
-        pivotFollowMotor.setMaxVelocity(2000, 0);
+        pivotMotor.setMaxVelocity(5000, 0);
+        pivotFollowMotor.setMaxVelocity(5000, 0);
 
-        extensionMotor.setMaxVelocity(2000, 0);
+        extensionMotor.setMaxVelocity(5000, 0);
 
-        pivotMotor.setMaxAcceleration(2000, 0);
-        pivotFollowMotor.setMaxAcceleration(2000, 0);
+        pivotMotor.setMaxAcceleration(5000, 0);
+        pivotFollowMotor.setMaxAcceleration(5000, 0);
 
-        extensionMotor.setMaxAcceleration(2000, 0);
+        extensionMotor.setMaxAcceleration(5000, 0);
         
         pivotMotor.motorControl.setReference(0,ControlType.kVoltage);
     }
@@ -63,11 +63,11 @@ public class Elevator {
 
         if (pivotUp) {
             setPivot = currentAngle < ELEVATOR.PIVOT_ANGLE_MAX;
-            setExtend = currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE && currentLengthMeters < ELEVATOR.EXTENSION_METERS_MAX;
+            setExtend = currentAngle > ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD && currentLengthMeters < ELEVATOR.EXTENSION_METERS_MAX;
         }
         else if (pivotDown){
             setExtend = currentLengthMeters > 0;
-            setPivot = (currentAngle > ELEVATOR.EXTENSION_ALLOWED_ANGLE || currentLengthMeters < 0.01) && currentAngle>0;
+            setPivot = (currentAngle > ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD || currentLengthMeters < 0.01) && currentAngle>0;
         }
         else {
             setPivot = false;

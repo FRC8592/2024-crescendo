@@ -1,5 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.LED.AnimationType;
+import frc.robot.LED.LEDConfig;
+
 public final class Constants {
     public final class SHARED {
         public static final String LOG_FOLDER = "CustomLogs";
@@ -157,11 +161,19 @@ public final class Constants {
     }
 
     public final class LEDS {
-        public static final int LED_LENGTH = 8;
-        public static final double MINIMUM_VOLTAGE = 9.0;
+        public static final int LED_LENGTH = 29;
         public static final int PULSE_METHOD_SPEED = 5;
         public static final int PULSE_SIZE = 2;
         public static final int PULSE_GAP = 5;
+
+        public static final LED.Color RED_COLOR = new LED.Color(255,0,0);
+        public static final LED.Color GREEN_COLOR = new LED.Color(0,255,0);
+
+        public static final LEDConfig DEFAULT_CONFIG = new LEDConfig()
+        .setType(AnimationType.BLINK)
+        .setColor1(RED_COLOR)
+        .setColor2(GREEN_COLOR)
+        .setFramerate(1);
     }
 
     public final class SWERVE {

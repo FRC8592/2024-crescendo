@@ -2,16 +2,17 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.LEDS;
 
 public class LED {
     private Timer timer;
-    private DotStarManager dsm;
+    public DotStarManager dsm;
     public enum AnimationType {
         BLINK,
         PULSE
     }
 
-    public class LEDConfig {
+    public static class LEDConfig {
         public AnimationType type;
         public Color color1;
         public Color color2;
@@ -47,6 +48,9 @@ public class LED {
     public LED() {
         timer = new Timer();
         timer.start();
+
+        dsm = new DotStarManager(LEDS.LED_LENGTH);
+
     }
 
     public void update(LEDConfig config) {
@@ -133,9 +137,9 @@ public class LED {
         }
     }
 
-    private class DotStarManager { // Class to do low-level SPI data management for the DotStars
+    public class DotStarManager { // Class to do low-level SPI data management for the DotStars
         private Color[] strip;
-        private SPI spi;
+        public SPI spi;
 
         /**
          * Create a manager for a strip of DotStars
@@ -144,6 +148,7 @@ public class LED {
         public DotStarManager(int length) {
             strip = new Color[length];
             spi = new SPI(SPI.Port.kOnboardCS0); //TODO: Check that this port is correct.
+            spi.initAuto(length * 3 + 7); // TODO: remove magic number!!!!!
             clear(); // Sets all elements to be new `Color()`s, so this doubles as a method to instantiate the array elements.
             show();
         }
@@ -152,7 +157,7 @@ public class LED {
          * Sets all LEDs to turn off on the next {@code show()}.
          */
         public void clear() {
-            fill(new Color());
+            fill(new Color(255, 255, 255));
         }
 
         /**
@@ -186,8 +191,11 @@ public class LED {
          * @param c the color to set
          */
         public void fill(Color c) {
+            int i = 0;
             for (Color d : strip) {
                 d = c;
+                strip[i] = c;
+                i++;
             }
         }
 
@@ -204,7 +212,7 @@ public class LED {
         }
     }
 
-    private class Color {
+    public static class Color {
         private int red;
         private int green;
         private int blue;
@@ -249,7 +257,14 @@ public class LED {
         }
 
         public int[] getIntArray() {
-            return new int[] { this.red, this.green, this.blue };
+            // need to bit shift right by 8
+            return new int[] { this.red / 256, this.green / 256, this.blue /256};
         }
     }
+
+    //------- Make the LEDs Work! -------//
+
+    
+    
+
 }

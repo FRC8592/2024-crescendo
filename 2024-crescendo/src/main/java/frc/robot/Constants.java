@@ -80,7 +80,7 @@ public final class Constants {
 
         public static final double SHOOTER_MOTOR_IZONE = 100; // RPM for the range within which the I term will be effective
 
-        public static final int FHYWHEEL_SPEED_ACCEPTABLE_RANGE = 10; // RPM
+        public static final int FHYWHEEL_SPEED_ACCEPTABLE_RANGE = 100; // RPM
 
         public static final int ACCEPTABLE_RANGE = 35;
         //Lookup table
@@ -124,16 +124,16 @@ public final class Constants {
         public static final double EXTENSION_kFF = 0.00025;
 
         public static final double EXTENSION_METERS_MAX = 0.26; // TODO: Figure out what this should be
-        public static final int PIVOT_ANGLE_MAX = 60; // TODO: Figure out what this should be
+        public static final int PIVOT_ANGLE_MAX = 75; // TODO: Figure out what this should be
 
         public static final double EXTENSION_METERS_STOWED = 0;
         public static final int PIVOT_ANGLE_STOWED = 0;
 
-        public static final double EXTENSION_METERS_AMP = 0.26;
+        public static final double EXTENSION_METERS_AMP = 0.27;
         public static final int PIVOT_ANGLE_AMP = 48; // TODO: Adjust this angle
 
-        public static final double EXTENSION_METERS_CLIMB = 0.26;
-        public static final int PIVOT_ANGLE_CLIMB = 55; // TODO: Adjust this angle
+        public static final double EXTENSION_METERS_CLIMB = 0.25;
+        public static final int PIVOT_ANGLE_CLIMB = 75; // TODO: Adjust this angle
 
         public static final double EXTENSION_FULLY_RETRACTED = 0.001; //Meters
         public static final double EXTENSION_FORCE_RETRACT_THRESHOLD = 30; //Degrees
@@ -150,7 +150,7 @@ public final class Constants {
         public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX / ELEVATOR_GEAR_RATIO;
 
         public static final double MANUAL_EXTENSION_SPEED = 0.001; //TODO: Adjust this
-        public static final double MANUAL_PIVOT_SPEED = 0;
+        public static final double MANUAL_PIVOT_SPEED = 0.1;
     }
 
     public final class POWER {
@@ -192,11 +192,6 @@ public final class Constants {
         public static final int WHITE_BACK_RIGHT_STEER_CAN = 16;
         public static final int WHITE_BACK_RIGHT_ENCODER_CAN = 18;
 
-        public static final double FRONT_LEFT_STEER_OFFSET = -Math.toRadians(233.525);
-        public static final double FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(133.77);
-        public static final double BACK_LEFT_STEER_OFFSET = -Math.toRadians(78.75);
-        public static final double BACK_RIGHT_STEER_OFFSET = -Math.toRadians(147.041);
-
         public static final double THROTTLE_kP = 0.02;
         public static final double THROTTLE_kI = 0.0;
         public static final double THROTTLE_kD = 0.01;
@@ -209,15 +204,15 @@ public final class Constants {
         public static final double DRIVE_TRAIN_LENGTH = 0.478; // meters 
         public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI;
 
-        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(145.898); // 354.639
-        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(343.213); // 0
-        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(67.500);    // 69.434
-        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(355.166); // 6.768
+        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(320.098); // 354.639
+        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(161.455); // 0
+        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(243.809);    // 69.434
+        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(178.857); // 6.768
 
         public static final double TRANSLATE_POWER_FAST = 1.0; // Scaling for teleop driving. 1.0 is maximum
         public static final double ROTATE_POWER_FAST = 0.75; // Scaling for teleop driving. 1.0 is maximum
-        public static final double TRANSLATE_POWER_SLOW = 0.15; // Scaling for teleop driving. 1.0 is maximum
-        public static final double ROTATE_POWER_SLOW = 0.15; // Scaling for teleop driving. 1.0 is maximum
+        public static final double TRANSLATE_POWER_SLOW = 0.25; // Scaling for teleop driving. 1.0 is maximum
+        public static final double ROTATE_POWER_SLOW = 0.2; // Scaling for teleop driving. 1.0 is maximum
 
         public static final double MAX_VOLTAGE = 12.0;
         public static final double TELEOP_CURRENT_LIMIT = 15.0; 

@@ -66,7 +66,7 @@ public class Elevator {
             setExtend = currentAngle > ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD && currentLengthMeters < ELEVATOR.EXTENSION_METERS_MAX;
         }
         else if (pivotDown){
-            setExtend = currentLengthMeters > 0;
+            setExtend = currentLengthMeters > 0 && currentLengthMeters < ELEVATOR.EXTENSION_METERS_MAX;
             setPivot = (currentAngle > ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD || currentLengthMeters < 0.01) && currentAngle>0;
         }
         else {
@@ -183,6 +183,8 @@ public class Elevator {
 
     public void setExtensionLengthCustom(double position){
         setLengthMeters = position;
+        pivotUp = false;
+        pivotDown = true;
     }
 
     /**

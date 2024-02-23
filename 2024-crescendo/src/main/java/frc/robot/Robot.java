@@ -63,6 +63,7 @@ public class Robot extends LoggedRobot {
     private double manualExtensionLength = 0;
     private double manualPivotAngle = 0;
     private boolean intaking;
+    private boolean intakeToggleLastFrame = false;
 
 
     @Override
@@ -110,10 +111,10 @@ public class Robot extends LoggedRobot {
 
         SmartDashboard.putNumber("PIVOT CUSTOM ANGLE", 45);
 
-        SmartDashboard.putNumber("ShooterKp", SHOOTER.BOTTOM_SHOOTER_MOTOR_kP);
-        SmartDashboard.putNumber("ShooterKi", SHOOTER.BOTTOM_SHOOTER_MOTOR_kI);
-        SmartDashboard.putNumber("ShooterKd", SHOOTER.BOTTOM_SHOOTER_MOTOR_kD);
-        SmartDashboard.putNumber("ShooterKff", SHOOTER.BOTTOM_SHOOTER_MOTOR_kF);
+        SmartDashboard.putNumber("FeederKp", SHOOTER.FEEDER_MOTOR_kP);
+        SmartDashboard.putNumber("FeederKi", SHOOTER.FEEDER_MOTOR_kI);
+        SmartDashboard.putNumber("FeederKd", SHOOTER.FEEDER_MOTOR_kD);
+        SmartDashboard.putNumber("FeederKff", SHOOTER.FEEDER_MOTOR_kF);
 
         SmartDashboard.putNumber("IntakeKp", INTAKE.TOP_MOTOR_kP);
         SmartDashboard.putNumber("IntakeKi", INTAKE.TOP_MOTOR_kI);
@@ -175,6 +176,11 @@ public class Robot extends LoggedRobot {
         swerve.setTeleopCurrentLimit();
 
         intaking = false;
+
+        // shooter.feederMotor.setPIDF(SmartDashboard.getNumber("FeederKp", 0),
+        // SmartDashboard.getNumber("FeederKp", 0),
+        // SmartDashboard.getNumber("FeederKp", 0),
+        // SmartDashboard.getNumber("FeederKp", 0), 0);
     }
 
     @Override
@@ -264,7 +270,7 @@ public class Robot extends LoggedRobot {
         //Basic driving controls
         double driveTranslateY = driverController.getLeftY();
         double driveTranslateX = driverController.getLeftX();
-        double driveRotate = driverController.getRightX();
+        double driveRotate = -driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
         boolean resetGyro = driverController.getBackButtonPressed();
         // boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
@@ -275,7 +281,8 @@ public class Robot extends LoggedRobot {
         boolean runFeeder = operatorController.getLeftBumper(); // TODO: What is this?
 
         boolean outake = operatorController.getRightBumper();
-        boolean intakeToggle = operatorController.getLeftTriggerAxis() > 0.1;
+        boolean intakeToggle = operatorController.getLeftTriggerAxis() > 0.1 && !intakeToggleLastFrame;
+        intakeToggleLastFrame = operatorController.getLeftTriggerAxis() > 0.1;
 
         boolean stowed = operatorController.getAButtonPressed();
         boolean ampPosition = operatorController.getXButton();
@@ -315,7 +322,6 @@ public class Robot extends LoggedRobot {
             elevator.stow();
             if (shooter.hasNote()) {
                 intaking = false;
-                shooter.setFeederSpeed(0);
             }
             else {
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
@@ -332,7 +338,7 @@ public class Robot extends LoggedRobot {
                 shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
             } else {
                 RangeTable.RangeEntry entry = RangeTable.get(0);
-                shooter.setShootVelocity(entry.flywheelSpeed,entry.flywheelSpeed); //TODO: Replace these once the range table is done
+                shooter.setShootVelocity(entry.flywheelSpeed,entry.flywheelSpeed);
                 elevator.setPivotAngleCustom(entry.pivotAngle);
             }
             if (shooter.isReady()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
@@ -347,6 +353,7 @@ public class Robot extends LoggedRobot {
         else{
             if (stowed){
                 elevator.stow();
+                manualExtensionLength = 0;
             }
             else if (prime){
                 elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 5));
@@ -356,6 +363,7 @@ public class Robot extends LoggedRobot {
             }
             else if (maxClimbPosition) {
                 elevator.climbPosition();
+                manualExtensionLength = ELEVATOR.EXTENSION_METERS_CLIMB;
             }
             else if (manualRaiseClimber){
                 manualExtensionLength += ELEVATOR.MANUAL_EXTENSION_SPEED; //meters

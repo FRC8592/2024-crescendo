@@ -45,7 +45,7 @@ public class SwerveTrajectory {
         mTurnPID.setTolerance(0.1, 0.1);
         mTurnPID.enableContinuousInput(-Math.PI, Math.PI); // Might need to change to degrees
 
-        turnPID = new PIDController(0.002, 0, 0); // NOTE: this is used
+        turnPID = new PIDController(0.001, 0, 0); // NOTE: this is used        
         turnPID.setTolerance(0.01);
         // turnPID.enableContinuousInput(-Math.PI/2, Math.PI/2);
 

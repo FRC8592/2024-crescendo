@@ -33,6 +33,7 @@ public class IntakeCommand extends Command {
     @Override
     public void shutdown() {
       intake.halt();
+      shooter.stopFeeders();
     }
     
 }

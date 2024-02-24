@@ -131,6 +131,9 @@ public final class Constants {
         public static final double EXTENSION_METERS_MAX = 0.26; // TODO: Figure out what this should be
         public static final int PIVOT_ANGLE_MAX = 75; // TODO: Figure out what this should be
 
+        public static final double EXTENSION_METERS_MIN = 0;
+        public static final int PIVOT_ANGLE_MIN = 0;
+
         public static final double EXTENSION_METERS_STOWED = 0;
         public static final int PIVOT_ANGLE_STOWED = 0;
 
@@ -154,8 +157,10 @@ public final class Constants {
         public static final double MAX_PIVOT_ROTATIONS = (PIVOT_ANGLE_MAX*PIVOT_GEAR_RATIO)/360;
         public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX / ELEVATOR_GEAR_RATIO;
 
-        public static final double MANUAL_EXTENSION_SPEED = 0.001; //TODO: Adjust this
+        public static final double MANUAL_EXTENSION_SPEED = 0.005; //TODO: Adjust this
         public static final double MANUAL_PIVOT_SPEED = 0.1;
+
+        public static final double RETRACT_THRESHOLD_TOLERANCE = 2;
     }
 
     public final class POWER {

@@ -97,12 +97,15 @@ public class Robot extends LoggedRobot {
         shooter.setMotorsIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         poseGetter = new PoseVision(APRILTAG_VISION.kP,APRILTAG_VISION.kI,APRILTAG_VISION.kD,0);
         intake = new Intake();
-        //noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
-        //        NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
+        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
+               0,0,0);
         elevator = new Elevator();
         smoothingFilter = new SmoothingFilter(1, 1, 1);
 
         elevator.resetEncoders();
+
+        drivePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
+        turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
 
         SmartDashboard.putNumber("topShootSpeed", 4500);
         SmartDashboard.putNumber("bottomShootSpeed", 4500);
@@ -276,6 +279,7 @@ public class Robot extends LoggedRobot {
         double driveRotate = -driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
         boolean resetGyro = driverController.getBackButtonPressed();
+        boolean autoCollect = driverController.getLeftBumper();
         // boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
 
         //operator controls
@@ -328,6 +332,9 @@ public class Robot extends LoggedRobot {
             }
             else {
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+                if(autoCollect){
+                    currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
+                }
             }
         }
         else if(outake){

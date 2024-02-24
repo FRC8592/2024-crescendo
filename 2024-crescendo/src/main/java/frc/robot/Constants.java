@@ -126,6 +126,9 @@ public final class Constants {
         public static final double EXTENSION_METERS_MAX = 0.26; // TODO: Figure out what this should be
         public static final int PIVOT_ANGLE_MAX = 75; // TODO: Figure out what this should be
 
+        public static final double EXTENSION_METERS_MIN = 0;
+        public static final int PIVOT_ANGLE_MIN = 0;
+
         public static final double EXTENSION_METERS_STOWED = 0;
         public static final int PIVOT_ANGLE_STOWED = 0;
 

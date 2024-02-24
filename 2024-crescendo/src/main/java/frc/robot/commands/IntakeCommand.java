@@ -10,7 +10,6 @@ import frc.robot.Constants.SHOOTER;
 public class IntakeCommand extends Command {
     private Intake intake;
     private Shooter shooter;
-    private Timer timer = new Timer();
     public IntakeCommand(Intake intake, Shooter shooter){
         this.intake = intake;
         this.shooter = shooter;
@@ -19,7 +18,7 @@ public class IntakeCommand extends Command {
 
     @Override
     public void initialize() {
-        timer.reset();
+        this.timeoutTimer.start();
     }
 
     @Override
@@ -27,12 +26,8 @@ public class IntakeCommand extends Command {
        //spins intake and feeder until beam sensor stops
         intake.spinPercentOutput(INTAKE.INTAKE_POWER);
         shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-        timer.start();
-        if (Robot.isReal()) {
-            return shooter.hasNote();
-        } else {
-            return timer.get() > 0.25;
-        }
+        timeoutTimer.start();
+        return shooter.hasNote() || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds);
     }
 
     @Override

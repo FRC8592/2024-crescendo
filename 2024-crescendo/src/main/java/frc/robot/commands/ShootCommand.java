@@ -22,6 +22,7 @@ public class ShootCommand extends Command{
     @Override
     public void initialize() {
         timer.reset();
+        timeoutTimer.start();
     }
 
     @Override
@@ -38,8 +39,8 @@ public class ShootCommand extends Command{
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
             }
         }
-        
-        return timer.get() > 1.5;
+
+        return timer.get() > 1.5 || (timeoutSeconds != -1 && timeoutTimer.get() >= timeoutSeconds);
     }
 
     @Override

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -60,8 +61,6 @@ public class Robot extends LoggedRobot {
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
     private LimelightTargeting gameObjectVision;
-    private double manualExtensionLength = 0;
-    private double manualPivotAngle = 0;
     private boolean intaking;
     private boolean intakeToggleLastFrame = false;
 
@@ -97,8 +96,7 @@ public class Robot extends LoggedRobot {
         shooter.setMotorsIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         poseGetter = new PoseVision(APRILTAG_VISION.kP,APRILTAG_VISION.kI,APRILTAG_VISION.kD,0);
         intake = new Intake();
-        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
-               0,0,0);
+        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,0,0,0);
         elevator = new Elevator();
         smoothingFilter = new SmoothingFilter(1, 1, 1);
 
@@ -285,7 +283,7 @@ public class Robot extends LoggedRobot {
         //operator controls
         // shooter/feeder functions
         boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
-        boolean runFeeder = operatorController.getLeftBumper(); // TODO: What is this?
+        boolean shootFromPodium = operatorController.getLeftBumper(); 
 
         boolean outake = operatorController.getRightBumper();
         boolean intakeToggle = operatorController.getLeftTriggerAxis() > 0.1 && !intakeToggleLastFrame;
@@ -362,15 +360,23 @@ public class Robot extends LoggedRobot {
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
             }
         }
-        // else if (runFeeder) { // TODO: What is this? Why does it try to drive the feeder motors at -50,000% power?
-        //     shooter.setShootVelocity(-2000, -2000);
-        //     shooter.setFeederSpeed(-500);
-        // }
+
+        else if (shootFromPodium) { 
+            if (ampPosition) {
+                shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
+            } else {
+                RangeTable.RangeEntry entry = RangeTable.get(0);
+                shooter.setShootVelocity(entry.flywheelSpeed,entry.flywheelSpeed); 
+                elevator.setPivotAngleCustom(entry.pivotAngle);
+            }
+            if (shooter.isReady()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
+                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
+            }
+        }
 
         else{
             if (stowed){
                 elevator.stow();
-                manualExtensionLength = 0;
             }
             else if (prime){
                 elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 5));
@@ -380,23 +386,18 @@ public class Robot extends LoggedRobot {
             }
             else if (maxClimbPosition) {
                 elevator.climbPosition();
-                manualExtensionLength = ELEVATOR.EXTENSION_METERS_CLIMB;
             }
             else if (manualRaiseClimber){
-                manualExtensionLength += ELEVATOR.MANUAL_EXTENSION_SPEED; //meters
-                elevator.setExtensionLengthCustom(manualExtensionLength);
+                elevator.extend();
             }
             else if (manualLowerClimber){
-                manualExtensionLength -= ELEVATOR.MANUAL_EXTENSION_SPEED; //meters
-                elevator.setExtensionLengthCustom(manualExtensionLength);
+                elevator.retract();
             }
             else if (manualPivotUp){
-                manualPivotAngle += ELEVATOR.MANUAL_PIVOT_SPEED; //degrees
-                elevator.setPivotAngleCustom(manualPivotAngle);
+                elevator.lift();
             }
             else if (manualPivotDown){
-                manualPivotAngle -= ELEVATOR.MANUAL_PIVOT_SPEED; //degrees
-                elevator.setPivotAngleCustom(manualPivotAngle);
+                elevator.lower();
             }
             else{
                 intake.halt();
@@ -436,7 +437,7 @@ public class Robot extends LoggedRobot {
             SmartDashboard.getNumber("IntakeKi",  0),
             SmartDashboard.getNumber("IntakeKd",  0),
             SmartDashboard.getNumber("IntakeKff", 0), 0
-        );        
+        );
 
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
@@ -448,17 +449,8 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
-
-        // re-zero
-        boolean reZero = driverController.getBackButton();
-        if(reZero) {
-            swerve.zeroGyroscope();
-        }
-        
-        testDrivetrain();
-        testIntake();
-        testElevator();
-        testShoot();
+        driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis() * 255);
+        operatorController.setRumble(RumbleType.kBothRumble, operatorController.getLeftTriggerAxis() * 255);
     } 
 
     public void testDrivetrain(){
@@ -552,49 +544,49 @@ public class Robot extends LoggedRobot {
         }
     }
 
-    public void testElevator(){
+    // public void testElevator(){
         
-        //elevator controls
-        boolean stowed = operatorController.getAButtonPressed();
-        boolean ampPosition = operatorController.getXButtonPressed();
-        boolean maxClimbPosition = operatorController.getYButtonPressed();
-        boolean prime = operatorController.getBButtonPressed();
-        boolean manualRaiseClimber = operatorController.getPOV() == 0;
-        boolean manualLowerClimber = operatorController.getPOV() == 180;
-        boolean manualPivotUp = operatorController.getPOV() == 90;
-        boolean manualPivotDown = operatorController.getPOV() == 270;
+    //     //elevator controls
+    //     boolean stowed = operatorController.getAButtonPressed();
+    //     boolean ampPosition = operatorController.getXButtonPressed();
+    //     boolean maxClimbPosition = operatorController.getYButtonPressed();
+    //     boolean prime = operatorController.getBButtonPressed();
+    //     boolean manualRaiseClimber = operatorController.getPOV() == 0;
+    //     boolean manualLowerClimber = operatorController.getPOV() == 180;
+    //     boolean manualPivotUp = operatorController.getPOV() == 90;
+    //     boolean manualPivotDown = operatorController.getPOV() == 270;
        
 
-        if (stowed){
-            elevator.stow();
-        }
-        else if (prime){
-            elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 0));
-        }
-        else if (ampPosition){
-            elevator.ampPosition();
-        }
-        else if (maxClimbPosition) {
-            elevator.climbPosition();
-        }
-        else if (manualRaiseClimber){
-            manualExtensionLength += 0.0001; //meters
-            elevator.setExtensionLengthCustom(manualExtensionLength);
-        }
-        else if (manualLowerClimber){
-            manualExtensionLength -= 0.0001; //meters
-            elevator.setExtensionLengthCustom(manualExtensionLength);
-        }
-        else if (manualPivotUp){
-            manualPivotAngle += 0.1; //degrees
-            elevator.setPivotAngleCustom(manualPivotAngle);
-        }
-        else if (manualPivotDown){
-            manualPivotAngle -= 0.1; //degrees
-            elevator.setPivotAngleCustom(manualPivotAngle);
-        }
+    //     if (stowed){
+    //         elevator.stow();
+    //     }
+    //     else if (prime){
+    //         elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 0));
+    //     }
+    //     else if (ampPosition){
+    //         elevator.ampPosition();
+    //     }
+    //     else if (maxClimbPosition) {
+    //         elevator.climbPosition();
+    //     }
+    //     else if (manualRaiseClimber){
+    //         manualExtensionLength += 0.0001; //meters
+    //         elevator.setExtensionLengthCustom(manualExtensionLength);
+    //     }
+    //     else if (manualLowerClimber){
+    //         manualExtensionLength -= 0.0001; //meters
+    //         elevator.setExtensionLengthCustom(manualExtensionLength);
+    //     }
+    //     else if (manualPivotUp){
+    //         manualPivotAngle += 0.1; //degrees
+    //         elevator.setPivotAngleCustom(manualPivotAngle);
+    //     }
+    //     else if (manualPivotDown){
+    //         manualPivotAngle -= 0.1; //degrees
+    //         elevator.setPivotAngleCustom(manualPivotAngle);
+    //     }
         
-        }
+        // }
 
     @Override
     public void simulationInit() {

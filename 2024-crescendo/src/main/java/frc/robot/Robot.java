@@ -332,11 +332,18 @@ public class Robot extends LoggedRobot {
             }
             else {
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-                if(autoCollect){
-                    currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
-                }
             }
         }
+
+        else if(autoCollect){
+            if (!shooter.hasNote()) {
+                currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
+                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+                intake.spinPercentOutput(INTAKE.INTAKE_POWER);
+                elevator.stow();
+            }
+        }
+
         else if(outake){
             intake.spinPercentOutput(INTAKE.OUTAKE_POWER);
             shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);

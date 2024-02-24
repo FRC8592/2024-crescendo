@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Swerve;
+import frc.robot.Constants.NOTELOCK;
 import frc.robot.Robot;
 import frc.robot.SmoothingFilter;
 import frc.robot.LimelightTargeting;
@@ -65,7 +66,7 @@ public class FollowerCommand extends Command {
         this.drive = drive;
         this.targeting = targeting;
         trajectory = pTraj;
-        visionPID = new PIDController(0.05, 0.0, 0.0);
+        visionPID = new PIDController(NOTELOCK.TURN_kP, NOTELOCK.TURN_kI, NOTELOCK.TURN_kD);
         timer = new Timer();
         targetPose = null;
     }
@@ -82,7 +83,7 @@ public class FollowerCommand extends Command {
         this.trajectory = pTraj;
         this.targetPose = pTargetPose;
         this.targeting = targeting;
-        this.visionPID = new PIDController(0.04, 0.0, 0.0);
+        this.visionPID = new PIDController(NOTELOCK.TURN_kP, NOTELOCK.TURN_kI, NOTELOCK.TURN_kD);
         // this.omegaSmoothing = new SmoothingFilter(1, 1, 1); // x, y, omega
         this.timer = new Timer();
     }

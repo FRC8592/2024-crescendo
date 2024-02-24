@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Intake;
 import frc.robot.Robot;
 import frc.robot.Shooter;
+import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.SHOOTER;
 
 public class IntakeCommand extends Command {
     private Intake intake;
@@ -16,15 +18,16 @@ public class IntakeCommand extends Command {
 
     @Override
     public void initialize() {
-        this.timer.start();
+        this.timeoutTimer.start();
     }
 
     @Override
     public boolean execute() {
        //spins intake and feeder until beam sensor stops
-        intake.spinPercentOutput(0.75);
-        shooter.setFeederVelocity(4000);
-        return shooter.hasNote() || (this.timeoutSeconds != -1 && this.timer.get() >= this.timeoutSeconds);
+        intake.spinPercentOutput(INTAKE.INTAKE_POWER);
+        shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+        timeoutTimer.start();
+        return shooter.hasNote() || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds);
     }
 
     @Override

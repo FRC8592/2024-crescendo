@@ -95,8 +95,7 @@ public class Robot extends LoggedRobot {
         shooter.setMotorsIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         poseGetter = new PoseVision(APRILTAG_VISION.kP,APRILTAG_VISION.kI,APRILTAG_VISION.kD,0);
         intake = new Intake();
-        //noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,
-        //        NOTELOCK.kP, NOTELOCK.kI, NOTELOCK.kD);
+        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,0,0,0);
         elevator = new Elevator();
         smoothingFilter = new SmoothingFilter(1, 1, 1);
 
@@ -135,6 +134,7 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterSpeedDifference (Bottom - Top)", shooter.bottomShooterMotor.getVelocity()-shooter.topShooterMotor.getVelocity());
 
+        Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.hasNote());
         SmartDashboard.putBoolean("hasNote()", shooter.hasNote());
 
         //SmartDashboard.putNumber("target angle", targetAngle);
@@ -160,6 +160,8 @@ public class Robot extends LoggedRobot {
         swerve.resetPose(currentAuto.getStartPose());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setAutoCurrentLimit();
+        swerve.zeroGyroscope();
+        swerve.drive(new ChassisSpeeds());
     }
 
     @Override
@@ -266,8 +268,8 @@ public class Robot extends LoggedRobot {
          * 
          */
         //Basic driving controls
-        double driveTranslateY = driverController.getLeftY();
-        double driveTranslateX = driverController.getLeftX();
+        double driveTranslateY = -driverController.getLeftY();
+        double driveTranslateX = -driverController.getLeftX();
         double driveRotate = -driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
         boolean resetGyro = driverController.getBackButtonPressed();

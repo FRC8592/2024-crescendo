@@ -31,15 +31,15 @@ public class Shooter {
     int toptargetSpeed = 0;
     int bottomTargetSpeed = 0;
 
-    boolean hasNote; 
+    public boolean hasNote; 
 
     /**
      * Shooter object constructor
      */
     public Shooter() {
-        topShooterMotor = new SparkFlexControl(SHOOTER.TOP_SHOOTER_MOTOR_CAN_ID, true);
+        topShooterMotor = new SparkFlexControl(SHOOTER.TOP_SHOOTER_MOTOR_CAN_ID, false);
         topShooterMotor.setInverted();
-        bottomShooterMotor = new SparkFlexControl(SHOOTER.BOTTOM_SHOOTER_MOTOR_CAN_ID, true);
+        bottomShooterMotor = new SparkFlexControl(SHOOTER.BOTTOM_SHOOTER_MOTOR_CAN_ID, false);
         feederMotor = new SparkFlexControl(SHOOTER.FEEDER_MOTOR_CAN_ID, false); 
 
         // table = NetworkTableInstance.getDefault().getTable(shooterTableName);

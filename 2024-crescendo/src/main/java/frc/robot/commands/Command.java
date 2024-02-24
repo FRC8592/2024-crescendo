@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 public abstract class Command {
     protected String tag = "DEFAULT COMMAND";
-    protected Timer timer = new Timer();
+    protected Timer timeoutTimer = new Timer();
     protected double timeoutSeconds = -1;
 
     /**

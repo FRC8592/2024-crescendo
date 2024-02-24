@@ -279,7 +279,7 @@ public class Robot extends LoggedRobot {
         //operator controls
         // shooter/feeder functions
         boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
-        boolean runFeeder = operatorController.getLeftBumper(); // TODO: What is this?
+        boolean shootFromPodium = operatorController.getLeftBumper(); 
 
         boolean outake = operatorController.getRightBumper();
         boolean intakeToggle = operatorController.getLeftTriggerAxis() > 0.1 && !intakeToggleLastFrame;
@@ -346,10 +346,19 @@ public class Robot extends LoggedRobot {
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
             }
         }
-        // else if (runFeeder) { // TODO: What is this? Why does it try to drive the feeder motors at -50,000% power?
-        //     shooter.setShootVelocity(-2000, -2000);
-        //     shooter.setFeederSpeed(-500);
-        // }
+
+        else if (shootFromPodium) { 
+            if (ampPosition) {
+                shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
+            } else {
+                RangeTable.RangeEntry entry = RangeTable.get(0);
+                shooter.setShootVelocity(entry.flywheelSpeed,entry.flywheelSpeed); 
+                elevator.setPivotAngleCustom(entry.pivotAngle);
+            }
+            if (shooter.isReady()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
+                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
+            }
+        }
 
         else{
             if (stowed){

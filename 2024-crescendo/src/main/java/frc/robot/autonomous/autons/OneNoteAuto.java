@@ -4,8 +4,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
-import frc.robot.commands.CommandQueue;
-import frc.robot.commands.ShootCommand;
+import frc.robot.commands.*;
 
 public class OneNoteAuto extends BaseAuto{
 
@@ -15,8 +14,11 @@ public class OneNoteAuto extends BaseAuto{
     @Override
     public void initialize() {
        queue = new CommandQueue(
-            new ShootCommand(shooter, elevator, 3000, 5)
-
+            new ShootCommand(shooter, elevator, 3000, 5),
+            new JointCommand(
+                new AutoCollectCommand(targeting, drive, shooter),
+                new IntakeCommand(intake, shooter).setTimeout(2)
+            )
        );
     }
 

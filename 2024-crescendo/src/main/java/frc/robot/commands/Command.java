@@ -1,9 +1,12 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.Timer;
 
 public abstract class Command {
     protected String tag = "DEFAULT COMMAND";
+    protected Timer timer = new Timer();
+    protected double timeoutSeconds = -1;
 
     /**
      * Setup the command; called directly before the command is run
@@ -29,6 +32,16 @@ public abstract class Command {
      */
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    /**
+     * Set the timeout for the command
+     * @param timeout in seconds
+     * @return this
+     */
+    public Command setTimeout(double timeout) {
+        this.timeoutSeconds = timeout;
+        return this;
     }
 
     /**

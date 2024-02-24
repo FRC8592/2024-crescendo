@@ -321,11 +321,11 @@ public class Robot extends LoggedRobot {
                     driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
         }
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, swerve.getGyroscopeRotation());
-
+        noteLock.updateVision();
         if(intaking){
             intake.spinPercentOutput(INTAKE.INTAKE_POWER);
             elevator.stow();
-            if (shooter.hasNote()) {
+            if (shooter.hasNote()) {  
                 intaking = false;
             }
             else {
@@ -348,7 +348,7 @@ public class Robot extends LoggedRobot {
             shooter.setShootVelocity(SHOOTER.OUTAKE_SHOOTER_VELOCITY, -SHOOTER.OUTAKE_SHOOTER_VELOCITY);
         }
 
-        else if (shoot) {
+        else if (shoot) { // TODO: Create shoot method to shoot from any distance 
             if (ampPosition) {
                 shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
             } else {
@@ -362,14 +362,10 @@ public class Robot extends LoggedRobot {
         }
 
         else if (shootFromPodium) { 
-            if (ampPosition) {
-                shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
-            } else {
-                RangeTable.RangeEntry entry = RangeTable.get(0);
-                shooter.setShootVelocity(entry.flywheelSpeed,entry.flywheelSpeed); 
-                elevator.setPivotAngleCustom(entry.pivotAngle);
-            }
-            if (shooter.isReady()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
+            RangeTable.RangeEntry entry = RangeTable.get(0);
+            shooter.setShootVelocity(3500,3500); 
+            elevator.setPivotAngleCustom(29);
+            if (shooter.isReady() && elevator.isTargetAngle()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
             }
         }

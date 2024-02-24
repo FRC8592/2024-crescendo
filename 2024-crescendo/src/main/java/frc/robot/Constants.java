@@ -29,7 +29,7 @@ public final class Constants {
         public static final double DRIVE_TO_TARGET_ANGLE = -24;
         
         // Turn-to PID constants for the drive-to-note function
-        public static final double DRIVE_TO_TURN_kP = 0.1;
+        public static final double DRIVE_TO_TURN_kP = 0.075;
         public static final double DRIVE_TO_TURN_kI = 0;
         public static final double DRIVE_TO_TURN_kD = 0;
 
@@ -153,7 +153,6 @@ public final class Constants {
                 (1 / 48.0) *                                //Multiply by the gearbox ratio,
                 DIAMETER_OF_ELEVATOR_SPROCKET * Math.PI *   //then multiply by πd (same as 2πr) to get circumference in inches,
                 CONVERSIONS.IN_TO_METERS;                   //then convert to meters.
-
         public static final double MAX_PIVOT_ROTATIONS = (PIVOT_ANGLE_MAX*PIVOT_GEAR_RATIO)/360;
         public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX / ELEVATOR_GEAR_RATIO;
 
@@ -161,6 +160,8 @@ public final class Constants {
         public static final double MANUAL_PIVOT_SPEED = 0.1;
 
         public static final double RETRACT_THRESHOLD_TOLERANCE = 2;
+
+        public static final double ANGLE_TOLERANCE = 0.5;
     }
 
     public final class POWER {

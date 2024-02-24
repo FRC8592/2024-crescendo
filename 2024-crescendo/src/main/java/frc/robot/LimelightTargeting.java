@@ -238,11 +238,13 @@ public class LimelightTargeting {
 
     
     public ChassisSpeeds driveToTarget(PIDController turnPID, PIDController drivePID, double targetAngle) {
-        double rotateSpeed = -this.turnRobot(0, turnPID, "tx", SWERVE.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
-        double driveToSpeed = this.turnRobot(0, drivePID, "ty", 4.5, targetAngle);
+        double rotateSpeed = this.turnRobot(0, turnPID, "tx", SWERVE.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
+        double driveToSpeed = -this.turnRobot(0, drivePID, "ty", 4.5, targetAngle);
         SmartDashboard.putNumber("Drive-to velocity", driveToSpeed);
         Logger.recordOutput(NOTELOCK.LOG_PATH+"Drive-to Velocity", driveToSpeed);
+        Logger.recordOutput(NOTELOCK.LOG_PATH+"RotateSpeed", rotateSpeed);
         return new ChassisSpeeds(driveToSpeed, 0, rotateSpeed);
+        
     }
 
     /**

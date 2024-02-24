@@ -38,7 +38,7 @@ public class Elevator {
         pivotMotor.setMaxAcceleration(5000, 0);
         pivotFollowMotor.setMaxAcceleration(5000, 0);
 
-        extensionMotor.setMaxAcceleration(5000, 0);
+        extensionMotor.setMaxAcceleration(10000, 0);
         
         pivotMotor.motorControl.setReference(0,ControlType.kVoltage);
     }
@@ -60,18 +60,21 @@ public class Elevator {
         // If we're close to the threshold pivot angle (30°) and the extension isn't
         // fully retracted, keep the pivot at a safe height but allow the extension to
         // do whatever it wants.
-        if (actualPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD){
+        if (actualPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD - ELEVATOR.RETRACT_THRESHOLD_TOLERANCE){
             targetExtension = actualExtension;
         }
 
         // If we're below "close to the threshold," and still extended, stop the
         // extension and bring the pivot back up.
-        if (actualExtension > 0 && targetPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD) {
+        if (actualExtension > ELEVATOR.EXTENSION_FULLY_RETRACTED && targetPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD) {
             targetPivot = ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD;
         }
 
-        extensionMotor.setPositionSmartMotion(targetExtension);
-        pivotMotor.setPositionSmartMotion(targetPivot);
+        double rotations = targetExtension / ELEVATOR.ELEVATOR_GEAR_RATIO;
+        extensionMotor.setPositionSmartMotion(rotations);
+        double pivotRotations = (ELEVATOR.PIVOT_GEAR_RATIO * targetPivot) / 360;
+        pivotMotor.setPositionSmartMotion(pivotRotations);
+        pivotFollowMotor.setPositionSmartMotion(pivotRotations);
     }
 
     //-------ELEVATOR CODE-------//
@@ -82,15 +85,6 @@ public class Elevator {
      */
     public void percentOutputExtension(double speed){
         extensionMotor.setPercentOutput(speed);
-    }
-
-    /** 
-     * sets the position in rotations
-     * @param position
-    */
-    private void setExtensionLength(double meters){ 
-        double rotations = meters/ELEVATOR.ELEVATOR_GEAR_RATIO;
-        extensionMotor.setPositionSmartMotion(rotations);
     }
 
     public void setExtensionLengthCustom(double position){
@@ -114,16 +108,6 @@ public class Elevator {
     public void percentOutputPivot(double speed){
         pivotMotor.setPercentOutput(speed);
         pivotFollowMotor.setPercentOutput(speed);
-    }
-    
-    /**
-     * sets angle of pivot to base of robot
-     * @param angle units: degrees
-     */
-    private void setPivotAngle(double angle) {
-        double rotations = (ELEVATOR.PIVOT_GEAR_RATIO * angle)/360;
-        pivotMotor.setPositionSmartMotion(rotations);
-        pivotFollowMotor.setPositionSmartMotion(rotations);
     }
 
     public void setPivotAngleCustom(double angle) {

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -413,7 +414,7 @@ public class Robot extends LoggedRobot {
             SmartDashboard.getNumber("IntakeKi",  0),
             SmartDashboard.getNumber("IntakeKd",  0),
             SmartDashboard.getNumber("IntakeKff", 0), 0
-        );        
+        );
 
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
@@ -425,17 +426,8 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
-
-        // re-zero
-        boolean reZero = driverController.getBackButton();
-        if(reZero) {
-            swerve.zeroGyroscope();
-        }
-        
-        testDrivetrain();
-        testIntake();
-        // testElevator();
-        testShoot();
+        driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis() * 255);
+        operatorController.setRumble(RumbleType.kBothRumble, operatorController.getLeftTriggerAxis() * 255);
     } 
 
     public void testDrivetrain(){

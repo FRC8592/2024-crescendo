@@ -37,6 +37,11 @@ public final class Constants {
         public static final double DRIVE_TO_DRIVE_kP = 0.13;
         public static final double DRIVE_TO_DRIVE_kI = 0;
         public static final double DRIVE_TO_DRIVE_kD = 0;
+
+        //Turn PID constants (NOT drive-to)
+        public static final double TURN_kP = 0.03;
+        public static final double TURN_kI = 0;
+        public static final double TURN_kD = 0;
     }
 
     public final class INTAKE {

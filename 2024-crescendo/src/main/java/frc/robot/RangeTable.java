@@ -4,6 +4,7 @@ package frc.robot;
 public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
             new RangeEntry(3000, 5), //TODO: Fill this out with real data
+            new RangeEntry(3500, 25)
     };
     public static boolean valid;
 

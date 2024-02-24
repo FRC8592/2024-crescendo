@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Elevator;
 import frc.robot.Shooter;
+import frc.robot.Constants.*;
 
 public class ShootCommand extends Command{
     private Shooter shooter;
@@ -28,9 +29,14 @@ public class ShootCommand extends Command{
         elevator.setPivotAngleCustom(elevatorPivotAngle);
         shooter.setShootVelocity(shootVelocity, shootVelocity);
 
-        if(shooter.isReady()){
-            shooter.setFeederVelocity(2000);
+        if(shooter.isReady() && Math.abs(elevator.getPivotAngle() - elevatorPivotAngle) <= 0.5){
             timer.start();
+            if(timer.get()>0.05){
+                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
+            }
+            else{
+                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
+            }
         }
         
         return timer.get() > 1.5;

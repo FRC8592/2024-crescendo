@@ -137,6 +137,7 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterSpeedDifference (Bottom - Top)", shooter.bottomShooterMotor.getVelocity()-shooter.topShooterMotor.getVelocity());
 
+        Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.hasNote());
         SmartDashboard.putBoolean("hasNote()", shooter.hasNote());
 
         //SmartDashboard.putNumber("target angle", targetAngle);
@@ -162,6 +163,8 @@ public class Robot extends LoggedRobot {
         swerve.resetPose(currentAuto.getStartPose());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setAutoCurrentLimit();
+        swerve.zeroGyroscope();
+        swerve.drive(new ChassisSpeeds());
     }
 
     @Override
@@ -268,8 +271,8 @@ public class Robot extends LoggedRobot {
          * 
          */
         //Basic driving controls
-        double driveTranslateY = driverController.getLeftY();
-        double driveTranslateX = driverController.getLeftX();
+        double driveTranslateY = -driverController.getLeftY();
+        double driveTranslateX = -driverController.getLeftX();
         double driveRotate = -driverController.getRightX();
         boolean slowMode = driverController.getRightBumper();
         boolean resetGyro = driverController.getBackButtonPressed();

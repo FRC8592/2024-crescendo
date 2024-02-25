@@ -138,8 +138,8 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterSpeedDifference (Bottom - Top)", shooter.bottomShooterMotor.getVelocity()-shooter.topShooterMotor.getVelocity());
 
-        Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.hasNote());
-        SmartDashboard.putBoolean("hasNote()", shooter.hasNote());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.hasNote);
+        SmartDashboard.putBoolean("hasNote()", shooter.hasNote);
 
         //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();
@@ -278,7 +278,7 @@ public class Robot extends LoggedRobot {
         boolean slowMode = driverController.getRightBumper();
         boolean resetGyro = driverController.getBackButtonPressed();
         boolean autoCollect = driverController.getLeftBumper();
-        // boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
+        boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
 
         //operator controls
         // shooter/feeder functions
@@ -320,12 +320,13 @@ public class Robot extends LoggedRobot {
                     driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
                     driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
         }
-        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, swerve.getGyroscopeRotation());
+        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented?new Rotation2d():swerve.getGyroscopeRotation());
         noteLock.updateVision();
+
         if(intaking){
             intake.spinPercentOutput(INTAKE.INTAKE_POWER);
             elevator.stow();
-            if (shooter.hasNote()) {  
+            if (shooter.hasNote()) {
                 intaking = false;
             }
             else {
@@ -351,6 +352,9 @@ public class Robot extends LoggedRobot {
         else if (shoot) { // TODO: Create shoot method to shoot from any distance 
             if (ampPosition) {
                 shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
+                // shooter.setShootVelocity(SHOOTER.AMP_SHOOTER_SPEED, SHOOTER.AMP_SHOOTER_SPEED);
+                // shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_SPEED);
+                // shooter.hasNote = false;
             } else {
                 RangeTable.RangeEntry entry = RangeTable.get(0);
                 shooter.setShootVelocity(entry.flywheelSpeed,entry.flywheelSpeed);
@@ -363,8 +367,8 @@ public class Robot extends LoggedRobot {
 
         else if (shootFromPodium) { 
             RangeTable.RangeEntry entry = RangeTable.get(0);
-            shooter.setShootVelocity(3500,3500); 
-            elevator.setPivotAngleCustom(29);
+            shooter.setShootVelocity(4500,4500); 
+            elevator.setPivotAngleCustom(29.5);
             if (shooter.isReady() && elevator.isTargetAngle()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
             }

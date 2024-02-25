@@ -14,11 +14,13 @@ public class AutonomousSelector {
     public Class<?>[] autos = {
         //putting all created autos in auto selector
         
-        OneNoteAuto.class,
+        TwoNoteVisionAuto.class,
         ThreeWingNoteAuto.class,
         SixNoteAuto.class,
-        NoteStealAuto.class
-        // SevenNoteAuto.class,
+        NoteStealAuto.class,
+        TwoNoteAuto.class,
+            RedThreeWingNoteVisionAuto.class,
+        ThreeWingNoteVisionAuto.class
         // IWillNameThisLaterAuto.class,
     };
 

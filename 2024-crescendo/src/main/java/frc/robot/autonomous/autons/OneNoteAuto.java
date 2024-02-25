@@ -22,12 +22,7 @@ public class OneNoteAuto extends BaseAuto{
     public void initialize() {
        queue = new CommandQueue(
         new ShootCommand(shooter, elevator, 3000, 5).setTimeout(1.5),
-          new FollowerCommand(drive, pathOne),
-          new JointCommand(
-            new IntakeCommand(intake, shooter),
-            new AutoCollectCommand(targeting, drive, shooter)
-          ),
-          new ShootCommand(shooter, elevator, 3500, 25)
+          new FollowerCommand(drive, pathOne)
        );
     }
 

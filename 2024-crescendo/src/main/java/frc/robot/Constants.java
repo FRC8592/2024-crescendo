@@ -26,7 +26,7 @@ public final class Constants {
         public static final double LOCK_ERROR = -1; // TODO: Not set yet
         public static final double CLOSE_ERROR = -1; // TODO: Not set yet
         public static final double CAMERA_HEIGHT = -1; // TODO: Not set yet
-        public static final double DRIVE_TO_TARGET_ANGLE = -24;
+        public static final double DRIVE_TO_TARGET_ANGLE = -20;
         
         // Turn-to PID constants for the drive-to-note function
         public static final double DRIVE_TO_TURN_kP = 0.075;
@@ -97,8 +97,8 @@ public final class Constants {
         public static final int FEEDER_MOTOR_CAN_ID = 31;
         public static final int NOTE_BEAM_BREAK_DIO_PORT = 0;
 
-        public static final int AMP_SHOOTER_SPEED = 3000;
-        public static final int AMP_FEEDER_SPEED = -1; //TODO: Figure out what this should actually be
+        public static final int AMP_SHOOTER_SPEED = -1000;
+        public static final int AMP_FEEDER_SPEED = -2000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_SHOOTER_SPEED = 0;
         public static final int INTAKE_FEEDER_SPEED = 4000;

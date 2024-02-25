@@ -8,17 +8,15 @@ import frc.robot.Constants.*;
 public class AutoCollectCommand extends Command {
     LimelightTargeting targeting;
     Swerve drive;
-    Shooter shooter;
     /**
      * MUST BE RUN WITH AN INTAKE COMMAND
      * @param targeting Limelight used to target the note
      * @param drive Drivetrain object to move
      * @param shooter Shooter object to detect whether we have a note
      */
-    public AutoCollectCommand(LimelightTargeting targeting, Swerve drive, Shooter shooter) {
+    public AutoCollectCommand(LimelightTargeting targeting, Swerve drive) {
         this.targeting = targeting;
         this.drive = drive;
-        this.shooter = shooter;
     }
 
     @Override

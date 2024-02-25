@@ -30,7 +30,7 @@ public class ShootCommand extends Command{
         elevator.setPivotAngleCustom(elevatorPivotAngle);
         shooter.setShootVelocity(shootVelocity, shootVelocity);
 
-        if(shooter.isReady() && Math.abs(elevator.getPivotAngle() - elevatorPivotAngle) <= 0.5){
+        if(shooter.isReady() && elevator.isTargetAngle()){
             timer.start();
             if(timer.get()>0.05){
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);

@@ -47,21 +47,21 @@ public class RedThreeWingNoteVisionAuto extends BaseAuto {
                 // First wing note
                 new FollowerCommand(drive, noteOne),
                 new JointCommand(
-                        new AutoCollectCommand(targeting, drive),
+                        new AutoCollectCommand(targeting, drive, shooter),
                         new IntakeCommand(intake, shooter)),
                 new FollowerCommand(drive, shootOne),
                 new ShootCommand(shooter, elevator, 4500, 29.5),
 
                 new FollowerCommand(drive, noteTwo), // Turn towards the second note
                 new JointCommand(
-                        new AutoCollectCommand(targeting, drive),
+                        new AutoCollectCommand(targeting, drive, shooter),
                         new IntakeCommand(intake, shooter)),
                 new FollowerCommand(drive, shootTwo),
                 new ShootCommand(shooter, elevator, 4500, 29.5),
 
                 new FollowerCommand(drive, noteThree),
                 new JointCommand(
-                        new AutoCollectCommand(targeting, drive),
+                        new AutoCollectCommand(targeting, drive, shooter),
                         new IntakeCommand(intake,shooter)),
                 new FollowerCommand(drive, shootThree),
                 new ShootCommand(shooter, elevator, 4500, 29.5) // shooting third note

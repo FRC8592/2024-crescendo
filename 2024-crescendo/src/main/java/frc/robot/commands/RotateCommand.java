@@ -10,7 +10,7 @@ public class RotateCommand extends Command {
     private Swerve drive;
     private Rotation2d target;
     public RotateCommand(Swerve drive, Rotation2d target) {
-        turnPID = new PIDController(0.001, 0, 0);
+        turnPID = new PIDController(0.05, 0, 0);
         this.drive = drive;
         this.target = target;
     }
@@ -21,7 +21,7 @@ public class RotateCommand extends Command {
     @Override
     public boolean execute() {
         drive.drive(new ChassisSpeeds(0, 0,
-                turnPID.calculate(drive.getGyroscopeRotation().getDegrees(), target.getDegrees())));
+                turnPID.calculate(drive.getGyroscopeRotation().getDegrees(), -target.getDegrees())));
         return Math.abs(drive.getGyroscopeRotation().getDegrees() - target.getDegrees()) < 3;
     }
     @Override

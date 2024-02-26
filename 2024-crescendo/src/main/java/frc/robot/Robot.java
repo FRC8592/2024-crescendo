@@ -323,6 +323,7 @@ public class Robot extends LoggedRobot {
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented?new Rotation2d():swerve.getGyroscopeRotation());
         noteLock.updateVision();
 
+                               
         if(intaking){
             intake.spinPercentOutput(INTAKE.INTAKE_POWER);
             elevator.stow();

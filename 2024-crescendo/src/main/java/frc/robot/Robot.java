@@ -104,27 +104,6 @@ public class Robot extends LoggedRobot {
 
         drivePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
-
-        SmartDashboard.putNumber("topShootSpeed", 4500);
-        SmartDashboard.putNumber("bottomShootSpeed", 4500);
-        SmartDashboard.putNumber("feederSpeedRPM", -500);
-        SmartDashboard.putNumber("feederSpeedShootRPM", -1000);
-
-        SmartDashboard.putNumber("PIVOT CUSTOM ANGLE", 45);
-
-        SmartDashboard.putNumber("FeederKp", SHOOTER.FEEDER_MOTOR_kP);
-        SmartDashboard.putNumber("FeederKi", SHOOTER.FEEDER_MOTOR_kI);
-        SmartDashboard.putNumber("FeederKd", SHOOTER.FEEDER_MOTOR_kD);
-        SmartDashboard.putNumber("FeederKff", SHOOTER.FEEDER_MOTOR_kF);
-
-        SmartDashboard.putNumber("IntakeKp", INTAKE.TOP_MOTOR_kP);
-        SmartDashboard.putNumber("IntakeKi", INTAKE.TOP_MOTOR_kI);
-        SmartDashboard.putNumber("IntakeKd", INTAKE.TOP_MOTOR_kD);
-        SmartDashboard.putNumber("IntakeKff",INTAKE.TOP_MOTOR_kFF);
-
-        SmartDashboard.putBoolean("hasNote()", false);
-
-        SmartDashboard.putBoolean("hasNote()", false);
     }
 
     @Override
@@ -139,19 +118,7 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterSpeedDifference (Bottom - Top)", shooter.bottomShooterMotor.getVelocity()-shooter.topShooterMotor.getVelocity());
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.hasNote);
-        SmartDashboard.putBoolean("hasNote()", shooter.hasNote);
-
-        //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();
-
-        
-        SmartDashboard.putNumber("elevator position in meters", elevator.getExtensionLength());
-        SmartDashboard.putNumber("elevator position in rotations", elevator.getExtensionLength()/ELEVATOR.ELEVATOR_GEAR_RATIO);
-
-        SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
-        //SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS*CONVERSIONS.PIVOT_GEAR_RATIO);
-        SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*ELEVATOR.PIVOT_GEAR_RATIO)/360);
-        
     }
 
     @Override
@@ -418,176 +385,13 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void testInit() {
-        shooter.bottomShooterMotor.setPIDF(
-            SmartDashboard.getNumber("ShooterKp",  0),
-            SmartDashboard.getNumber("ShooterKi",  0),
-            SmartDashboard.getNumber("ShooterKd",  0),
-            SmartDashboard.getNumber("ShooterKff", 0), 0
-        );
-
-        shooter.topShooterMotor.setPIDF(
-            SmartDashboard.getNumber("ShooterKp",  0),
-            SmartDashboard.getNumber("ShooterKi",  0),
-            SmartDashboard.getNumber("ShooterKd",  0),
-            SmartDashboard.getNumber("ShooterKff", 0), 0
-        );
-
-        intake.topMotor.setPIDF(
-            SmartDashboard.getNumber("IntakeKp",  0),
-            SmartDashboard.getNumber("IntakeKi",  0),
-            SmartDashboard.getNumber("IntakeKd",  0),
-            SmartDashboard.getNumber("IntakeKff", 0), 0
-        );
-
-        // shooter.setAlliance(DriverStation.getAlliance().get());
-        swerve.setSteerAnglesToAbsEncoder();
-        swerve.setTeleopCurrentLimit();
-
-        SmartDashboard.putNumber("Measured Intake Top RPM", 0);
-        SmartDashboard.putNumber("Measured Intake Bottom RPM", 0);
-    }
+    public void testInit() {}
 
     @Override
     public void testPeriodic() {
         driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis() * 255);
         operatorController.setRumble(RumbleType.kBothRumble, operatorController.getLeftTriggerAxis() * 255);
     } 
-
-    public void testDrivetrain(){
-        
-        //driver controls
-        double driveTranslateY = -driverController.getLeftY();
-        double driveTranslateX = -driverController.getLeftX();
-        double driveRotate = driverController.getRightX();
-        boolean slowMode = driverController.getRightBumper();
-        boolean resetGyro = driverController.getBackButtonPressed();
-        boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
-        // boolean driveToNote = driverController.getLeftTriggerAxis() >0.1;
-
-        // Resets the gyroscope to 0 once b button is pressed
-        if(resetGyro){
-            swerve.zeroGyroscope();
-        }
-
-        //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
-        ChassisSpeeds currentSpeeds;
-        if (slowMode) { //Slow Mode slows down the robot for better precision & control
-            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    new ChassisSpeeds(
-                            driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
-                    !robotOriented?swerve.getGyroscopeRotation():new Rotation2d());
-        }
-        else {
-            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    new ChassisSpeeds(
-                            driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
-                    !robotOriented?swerve.getGyroscopeRotation():new Rotation2d());
-        }
-        currentSpeeds = smoothingFilter.smooth(currentSpeeds);
-        swerve.drive(currentSpeeds);
-
-    }
-
-    public void testIntake(){
-        
-        //Intaking and Outaking controls
-        boolean outake = operatorController.getRightBumper();
-        boolean intaking = operatorController.getLeftTriggerAxis() > 0.1; // TODO: use dedicated deadband function
-        boolean fullPowerIntake = operatorController.getLeftBumper();
-
-         // intaking
-        if (intaking) {
-            // intake.spinPercentOutput(0.5);
-            intake.setIntakeVelocity(SmartDashboard.getNumber("Intake Top RPM", 0));
-        }
-        else if(outake){
-            intake.setIntakeVelocity(-2000);
-            shooter.setFeederVelocity(2000);
-            shooter.setShootVelocity(-2000, -2000);
-
-        }
-        // else if (fullPowerIntake) {
-        //     intake.spinPercentOutput(1.0);
-        // }
-        else {
-            intake.halt();
-        }
-
-    }
-
-    public void testShoot(){
-        boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
-        boolean runFeeder = operatorController.getLeftBumper();
-
-         if (shoot) {
-            shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 0), 
-                    (int) SmartDashboard.getNumber("bottomShootSpeed", 0));
-            if (shooter.isReady()) {// isReady returns whether the shooter angle and
-                // flywheel speeds are within a threshhold of where we asked them to be
-                shooter.setFeederVelocity(SmartDashboard.getNumber("feederSpeedShootRPM", 0)); // runs the feeder wheels
-                // if (!shooter.hasNote()) {
-                //     shooter.stop();
-                //     shooter.stopFeeders();
-                //     elevator.stow()
-                // }
-            }
-        } else if (runFeeder){
-            shooter.setFeederVelocity(SmartDashboard.getNumber("feederSpeedRPM", 0));
-        }
-        else {
-            shooter.setShootVelocity(0, 0);
-            shooter.setFeederSpeed(0);
-        }
-    }
-
-    // public void testElevator(){
-        
-    //     //elevator controls
-    //     boolean stowed = operatorController.getAButtonPressed();
-    //     boolean ampPosition = operatorController.getXButtonPressed();
-    //     boolean maxClimbPosition = operatorController.getYButtonPressed();
-    //     boolean prime = operatorController.getBButtonPressed();
-    //     boolean manualRaiseClimber = operatorController.getPOV() == 0;
-    //     boolean manualLowerClimber = operatorController.getPOV() == 180;
-    //     boolean manualPivotUp = operatorController.getPOV() == 90;
-    //     boolean manualPivotDown = operatorController.getPOV() == 270;
-       
-
-    //     if (stowed){
-    //         elevator.stow();
-    //     }
-    //     else if (prime){
-    //         elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 0));
-    //     }
-    //     else if (ampPosition){
-    //         elevator.ampPosition();
-    //     }
-    //     else if (maxClimbPosition) {
-    //         elevator.climbPosition();
-    //     }
-    //     else if (manualRaiseClimber){
-    //         manualExtensionLength += 0.0001; //meters
-    //         elevator.setExtensionLengthCustom(manualExtensionLength);
-    //     }
-    //     else if (manualLowerClimber){
-    //         manualExtensionLength -= 0.0001; //meters
-    //         elevator.setExtensionLengthCustom(manualExtensionLength);
-    //     }
-    //     else if (manualPivotUp){
-    //         manualPivotAngle += 0.1; //degrees
-    //         elevator.setPivotAngleCustom(manualPivotAngle);
-    //     }
-    //     else if (manualPivotDown){
-    //         manualPivotAngle -= 0.1; //degrees
-    //         elevator.setPivotAngleCustom(manualPivotAngle);
-    //     }
-        
-        // }
 
     @Override
     public void simulationInit() {

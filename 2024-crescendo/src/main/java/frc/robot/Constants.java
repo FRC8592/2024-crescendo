@@ -106,8 +106,11 @@ public final class Constants {
         //No shooter speed because we use the range table
         public static final int SHOOTING_FEEDER_SPEED = 1500;
 
-        public static final int OUTAKE_SHOOTER_VELOCITY = -1; //TODO: Figure out what this should be.
+        public static final int OUTAKE_SHOOTER_VELOCITY = -500; //TODO: Figure out what this should be.
         public static final double OUTAKE_FEEDER_VELOCITY = -2000;
+
+        public static final double SHOOT_SCORE_TIME = 0.5;
+        public static final double AMP_SCORE_TIME = 1;
     }
 
 

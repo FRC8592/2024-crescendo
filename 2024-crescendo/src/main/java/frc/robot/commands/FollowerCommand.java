@@ -17,12 +17,14 @@ import frc.robot.SmoothingFilter;
 import frc.robot.LimelightTargeting;
 import frc.robot.autonomous.SwerveTrajectory;
 import frc.robot.SmoothingFilter;
+import frc.robot.PoseVision;
 
 public class FollowerCommand extends Command {
     private Swerve drive;
     private SwerveTrajectory trajectory;
     private Timer timer;
     private LimelightTargeting targeting;
+    private PoseVision vision;
     private PIDController visionPID;
     // private Rotation2d endRotation;
     private Pose2d targetPose;
@@ -88,6 +90,15 @@ public class FollowerCommand extends Command {
         this.timer = new Timer();
     }
 
+    public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Pose2d pTargetPose, PoseVision vision) {
+        this.drive = pDrive;
+        this.trajectory = pTraj;
+        this.targetPose = pTargetPose;
+        this.vision = vision;
+        // this.omegaSmoothing = new SmoothingFilter(1, 1, 1); // x, y, omega
+        this.timer = new Timer();
+    }
+
     // public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Rotation2d
     // pRot, boolean lockWheels) {
     // drive = pDrive;
@@ -125,7 +136,7 @@ public class FollowerCommand extends Command {
         ChassisSpeeds newSpeeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond,
                 speeds.omegaRadiansPerSecond);
         Pose2d idealPose = new Pose2d();
-        if (targeting != null) { // if we have vision
+        if (targeting != null) { // if we have vision from the limelight
             targeting.updateVision();
             double omegaVision;
             if (targeting.isTargetValid()) { // target in view
@@ -188,6 +199,22 @@ public class FollowerCommand extends Command {
                     speeds.vyMetersPerSecond,
                     omegaVision);
             // newSpeeds = omegaSmoothing.smooth(newSpeeds);
+        }
+        else if (vision != null) { // we have OAK vision
+            double omegaVision;
+            if (vision.getTagInView()) { // target in view
+                // TODO: figure out how to know which apriltag to look for
+                omegaVision = -vision.visual_servo(5, 2.0, 4, 0.0);
+                System.out.println("AprilTag Found: omega = " + omegaVision + " tx = " + vision.getTagTx() + " ID = " + vision.getCurrTagID());
+
+                Logger.recordOutput("CustomLogs/Autonomous/OAKVisionRotationTarget", omegaVision);
+                Logger.recordOutput("CustomLogs/Autonomous/OAKVisionOffset", vision.getTagTx());
+
+                newSpeeds = new ChassisSpeeds(
+                        speeds.vxMetersPerSecond,
+                        speeds.vyMetersPerSecond,
+                        omegaVision);
+            }
         }
         Logger.recordOutput("CustomLogs/Autonomous/ActualPose", drive.getCurrentPos()); // Log where the robot actually
                                                                                         // is. This is still

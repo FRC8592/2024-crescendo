@@ -62,9 +62,19 @@ public class PoseVision {
     }
 
     /**
+     * Return "tx" equivalent from limelight
+     * @return tx calculated from Oak-D data
+     */
+    public double getTagTx() {
+        // atan2(z, x) - yaw  
+        // verify math is correct
+        return Math.atan2(getCurrTagZ(), getCurrTagX()) - getCurrTagYaw();
+    }
+
+    /**
      * Assume we have a tag in view. 
      * 
-     * @param servoTarget 1 for x, 2 for y, 3 for z, 4 for yaw, see {@code VISUAL_SERVO_TARGETS}
+     * @param servoTarget 1 for x, 2 for y, 3 for z, 4 for yaw, 5 for tx, see {@code VISUAL_SERVO_TARGETS}
      * @return Variable of interest (e.g. v_x, v_y, omega, ...)
      */
     public double visual_servo(int servoTarget, double limit, int tag_id, double defaultValue) {
@@ -86,6 +96,9 @@ public class PoseVision {
         }
         else if (servoTarget == 3) {
             curr_value = getCurrTagYaw();
+        }
+        else if (servoTarget == 4) {
+            curr_value = getTagTx();
         }
         else {
             return 0.0; // TODO: better edge case behaviour

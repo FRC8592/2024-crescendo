@@ -20,7 +20,8 @@ public class AutonomousSelector {
         NoteStealAuto.class,
         TwoNoteAuto.class,
             RedThreeWingNoteVisionAuto.class,
-        ThreeWingNoteVisionAuto.class
+            ThreeWingNoteVisionAuto.class,
+        OneNoteAuto.class
         // IWillNameThisLaterAuto.class,
     };
 

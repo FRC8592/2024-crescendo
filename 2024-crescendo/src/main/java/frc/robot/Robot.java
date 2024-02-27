@@ -61,9 +61,25 @@ public class Robot extends LoggedRobot {
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
     private LimelightTargeting gameObjectVision;
-    private boolean intaking;
-    private boolean intakeToggleLastFrame = false;
+    private MainSubsystemsManager subsystemsManager;
+    private boolean intakeButtonLastFrame = false;
 
+    BooleanManager slowMode = new BooleanManager(false);
+    BooleanManager resetGyro = new BooleanManager(false);
+    BooleanManager autoCollect = new BooleanManager(false);
+    BooleanManager robotOriented = new BooleanManager(false);
+
+    // operator controls
+    BooleanManager score = new BooleanManager(false);
+    BooleanManager shootFromPodium = new BooleanManager(false);
+    BooleanManager outake = new BooleanManager(false);
+    BooleanManager intaking = new BooleanManager(false);
+    BooleanManager stow = new BooleanManager(false);
+    BooleanManager amp = new BooleanManager(false);
+    BooleanManager climb = new BooleanManager(false);
+    BooleanManager prime = new BooleanManager(false);
+    BooleanManager manualRaiseClimber = new BooleanManager(false);
+    BooleanManager manualLowerClimber = new BooleanManager(false);
 
     @Override
     public void robotInit() {
@@ -104,6 +120,8 @@ public class Robot extends LoggedRobot {
 
         drivePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
+        
+        subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator);
     }
 
     @Override
@@ -145,8 +163,6 @@ public class Robot extends LoggedRobot {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
-
-        intaking = false;
 
         // shooter.feederMotor.setPIDF(SmartDashboard.getNumber("FeederKp", 0),
         // SmartDashboard.getNumber("FeederKp", 0),
@@ -241,41 +257,34 @@ public class Robot extends LoggedRobot {
         //Basic driving controls
         double driveTranslateY = -driverController.getLeftY();
         double driveTranslateX = -driverController.getLeftX();
-        double driveRotate = -driverController.getRightX();
-        boolean slowMode = driverController.getRightBumper();
-        boolean resetGyro = driverController.getBackButtonPressed();
-        boolean autoCollect = driverController.getLeftBumper();
-        boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
+        double driveRotate =     -driverController.getRightX();
+        slowMode.update          (driverController.getRightBumper());
+        resetGyro.update         (driverController.getBackButton());
+        autoCollect.update       (driverController.getLeftBumper());
+        robotOriented.update     (driverController.getRightTriggerAxis() >0.1);
 
         //operator controls
         // shooter/feeder functions
-        boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
-        boolean shootFromPodium = operatorController.getLeftBumper(); 
+        score.update             (operatorController.getRightTriggerAxis() > 0.1);
+        shootFromPodium.update   (operatorController.getLeftBumper()); 
 
-        boolean outake = operatorController.getRightBumper();
-        boolean intakeToggle = operatorController.getLeftTriggerAxis() > 0.1 && !intakeToggleLastFrame;
-        intakeToggleLastFrame = operatorController.getLeftTriggerAxis() > 0.1;
+        outake.update            (operatorController.getRightBumper());
+        intaking.update          (operatorController.getLeftTriggerAxis()>0.1);
 
-        boolean stowed = operatorController.getAButtonPressed();
-        boolean ampPosition = operatorController.getXButton();
-        boolean maxClimbPosition = operatorController.getYButtonPressed();
-        boolean prime = operatorController.getBButtonPressed();
-        boolean manualRaiseClimber = operatorController.getPOV() == 0;
-        boolean manualLowerClimber = operatorController.getPOV() == 180;
-        boolean manualPivotUp = operatorController.getPOV() == 90;
-        boolean manualPivotDown = operatorController.getPOV() == 270;
-
-        if (intakeToggle) {
-            intaking = !intaking;
-        }
+        stow.update              (operatorController.getAButton());
+        amp.update               (operatorController.getXButton());
+        climb.update             (operatorController.getYButton());
+        prime.update             (operatorController.getBButton());
+        manualRaiseClimber.update(operatorController.getPOV() == 0);
+        manualLowerClimber.update(operatorController.getPOV() == 180);
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
-        if(resetGyro){
+        if(resetGyro.getValue()){
             swerve.zeroGyroscope();
         }
 
-        if (slowMode) { //Slow Mode slows down the robot for better precision & control
+        if (slowMode.getValue()) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
                     driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
                     driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
@@ -287,93 +296,60 @@ public class Robot extends LoggedRobot {
                     driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
                     driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
         }
-        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented?new Rotation2d():swerve.getGyroscopeRotation());
+        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented.getValue()?new Rotation2d():swerve.getGyroscopeRotation());
         noteLock.updateVision();
 
-                               
-        if(intaking){
-            intake.spinPercentOutput(INTAKE.INTAKE_POWER);
-            elevator.stow();
-            if (shooter.hasNote()) {
-                intaking = false;
-            }
-            else {
-                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-            }
-        }
-
-        else if(autoCollect){
+        if (autoCollect.getValue()) { // Different from the others because it interacts with both the drivetrain and the main subsystems manager subsystems
             if (!shooter.hasNote()) {
                 currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
-                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-                intake.spinPercentOutput(INTAKE.INTAKE_POWER);
-                elevator.stow();
+                if (autoCollect.isRisingEdge()) {
+                    subsystemsManager.intake(true);
+                }
             }
         }
-
-        else if(outake){
-            intake.spinPercentOutput(INTAKE.OUTAKE_POWER);
-            shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
-            shooter.setShootVelocity(SHOOTER.OUTAKE_SHOOTER_VELOCITY, -SHOOTER.OUTAKE_SHOOTER_VELOCITY);
+        else if (autoCollect.isFallingEdge()) {
+            subsystemsManager.intake(false);
         }
-
-        else if (shoot) { // TODO: Create shoot method to shoot from any distance 
-            if (ampPosition) {
-                shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
-                // shooter.setShootVelocity(SHOOTER.AMP_SHOOTER_SPEED, SHOOTER.AMP_SHOOTER_SPEED);
-                // shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_SPEED);
-                // shooter.hasNote = false;
-            } else {
-                RangeTable.RangeEntry entry = RangeTable.get(0);
-                shooter.setShootVelocity(entry.flywheelSpeed,entry.flywheelSpeed);
-                elevator.setPivotAngleCustom(entry.pivotAngle);
-            }
-            if (shooter.isReady()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
-                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
-            }
+        else if (intaking.isRisingEdge()) {
+            subsystemsManager.intake(true);
         }
-
-        else if (shootFromPodium) { 
-            RangeTable.RangeEntry entry = RangeTable.get(0);
-            shooter.setShootVelocity(4500,4500); 
-            elevator.setPivotAngleCustom(29.5);
-            if (shooter.isReady() && elevator.isTargetAngle()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
-                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
-            }
+        else if (intaking.isFallingEdge()) {
+            subsystemsManager.intake(false);
         }
-
-        else{
-            if (stowed){
-                elevator.stow();
-            }
-            else if (prime){
-                elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 5));
-            }
-            else if (ampPosition){
-                elevator.ampPosition();
-            }
-            else if (maxClimbPosition) {
-                elevator.climbPosition();
-            }
-            else if (manualRaiseClimber){
-                elevator.extend();
-            }
-            else if (manualLowerClimber){
-                elevator.retract();
-            }
-            else if (manualPivotUp){
-                elevator.lift();
-            }
-            else if (manualPivotDown){
-                elevator.lower();
-            }
-            else{
-                intake.halt();
-                shooter.stopFeeders();
-                shooter.stop();
-            }
+        else if (amp.isToggleRisingEdge()) {
+            subsystemsManager.amp(true);
         }
-        swerve.drive(currentSpeeds);
+        else if (amp.isToggleFallingEdge()) {
+            subsystemsManager.amp(false);
+        }
+        else if (stow.isRisingEdge()) {
+            subsystemsManager.home();
+        }
+        //Maybe add something here to trigger `subsystemsManager.forceHome()`
+        else if (climb.isToggleRisingEdge()) {
+            subsystemsManager.climb(true);
+        }
+        else if (climb.isToggleFallingEdge()) {
+            subsystemsManager.climb(false);
+        }
+        //TODO: Figure out what to do with prime
+        else if (manualRaiseClimber.isRisingEdge()) {
+            subsystemsManager.climbExtend(true);
+        }
+        else if (manualRaiseClimber.isFallingEdge()) {
+            subsystemsManager.climbExtend(false);
+        }
+        else if (outake.isRisingEdge()) {
+            subsystemsManager.outake(true);
+        }
+        else if (outake.isFallingEdge()) {
+            subsystemsManager.outake(false);
+        }
+        else if (shootFromPodium.isRisingEdge()) {
+            //This whole control is temporary. We account for the change in angle using code in the subsystemsManager.update() line
+            subsystemsManager.speaker(true);
+        }
+        swerve.drive(subsystemsManager.update(shootFromPodium.getValue()?1:0/*<-- temporary*/, currentSpeeds));
     }
 
     @Override

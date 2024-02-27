@@ -7,20 +7,22 @@ import frc.robot.Constants.*;
 
 public class MainSubsystemsManager {
     private enum MainStates {
-        HOME,
-        SPEAKER,
-        AMP,
-        CLIMB,
-        INTAKE
+        HOME, // Everything goes to the home position
+        SPEAKER, // Interact with the speaker
+        AMP, //Interact with the amp
+        CLIMB, // Interact with the stage
+        INTAKE, // Intake from the floor
+        OUTAKE //Get rid of anything we're holding
+        // Maybe add a case for source intaking.
     }
 
     private enum SubStates {
-        PREP,
-        READY,
-        SCORE,
-        UP,
-        DOWN,
-        INTAKE,
+        PREP,   // Score modes & Intake: get everything ready
+        READY,  // Score modes: Continue staying ready, but signal that we can score
+        SCORE,  // Score modes: Score the note
+        UP,     // Climb: Move up
+        DOWN,   // Climb: Move down.
+        INTAKE, // Intake: run the intake and feeder motors
         NOTHING
     }
 
@@ -40,7 +42,7 @@ public class MainSubsystemsManager {
 
     /**
      * Update the state machine for the shooter, elevator, and intake
-     * @param distanceToSpeaker Distance from the speaker tag in inches from Manav's system. This can be anything if not shooting into the speaker with a range table.
+     * @param distanceToSpeaker Distance from the speaker tag in inches from vision. This can be anything if not shooting into the speaker with a range table.
      * @param originalSpeeds ChassisSpeeds object derived exclusively from the controllers. {@code update()} will modify this as needed for the current function, then return it.
      * @return {@code originalSpeeds}, with any needed modifications for the current function.
      */
@@ -67,8 +69,9 @@ public class MainSubsystemsManager {
                             mainState = MainStates.HOME;
                             subState = SubStates.NOTHING;
                             return originalSpeeds;
-                        }
-                    case PREP: //No break here, so SCORE also runs PREP's code
+                        } //NOTE: No break statement here
+                    case READY: //Does the same thing as PREP; this is just a flag for the score() function
+                    case PREP:
                         RangeTable.RangeEntry target = RangeTable.get(distanceToSpeaker);
                         shooter.setShootVelocity(target.flywheelSpeed, target.flywheelSpeed);
                         elevator.setPivotAngleCustom(target.pivotAngle);
@@ -93,6 +96,7 @@ public class MainSubsystemsManager {
                             subState = SubStates.NOTHING;
                             return originalSpeeds;
                         }
+                    case READY:
                     case PREP:
                         elevator.setPivotAngleCustom(ELEVATOR.PIVOT_ANGLE_AMP);
                         if (elevator.isTargetAngle() && subState != SubStates.SCORE) {
@@ -137,28 +141,42 @@ public class MainSubsystemsManager {
                         }
                         return originalSpeeds;
                 }
+            case OUTAKE:
+                intake.spinPercentOutput(INTAKE.OUTAKE_POWER);
+                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
+                shooter.setShootVelocity(SHOOTER.OUTAKE_SHOOTER_VELOCITY, SHOOTER.OUTAKE_SHOOTER_VELOCITY);
+                return originalSpeeds;
         }
     }
 
     /**
-     * Stow, then run the intake motors until the note is collected.
-     * @param yn a boolean for whether to start or stop the intake. Intended to be used with rising- and falling-edge triggers on the controller.
+     * If we're starting, stow and run the intake motors until the note is
+     * collected.<p>
+     * 
+     * NOTE: If we stop the intake, it will only do anything if we are
+     * currently intaking. If we're doing anything else, it will be ignored.
+     * 
+     * @param startStop a boolean for whether to start or stop the intake.
      */
-    public void intake(boolean yn) {
-        if (yn) {
-            if (mainState != MainStates.INTAKE) { // subState could be something other than PREP, so this blocks it from being reset.
-                mainState = MainStates.INTAKE;
-                subState = SubStates.PREP;
-            }
-        }
-        else {
-            if (mainState == MainStates.INTAKE) {
-                mainState = MainStates.HOME;
-                subState = SubStates.NOTHING;
+    public void intake(boolean startStop) {
+        if (subState != SubStates.SCORE) {
+            if (startStop) {
+                if (mainState != MainStates.INTAKE) {
+                    mainState = MainStates.INTAKE;
+                    subState = SubStates.PREP;
+                }
+            } else {
+                if (mainState == MainStates.INTAKE) {
+                    mainState = MainStates.HOME;
+                    subState = SubStates.NOTHING;
+                }
             }
         }
     }
 
+    /**
+     * If we're in a mode that scores and we're ready to score, then score.
+     */
     public void score() {
         if (subState == SubStates.READY) {
             subState = SubStates.SCORE;
@@ -168,33 +186,137 @@ public class MainSubsystemsManager {
     /**
      * Go to amp position.
      * 
-     * @param yn a boolean for whether to start or stop amp position (stopping stows by default).
+     * @param startStop start or stop amp position (stopping stows by default).
      */
-    public void amp(boolean yn) {
-        if (yn) {
-            if (subState != SubStates.SCORE && mainState != MainStates.AMP) { // If we're actively scoring, finish that score before continuing.
-                mainState = MainStates.AMP;
-                subState = SubStates.PREP;
-            }
-        }
-        else {
-            if (subState != SubStates.SCORE && mainState == MainStates.AMP) {
-                mainState = MainStates.HOME;
-                subState = SubStates.NOTHING;
+    public void amp(boolean startStop) {
+        if (subState != SubStates.SCORE) {
+            if (startStop) {
+                if (mainState != MainStates.AMP) { // If we're actively scoring, finish that score before continuing.
+                    mainState = MainStates.AMP;
+                    subState = SubStates.PREP;
+                }
+            } else {
+                if (mainState == MainStates.AMP) {
+                    mainState = MainStates.HOME;
+                    subState = SubStates.NOTHING;
+                }
             }
         }
     }
 
-    public void speaker(boolean yn) {
-        if (yn) {
-            if (mainState != MainStates.SPEAKER && subState != SubStates.SCORE) {
-                mainState = MainStates.SPEAKER;
-                subState = SubStates.PREP;
+    /**
+     * Start/stop preparing to shoot into the speaker
+     * @param startStop whether to start or stop preparing
+     */
+    public void speaker(boolean startStop) {
+        if (subState != SubStates.SCORE) {
+            if (startStop) {
+                if (mainState != MainStates.SPEAKER) {
+                    mainState = MainStates.SPEAKER;
+                    subState = SubStates.PREP;
+                }
+            } else {
+                if (mainState == MainStates.SPEAKER) {
+                    mainState = MainStates.HOME;
+                    subState = SubStates.NOTHING;
+                }
             }
-        } else {
-            if (mainState == MainStates.SPEAKER && subState != SubStates.SCORE) {
-                mainState = MainStates.HOME;
-                subState = SubStates.NOTHING;
+        }
+    }
+
+    /**
+     * Return all subsystems to the home positions/speeds. Does nothing if actively scoring.
+     */
+    public void home() {
+        if (subState != SubStates.SCORE) {
+            mainState = MainStates.HOME;
+            subState = SubStates.NOTHING;
+        }
+    }
+
+    /**
+     * Return all subsystems to the home positions/speeds. Overrides the usual "ignore-if-scoring" rule
+     */
+    public void forceHome() {
+        mainState = MainStates.HOME;
+        subState = SubStates.NOTHING;
+    }
+
+    /**
+     * Start/stop preparing for a climb
+     * 
+     * @param startStop whether to start (lift the pivot and extension to the max) or stop (stow) preparing. Note that stopping doesn't do anything if not already in the climbing state.
+     */
+    public void climb(boolean startStop){
+        if (subState != SubStates.SCORE) {
+            if (startStop) {
+                if (mainState != MainStates.CLIMB) {
+                    mainState = MainStates.CLIMB;
+                    subState = SubStates.PREP;
+                }
+            } else {
+                if (mainState == MainStates.CLIMB) {
+                    mainState = MainStates.HOME;
+                    subState = SubStates.NOTHING;
+                }
+            }
+        }
+    }
+
+    /**
+     * Start or stop extending the elevator. Respects soft limits.
+     * @param startStop start or stop extending. Note that this does nothing if the pivot is not at full height.
+     */
+    public void climbExtend(boolean startStop) {
+        if (mainState == MainStates.CLIMB && subState != SubStates.PREP) { //In climb mode, but done preparing.
+            if (startStop) {
+                if (subState != SubStates.UP) {
+                    subState = SubStates.UP;
+                }
+            }
+            else {
+                if (subState == SubStates.UP) {
+                    subState = SubStates.NOTHING;
+                }
+            }
+        }
+    }
+
+    /**
+     * Start or stop retracting the elevator. Respects soft limits.
+     * 
+     * @param startStop start or stop retracting. Note that this does nothing if the pivot is not at full height.
+     */
+    public void climbRetract(boolean startStop) {
+        if (mainState == MainStates.CLIMB && subState != SubStates.PREP) { // In climb mode, but done preparing.
+            if (startStop) {
+                if (subState != SubStates.DOWN) {
+                    subState = SubStates.DOWN;
+                }
+            } else {
+                if (subState == SubStates.DOWN) {
+                    subState = SubStates.NOTHING;
+                }
+            }
+        }
+    }
+
+    /**
+     * Start or stop outaking. Does nothing if actively scoring.
+     * @param startStop
+     */
+    public void outake(boolean startStop) {
+        if (subState != SubStates.SCORE) {
+            if (startStop) {
+                if (mainState != MainStates.OUTAKE) {
+                    mainState = MainStates.OUTAKE;
+                    subState = SubStates.NOTHING;
+                }
+            } else {
+                if (mainState == MainStates.OUTAKE) {
+                    mainState = MainStates.OUTAKE;
+                    subState = SubStates.NOTHING;
+                }
             }
         }
     }

@@ -36,7 +36,7 @@ public class ShootCommand extends Command{
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
             }
             else{
-                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
+                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
             }
         }
 

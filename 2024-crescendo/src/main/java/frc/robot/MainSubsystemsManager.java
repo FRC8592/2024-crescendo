@@ -88,7 +88,7 @@ public class MainSubsystemsManager {
                     case SCORE:
                         timer.start();
                         shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_SPEED);
-                        shooter.setShootVelocity(SHOOTER.AMP_SHOOTER_SPEED, SHOOTER.AMP_SHOOTER_SPEED);
+                        shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED, SHOOTER.AMP_FLYWHEEL_SPEED);
                         if (timer.get() > SHOOTER.AMP_SCORE_TIME) {
                             timer.stop();
                             timer.reset();
@@ -143,8 +143,8 @@ public class MainSubsystemsManager {
                 }
             case OUTAKE:
                 intake.spinPercentOutput(INTAKE.OUTAKE_POWER);
-                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
-                shooter.setShootVelocity(SHOOTER.OUTAKE_SHOOTER_VELOCITY, SHOOTER.OUTAKE_SHOOTER_VELOCITY);
+                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
+                shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
                 return originalSpeeds;
         }
     }

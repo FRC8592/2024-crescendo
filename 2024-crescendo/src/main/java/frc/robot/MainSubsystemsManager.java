@@ -52,24 +52,28 @@ public class MainSubsystemsManager {
         ChassisSpeeds modifiedSpeeds = null;
         switch (mainState) {
             case HOME:
-            default:
+            default: // Stop all the wheels and stow the elevator
                 elevator.stow();
                 shooter.setFeederSpeed(0);
                 shooter.setShootPercentOutput(0);
                 intake.spinPercentOutput(0);
+                break;
             case SPEAKER:
                 switch (subState) {
                     default:
-                        subState = SubStates.NOTHING; //If we're not in a compatible sub-state, set back to NOTHING.
-                    case SCORE:
+                        subState = SubStates.NOTHING; //If we're not in a compatible sub-state, set back to NOTHING and don't run anything else.
+                        break;
+                    case SCORE: // Note that this runs READY and PREP's code too because there's no `break;` after this code
                         timer.start();
                         shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
                         if (timer.get() > SHOOTER.SHOOT_SCORE_TIME) {
                             timer.stop();
                             timer.reset();
+                            shooter.hasNote = false;
                             mainState = MainStates.HOME;
                             subState = SubStates.NOTHING;
-                        } //NOTE: No break statement here
+                            break;
+                        }
                     case READY: //Does the same thing as PREP; this is just a flag for the score() function
                     case PREP:
                         RangeTable.RangeEntry target = RangeTable.get(distanceToSpeaker);
@@ -78,51 +82,59 @@ public class MainSubsystemsManager {
                         if (shooter.isReady() && elevator.isTargetAngle() && subState != SubStates.SCORE) { // The second condition is in case we're SCOREing as well as PREPping. We don't want to reset to READY while scoring.
                             subState = SubStates.READY;
                         }
+                        break;
                 }
+                break;
             case AMP:
                 switch (subState) {
                     default:
                         subState = SubStates.NOTHING;
-                    case SCORE:
+                        break;
+                    case SCORE: //Note that this runs READY and PREP's code too
                         timer.start();
                         shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_SPEED);
                         shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED, SHOOTER.AMP_FLYWHEEL_SPEED);
                         if (timer.get() > SHOOTER.AMP_SCORE_TIME) {
                             timer.stop();
                             timer.reset();
+                            shooter.hasNote = false;
                             mainState = MainStates.HOME;
                             subState = SubStates.NOTHING;
+                            break;
                         }
                     case READY:
                     case PREP:
                         elevator.setPivotAngleCustom(ELEVATOR.PIVOT_ANGLE_AMP);
-                        if (elevator.isTargetAngle() && subState != SubStates.SCORE) {
+                        if (elevator.isTargetAngle() && subState == SubStates.PREP) {
                             subState = SubStates.READY;
                         }
+                        break;
                 }
+                break;
             case CLIMB:
                 switch (subState) {
                     default:
                         subState = SubStates.NOTHING;
+                        break;
+                    case UP:
+                        elevator.extend();
+                        break;
+                    case DOWN:
+                        elevator.retract();
+                        break;
                     case PREP:
                         elevator.climbPosition();
                         if (elevator.isTargetAngle()) {
                             subState = SubStates.NOTHING;
                         }
-                    case UP:
-                        elevator.extend();
-                    case DOWN:
-                        elevator.retract();
+                        break;
                 }
+                break;
             case INTAKE:
                 switch (subState) {
                     default:
                         subState = SubStates.NOTHING;
-                    case PREP:
-                        elevator.stow();
-                        if (elevator.isTargetAngle()) {
-                            subState = SubStates.INTAKE;
-                        }
+                        break;
                     case INTAKE:
                         intake.spinPercentOutput(INTAKE.INTAKE_POWER);
                         shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
@@ -130,11 +142,20 @@ public class MainSubsystemsManager {
                             mainState = MainStates.HOME;
                             subState = SubStates.NOTHING;
                         }
+                        break;
+                    case PREP:
+                        elevator.stow();
+                        if (elevator.isTargetAngle()) {
+                            subState = SubStates.INTAKE;
+                        }
+                        break;
                 }
+                break;
             case OUTAKE:
                 intake.spinPercentOutput(INTAKE.OUTAKE_POWER);
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
                 shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
+                break;
         }
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH + "MainState", mainState.name());
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH + "SubState", subState.name());
@@ -151,7 +172,7 @@ public class MainSubsystemsManager {
      * @param startStop a boolean for whether to start or stop the intake.
      */
     public void intake(boolean startStop) {
-        if (subState != SubStates.SCORE) {
+        if (subState != SubStates.SCORE && !shooter.hasNote()) {
             if (startStop) {
                 if (mainState != MainStates.INTAKE) {
                     mainState = MainStates.INTAKE;

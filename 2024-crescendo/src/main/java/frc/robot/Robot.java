@@ -76,7 +76,7 @@ public class Robot extends LoggedRobot {
     private BooleanManager stow = new BooleanManager(false);
     private BooleanManager amp = new BooleanManager(false);
     private BooleanManager climb = new BooleanManager(false);
-    private BooleanManager prime = new BooleanManager(false);
+    private BooleanManager speaker = new BooleanManager(false);
     private BooleanManager manualRaiseClimber = new BooleanManager(false);
     private BooleanManager manualLowerClimber = new BooleanManager(false);
 
@@ -271,7 +271,7 @@ public class Robot extends LoggedRobot {
         stow.update              (operatorController.getAButton());
         amp.update               (operatorController.getXButton());
         climb.update             (operatorController.getYButton());
-        prime.update             (operatorController.getBButton());
+        speaker.update           (operatorController.getBButton());
         manualRaiseClimber.update(operatorController.getPOV() == 0);
         manualLowerClimber.update(operatorController.getPOV() == 180);
 
@@ -345,6 +345,15 @@ public class Robot extends LoggedRobot {
         else if (shootFromPodium.isRisingEdge()) {
             //This whole control is temporary. We account for the change in angle using code in the subsystemsManager.update() line
             subsystemsManager.speaker(true);
+        }
+        else if (shootFromPodium.isFallingEdge()) {
+            subsystemsManager.speaker(false);
+        }
+        else if (speaker.isRisingEdge()) {
+            subsystemsManager.speaker(true);
+        }
+        else if (speaker.isFallingEdge()) {
+            subsystemsManager.speaker(false);
         }
         swerve.drive(subsystemsManager.update(shootFromPodium.getValue()?1:0/*<-- temporary*/, currentSpeeds));
     }

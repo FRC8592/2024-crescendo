@@ -1,5 +1,7 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
@@ -47,6 +49,7 @@ public class MainSubsystemsManager {
      * @return {@code originalSpeeds}, with any needed modifications for the current function.
      */
     public ChassisSpeeds update(double distanceToSpeaker, ChassisSpeeds originalSpeeds) {
+        ChassisSpeeds modifiedSpeeds = null;
         switch (mainState) {
             case HOME:
             default:
@@ -54,12 +57,10 @@ public class MainSubsystemsManager {
                 shooter.setFeederSpeed(0);
                 shooter.setShootPercentOutput(0);
                 intake.spinPercentOutput(0);
-                return originalSpeeds;
             case SPEAKER:
                 switch (subState) {
                     default:
                         subState = SubStates.NOTHING; //If we're not in a compatible sub-state, set back to NOTHING.
-                        return originalSpeeds;
                     case SCORE:
                         timer.start();
                         shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
@@ -68,7 +69,6 @@ public class MainSubsystemsManager {
                             timer.reset();
                             mainState = MainStates.HOME;
                             subState = SubStates.NOTHING;
-                            return originalSpeeds;
                         } //NOTE: No break statement here
                     case READY: //Does the same thing as PREP; this is just a flag for the score() function
                     case PREP:
@@ -78,13 +78,11 @@ public class MainSubsystemsManager {
                         if (shooter.isReady() && elevator.isTargetAngle() && subState != SubStates.SCORE) { // The second condition is in case we're SCOREing as well as PREPping. We don't want to reset to READY while scoring.
                             subState = SubStates.READY;
                         }
-                        return originalSpeeds;
                 }
             case AMP:
                 switch (subState) {
                     default:
                         subState = SubStates.NOTHING;
-                        return originalSpeeds;
                     case SCORE:
                         timer.start();
                         shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_SPEED);
@@ -94,7 +92,6 @@ public class MainSubsystemsManager {
                             timer.reset();
                             mainState = MainStates.HOME;
                             subState = SubStates.NOTHING;
-                            return originalSpeeds;
                         }
                     case READY:
                     case PREP:
@@ -102,13 +99,11 @@ public class MainSubsystemsManager {
                         if (elevator.isTargetAngle() && subState != SubStates.SCORE) {
                             subState = SubStates.READY;
                         }
-                        return originalSpeeds;
                 }
             case CLIMB:
                 switch (subState) {
                     default:
                         subState = SubStates.NOTHING;
-                        return originalSpeeds;
                     case PREP:
                         elevator.climbPosition();
                         if (elevator.isTargetAngle()) {
@@ -116,22 +111,18 @@ public class MainSubsystemsManager {
                         }
                     case UP:
                         elevator.extend();
-                        return originalSpeeds;
                     case DOWN:
                         elevator.retract();
-                        return originalSpeeds;
                 }
             case INTAKE:
                 switch (subState) {
                     default:
                         subState = SubStates.NOTHING;
-                        return originalSpeeds;
                     case PREP:
                         elevator.stow();
                         if (elevator.isTargetAngle()) {
                             subState = SubStates.INTAKE;
                         }
-                        return originalSpeeds;
                     case INTAKE:
                         intake.spinPercentOutput(INTAKE.INTAKE_POWER);
                         shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
@@ -139,14 +130,15 @@ public class MainSubsystemsManager {
                             mainState = MainStates.HOME;
                             subState = SubStates.NOTHING;
                         }
-                        return originalSpeeds;
                 }
             case OUTAKE:
                 intake.spinPercentOutput(INTAKE.OUTAKE_POWER);
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
                 shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
-                return originalSpeeds;
         }
+        Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH + "MainState", mainState.name());
+        Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH + "SubState", subState.name());
+        return modifiedSpeeds == null ? originalSpeeds : modifiedSpeeds;
     }
 
     /**

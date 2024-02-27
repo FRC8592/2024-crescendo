@@ -56,16 +56,10 @@ public class Shooter {
         noteBeamBreak = new DigitalInput(SHOOTER.NOTE_BEAM_BREAK_DIO_PORT);
 
         bottomShooterMotor.follow(topShooterMotor, true);
-        // bottomShooterMotor.setInverted();
-    }
 
-    /**
-     * set i-zone for accumulator for both motors
-     * @param izone
-     */
-    public void setMotorsIZone(double izone) {
-        topShooterMotor.motorControl.setIZone(izone);
-        bottomShooterMotor.motorControl.setIZone(izone);
+        topShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
+        bottomShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
+        // bottomShooterMotor.setInverted();
     }
 
     /**

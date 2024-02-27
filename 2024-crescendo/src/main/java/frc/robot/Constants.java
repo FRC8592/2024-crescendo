@@ -244,6 +244,9 @@ public final class Constants {
         public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.5;
         public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
                 Math.hypot(SWERVE.DRIVE_TRAIN_WIDTH / 2.0, DRIVE_TRAIN_LENGTH / 2.0);
+
+        public static final int TRANSLATION_SMOOTHING_AMOUNT = 1; // TODO: Currently unset, tune this
+        public static final int ROTATION_SMOOTHING_AMOUNT = 1; // TODO: Currently unset, tune this
     }
 
     public final class PIGEON {
@@ -259,5 +262,9 @@ public final class Constants {
         public static final double kP = 0;
         public static final double kI = 0;
         public static final double kD = 0;
+    }
+
+    public class MAIN_SUBSYSTEMS_MANAGER{
+        public static final String LOG_PATH = SHARED.LOG_FOLDER + "/MainSubsystems/";
     }
 }

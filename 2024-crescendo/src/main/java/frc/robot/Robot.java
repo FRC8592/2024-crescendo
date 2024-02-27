@@ -52,34 +52,33 @@ public class Robot extends LoggedRobot {
     private Intake intake;
     private Elevator elevator;
     private LimelightTargeting noteLock;
-    private PoseVision apriltagLockYaw;
-    private PoseVision apriltagLockY;
-    private PoseVision poseGetter;
-    private LED leds;
+    private LimelightTargeting apriltagVision;
+    // private PoseVision apriltagLockYaw;
+    // private PoseVision apriltagLockY;
+    // private PoseVision poseGetter;
+    // private LED leds;
     private Power power;
     private PIDController turnPID;
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
-    private LimelightTargeting gameObjectVision;
     private MainSubsystemsManager subsystemsManager;
-    private boolean intakeButtonLastFrame = false;
 
-    BooleanManager slowMode = new BooleanManager(false);
-    BooleanManager resetGyro = new BooleanManager(false);
-    BooleanManager autoCollect = new BooleanManager(false);
-    BooleanManager robotOriented = new BooleanManager(false);
+    private BooleanManager slowMode = new BooleanManager(false);
+    private BooleanManager resetGyro = new BooleanManager(false);
+    private BooleanManager autoCollect = new BooleanManager(false);
+    private BooleanManager robotOriented = new BooleanManager(false);
 
     // operator controls
-    BooleanManager score = new BooleanManager(false);
-    BooleanManager shootFromPodium = new BooleanManager(false);
-    BooleanManager outake = new BooleanManager(false);
-    BooleanManager intaking = new BooleanManager(false);
-    BooleanManager stow = new BooleanManager(false);
-    BooleanManager amp = new BooleanManager(false);
-    BooleanManager climb = new BooleanManager(false);
-    BooleanManager prime = new BooleanManager(false);
-    BooleanManager manualRaiseClimber = new BooleanManager(false);
-    BooleanManager manualLowerClimber = new BooleanManager(false);
+    private BooleanManager score = new BooleanManager(false);
+    private BooleanManager shootFromPodium = new BooleanManager(false);
+    private BooleanManager outake = new BooleanManager(false);
+    private BooleanManager intaking = new BooleanManager(false);
+    private BooleanManager stow = new BooleanManager(false);
+    private BooleanManager amp = new BooleanManager(false);
+    private BooleanManager climb = new BooleanManager(false);
+    private BooleanManager prime = new BooleanManager(false);
+    private BooleanManager manualRaiseClimber = new BooleanManager(false);
+    private BooleanManager manualLowerClimber = new BooleanManager(false);
 
     @Override
     public void robotInit() {
@@ -109,12 +108,11 @@ public class Robot extends LoggedRobot {
         power = new Power();
         // leds = new LED();
         shooter = new Shooter();
-        shooter.setMotorsIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
-        poseGetter = new PoseVision(APRILTAG_VISION.kP,APRILTAG_VISION.kI,APRILTAG_VISION.kD,0);
+        // poseGetter = new PoseVision(APRILTAG_VISION.kP,APRILTAG_VISION.kI,APRILTAG_VISION.kD,0);
         intake = new Intake();
-        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,0,0,0);
+        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR,0,0,0,0);
         elevator = new Elevator();
-        smoothingFilter = new SmoothingFilter(1, 1, 1);
+        smoothingFilter = new SmoothingFilter(SWERVE.TRANSLATION_SMOOTHING_AMOUNT, SWERVE.TRANSLATION_SMOOTHING_AMOUNT, SWERVE.ROTATION_SMOOTHING_AMOUNT);
 
         elevator.resetEncoders();
 
@@ -126,7 +124,6 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
-
         Logger.recordOutput(SHOOTER.LOG_PATH+"TopMotorRPM", shooter.topShooterMotor.getVelocity());
         Logger.recordOutput(SHOOTER.LOG_PATH+"BottomMotorRPM", shooter.bottomShooterMotor.getVelocity());
 

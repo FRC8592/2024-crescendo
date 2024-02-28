@@ -123,8 +123,12 @@ public class Elevator {
         return ticksConverted;
     }
 
-    public boolean isTargetAngle(){
-        return Math.abs(getPivotAngle()-desiredPivot)<ELEVATOR.ANGLE_TOLERANCE;
+    public boolean isTargetAngle() {
+        return Math.abs(getPivotAngle() - desiredPivot) < ELEVATOR.ANGLE_TOLERANCE;
+    }
+
+    public boolean isTargetLength() {
+        return Math.abs(getExtensionLength() - desiredExtension) < ELEVATOR.LENGTH_TOLERANCE;
     }
 
     //-------COMBINED CODE-------//

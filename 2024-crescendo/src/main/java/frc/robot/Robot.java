@@ -31,6 +31,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 
 import frc.robot.Constants.*;
+import frc.robot.MainSubsystemsManager.MainStates;
+import frc.robot.MainSubsystemsManager.SubStates;
 
 public class Robot extends LoggedRobot {
     
@@ -314,7 +316,10 @@ public class Robot extends LoggedRobot {
             subsystemsManager.intake(false);
         }
         else if (amp.isToggleRisingEdge()) {
-            subsystemsManager.amp(true);
+            if (subsystemsManager.amp(true)) {
+                speaker.setToggle(false);
+                shootFromPodium.setToggle(false);
+            }
         }
         else if (amp.isToggleFallingEdge()) {
             subsystemsManager.amp(false);
@@ -336,26 +341,47 @@ public class Robot extends LoggedRobot {
         else if (manualRaiseClimber.isFallingEdge()) {
             subsystemsManager.climbExtend(false);
         }
+        else if (manualLowerClimber.isRisingEdge()) {
+            subsystemsManager.climbRetract(true);
+        }
+        else if (manualLowerClimber.isFallingEdge()) {
+            subsystemsManager.climbRetract(false);
+        }
         else if (outake.isRisingEdge()) {
             subsystemsManager.outake(true);
         }
         else if (outake.isFallingEdge()) {
             subsystemsManager.outake(false);
         }
-        else if (shootFromPodium.isRisingEdge()) {
+        else if (shootFromPodium.isToggleRisingEdge()) {
             //This whole control is temporary. We account for the change in angle using code in the subsystemsManager.update() line
-            subsystemsManager.speaker(true);
+            if (subsystemsManager.speaker(true)) {
+                amp.setToggle(false);
+                speaker.setToggle(false);
+            }
         }
-        else if (shootFromPodium.isFallingEdge()) {
+        else if (shootFromPodium.isToggleFallingEdge()) {
             subsystemsManager.speaker(false);
         }
-        else if (speaker.isRisingEdge()) {
-            subsystemsManager.speaker(true);
+        else if (speaker.isToggleRisingEdge()) {
+            if (subsystemsManager.speaker(true) || (subsystemsManager.mainState == MainStates.SPEAKER && subsystemsManager.subState != SubStates.SCORE)) {
+                amp.setToggle(false);
+                shootFromPodium.setToggle(false);
+                subsystemsManager.mainState = MainStates.SPEAKER;
+                subsystemsManager.subState = SubStates.PREP;
+            }
         }
-        else if (speaker.isFallingEdge()) {
+        else if (speaker.isToggleFallingEdge()) {
             subsystemsManager.speaker(false);
         }
-        swerve.drive(subsystemsManager.update(shootFromPodium.getValue()?1:0/*<-- temporary*/, currentSpeeds));
+        else if (score.getValue()) {
+            if (subsystemsManager.score()) {
+                shootFromPodium.setToggle(false);
+                amp.setToggle(false);
+                speaker.setToggle(false);
+            }
+        }
+        swerve.drive(subsystemsManager.update(shootFromPodium.isToggle()?1:0/*<-- temporary*/, currentSpeeds));
     }
 
     @Override

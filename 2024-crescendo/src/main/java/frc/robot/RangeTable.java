@@ -1,5 +1,6 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
 
 public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
@@ -46,7 +47,8 @@ public class RangeTable {
         //     System.out.println("ERROR: Range table is empty");
         //     return new RangeEntry(0, 0);
         // }
-        return RANGE_TABLE[(int)distance];
+        Logger.recordOutput("RangeTable/GetValue", distance);
+        return RANGE_TABLE[(int) distance];
     }
 
     public boolean isValid() {

@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.*;
 
 public class MainSubsystemsManager {
-    private enum MainStates {
+    public enum MainStates {
         HOME, // Everything goes to the home position
         SPEAKER, // Interact with the speaker
         AMP, //Interact with the amp
@@ -18,7 +18,7 @@ public class MainSubsystemsManager {
         // Maybe add a case for source intaking.
     }
 
-    private enum SubStates {
+    public enum SubStates {
         PREP,   // Score modes & Intake: get everything ready
         READY,  // Score modes: Continue staying ready, but signal that we can score
         SCORE,  // Score modes: Score the note
@@ -28,8 +28,8 @@ public class MainSubsystemsManager {
         NOTHING
     }
 
-    private MainStates mainState = MainStates.HOME;
-    private SubStates subState = SubStates.NOTHING;
+    public MainStates mainState = MainStates.HOME;
+    public SubStates subState = SubStates.NOTHING;
     private Intake intake;
     private Shooter shooter;
     private Elevator elevator;
@@ -62,6 +62,9 @@ public class MainSubsystemsManager {
                 switch (subState) {
                     default:
                         subState = SubStates.NOTHING; //If we're not in a compatible sub-state, set back to NOTHING and don't run anything else.
+                        shooter.setFeederSpeed(0);
+                        shooter.setShootPercentOutput(0);
+                        intake.spinPercentOutput(0);
                         break;
                     case SCORE: // Note that this runs READY and PREP's code too because there's no `break;` after this code
                         timer.start();
@@ -79,7 +82,7 @@ public class MainSubsystemsManager {
                         RangeTable.RangeEntry target = RangeTable.get(distanceToSpeaker);
                         shooter.setShootVelocity(target.flywheelSpeed, target.flywheelSpeed);
                         elevator.setPivotAngleCustom(target.pivotAngle);
-                        if (shooter.isReady() && elevator.isTargetAngle() && subState != SubStates.SCORE) { // The second condition is in case we're SCOREing as well as PREPping. We don't want to reset to READY while scoring.
+                        if (shooter.isReady() && elevator.isTargetAngle() && subState == SubStates.PREP) { // The second condition is in case we're SCOREing as well as PREPping. We don't want to reset to READY while scoring.
                             subState = SubStates.READY;
                         }
                         break;
@@ -89,6 +92,9 @@ public class MainSubsystemsManager {
                 switch (subState) {
                     default:
                         subState = SubStates.NOTHING;
+                        shooter.setFeederSpeed(0);
+                        shooter.setShootPercentOutput(0);
+                        intake.spinPercentOutput(0);
                         break;
                     case SCORE: //Note that this runs READY and PREP's code too
                         timer.start();
@@ -105,6 +111,10 @@ public class MainSubsystemsManager {
                     case READY:
                     case PREP:
                         elevator.setPivotAngleCustom(ELEVATOR.PIVOT_ANGLE_AMP);
+                        elevator.setExtensionLengthCustom(ELEVATOR.EXTENSION_METERS_AMP);
+                        shooter.setShootVelocity(0, 0);
+                        shooter.setFeederVelocity(0);
+                        intake.spinPercentOutput(0);
                         if (elevator.isTargetAngle() && subState == SubStates.PREP) {
                             subState = SubStates.READY;
                         }
@@ -115,6 +125,9 @@ public class MainSubsystemsManager {
                 switch (subState) {
                     default:
                         subState = SubStates.NOTHING;
+                        shooter.setFeederSpeed(0);
+                        shooter.setShootPercentOutput(0);
+                        intake.spinPercentOutput(0);
                         break;
                     case UP:
                         elevator.extend();
@@ -123,6 +136,8 @@ public class MainSubsystemsManager {
                         elevator.retract();
                         break;
                     case PREP:
+                        shooter.setShootVelocity(0, 0);
+                        shooter.setFeederVelocity(0);
                         elevator.climbPosition();
                         if (elevator.isTargetAngle()) {
                             subState = SubStates.NOTHING;
@@ -190,9 +205,13 @@ public class MainSubsystemsManager {
     /**
      * If we're in a mode that scores and we're ready to score, then score.
      */
-    public void score() {
+    public boolean score() {
         if (subState == SubStates.READY) {
             subState = SubStates.SCORE;
+            return true;
+        }
+        else {
+            return false;
         }
     }
 
@@ -201,40 +220,46 @@ public class MainSubsystemsManager {
      * 
      * @param startStop start or stop amp position (stopping stows by default).
      */
-    public void amp(boolean startStop) {
+    public boolean amp(boolean startStop) {
         if (subState != SubStates.SCORE) {
             if (startStop) {
                 if (mainState != MainStates.AMP) { // If we're actively scoring, finish that score before continuing.
                     mainState = MainStates.AMP;
                     subState = SubStates.PREP;
+                    return true;
                 }
             } else {
                 if (mainState == MainStates.AMP) {
                     mainState = MainStates.HOME;
                     subState = SubStates.NOTHING;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     /**
      * Start/stop preparing to shoot into the speaker
      * @param startStop whether to start or stop preparing
      */
-    public void speaker(boolean startStop) {
+    public boolean speaker(boolean startStop) {
         if (subState != SubStates.SCORE) {
             if (startStop) {
                 if (mainState != MainStates.SPEAKER) {
                     mainState = MainStates.SPEAKER;
                     subState = SubStates.PREP;
+                    return true;
                 }
             } else {
                 if (mainState == MainStates.SPEAKER) {
                     mainState = MainStates.HOME;
                     subState = SubStates.NOTHING;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -327,7 +352,7 @@ public class MainSubsystemsManager {
                 }
             } else {
                 if (mainState == MainStates.OUTAKE) {
-                    mainState = MainStates.OUTAKE;
+                    mainState = MainStates.HOME;
                     subState = SubStates.NOTHING;
                 }
             }

@@ -69,4 +69,12 @@ public class BooleanManager {
     public boolean isToggleFallingEdge() {
         return this.isToggleFallingEdge;
     }
+
+    /**
+     * @param isToggle boolean to manually set the internal toggle to. Bypasses rising and falling edge detection.
+     */
+    public void setToggle(boolean isToggle){
+        this.isToggle = isToggle;
+        this.lastToggle = isToggle;
+    }
 }

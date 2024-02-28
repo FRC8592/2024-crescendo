@@ -168,6 +168,7 @@ public final class Constants {
 
         public static final LED.Color RED_COLOR = new LED.Color(255,0,0);
         public static final LED.Color GREEN_COLOR = new LED.Color(0,255,0);
+        public static final LED.Color NO_COLOR = new LED.Color(0,0,0);
 
         public static final LEDConfig DEFAULT_CONFIG = new LEDConfig()
         .setType(AnimationType.BLINK)

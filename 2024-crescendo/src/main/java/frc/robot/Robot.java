@@ -150,6 +150,8 @@ public class Robot extends LoggedRobot {
         // SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*ELEVATOR.PIVOT_GEAR_RATIO)/360);
         
         // leds.update(LEDS.DEFAULT_CONFIG);
+
+
         leds.dsm.fill(LEDS.RED_COLOR);
         leds.dsm.show();
 

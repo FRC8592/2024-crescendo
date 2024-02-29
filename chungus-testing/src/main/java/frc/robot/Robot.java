@@ -33,6 +33,7 @@ import frc.robot.autonomous.BaseAuto;
 import pabeles.concurrency.IntOperatorTask.Min;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import frc.robot.PoseVision;
 
 import frc.robot.BunnyDropper.States;
 
@@ -72,6 +73,7 @@ public class Robot extends LoggedRobot {
     private boolean wasZeroed = false;
     private boolean isAiming = false;
     public static Field2d FIELD = new Field2d();
+    public PoseVision poseVision;
 
     private double currentBatteryVoltage;
     private ArrayList<Double> voltages;
@@ -105,14 +107,15 @@ public class Robot extends LoggedRobot {
         voltages = new ArrayList<Double>();
         pigeon = new NewtonPigeon(new Pigeon2(Constants.SWERVE_PIGEON_CAN_ID));
         swerve = new Swerve(pigeon);
-        shooter = new Shooter();
-        intake = new Intake();
-        dropper = new BunnyDropper();
+        // shooter = new Shooter();
+        // intake = new Intake();
+        // dropper = new BunnyDropper();
         driverController = new XboxController(Constants.CONTROLLER_DRIVER_PORT);
         operatorController = new XboxController(Constants.CONTROLLER_OPERATOR_PORT);
         aimTimer = new Timer();
         autoSelect = new AutonomousSelector();
-        cIntake = new CrescendoIntake();
+        // cIntake = new CrescendoIntake();
+        poseVision = new PoseVision(0.1, 0, 0, 0); // kd, ki, kp, setpoint
     }
 
     /**
@@ -195,27 +198,37 @@ public class Robot extends LoggedRobot {
         }
         SmartDashboard.putNumber("Lower Intake Speed", 0);
         SmartDashboard.putNumber("Upper Intake Speed", 0);
+
+        SmartDashboard.putNumber("OAK tx", 0);
+        SmartDashboard.putNumber("OAK omega", 0);
     }
 
     /** This function is called periodically during operator control. */
     @Override
     public void teleopPeriodic() {
-        swerve.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 new ChassisSpeeds(
                         -driverController.getLeftY() * swerve.getMaxTranslateVelo() * 0.15,
                         -driverController.getLeftX() * swerve.getMaxTranslateVelo() * 0.15,
                         driverController.getRightX() * swerve.getMaxAngularVelo() * 0.15),
-                swerve.getGyroscopeRotation()));
+                swerve.getGyroscopeRotation());
+        
         if (driverController.getAButton()) {
-            cIntake.spinPercentOutput(0.2); // Set for the first test
+            if (poseVision.getTagInView()) {
+                // calculate tx
+                double tx = poseVision.getTagTx();
+                // calculate omega
+                double omega = poseVision.visual_servo(5, 1.0, 4, 0);
+                // set speeds
+                speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, omega);
+
+                // log to shuffleboard
+                SmartDashboard.putNumber("OAK tx", tx);
+                SmartDashboard.putNumber("OAK omega", omega);
+            }
         }
-        else if (driverController.getBButton()) {
-            cIntake.intakeNote(SmartDashboard.getNumber("Lower Intake Speed", 0),
-                    SmartDashboard.getNumber("Upper Intake Speed", 0));
-        }
-        else {
-            cIntake.spinPercentOutput(0);
-        }
+        
+        swerve.drive(speeds);
     }
 
     /** This function is called once when the robot is disabled. */

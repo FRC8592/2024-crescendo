@@ -100,7 +100,7 @@ public final class Constants {
 
 
         public static final int AMP_FLYWHEEL_SPEED = -1000;
-        public static final int AMP_FEEDER_SPEED = -2000; //TODO: Figure out what this should actually be
+        public static final int AMP_FEEDER_SPEED = -6000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
         public static final int INTAKE_FEEDER_SPEED = 4000;
@@ -113,7 +113,7 @@ public final class Constants {
 
 
         public static final double SHOOT_SCORE_TIME = 0.5; //TODO: Tune this
-        public static final double AMP_SCORE_TIME = 1; //TODO: Tune this
+        public static final double AMP_SCORE_TIME = 1.5; //TODO: Tune this
     }
 
 
@@ -155,7 +155,7 @@ public final class Constants {
         public static final int PIVOT_ANGLE_STOWED = 0;
 
         public static final double EXTENSION_METERS_AMP = 0.27;
-        public static final int PIVOT_ANGLE_AMP = 48; // TODO: Adjust this angle
+        public static final int PIVOT_ANGLE_AMP = 45; // TODO: Adjust this angle
 
         public static final double EXTENSION_METERS_CLIMB = 0.25;
         public static final int PIVOT_ANGLE_CLIMB = 75; // TODO: Adjust this angle
@@ -248,6 +248,8 @@ public final class Constants {
 
         public static final int TRANSLATION_SMOOTHING_AMOUNT = 1; // TODO: Currently unset, tune this
         public static final int ROTATION_SMOOTHING_AMOUNT = 1; // TODO: Currently unset, tune this
+
+        public static final double JOYSTICK_EXPONENT = 2;
     }
 
     public final class PIGEON {

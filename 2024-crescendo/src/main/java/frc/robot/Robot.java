@@ -78,7 +78,7 @@ public class Robot extends LoggedRobot {
     private BooleanManager stow = new BooleanManager(false);
     private BooleanManager amp = new BooleanManager(false);
     private BooleanManager climb = new BooleanManager(false);
-    private BooleanManager speaker = new BooleanManager(false);
+    private BooleanManager speakerAmp = new BooleanManager(false);
     private BooleanManager manualRaiseClimber = new BooleanManager(false);
     private BooleanManager manualLowerClimber = new BooleanManager(false);
 
@@ -254,9 +254,12 @@ public class Robot extends LoggedRobot {
          * 
          */
         //Basic driving controls
-        double driveTranslateY = -driverController.getLeftY();
-        double driveTranslateX = -driverController.getLeftX();
-        double driveRotate =     -driverController.getRightX();
+        double rawLeftY = -driverController.getLeftY();
+        double rawLeftX = -driverController.getLeftX();
+        double rawRightX = -driverController.getRightX();
+        double driveTranslateY = rawLeftY; //>= 0 ? (Math.pow(rawLeftY, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawLeftY, SWERVE.JOYSTICK_EXPONENT));
+        double driveTranslateX = rawLeftX; //>= 0 ? (Math.pow(rawLeftX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawLeftX, SWERVE.JOYSTICK_EXPONENT));
+        double driveRotate =     rawRightX >= 0 ? (Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT));
         slowMode.update          (driverController.getRightBumper());
         resetGyro.update         (driverController.getBackButton());
         autoCollect.update       (driverController.getLeftBumper());
@@ -264,7 +267,6 @@ public class Robot extends LoggedRobot {
 
         //operator controls
         // shooter/feeder functions
-        score.update             (operatorController.getRightTriggerAxis() > 0.1);
         shootFromPodium.update   (operatorController.getLeftBumper()); 
 
         outake.update            (operatorController.getRightBumper());
@@ -273,7 +275,7 @@ public class Robot extends LoggedRobot {
         stow.update              (operatorController.getAButton());
         amp.update               (operatorController.getXButton());
         climb.update             (operatorController.getYButton());
-        speaker.update           (operatorController.getBButton());
+        speakerAmp.update           (operatorController.getRightTriggerAxis()>0.1);
         manualRaiseClimber.update(operatorController.getPOV() == 0);
         manualLowerClimber.update(operatorController.getPOV() == 180);
 
@@ -317,8 +319,7 @@ public class Robot extends LoggedRobot {
         }
         else if (amp.isToggleRisingEdge()) {
             if (subsystemsManager.amp(true)) {
-                speaker.setToggle(false);
-                shootFromPodium.setToggle(false);
+                climb.setToggle(false);
             }
         }
         else if (amp.isToggleFallingEdge()) {
@@ -329,7 +330,9 @@ public class Robot extends LoggedRobot {
         }
         //Maybe add something here to trigger `subsystemsManager.forceHome()`
         else if (climb.isToggleRisingEdge()) {
-            subsystemsManager.climb(true);
+            if (subsystemsManager.climb(true)) {
+                amp.setToggle(false);
+            }
         }
         else if (climb.isToggleFallingEdge()) {
             subsystemsManager.climb(false);
@@ -353,35 +356,33 @@ public class Robot extends LoggedRobot {
         else if (outake.isFallingEdge()) {
             subsystemsManager.outake(false);
         }
-        else if (shootFromPodium.isToggleRisingEdge()) {
+        else if (shootFromPodium.isRisingEdge()) {
             //This whole control is temporary. We account for the change in angle using code in the subsystemsManager.update() line
-            if (subsystemsManager.speaker(true)) {
-                amp.setToggle(false);
-                speaker.setToggle(false);
-            }
+            subsystemsManager.speaker(true);
         }
-        else if (shootFromPodium.isToggleFallingEdge()) {
+        else if (shootFromPodium.isFallingEdge()) {
             subsystemsManager.speaker(false);
         }
-        else if (speaker.isToggleRisingEdge()) {
-            if (subsystemsManager.speaker(true) || (subsystemsManager.mainState == MainStates.SPEAKER && subsystemsManager.subState != SubStates.SCORE)) {
-                amp.setToggle(false);
-                shootFromPodium.setToggle(false);
-                subsystemsManager.mainState = MainStates.SPEAKER;
-                subsystemsManager.subState = SubStates.PREP;
+        else if (speakerAmp.isRisingEdge()) {
+            if (subsystemsManager.mainState == MainStates.AMP) {
+                subsystemsManager.score();
+            }
+            else {
+                subsystemsManager.speaker(true);
             }
         }
-        else if (speaker.isToggleFallingEdge()) {
-            subsystemsManager.speaker(false);
-        }
-        else if (score.getValue()) {
-            if (subsystemsManager.score()) {
-                shootFromPodium.setToggle(false);
-                amp.setToggle(false);
-                speaker.setToggle(false);
+        else if (speakerAmp.isFallingEdge()) {
+            if (subsystemsManager.mainState == MainStates.SPEAKER) {
+                subsystemsManager.speaker(false);
             }
         }
-        swerve.drive(subsystemsManager.update(shootFromPodium.isToggle()?1:0/*<-- temporary*/, currentSpeeds));
+        else if (speakerAmp.getValue()) {
+            subsystemsManager.score();
+        }
+        else if (shootFromPodium.getValue()) {
+            subsystemsManager.score();
+        }
+        swerve.drive(subsystemsManager.update(shootFromPodium.getValue()?1:0/*<-- temporary*/, currentSpeeds));
     }
 
     @Override

@@ -121,14 +121,14 @@ public class MainSubsystemsManager {
                             timer.stop();
                             timer.reset();
                             shooter.hasNote = false;
-                            mainState = MainStates.HOME;
-                            subState = SubStates.NOTHING;
+                            // mainState = MainStates.HOME;
+                            subState = SubStates.INIT;
                             break;
                         }
                     case READY:
                     case PREP:
                         elevator.ampPosition();
-                        if (elevator.isTargetAngle() && elevator.isTargetLength() && subState == SubStates.PREP) {
+                        if (elevator.isTargetAngle() && subState == SubStates.PREP) {
                             subState = SubStates.READY;
                         }
                         break;
@@ -141,6 +141,7 @@ public class MainSubsystemsManager {
                         break;
                     case INIT:
                         stopWheels();
+                        elevator.climbPosition();
                         subState = SubStates.PREP;
                         break;
                     case UP: // In this state when the buton is held
@@ -150,8 +151,7 @@ public class MainSubsystemsManager {
                         elevator.retract();
                         break;
                     case PREP:
-                        elevator.climbPosition();
-                        if (elevator.isTargetAngle() && elevator.isTargetLength()) {
+                        if (elevator.isTargetAngle()) {
                             subState = SubStates.NOTHING;
                         }
                         break;
@@ -313,20 +313,23 @@ public class MainSubsystemsManager {
      * 
      * @param startStop whether to start (lift the pivot and extension to the max) or stop (stow) preparing. Note that stopping doesn't do anything if not already in the climbing state.
      */
-    public void climb(boolean startStop){
+    public boolean climb(boolean startStop){
         if (subState != SubStates.SCORE) {
             if (startStop) {
                 if (mainState != MainStates.CLIMB) {
                     mainState = MainStates.CLIMB;
                     subState = SubStates.INIT;
+                    return true;
                 }
             } else {
                 if (mainState == MainStates.CLIMB) {
                     mainState = MainStates.HOME;
                     subState = SubStates.NOTHING;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     /**

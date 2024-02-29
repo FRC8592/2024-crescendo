@@ -36,9 +36,8 @@ public class AutoAimCommand extends Command {
         targeting.updateVision();
         double omega = targeting.turnRobot(0.0, turnPID, "tx", 2.0, 0.0);
         double vy = targeting.turnRobot(0, drivePID, "ty", 2.0, APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET);
-        drive.drive(new ChassisSpeeds(0, vy,
-            omega));
-        return (omega == 0); // && is target valid
+        drive.drive(new ChassisSpeeds(vy, 0, omega));
+        return (Math.abs(targeting.tx.getDouble(0))<2) && (Math.abs(targeting.ty.getDouble(0) - APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET) < 1); // && is target valid
     }
     @Override
     public void shutdown() {

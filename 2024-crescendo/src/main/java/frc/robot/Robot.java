@@ -58,7 +58,7 @@ public class Robot extends LoggedRobot {
     // private PoseVision apriltagLockYaw;
     // private PoseVision apriltagLockY;
     // private PoseVision poseGetter;
-    // private LED leds;
+    private NeoPixelLED leds;
     private Power power;
     private PIDController turnPID;
     private PIDController drivePID;
@@ -71,7 +71,7 @@ public class Robot extends LoggedRobot {
     private BooleanManager robotOriented = new BooleanManager(false);
 
     // operator controls
-    private BooleanManager score = new BooleanManager(false);
+    private BooleanManager ledAmpSignal = new BooleanManager(false);
     private BooleanManager shootFromPodium = new BooleanManager(false);
     private BooleanManager outake = new BooleanManager(false);
     private BooleanManager intaking = new BooleanManager(false);
@@ -108,7 +108,7 @@ public class Robot extends LoggedRobot {
         pigeon = new NewtonPigeon2(new Pigeon2(PIGEON.CAN_ID));
         swerve = new Swerve(pigeon);
         power = new Power();
-        // leds = new LED();
+        leds = new NeoPixelLED();
         shooter = new Shooter();
         // poseGetter = new PoseVision(APRILTAG_VISION.kP,APRILTAG_VISION.kI,APRILTAG_VISION.kD,0);
         intake = new Intake();
@@ -267,6 +267,7 @@ public class Robot extends LoggedRobot {
         resetGyro.update         (driverController.getBackButton());
         autoCollect.update       (driverController.getLeftBumper());
         robotOriented.update     (driverController.getRightTriggerAxis() >0.1);
+        ledAmpSignal.update      (driverController.getBButton());
 
         //operator controls
         // shooter/feeder functions
@@ -278,7 +279,7 @@ public class Robot extends LoggedRobot {
         stow.update              (operatorController.getAButton());
         amp.update               (operatorController.getXButton());
         climb.update             (operatorController.getYButton());
-        speakerAmp.update           (operatorController.getRightTriggerAxis()>0.1);
+        speakerAmp.update        (operatorController.getRightTriggerAxis()>0.1);
         manualRaiseClimber.update(operatorController.getPOV() == 0);
         manualLowerClimber.update(operatorController.getPOV() == 180);
 
@@ -384,6 +385,17 @@ public class Robot extends LoggedRobot {
         }
         else if (shootFromPodium.getValue()) {
             subsystemsManager.score();
+        }
+
+        //LED management
+        if (ledAmpSignal.isRisingEdge()) {
+            leds.flashTimer.reset();
+        }
+        if (ledAmpSignal.getValue()) {
+            leds.amp();
+        }
+        else if (shooter.hasNote) {
+            leds.notePickup();
         }
         swerve.drive(subsystemsManager.update(shootFromPodium.getValue()?1:0/*<-- temporary*/, currentSpeeds));
     }

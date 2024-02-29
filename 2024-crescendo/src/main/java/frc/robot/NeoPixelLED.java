@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.Timer;
 
 public class NeoPixelLED {
     private AddressableLED ledStrip;
@@ -9,6 +10,7 @@ public class NeoPixelLED {
     private int LED_LENGTH = 30;
     private int ledCounter = 0;
     private LEDMode mode;
+    public Timer flashTimer;
 
     public NeoPixelLED() {
         ledStrip = new AddressableLED(0);
@@ -16,6 +18,8 @@ public class NeoPixelLED {
         ledBuffer = new AddressableLEDBuffer(LED_LENGTH);
         ledStrip.start();
         mode = LEDMode.OFF;
+        flashTimer = new Timer();
+        flashTimer.start();
     }
 
     public void update() {
@@ -33,18 +37,17 @@ public class NeoPixelLED {
     }
 
     public void amp() {
-        for (int i = 0; i < LED_LENGTH; i++) {
-            if ((i + ledCounter / 5) % 8 < 4) {
-                ledBuffer.setRGB(i, 255, 128, 0); // YELLOW
-            } else {
-                ledBuffer.setRGB(i, 0, 0, 0); // OFF
+        if (((int) (flashTimer.get() * 4)) % 2 == 0) {
+            for (int i = 0; i < LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, 255, 128, 0);
             }
+            ledStrip.setData(ledBuffer);
         }
-        ledCounter++;
-        ledStrip.setData(ledBuffer);
-        
-        if (ledCounter > 200) {
-            setMode(LEDMode.OFF);
+        else {
+            for (int i = 0; i < LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, 0, 0, 0);
+            }
+            ledStrip.setData(ledBuffer);
         }
     }
 

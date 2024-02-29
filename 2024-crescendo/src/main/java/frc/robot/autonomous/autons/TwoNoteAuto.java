@@ -11,7 +11,7 @@ import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.JointCommand;
 import frc.robot.commands.ShootCommand;
 
-public class TwoNoteAuto extends BaseAuto{
+public class TwoNoteAuto extends BaseAuto {
 
     private TrajectoryConfig config = new TrajectoryConfig(1, 1);
     private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);

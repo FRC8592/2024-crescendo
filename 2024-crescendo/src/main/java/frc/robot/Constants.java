@@ -32,14 +32,14 @@ public final class Constants {
         public static final double CAMERA_HEIGHT = -1; // TODO: Not set yet
 
         // Turn-to PID constants for the drive-to-note function
-        public static final double DRIVE_TO_TURN_kP = 0.075;
+        public static final double DRIVE_TO_TURN_kP = 0.05;
         public static final double DRIVE_TO_TURN_kI = 0;
         public static final double DRIVE_TO_TURN_kD = 0;
 
         // Drive PID constants for the drive-to-note function
         public static final double DRIVE_TO_DRIVE_kP = 0.13;
         public static final double DRIVE_TO_DRIVE_kI = 0;
-        public static final double DRIVE_TO_DRIVE_kD = 0;
+        public static final double DRIVE_TO_DRIVE_kD = 0.01;
 
         public static final double DRIVE_TO_TARGET_ANGLE = -20;
 
@@ -47,6 +47,26 @@ public final class Constants {
         public static final double TURN_kP = 0.03;
         public static final double TURN_kI = 0;
         public static final double TURN_kD = 0;
+    }
+
+    public final class APRILTAG_LIMELIGHT {
+        public static final String LIMELIGHT_NAME = "limelight-target"; // TODO idk what this is
+        
+        // for auto lock to speaker
+        public static final double SPEAKER_TURN_kP = 0.03;
+        public static final double SPEAKER_TURN_kI = 0;
+        public static final double SPEAKER_TURN_kD = 0;
+
+        public static final double SPEAKER_DRIVE_kP = 0.13;
+        public static final double SPEAKER_DRIVE_kI = 0;
+        public static final double SPEAKER_DRIVE_kD = 0;
+        public static final double SPEAKER_TY_TARGET = 13.5;
+
+        public static final double LOCK_ERROR = 2.0;
+        public static final double CLOSE_ERROR = 0;
+        public static final double CAMERA_HEIGHT = 0;
+        public static final double CAMERA_ANGLE = 0;
+        public static final double TARGET_HEIGHT = 0;
     }
 
     public final class INTAKE {

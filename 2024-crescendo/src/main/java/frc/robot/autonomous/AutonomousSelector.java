@@ -50,7 +50,10 @@ public class AutonomousSelector {
             BaseAuto selected = (BaseAuto) autonChooser.getSelected().getDeclaredConstructor().newInstance();
             return selected;
         } catch (Exception e) {
-            return null;
+             System.out.println(e.getMessage());
+             return null;
         }
+        // BaseAuto selected = (BaseAuto) autonChooser.getSelected().getDeclaredConstructor().newInstance();
+        // return selected;
     }
 }

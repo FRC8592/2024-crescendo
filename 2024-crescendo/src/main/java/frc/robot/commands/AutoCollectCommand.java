@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
@@ -29,6 +31,9 @@ public class AutoCollectCommand extends Command {
 
     @Override
     public boolean execute() {
+        Logger.recordOutput("CurrentCommand", "AutoCollectCommand");
+        Logger.recordOutput("hasNote", shooter.hasNote());
+
         this.targeting.updateVision();
         this.drive.drive(targeting.driveToTarget(
                 new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD),

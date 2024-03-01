@@ -167,7 +167,7 @@ public class MainSubsystemsManager {
                         subState = SubStates.PREP;
                         break;
                     case INTAKE:
-                        intake.spinPercentOutput(INTAKE.INTAKE_POWER);
+                        intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                         shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
                         if (shooter.hasNote()) {
                             mainState = MainStates.HOME;
@@ -183,7 +183,7 @@ public class MainSubsystemsManager {
                 }
                 break;
             case OUTAKE:
-                intake.spinPercentOutput(INTAKE.OUTAKE_POWER);
+                intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
                 shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
                 break;

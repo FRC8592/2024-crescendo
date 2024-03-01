@@ -138,6 +138,7 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putBoolean("hasNote()", shooter.noteBeamBreak.get());
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"FeederSpeedRPM", shooter.feederMotor.getVelocity());
+        Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getTopMotorVelocityRPM());
 
         //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();

@@ -396,6 +396,8 @@ public class Robot extends LoggedRobot {
         }
         else if (shooter.hasNote) {
             leds.notePickup();
+        } else {
+            leds.off();
         }
         swerve.drive(subsystemsManager.update(shootFromPodium.getValue()?1:0/*<-- temporary*/, currentSpeeds));
     }

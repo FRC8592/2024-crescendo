@@ -39,7 +39,7 @@ public class NeoPixelLED {
     public void amp() {
         if (((int) (flashTimer.get() * 4)) % 2 == 0) {
             for (int i = 0; i < LED_LENGTH; i++) {
-                ledBuffer.setRGB(i, 255, 128, 0);
+                ledBuffer.setRGB(i, 255, 255, 0);
             }
             ledStrip.setData(ledBuffer);
         }
@@ -53,7 +53,7 @@ public class NeoPixelLED {
 
     public void notePickup() {
         for(int i = 0; i < LED_LENGTH; i++) {
-            ledBuffer.setRGB(i, 0, 80, 30);
+            ledBuffer.setRGB(i, 0, 255,255);
         }
         ledStrip.setData(ledBuffer);
         
@@ -66,6 +66,13 @@ public class NeoPixelLED {
     public void off() {
         for(int i = 0; i < LED_LENGTH; i++) {
             ledBuffer.setRGB(i, 0, 0, 0);
+        }
+        ledStrip.setData(ledBuffer);
+    }
+
+    public void disabled() {
+        for(int i = 0; i < LED_LENGTH; i++) {
+            ledBuffer.setRGB(i, 0, 255, 0);
         }
         ledStrip.setData(ledBuffer);
     }

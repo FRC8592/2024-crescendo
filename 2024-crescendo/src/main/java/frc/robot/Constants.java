@@ -60,12 +60,12 @@ public final class Constants {
         public static final double SPEAKER_TURN_IZONE = 5;
 
         public static final double SPEAKER_DRIVE_kP = 0.2;
-        public static final double SPEAKER_DRIVE_kI = 0.03;
+        public static final double SPEAKER_DRIVE_kI = 0.3;
         public static final double SPEAKER_DRIVE_kD = 0;
         public static final double SPEAKER_TY_TARGET = 13.5;
 
         public static final double LOCK_ERROR = 1.0;
-        public static final double CLOSE_ERROR = 0.2;
+        public static final double CLOSE_ERROR = 0.1;
         public static final double CAMERA_HEIGHT = 0;
         public static final double CAMERA_ANGLE = 0;
         public static final double TARGET_HEIGHT = 0;

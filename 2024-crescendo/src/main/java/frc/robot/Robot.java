@@ -270,7 +270,6 @@ public class Robot extends LoggedRobot {
         resetGyro.update         (driverController.getBackButton());
         autoCollect.update       (driverController.getLeftBumper());
         robotOriented.update     (driverController.getRightTriggerAxis() >0.1);
-        ledAmpSignal.update      (driverController.getBButton());
 
         //operator controls
         // shooter/feeder functions
@@ -285,6 +284,7 @@ public class Robot extends LoggedRobot {
         speakerAmp.update        (operatorController.getRightTriggerAxis()>0.1);
         manualRaiseClimber.update(operatorController.getPOV() == 0);
         manualLowerClimber.update(operatorController.getPOV() == 180);
+        ledAmpSignal.update      (operatorController.getBackButton());
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
@@ -399,6 +399,8 @@ public class Robot extends LoggedRobot {
         }
         else if (shooter.hasNote) {
             leds.notePickup();
+        } else {
+            leds.off();
         }
         swerve.drive(subsystemsManager.update(shootFromPodium.getValue()?1:0/*<-- temporary*/, currentSpeeds));
     }

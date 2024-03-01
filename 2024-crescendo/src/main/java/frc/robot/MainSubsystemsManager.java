@@ -26,6 +26,7 @@ public class MainSubsystemsManager {
         UP,     // Climb: Move up
         DOWN,   // Climb: Move down.
         INTAKE, // Intake: run the intake and feeder motors
+        SPINNING_UP, // Amp
         NOTHING
     }
 
@@ -114,7 +115,9 @@ public class MainSubsystemsManager {
                         subState = SubStates.PREP;
                         break;
                     case SCORE: //Note that this runs READY and PREP's code too
-                        timer.start();
+                        if(Math.abs(shooter.feederMotor.getVelocity()-SHOOTER.AMP_FEEDER_SPEED)<SHOOTER.FEEDER_AMP_TOLERANCE){
+                            timer.start();
+                        }
                         shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_SPEED);
                         shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED, SHOOTER.AMP_FLYWHEEL_SPEED);
                         if (timer.get() > SHOOTER.AMP_SCORE_TIME) { //If we've been pushing the note into the amp for long enough

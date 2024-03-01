@@ -124,7 +124,7 @@ public final class Constants {
 
 
         public static final int AMP_FLYWHEEL_SPEED = -1000;
-        public static final int AMP_FEEDER_SPEED = -6000; //TODO: Figure out what this should actually be
+        public static final int AMP_FEEDER_SPEED = -3000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
         public static final int INTAKE_FEEDER_SPEED = 2000;
@@ -137,7 +137,9 @@ public final class Constants {
 
 
         public static final double SHOOT_SCORE_TIME = 0.5; //TODO: Tune this
-        public static final double AMP_SCORE_TIME = 1.5; //TODO: Tune this
+        public static final double AMP_SCORE_TIME = 0.25; //TODO: Tune this
+
+        public static final double FEEDER_AMP_TOLERANCE = 100;
     }
 
 

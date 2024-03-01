@@ -48,17 +48,18 @@ public final class Constants {
         public static final String LIMELIGHT_NAME = "limelight-target"; // TODO idk what this is
         
         // for auto lock to speaker
-        public static final double SPEAKER_TURN_kP = 0.03;
-        public static final double SPEAKER_TURN_kI = 0;
+        public static final double SPEAKER_TURN_kP = 0.05;
+        public static final double SPEAKER_TURN_kI = 0.016;
         public static final double SPEAKER_TURN_kD = 0;
+        public static final double SPEAKER_TURN_IZONE = 4;
 
-        public static final double SPEAKER_DRIVE_kP = 0.13;
+        public static final double SPEAKER_DRIVE_kP = 0.2;
         public static final double SPEAKER_DRIVE_kI = 0;
         public static final double SPEAKER_DRIVE_kD = 0;
         public static final double SPEAKER_TY_TARGET = 13.5;
 
-        public static final double LOCK_ERROR = 2.0;
-        public static final double CLOSE_ERROR = 0;
+        public static final double LOCK_ERROR = 0.5;
+        public static final double CLOSE_ERROR = 1.0;
         public static final double CAMERA_HEIGHT = 0;
         public static final double CAMERA_ANGLE = 0;
         public static final double TARGET_HEIGHT = 0;
@@ -88,7 +89,7 @@ public final class Constants {
     public final class SHOOTER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Shooter/";
         
-        public static final double FEEDER_MOTOR_kP = 0; //TODO: Tune this; start with 0.00001;
+        public static final double FEEDER_MOTOR_kP = 0.0000425; //TODO: Tune this; start with 0.00001;
         public static final double FEEDER_MOTOR_kI = 0.0;
         public static final double FEEDER_MOTOR_kD = 0.0;
         public static final double FEEDER_MOTOR_kF = 0.0001;
@@ -121,7 +122,7 @@ public final class Constants {
         public static final int AMP_FEEDER_SPEED = -2000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_SHOOTER_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 4000;
+        public static final int INTAKE_FEEDER_SPEED = 2000;
 
         //No shooter speed because we use the range table
         public static final int SHOOTING_FEEDER_SPEED = 1500;

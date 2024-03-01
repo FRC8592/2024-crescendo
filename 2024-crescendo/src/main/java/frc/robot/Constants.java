@@ -42,6 +42,7 @@ public final class Constants {
         public static final double DRIVE_TO_DRIVE_kD = 0.01;
 
         public static final double DRIVE_TO_TARGET_ANGLE = -20;
+        public static final double TELEOP_DRIVE_TO_TARGET_ANGLE = -24;
 
         //Turn PID constants (NOT drive-to)
         public static final double TURN_kP = 0.03;
@@ -54,17 +55,17 @@ public final class Constants {
         
         // for auto lock to speaker
         public static final double SPEAKER_TURN_kP = 0.05;
-        public static final double SPEAKER_TURN_kI = 0.016;
+        public static final double SPEAKER_TURN_kI = 0.032;
         public static final double SPEAKER_TURN_kD = 0;
-        public static final double SPEAKER_TURN_IZONE = 4;
+        public static final double SPEAKER_TURN_IZONE = 5;
 
         public static final double SPEAKER_DRIVE_kP = 0.2;
-        public static final double SPEAKER_DRIVE_kI = 0;
+        public static final double SPEAKER_DRIVE_kI = 0.03;
         public static final double SPEAKER_DRIVE_kD = 0;
         public static final double SPEAKER_TY_TARGET = 13.5;
 
-        public static final double LOCK_ERROR = 0.5;
-        public static final double CLOSE_ERROR = 1.0;
+        public static final double LOCK_ERROR = 1.0;
+        public static final double CLOSE_ERROR = 0.2;
         public static final double CAMERA_HEIGHT = 0;
         public static final double CAMERA_ANGLE = 0;
         public static final double TARGET_HEIGHT = 0;

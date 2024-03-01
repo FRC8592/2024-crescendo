@@ -24,6 +24,7 @@ public class AutoAimCommand extends Command {
         this.targeting = vision;
         this.tolerance = tolerance;
         turnPID.setTolerance(tolerance);
+        turnPID.setIZone(APRILTAG_LIMELIGHT.SPEAKER_TURN_IZONE);
     }
     @Override
     public void initialize() {
@@ -35,9 +36,9 @@ public class AutoAimCommand extends Command {
 
         targeting.updateVision();
         double omega = targeting.turnRobot(0.0, turnPID, "tx", 2.0, 0.0);
-        double vy = targeting.turnRobot(0, drivePID, "ty", 2.0, APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET);
+        double vy = -targeting.turnRobot(0, drivePID, "ty", 2.0, APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET);
         drive.drive(new ChassisSpeeds(vy, 0, omega));
-        return (Math.abs(targeting.tx.getDouble(0))<2) && (Math.abs(targeting.ty.getDouble(0) - APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET) < 1); // && is target valid
+        return (Math.abs(targeting.processedDx)<APRILTAG_LIMELIGHT.LOCK_ERROR) && (Math.abs(targeting.processedDy - APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET) < APRILTAG_LIMELIGHT.CLOSE_ERROR); // && is target valid
     }
     @Override
     public void shutdown() {

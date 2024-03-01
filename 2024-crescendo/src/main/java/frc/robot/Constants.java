@@ -53,17 +53,18 @@ public final class Constants {
         public static final String LIMELIGHT_NAME = "limelight-target"; // TODO idk what this is
         
         // for auto lock to speaker
-        public static final double SPEAKER_TURN_kP = 0.03;
-        public static final double SPEAKER_TURN_kI = 0;
+        public static final double SPEAKER_TURN_kP = 0.05;
+        public static final double SPEAKER_TURN_kI = 0.016;
         public static final double SPEAKER_TURN_kD = 0;
+        public static final double SPEAKER_TURN_IZONE = 4;
 
-        public static final double SPEAKER_DRIVE_kP = 0.13;
+        public static final double SPEAKER_DRIVE_kP = 0.2;
         public static final double SPEAKER_DRIVE_kI = 0;
         public static final double SPEAKER_DRIVE_kD = 0;
         public static final double SPEAKER_TY_TARGET = 13.5;
 
-        public static final double LOCK_ERROR = 2.0;
-        public static final double CLOSE_ERROR = 0;
+        public static final double LOCK_ERROR = 0.5;
+        public static final double CLOSE_ERROR = 1.0;
         public static final double CAMERA_HEIGHT = 0;
         public static final double CAMERA_ANGLE = 0;
         public static final double TARGET_HEIGHT = 0;
@@ -74,14 +75,17 @@ public final class Constants {
         public static final int TOP_MOTOR_CAN_ID = 35;
         public static final int BOTTOM_MOTOR_CAN_ID = 34;
 
-        public static final double MOTOR_kP = 0.0007;
+        public static final double MOTOR_kP = 0.00015;
         public static final double MOTOR_kI = 0.00; //TODO: We need a lot of this
-        public static final double MOTOR_kD = 0.01;
-        public static final double MOTOR_kFF = 0.000175;
+        public static final double MOTOR_kD = 0.015;
+        public static final double MOTOR_kFF = 0.00016;
 
         // public static final double SPEED_TOP = 1000; TODO: Currently in power mode. We should change back to velocity mode before our first regional
         public static final double INTAKE_POWER = 0.75; //TODO: Delete this once we have velocity mode working
         public static final double OUTAKE_POWER = -0.75;
+
+        public static final double INTAKE_VELOCITY = 4500;
+        public static final double OUTAKE_VELOCITY = -2500;
 
         // NOTE: only one motor on now
         // public static final double BOTTOM_MOTOR_kP = 0.0001;
@@ -98,10 +102,10 @@ public final class Constants {
         public static final int FEEDER_MOTOR_CAN_ID = 31;
         public static final int NOTE_BEAM_BREAK_DIO_PORT = 0;
 
-        public static final double FEEDER_MOTOR_kP = 0; //TODO: Tune this; start with 0.00001;
+        public static final double FEEDER_MOTOR_kP = 0.00001; //TODO: Tune this; start with 0.00001;
         public static final double FEEDER_MOTOR_kI = 0.0;
         public static final double FEEDER_MOTOR_kD = 0.0;
-        public static final double FEEDER_MOTOR_kF = 0.0001;
+        public static final double FEEDER_MOTOR_kF = 0.00018;
 
         public static final double TOP_SHOOTER_MOTOR_kP = 0.0000825;
         public static final double TOP_SHOOTER_MOTOR_kI = 0.0000001;
@@ -120,10 +124,10 @@ public final class Constants {
 
 
         public static final int AMP_FLYWHEEL_SPEED = -1000;
-        public static final int AMP_FEEDER_SPEED = -6000; //TODO: Figure out what this should actually be
+        public static final int AMP_FEEDER_SPEED = -3000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 4000;
+        public static final int INTAKE_FEEDER_SPEED = 2000;
 
         //No shooter speed because we use the range table
         public static final int SHOOTING_FEEDER_SPEED = 1500;
@@ -133,7 +137,9 @@ public final class Constants {
 
 
         public static final double SHOOT_SCORE_TIME = 0.5; //TODO: Tune this
-        public static final double AMP_SCORE_TIME = 1.5; //TODO: Tune this
+        public static final double AMP_SCORE_TIME = 0.25; //TODO: Tune this
+
+        public static final double FEEDER_AMP_TOLERANCE = 100;
     }
 
 

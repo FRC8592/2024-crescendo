@@ -134,8 +134,22 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterSpeedDifference (Bottom - Top)", shooter.bottomShooterMotor.getVelocity()-shooter.topShooterMotor.getVelocity());
 
-        Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.hasNote);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.noteBeamBreak.get());
+        SmartDashboard.putBoolean("hasNote()", shooter.noteBeamBreak.get());
+
+        Logger.recordOutput(SHOOTER.LOG_PATH+"FeederSpeedRPM", shooter.feederMotor.getVelocity());
+
+        //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();
+
+        
+        // SmartDashboard.putNumber("elevator position in meters", elevator.getExtensionLength());
+        // SmartDashboard.putNumber("elevator position in rotations", elevator.getExtensionLength()/ELEVATOR.ELEVATOR_GEAR_RATIO);
+
+        // SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
+        //SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS*CONVERSIONS.PIVOT_GEAR_RATIO);
+        // SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*ELEVATOR.PIVOT_GEAR_RATIO)/360);
+        
     }
 
     @Override

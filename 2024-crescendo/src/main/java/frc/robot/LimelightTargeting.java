@@ -39,7 +39,7 @@ public class LimelightTargeting {
     public double targetRange; // Range from robot to target (inches)
     public Timer timer;
     public double processedDx = 0;
-    private double processedDy = 0;
+    public double processedDy = 0;
     // Private autoaim variables
     private double turnSpeed;
     private double lastTime = 0;

@@ -32,14 +32,14 @@ public final class Constants {
         public static final double CAMERA_HEIGHT = -1; // TODO: Not set yet
 
         // Turn-to PID constants for the drive-to-note function
-        public static final double DRIVE_TO_TURN_kP = 0.075;
+        public static final double DRIVE_TO_TURN_kP = 0.05;
         public static final double DRIVE_TO_TURN_kI = 0;
         public static final double DRIVE_TO_TURN_kD = 0;
 
         // Drive PID constants for the drive-to-note function
         public static final double DRIVE_TO_DRIVE_kP = 0.13;
         public static final double DRIVE_TO_DRIVE_kI = 0;
-        public static final double DRIVE_TO_DRIVE_kD = 0;
+        public static final double DRIVE_TO_DRIVE_kD = 0.01;
 
         public static final double DRIVE_TO_TARGET_ANGLE = -20;
 
@@ -47,6 +47,27 @@ public final class Constants {
         public static final double TURN_kP = 0.03;
         public static final double TURN_kI = 0;
         public static final double TURN_kD = 0;
+    }
+
+    public final class APRILTAG_LIMELIGHT {
+        public static final String LIMELIGHT_NAME = "limelight-target"; // TODO idk what this is
+        
+        // for auto lock to speaker
+        public static final double SPEAKER_TURN_kP = 0.05;
+        public static final double SPEAKER_TURN_kI = 0.016;
+        public static final double SPEAKER_TURN_kD = 0;
+        public static final double SPEAKER_TURN_IZONE = 4;
+
+        public static final double SPEAKER_DRIVE_kP = 0.2;
+        public static final double SPEAKER_DRIVE_kI = 0;
+        public static final double SPEAKER_DRIVE_kD = 0;
+        public static final double SPEAKER_TY_TARGET = 13.5;
+
+        public static final double LOCK_ERROR = 0.5;
+        public static final double CLOSE_ERROR = 1.0;
+        public static final double CAMERA_HEIGHT = 0;
+        public static final double CAMERA_ANGLE = 0;
+        public static final double TARGET_HEIGHT = 0;
     }
 
     public final class INTAKE {
@@ -78,7 +99,7 @@ public final class Constants {
         public static final int FEEDER_MOTOR_CAN_ID = 31;
         public static final int NOTE_BEAM_BREAK_DIO_PORT = 0;
 
-        public static final double FEEDER_MOTOR_kP = 0; //TODO: Tune this; start with 0.00001;
+        public static final double FEEDER_MOTOR_kP = 0.0000425; //TODO: Tune this; start with 0.00001;
         public static final double FEEDER_MOTOR_kI = 0.0;
         public static final double FEEDER_MOTOR_kD = 0.0;
         public static final double FEEDER_MOTOR_kF = 0.0001;
@@ -103,7 +124,7 @@ public final class Constants {
         public static final int AMP_FEEDER_SPEED = -6000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 4000;
+        public static final int INTAKE_FEEDER_SPEED = 2000;
 
         //No shooter speed because we use the range table
         public static final int SHOOTING_FEEDER_SPEED = 1500;

@@ -1,6 +1,9 @@
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Elevator;
 import frc.robot.Shooter;
 import frc.robot.Constants.*;
@@ -23,10 +26,14 @@ public class ShootCommand extends Command{
     public void initialize() {
         timer.reset();
         timeoutTimer.start();
+
+        SmartDashboard.putBoolean("SHOOTER_ACTIVE", true);
     }
 
     @Override
     public boolean execute() {
+        Logger.recordOutput("CurrentCommand", "ShootCommand");
+
         elevator.setPivotAngleCustom(elevatorPivotAngle);
         shooter.setShootVelocity(shootVelocity, shootVelocity);
 
@@ -48,6 +55,8 @@ public class ShootCommand extends Command{
       shooter.stop();
       shooter.stopFeeders();
       elevator.stow();
+
+      SmartDashboard.putBoolean("SHOOTER_ACTIVE", false);
     }
     
 }

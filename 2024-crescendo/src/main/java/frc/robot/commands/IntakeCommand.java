@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Intake;
 import frc.robot.Robot;
@@ -23,6 +25,8 @@ public class IntakeCommand extends Command {
 
     @Override
     public boolean execute() {
+        Logger.recordOutput("CurrentCommand", "IntakeCommand");
+
        //spins intake and feeder until beam sensor stops
         intake.spinPercentOutput(INTAKE.INTAKE_POWER);
         shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);

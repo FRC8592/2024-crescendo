@@ -22,30 +22,26 @@ public class RedLeft2MidnotesAuto extends BaseAuto{
 
         queue = new CommandQueue(
                 new GyroSetCommand(drive, -45),
-                new ShootCommand(shooter, elevator, 3000, 5),
-                new FollowerCommand(drive, midNote1),
-                new JointCommand(
-                        new IntakeCommand(intake, shooter),
-                        new AutoCollectCommand(targeting, drive, shooter)
-                ),
-                new DriveToPointCommand(drive, AutonomousPositions.SUBWOOFER_MIDDLE.translate(2,-2), config.setEndVelocity(1)),
-                new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
-                new ShootCommand(shooter, elevator, 4500, 29.5),
-                new DriveToPointCommand(drive, AutonomousPositions.MID_NOTE_4.translate(-2, 0), config.setEndVelocity(0)),
-                new JointCommand(
-                        new IntakeCommand(intake, shooter),
-                        new AutoCollectCommand(targeting, drive, shooter)
-                ),
-                new DriveToPointCommand(drive, AutonomousPositions.SUBWOOFER_MIDDLE.translate(2,-1), config.setEndVelocity(1)),
-                new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
-                new ShootCommand(shooter, elevator, 4500, 29.5)
                 // new ShootCommand(shooter, elevator, 3000, 5),
+                new FollowerCommand(drive, midNote1),
                 // new JointCommand(
                 //         new IntakeCommand(intake, shooter),
-                //         new AutoCollectCommand(targeting, drive,
-                //                 shooter)),
-                // new DriveToPointCommand(drive, AutonomousPositions.SUBWOOFER_MIDDLE.getPose(), config),
-                // new ShootCommand(shooter, elevator, 3000,5)
+                //         new AutoCollectCommand(targeting, drive, shooter)
+                // ),
+                new DriveToPointCommand(drive, AutonomousPositions.MID_NOTE_5.getPose(), AutonomousPositions.SUBWOOFER_MIDDLE.translate(4,-4), config.setEndVelocity(3)),
+                new DriveToPointCommand(drive, AutonomousPositions.SUBWOOFER_MIDDLE.translate(4,-4), AutonomousPositions.SUBWOOFER_MIDDLE.translate(1.5,-3), config.setStartVelocity(3)),
+                new DriveToPointCommand(drive, AutonomousPositions.SUBWOOFER_MIDDLE.translate(1.5,-3), AutonomousPositions.SUBWOOFER_MIDDLE.translate(1,-1.5), config),
+                // new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
+                // new ShootCommand(shooter, elevator, 4500, 29.5),
+                // Add a midpoint
+                new DriveToPointCommand(drive, AutonomousPositions.SUBWOOFER_MIDDLE.translate(1,-1.5), AutonomousPositions.MID_NOTE_4.translate(-2,0), config.setStartVelocity(0)),
+                // new JointCommand(
+                //         new IntakeCommand(intake, shooter),
+                //         new AutoCollectCommand(targeting, drive, shooter)
+                // ),
+                new DriveToPointCommand(drive, AutonomousPositions.MID_NOTE_4.getPose(), AutonomousPositions.SUBWOOFER_MIDDLE.translate(1,-1), config.setEndVelocity(1))
+                // new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
+                // new ShootCommand(shooter, elevator, 4500, 29.5)
                 );
     }
 

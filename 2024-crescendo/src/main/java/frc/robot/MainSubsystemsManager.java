@@ -56,8 +56,6 @@ public class MainSubsystemsManager {
      *
      * 4. All main states have an INIT state that run initialization code and then switches the sub-state to PREP; all state-setters other than HOME set the sub-state to INIT.
      *
-     * 5. Aside from "force" state-setters, state-setters don't do anything if we're actively scoring.
-     *
      * 6. All state-setters return whether they set the state as requested.
      */
     /**
@@ -213,19 +211,17 @@ public class MainSubsystemsManager {
      * @return whether or not the state was set as requested.
      */
     public boolean intake(boolean startStop) {
-        if (subState != SubStates.SCORE && !shooter.hasNote) {
-            if (startStop) {
-                if (mainState != MainStates.INTAKE) {
-                    mainState = MainStates.INTAKE;
-                    subState = SubStates.INIT;
-                    return true;
-                }
-            } else {
-                if (mainState == MainStates.INTAKE) {
-                    mainState = MainStates.HOME;
-                    subState = SubStates.NOTHING;
-                    return true;
-                }
+        if (startStop) {
+            if (mainState != MainStates.INTAKE) {
+                mainState = MainStates.INTAKE;
+                subState = SubStates.INIT;
+                return true;
+            }
+        } else {
+            if (mainState == MainStates.INTAKE) {
+                mainState = MainStates.HOME;
+                subState = SubStates.NOTHING;
+                return true;
             }
         }
         return false;
@@ -252,19 +248,17 @@ public class MainSubsystemsManager {
      * @param startStop start or stop amp position (stopping stows by default).
      */
     public boolean amp(boolean startStop) {
-        if (subState != SubStates.SCORE) {
-            if (startStop) {
-                if (mainState != MainStates.AMP) { // If we're actively scoring, finish that score before continuing.
-                    mainState = MainStates.AMP;
-                    subState = SubStates.INIT;
-                    return true;
-                }
-            } else {
-                if (mainState == MainStates.AMP) {
-                    mainState = MainStates.HOME;
-                    subState = SubStates.NOTHING;
-                    return true;
-                }
+        if (startStop) {
+            if (mainState != MainStates.AMP) { // If we're actively scoring, finish that score before continuing.
+                mainState = MainStates.AMP;
+                subState = SubStates.INIT;
+                return true;
+            }
+        } else {
+            if (mainState == MainStates.AMP) {
+                mainState = MainStates.HOME;
+                subState = SubStates.NOTHING;
+                return true;
             }
         }
         return false;
@@ -275,19 +269,17 @@ public class MainSubsystemsManager {
      * @param startStop whether to start or stop preparing
      */
     public boolean speaker(boolean startStop) {
-        if (subState != SubStates.SCORE) {
-            if (startStop) {
-                if (mainState != MainStates.SPEAKER) {
-                    mainState = MainStates.SPEAKER;
-                    subState = SubStates.INIT;
-                    return true;
-                }
-            } else {
-                if (mainState == MainStates.SPEAKER) {
-                    mainState = MainStates.HOME;
-                    subState = SubStates.NOTHING;
-                    return true;
-                }
+        if (startStop) {
+            if (mainState != MainStates.SPEAKER) {
+                mainState = MainStates.SPEAKER;
+                subState = SubStates.INIT;
+                return true;
+            }
+        } else {
+            if (mainState == MainStates.SPEAKER) {
+                mainState = MainStates.HOME;
+                subState = SubStates.NOTHING;
+                return true;
             }
         }
         return false;
@@ -297,16 +289,6 @@ public class MainSubsystemsManager {
      * Return all subsystems to the home positions/speeds. Does nothing if actively scoring.
      */
     public void home() {
-        if (subState != SubStates.SCORE) {
-            mainState = MainStates.HOME;
-            subState = SubStates.NOTHING;
-        }
-    }
-
-    /**
-     * Return all subsystems to the home positions/speeds. Overrides the usual "ignore-if-scoring" rule
-     */
-    public void forceHome() {
         mainState = MainStates.HOME;
         subState = SubStates.NOTHING;
     }
@@ -317,19 +299,17 @@ public class MainSubsystemsManager {
      * @param startStop whether to start (lift the pivot and extension to the max) or stop (stow) preparing. Note that stopping doesn't do anything if not already in the climbing state.
      */
     public boolean climb(boolean startStop){
-        if (subState != SubStates.SCORE) {
-            if (startStop) {
-                if (mainState != MainStates.CLIMB) {
-                    mainState = MainStates.CLIMB;
-                    subState = SubStates.INIT;
-                    return true;
-                }
-            } else {
-                if (mainState == MainStates.CLIMB) {
-                    mainState = MainStates.HOME;
-                    subState = SubStates.NOTHING;
-                    return true;
-                }
+        if (startStop) {
+            if (mainState != MainStates.CLIMB) {
+                mainState = MainStates.CLIMB;
+                subState = SubStates.INIT;
+                return true;
+            }
+        } else {
+            if (mainState == MainStates.CLIMB) {
+                mainState = MainStates.HOME;
+                subState = SubStates.NOTHING;
+                return true;
             }
         }
         return false;

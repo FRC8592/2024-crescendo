@@ -168,6 +168,7 @@ public class MainSubsystemsManager {
                         subState = SubStates.PREP;
                         break;
                     case INTAKE:
+                        shooter.hasNote(); //Update the beam-break
                         intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                         shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
                         break;

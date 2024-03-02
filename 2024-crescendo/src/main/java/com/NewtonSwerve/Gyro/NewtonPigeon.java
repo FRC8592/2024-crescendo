@@ -30,4 +30,8 @@ public class NewtonPigeon implements Gyro {
         this.pigeon.setYaw(0);
     }
 
+    public void setYaw(double yaw){
+        this.pigeon.setYaw(yaw);
+    }
+
 }

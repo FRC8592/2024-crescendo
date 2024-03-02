@@ -27,6 +27,7 @@
         }
       },
       "/SmartDashboard/Field": {
+        "image": "/home/martin/Downloads/2024-field.png",
         "window": {
           "visible": true
         }

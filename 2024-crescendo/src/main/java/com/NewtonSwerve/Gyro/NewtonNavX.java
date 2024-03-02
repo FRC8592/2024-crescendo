@@ -25,4 +25,7 @@ public class NewtonNavX implements Gyro {
     public void zeroYaw() {
         this.navX.zeroYaw();
     }
+    public void setYaw(double yaw){
+        System.err.println("Can't set yaw on a NavX");
+    }
 }

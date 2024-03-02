@@ -45,18 +45,18 @@ public class RedLeft2MidnotesAuto extends BaseAuto{
                 //         new IntakeCommand(intake, shooter),
                 //         new AutoCollectCommand(targeting, drive, shooter)
                 // ),
-                new DriveToPointCommand(drive, AutonomousPositions.MID_NOTE_5.getPose(), AutonomousPositions.MID_NOTE_5.translate(-2,0), config.setStartVelocity(0).setEndVelocity(3)),
+                new DriveToPointCommand(drive, AutonomousPositions.MID_NOTE_5.translate(-2,0), config.setStartVelocity(0).setEndVelocity(3)),
                 new FollowerCommand(drive, mn1ToShoot),
                 // new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
                 // new ShootCommand(shooter, elevator, 4500, 29.5),
                 // Add a midpoint
-                new DriveToPointCommand(drive, AutonomousPositions.SUBWOOFER_DOWN.translate(1.5,0,new Rotation2d()), new Pose2d(2.5,4.5,new Rotation2d()), config.setStartVelocity(0).setEndVelocity(3)),
+                new DriveToPointCommand(drive, new Pose2d(2.5,4.5,new Rotation2d()), config.setStartVelocity(0).setEndVelocity(3)),
                 new FollowerCommand(drive, shootToMN2),
                 // new JointCommand(
                 //         new IntakeCommand(intake, shooter),
                 //         new AutoCollectCommand(targeting, drive, shooter)
                 // ),
-                new DriveToPointCommand(drive, AutonomousPositions.MID_NOTE_4.getPose(), AutonomousPositions.MID_NOTE_5.translate(-2,0.5), config.setStartVelocity(0).setEndVelocity(3)),
+                new DriveToPointCommand(drive, AutonomousPositions.MID_NOTE_5.translate(-2,0.5), config.setStartVelocity(0).setEndVelocity(3)),
                 new FollowerCommand(drive, mn2ToShoot)
                 // new DriveToPointCommand(drive, AutonomousPositions.MID_NOTE_4.getPose(), AutonomousPositions.SUBWOOFER_MIDDLE.translate(1,-1), config.setEndVelocity(1))
                 // new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),

@@ -156,4 +156,8 @@ public class Swerve {
     public void zeroGyroscope() {
         swerve.zeroGyroscope();
     }
+
+    public void setGyroscopeRotation(double yaw){
+        swerve.gyro.setYaw(yaw);
+    }
 }

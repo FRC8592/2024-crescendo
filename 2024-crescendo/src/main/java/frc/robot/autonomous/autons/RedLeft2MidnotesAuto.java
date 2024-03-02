@@ -7,7 +7,7 @@ import frc.robot.Constants.*;
 import frc.robot.autonomous.*;
 import frc.robot.commands.*;
 
-public class Left2MidnotesAuto extends BaseAuto{
+public class RedLeft2MidnotesAuto extends BaseAuto{
     private TrajectoryConfig config = new TrajectoryConfig(3, 1);
     private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
 
@@ -21,6 +21,7 @@ public class Left2MidnotesAuto extends BaseAuto{
         speakerPID.setTolerance(APRILTAG_LIMELIGHT.LOCK_ERROR);
 
         queue = new CommandQueue(
+                new GyroSetCommand(drive, -45),
                 new ShootCommand(shooter, elevator, 3000, 5),
                 new FollowerCommand(drive, midNote1),
                 new JointCommand(
@@ -35,7 +36,7 @@ public class Left2MidnotesAuto extends BaseAuto{
                         new IntakeCommand(intake, shooter),
                         new AutoCollectCommand(targeting, drive, shooter)
                 ),
-                new DriveToPointCommand(drive, AutonomousPositions.SUBWOOFER_MIDDLE.translate(2,-2), config.setEndVelocity(1)),
+                new DriveToPointCommand(drive, AutonomousPositions.SUBWOOFER_MIDDLE.translate(2,-1), config.setEndVelocity(1)),
                 new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
                 new ShootCommand(shooter, elevator, 4500, 29.5)
                 // new ShootCommand(shooter, elevator, 3000, 5),

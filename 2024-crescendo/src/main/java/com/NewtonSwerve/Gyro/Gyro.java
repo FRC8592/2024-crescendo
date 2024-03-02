@@ -7,6 +7,8 @@ public interface Gyro {
 
     public double getPitch();
 
+    public void setYaw(double yaw);
+
     public void zeroYaw();
 
     // public boolean isRotating();

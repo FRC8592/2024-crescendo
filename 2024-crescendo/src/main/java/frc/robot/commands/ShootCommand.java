@@ -47,7 +47,7 @@ public class ShootCommand extends Command{
             }
         }
 
-        return timer.get() > 0.5 || (timeoutSeconds != -1 && timeoutTimer.get() >= timeoutSeconds);
+        return timer.get() > 0.75 || (timeoutSeconds != -1 && timeoutTimer.get() >= timeoutSeconds);
     }
 
     @Override

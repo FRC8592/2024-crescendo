@@ -12,7 +12,7 @@ import frc.robot.autonomous.*;
 import frc.robot.commands.*;
 
 public class Left2MidnotesAuto extends BaseAuto{
-    private TrajectoryConfig config = new TrajectoryConfig(4, 3);
+    private TrajectoryConfig config = new TrajectoryConfig(2,1);
     private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
 
     private SwerveTrajectory midNote1 = AutonomousPositions.generate(config.setEndVelocity(4),
@@ -40,34 +40,34 @@ public class Left2MidnotesAuto extends BaseAuto{
         speakerPID.setTolerance(APRILTAG_LIMELIGHT.LOCK_ERROR);
         int angle = 0;
         if(DriverStation.getAlliance().get() == Alliance.Red){
-            angle = 60;
+            angle = 0;
         }
         else{
-            angle = -60;
+            angle = 0;
         }
         queue = new CommandQueue(
-                new GyroSetCommand(drive, angle),
-                new ShootCommand(shooter, elevator, 3000, 5),
+                new GyroSetCommand(drive, -angle),
+                // new ShootCommand(shooter, elevator, 3000, 6),
                 new FollowerCommand(drive, midNote1),
                 new RotateCommand(drive, Rotation2d.fromDegrees(-angle)),
-                new JointCommand(
-                        new IntakeCommand(intake, shooter),
-                        new AutoCollectCommand(targeting, drive, shooter)
-                ),
+                // new JointCommand(
+                //         new IntakeCommand(intake, shooter),
+                //         new AutoCollectCommand(targeting, drive, shooter)
+                // ),
                 new RotateCommand(drive, Rotation2d.fromDegrees(-angle)),
                 new FollowerCommand(drive, mn1ToShoot),
-                new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
-                new ShootCommand(shooter, elevator, 4500, 29.5),
+                // new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
+                // new ShootCommand(shooter, elevator, 4500, 29.5),
                 new RotateCommand(drive, Rotation2d.fromDegrees(-angle)),
                 new FollowerCommand(drive, shootToMN2),
-                new JointCommand(
-                        new IntakeCommand(intake, shooter),
-                        new AutoCollectCommand(targeting, drive, shooter)
-                ),
+                // new JointCommand(
+                //         new IntakeCommand(intake, shooter),
+                //         new AutoCollectCommand(targeting, drive, shooter)
+                // ),
                 new RotateCommand(drive, Rotation2d.fromDegrees(-angle)),
-                new FollowerCommand(drive, mn2ToShoot),
-                new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
-                new ShootCommand(shooter, elevator, 4500, 29.5)
+                new FollowerCommand(drive, mn2ToShoot)
+                // new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
+                // new ShootCommand(shooter, elevator, 4500, 29.5)
                 );
     }
 

@@ -71,6 +71,7 @@ public class MainSubsystemsManager {
             default: // Stop all the wheels and stow the elevator
                 elevator.stow();
                 stopWheels();
+                timer.reset();
                 break;
             case SPEAKER:
                 switch (subState) {
@@ -80,6 +81,7 @@ public class MainSubsystemsManager {
                     case INIT: //Single-frame initialization case
                         intake.spinPercentOutput(0);
                         subState = SubStates.PREP;
+                        timer.reset();
                         break;
                     case SCORE: // Note that this runs READY and PREP's code too because there's no `break;` after this code
                         timer.start();
@@ -111,6 +113,7 @@ public class MainSubsystemsManager {
                     case INIT:
                         stopWheels();
                         subState = SubStates.PREP;
+                        timer.reset();
                         break;
                     case SCORE: //Note that this runs READY and PREP's code too
                         if(Math.abs(shooter.feederMotor.getVelocity()-SHOOTER.AMP_FEEDER_SPEED)<SHOOTER.FEEDER_AMP_TOLERANCE){
@@ -143,6 +146,7 @@ public class MainSubsystemsManager {
                     case INIT:
                         stopWheels();
                         elevator.climbPosition();
+                        timer.reset();
                         subState = SubStates.PREP;
                         break;
                     case UP: // In this state when the buton is held
@@ -166,6 +170,7 @@ public class MainSubsystemsManager {
                     case INIT:
                         shooter.setShootPercentOutput(0); // Not using stopWheels here because we want to run the intake and feeder wheels
                         subState = SubStates.PREP;
+                        timer.reset();
                         break;
                     case INTAKE:
                         intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);

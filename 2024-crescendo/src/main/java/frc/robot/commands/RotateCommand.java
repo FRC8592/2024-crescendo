@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.*;
@@ -20,9 +21,15 @@ public class RotateCommand extends Command {
     }
     @Override
     public boolean execute() {
-        drive.drive(new ChassisSpeeds(0, 0,
-                turnPID.calculate(drive.getGyroscopeRotation().getDegrees(), -target.getDegrees())));
-        return Math.abs(drive.getGyroscopeRotation().getDegrees() - target.getDegrees()) < 3;
+        if(Robot.isReal()){
+            drive.drive(new ChassisSpeeds(0, 0,
+                    turnPID.calculate(drive.getGyroscopeRotation().getDegrees(), -target.getDegrees())));
+            return Math.abs(drive.getGyroscopeRotation().getDegrees() - target.getDegrees()) < 3;
+        }
+        else{
+            Robot.FIELD.setRobotPose(new Pose2d(Robot.FIELD.getRobotPose().getTranslation(), target));
+            return true;
+        }
     }
     @Override
     public void shutdown() {

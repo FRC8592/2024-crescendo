@@ -22,7 +22,7 @@ public class AutonomousSelector {
             RedThreeWingNoteVisionAuto.class,
             ThreeWingNoteVisionAuto.class,
         OneNoteAuto.class,
-        RedLeft2MidnotesAuto.class
+        Left2MidnotesAuto.class
         // IWillNameThisLaterAuto.class,
     };
 

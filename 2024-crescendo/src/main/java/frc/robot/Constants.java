@@ -165,7 +165,7 @@ public final class Constants {
 
 
         //Protection control config
-        public static final double EXTENSION_FULLY_RETRACTED = 0.001; //When the extension is retracted below this value, we can lower the pivot to zero.
+        public static final double EXTENSION_FULLY_RETRACTED = 0.01; //When the extension is retracted below this value, we can lower the pivot to zero.
         public static final double EXTENSION_FORCE_RETRACT_THRESHOLD = 30; //The threshold for the protection code from the hooks on the elevator. See Elevator.java.
         public static final double RETRACT_THRESHOLD_TOLERANCE = 2; //If we're within this value of the threshold (or higher), the extension works.
         public static final double ANGLE_TOLERANCE = 0.5; //Half a degree; used for the function that detects whether the pivot is at the target angle.

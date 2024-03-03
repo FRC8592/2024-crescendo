@@ -324,25 +324,15 @@ public class Robot extends LoggedRobot {
         else if (intaking.isFallingEdge()) {
             subsystemsManager.intake(false);
         }
-        else if (amp.isToggleRisingEdge()) {
-            if (subsystemsManager.amp(true)) {
-                climb.setToggle(false);
-            }
-        }
-        else if (amp.isToggleFallingEdge()) {
-            subsystemsManager.amp(false);
+        else if (amp.isRisingEdge()) {
+            subsystemsManager.amp(true);
         }
         else if (stow.isRisingEdge()) {
             subsystemsManager.home();
         }
         //Maybe add something here to trigger `subsystemsManager.forceHome()`
-        else if (climb.isToggleRisingEdge()) {
-            if (subsystemsManager.climb(true)) {
-                amp.setToggle(false);
-            }
-        }
-        else if (climb.isToggleFallingEdge()) {
-            subsystemsManager.climb(false);
+        else if (climb.isRisingEdge()) {
+            subsystemsManager.climb(true);
         }
         //TODO: Figure out what to do with prime
         else if (manualRaiseClimber.isRisingEdge()) {

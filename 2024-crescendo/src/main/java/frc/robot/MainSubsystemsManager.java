@@ -170,10 +170,6 @@ public class MainSubsystemsManager {
                     case INTAKE:
                         intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                         shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-                        if (shooter.hasNote()) {
-                            mainState = MainStates.HOME;
-                            subState = SubStates.NOTHING;
-                        }
                         break;
                     case PREP:
                         elevator.stow();

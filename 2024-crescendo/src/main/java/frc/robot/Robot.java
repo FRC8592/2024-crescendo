@@ -409,8 +409,9 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testPeriodic() {
-        driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis() * 255);
-        operatorController.setRumble(RumbleType.kBothRumble, operatorController.getLeftTriggerAxis() * 255);
+        // driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis() * 255);
+        // operatorController.setRumble(RumbleType.kBothRumble, operatorController.getLeftTriggerAxis() * 255);
+        SmartDashboard.putNumber("Robot Yaw", swerve.getGyroscopeRotation().getDegrees());
     } 
 
     @Override

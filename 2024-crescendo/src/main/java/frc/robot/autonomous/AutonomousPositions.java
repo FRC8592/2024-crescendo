@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public enum AutonomousPositions {
     
     
-    SUBWOOFER_UP(1.0, 6.25, Rotation2d.fromDegrees(45)),
+    SUBWOOFER_UP(1.0, 6.25, Rotation2d.fromDegrees(60)),
     SUBWOOFER_MIDDLE(1.4, 5.5, new Rotation2d()),
     SUBWOOFER_MIDDLE_2(14.6, 5.5, new Rotation2d()),
-    SUBWOOFER_DOWN(1.0, 4.5, Rotation2d.fromDegrees(-45)),
+    SUBWOOFER_DOWN(1.0, 4.5, Rotation2d.fromDegrees(-60)),
     WING_NOTE_1(2.4, 6.75, new Rotation2d()),
     WING_NOTE_2(2.4, 5.5, new Rotation2d()),
     WING_NOTE_3(2.4, 4.125, new Rotation2d()),
@@ -75,6 +75,12 @@ public enum AutonomousPositions {
                 nonEndPoses[i-1] = new Translation2d(FIELD_LENGTH_X - nonEndPoses[i-1].getX(), nonEndPoses[i-1].getY());
             }
         }
+        System.out.println("PRINTING GENERATED POINTS FOR TRAJECTORY");
+        System.out.println(startPose);
+        for(int i = 0; i < nonEndPoses.length; i++){
+            System.out.println(nonEndPoses[i].toString());
+        }
+        System.out.println(endPose.toString());
 
         traj = TrajectoryGenerator.generateTrajectory(
             startPose, 

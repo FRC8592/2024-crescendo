@@ -22,7 +22,8 @@ public class AutonomousSelector {
             RedThreeWingNoteVisionAuto.class,
             ThreeWingNoteVisionAuto.class,
         OneNoteAuto.class,
-        Left2MidnotesAuto.class
+        Left2MidnotesAuto.class,
+        DONTSELECT_RotateTestAuto.class
         // IWillNameThisLaterAuto.class,
     };
 

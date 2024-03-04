@@ -12,7 +12,7 @@ import frc.robot.autonomous.*;
 import frc.robot.commands.*;
 
 public class Left2MidnotesAuto extends BaseAuto{
-    private TrajectoryConfig config = new TrajectoryConfig(1,0.5);
+    private TrajectoryConfig config = new TrajectoryConfig(2,1);
     private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
 
     private SwerveTrajectory midNote1 = AutonomousPositions.generate(config.setEndVelocity(4),
@@ -40,7 +40,7 @@ public class Left2MidnotesAuto extends BaseAuto{
         speakerPID.setTolerance(APRILTAG_LIMELIGHT.LOCK_ERROR);
         int angle = 0;
         if(DriverStation.getAlliance().get() == Alliance.Red){
-            angle = -90;
+            angle = 0;
         }
         queue = new CommandQueue(
                 new GyroSetCommand(drive, 0),

@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.Logger;
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4ModuleConfiguration;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
@@ -30,6 +29,8 @@ import edu.wpi.first.math.controller.PIDController;
 
 
 import static frc.robot.Constants.*;
+
+import org.littletonrobotics.junction.Logger;
 
 
 public class Drivetrain {
@@ -241,6 +242,7 @@ public class Drivetrain {
     }
     
     public void drive(ChassisSpeeds chassisSpeeds) {
+        Logger.recordOutput("RotationSpeedDegrees", Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond));
         SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(chassisSpeeds);
         //SmartDashboard.putNumber("Chassis Speeds X", chassisSpeeds.vxMetersPerSecond);
         //SmartDashboard.putNumber("Chassis Speeds Y", chassisSpeeds.vyMetersPerSecond);

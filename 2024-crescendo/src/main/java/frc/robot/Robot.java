@@ -330,9 +330,13 @@ public class Robot extends LoggedRobot {
         if(autoCollect.isPressed()){
             currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
             state = States.INTAKING;
+            amp.resetTrigger();
+            climb.resetTrigger();
         }
         else if(intaking.isRisingEdge()){
             state = States.INTAKING;
+            amp.resetTrigger();
+            climb.resetTrigger();
         }
         else if(outake.isRisingEdge()){
             state = States.OUTAKING;
@@ -349,6 +353,8 @@ public class Robot extends LoggedRobot {
                 || (outake.isFallingEdge() && state == States.OUTAKING)
                 || stow.isPressed()){
             state = States.STOWED;
+            amp.resetTrigger();
+            climb.resetTrigger();
         }
 
         // Set all the defaults. `-1`s are written in the switch statement

@@ -66,11 +66,11 @@ public class Shooter {
      * set shooter motors speeds in terms of RPM
      * @param speedRPM
      */
-    public void setShootVelocity(int topspeedRPM, int bottomspeedRPM){
-        topShooterMotor.setVelocity(topspeedRPM);
-        bottomShooterMotor.setVelocity(bottomspeedRPM);
-        toptargetSpeed = topspeedRPM;
-        bottomTargetSpeed = bottomspeedRPM;
+    public void setShootVelocity(double speedRPM){
+        topShooterMotor.setVelocity((int)speedRPM);
+        bottomShooterMotor.setVelocity((int)speedRPM);
+        toptargetSpeed = (int)speedRPM;
+        bottomTargetSpeed = (int)speedRPM;
     }
 
     /**
@@ -92,10 +92,10 @@ public class Shooter {
 
     /**
      * Sets speed of the feeder wheels in terms of percent output
-     * @param speed power
+     * @param power
      */
-    public void setFeederSpeed(double speed) {
-        feederMotor.setPercentOutput(speed);
+    public void setFeederPower(double power) {
+        feederMotor.setPercentOutput(power);
     }
 
     /**

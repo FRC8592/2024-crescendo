@@ -35,7 +35,7 @@ public class ShootCommand extends Command{
         Logger.recordOutput("CurrentCommand", "ShootCommand");
 
         elevator.setPivotAngleCustom(elevatorPivotAngle);
-        shooter.setShootVelocity(shootVelocity, shootVelocity);
+        shooter.setShootVelocity(shootVelocity);
 
         if(shooter.isReady() && elevator.isTargetAngle()){
             timer.start();

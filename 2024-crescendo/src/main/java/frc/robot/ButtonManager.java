@@ -1,6 +1,6 @@
 package frc.robot;
 
-public class BooleanManager {
+public class ButtonManager {
     private boolean value = false;
     private boolean lastFrame = false;
     private boolean isRisingEdge = false;
@@ -9,15 +9,18 @@ public class BooleanManager {
     private boolean lastToggle = false;
     private boolean isToggleRisingEdge = false;
     private boolean isToggleFallingEdge = false;
+    private boolean isTrigger = false; // Locks onto `true` when `update()` is called with value `triggerCase`. Reset only with a method
+    private boolean isTriggerRisingEdge = false;
+    private boolean triggerCase = true; // If `update()` is called with this value, `isTrigger` will be set to `true`
 
-    public BooleanManager() {}
-    
-    public BooleanManager(boolean b) {
+    public ButtonManager() {}
+
+    public ButtonManager(boolean b) {
         value = b;
         lastFrame = b;
     }
 
-    public boolean getValue() {
+    public boolean isPressed() {
         return value;
     }
 
@@ -33,6 +36,12 @@ public class BooleanManager {
         isToggleRisingEdge = isToggle ? (lastToggle ? false : true) : false;
         isToggleFallingEdge = isToggle ? false : (lastToggle ? true : false);
         lastToggle = isToggle;
+
+        isTriggerRisingEdge = false;
+        if(value == triggerCase && !isTrigger){
+            isTrigger = true;
+            isTriggerRisingEdge = true;
+        }
     }
 
     /**
@@ -52,7 +61,7 @@ public class BooleanManager {
     /**
      * @return a boolean representing the state of the internal toggle (flipped by a rising edge)
      */
-    public boolean isToggle() {
+    public boolean isToggled() {
         return this.isToggle;
     }
     
@@ -76,5 +85,34 @@ public class BooleanManager {
     public void setToggle(boolean isToggle){
         this.isToggle = isToggle;
         this.lastToggle = isToggle;
+    }
+
+    /**
+     * @return {@code true} if {@code update(triggerCase)} (see {@code setTriggerCase()}) has been called since the last {@code resetTrigger()}
+     */
+    public boolean isTriggered(){
+        return this.isTrigger;
+    }
+
+    /**
+     * Reset the internal trigger
+     */
+    public void resetTrigger(){
+        this.isTrigger = false;
+    }
+
+    /**
+     * Sets the case for when the internal trigger is fired. This is {@code true} by default, meaning the trigger responds to {@code update()} being called with {@code true} as the argument.
+     * @param tCase
+     */
+    public void setTriggerCase(boolean tCase){
+        this.triggerCase = tCase;
+    }
+
+    /**
+     * @return whether we're currently on the first frame that the trigger has been activated
+     */
+    public boolean isTriggerRisingEdge(){
+        return this.isTriggerRisingEdge;
     }
 }

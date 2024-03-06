@@ -1,6 +1,5 @@
 package frc.robot;
 
-import org.ejml.equation.IntegerSequence.Range;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -31,8 +30,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 
 import frc.robot.Constants.*;
-import frc.robot.MainSubsystemsManager.MainStates;
-import frc.robot.MainSubsystemsManager.SubStates;
 
 public class Robot extends LoggedRobot {
     
@@ -63,24 +60,53 @@ public class Robot extends LoggedRobot {
     private PIDController turnPID;
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
-    private MainSubsystemsManager subsystemsManager;
 
-    private BooleanManager slowMode = new BooleanManager(false);
-    private BooleanManager resetGyro = new BooleanManager(false);
-    private BooleanManager autoCollect = new BooleanManager(false);
-    private BooleanManager robotOriented = new BooleanManager(false);
+    private ButtonManager slowMode = new ButtonManager(false);
+    private ButtonManager resetGyro = new ButtonManager(false);
+    private ButtonManager autoCollect = new ButtonManager(false);
+    private ButtonManager robotOriented = new ButtonManager(false);
 
     // operator controls
-    private BooleanManager ledAmpSignal = new BooleanManager(false);
-    private BooleanManager shootFromPodium = new BooleanManager(false);
-    private BooleanManager outake = new BooleanManager(false);
-    private BooleanManager intaking = new BooleanManager(false);
-    private BooleanManager stow = new BooleanManager(false);
-    private BooleanManager amp = new BooleanManager(false);
-    private BooleanManager climb = new BooleanManager(false);
-    private BooleanManager speakerAmp = new BooleanManager(false);
-    private BooleanManager manualRaiseClimber = new BooleanManager(false);
-    private BooleanManager manualLowerClimber = new BooleanManager(false);
+    private ButtonManager ledAmpSignal = new ButtonManager(false);
+    private ButtonManager shootFromPodium = new ButtonManager(false);
+    private ButtonManager outake = new ButtonManager(false);
+    private ButtonManager intaking = new ButtonManager(false);
+    private ButtonManager stow = new ButtonManager(false);
+    private ButtonManager amp = new ButtonManager(false);
+    private ButtonManager climb = new ButtonManager(false);
+    private ButtonManager speakerAmp = new ButtonManager(false);
+    private ButtonManager manualRaiseClimber = new ButtonManager(false);
+    private ButtonManager manualLowerClimber = new ButtonManager(false);
+
+    private enum States{
+        //-1 means the code in the case will handle it
+
+        // Variables:
+        //        intake roller speed,    elevator pivot angle,        elevator extension length,        shooter feeder speed,        shooter flywheel speed
+        STOWED   (0,                      ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_METERS_STOWED, 0,                           0                            ),
+        INTAKING (-1,                     ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_METERS_STOWED, SHOOTER.INTAKE_FEEDER_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED),
+        OUTAKING (INTAKE.OUTAKE_VELOCITY, -1,                          -1,                               SHOOTER.OUTAKE_FEEDER_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED),
+        AMP      (0,                      ELEVATOR.PIVOT_ANGLE_AMP,    ELEVATOR.EXTENSION_METERS_AMP,    -1,                          -1                           ),
+        CLIMB    (0,                      ELEVATOR.PIVOT_ANGLE_CLIMB,  -1,                               0,                           0                            ),
+        SHOOT    (0,                      -1,                          0,                                -1,                          -1                           ),
+        ;
+
+        public double intakeRollerSpeed;
+        public double elevatorPivotAngle;
+        public double elevatorExtensionLength;
+        public double shooterFeederSpeed;
+        public double shooterFlywheelSpeed;
+
+        States(double intakeRollerSpeed, double elevatorPivotAngle, double elevatorExtensionLength, double shooterFeederSpeed, double shooterFlywheelSpeed){
+            this.intakeRollerSpeed = intakeRollerSpeed;
+            this.elevatorPivotAngle = elevatorPivotAngle;
+            this.elevatorExtensionLength = elevatorExtensionLength;
+            this.shooterFeederSpeed = shooterFeederSpeed;
+            this.shooterFlywheelSpeed = shooterFlywheelSpeed;
+        }
+    }
+
+    private States state;
 
     @Override
     public void robotInit() {
@@ -121,7 +147,7 @@ public class Robot extends LoggedRobot {
         drivePID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kP, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kI, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kD);
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
         
-        subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator);
+        state = States.STOWED;
     }
 
     @Override
@@ -273,7 +299,7 @@ public class Robot extends LoggedRobot {
 
         //operator controls
         // shooter/feeder functions
-        shootFromPodium.update   (operatorController.getLeftBumper()); 
+        shootFromPodium.update   (operatorController.getLeftBumper());
 
         outake.update            (operatorController.getRightBumper());
         intaking.update          (operatorController.getLeftTriggerAxis()>0.1);
@@ -288,11 +314,11 @@ public class Robot extends LoggedRobot {
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
-        if(resetGyro.getValue()){
+        if(resetGyro.isPressed()){
             swerve.zeroGyroscope();
         }
 
-        if (slowMode.getValue()) { //Slow Mode slows down the robot for better precision & control
+        if (slowMode.isPressed()) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
                     driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
                     driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
@@ -304,87 +330,110 @@ public class Robot extends LoggedRobot {
                     driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
                     driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
         }
-        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented.getValue()?new Rotation2d():swerve.getGyroscopeRotation());
+        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented.isPressed() ? new Rotation2d() : swerve.getGyroscopeRotation());
         noteLock.updateVision();
 
-        if (autoCollect.getValue()) { // Different from the others because it interacts with both the drivetrain and the main subsystems manager subsystems
-            if (!shooter.hasNote()) {
-                currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
-                if (autoCollect.isRisingEdge()) {
-                    subsystemsManager.intake(true);
+        if(autoCollect.isPressed()){
+            currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
+            state = States.INTAKING;
+        }
+        else if(intaking.isRisingEdge()){
+            state = States.INTAKING;
+        }
+        else if(outake.isRisingEdge()){
+            state = States.OUTAKING;
+        }
+        else if(amp.isTriggerRisingEdge()){
+            state = States.AMP;
+            climb.resetTrigger();
+        }
+        else if(climb.isTriggerRisingEdge()){
+            state = States.CLIMB;
+            amp.resetTrigger();
+        }
+        else if((intaking.isFallingEdge() && state == States.INTAKING)
+                || (outake.isFallingEdge() && state == States.OUTAKING)
+                || stow.isPressed()){
+            state = States.STOWED;
+        }
+
+        // Set all the defaults. `-1`s are written in the switch statement
+        if(state.intakeRollerSpeed != -1){intake.setIntakeVelocity(state.intakeRollerSpeed);}
+        if(state.elevatorPivotAngle != -1){elevator.setPivotAngleCustom(state.elevatorPivotAngle);}
+        if(state.elevatorExtensionLength != -1){elevator.setExtensionLengthCustom(state.elevatorExtensionLength);}
+        if(state.shooterFeederSpeed != -1){shooter.setFeederVelocity(state.shooterFeederSpeed);}
+        if(state.shooterFlywheelSpeed != -1){shooter.setShootVelocity(state.shooterFlywheelSpeed);}
+        switch (state) {
+            case STOWED: //NOT SET: Nothing
+                if(speakerAmp.isRisingEdge() || shootFromPodium.isRisingEdge()){
+                    state = States.SHOOT;
                 }
-            }
-        }
-        else if (autoCollect.isFallingEdge()) {
-            subsystemsManager.intake(false);
-        }
-        else if (intaking.isRisingEdge()) {
-            subsystemsManager.intake(true);
-        }
-        else if (intaking.isFallingEdge()) {
-            subsystemsManager.intake(false);
-        }
-        else if (amp.isRisingEdge()) {
-            subsystemsManager.amp(true);
-        }
-        else if (stow.isRisingEdge()) {
-            subsystemsManager.home();
-        }
-        //Maybe add something here to trigger `subsystemsManager.forceHome()`
-        else if (climb.isRisingEdge()) {
-            subsystemsManager.climb(true);
-        }
-        //TODO: Figure out what to do with prime
-        else if (manualRaiseClimber.isRisingEdge()) {
-            subsystemsManager.climbExtend(true);
-        }
-        else if (manualRaiseClimber.isFallingEdge()) {
-            subsystemsManager.climbExtend(false);
-        }
-        else if (manualLowerClimber.isRisingEdge()) {
-            subsystemsManager.climbRetract(true);
-        }
-        else if (manualLowerClimber.isFallingEdge()) {
-            subsystemsManager.climbRetract(false);
-        }
-        else if (outake.isRisingEdge()) {
-            subsystemsManager.outake(true);
-        }
-        else if (outake.isFallingEdge()) {
-            subsystemsManager.outake(false);
-        }
-        else if (shootFromPodium.isRisingEdge()) {
-            //This whole control is temporary. We account for the change in angle using code in the subsystemsManager.update() line
-            subsystemsManager.speaker(true);
-        }
-        else if (shootFromPodium.isFallingEdge()) {
-            subsystemsManager.speaker(false);
-        }
-        else if (speakerAmp.isRisingEdge()) {
-            if (subsystemsManager.mainState == MainStates.AMP) {
-                subsystemsManager.score();
-            }
-            else {
-                subsystemsManager.speaker(true);
-            }
-        }
-        else if (speakerAmp.isFallingEdge()) {
-            if (subsystemsManager.mainState == MainStates.SPEAKER) {
-                subsystemsManager.speaker(false);
-            }
-        }
-        else if (speakerAmp.getValue()) {
-            subsystemsManager.score();
-        }
-        else if (shootFromPodium.getValue()) {
-            subsystemsManager.score();
+                break;
+
+            case SHOOT: //NOT SET: Elevator pivot angle, shooter feeder speed, shooter flywheel speed
+                if(speakerAmp.isPressed()){
+                    shooter.setShootVelocity(RangeTable.get(0).flywheelSpeed);
+                    elevator.setPivotAngleCustom(RangeTable.get(0).pivotAngle);
+                }
+                else if(shootFromPodium.isPressed()){
+                    shooter.setShootVelocity(RangeTable.get(1).flywheelSpeed);
+                    elevator.setPivotAngleCustom(RangeTable.get(1).pivotAngle);
+                }
+                else{
+                    state = States.STOWED;
+                    break; // Don't run anything after this
+                }
+
+                if(shooter.isReady() && elevator.isTargetAngle()){
+                    shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
+                }
+                break;
+
+            case INTAKING: //NOT SET: Intake roller speed
+                if(elevator.isTargetAngle()){
+                    intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
+                }
+                else{
+                    intake.setIntakeVelocity(0);
+                }
+                // Possibly add code to make it automatically stop intaking when we get a note.
+                break;
+
+            case OUTAKING: //NOT SET: Elevator pivot angle, elevator extension length
+                // Freeze the elevator
+                elevator.setPivotAngleCustom(elevator.getPivotAngle());
+                elevator.setExtensionLengthCustom(elevator.getExtensionLength());
+                break;
+
+            case AMP: //NOT SET: Shooter feeder speed, shooter flywheel speed
+                if(speakerAmp.isPressed()){
+                    shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_SPEED);
+                    shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED);
+                }
+                else{
+                    shooter.setFeederVelocity(0);
+                    shooter.setShootVelocity(0);
+                }
+                break;
+
+            case CLIMB: //NOT SET: Elevator extension length
+                if(climb.isRisingEdge()){ // If this is the first frame that we're climbing
+                    elevator.setExtensionLengthCustom(ELEVATOR.EXTENSION_METERS_CLIMB);
+                }
+                if(manualRaiseClimber.isPressed()){
+                    elevator.extend();
+                }
+                if(manualLowerClimber.isPressed()){
+                    elevator.retract();
+                }
+                break;
         }
 
         //LED management
         if (ledAmpSignal.isRisingEdge()) {
             leds.flashTimer.reset();
         }
-        if (ledAmpSignal.getValue()) {
+        if (ledAmpSignal.isPressed()) {
             leds.amp();
         }
         else if (shooter.hasNote) {
@@ -392,7 +441,7 @@ public class Robot extends LoggedRobot {
         } else {
             leds.off();
         }
-        swerve.drive(subsystemsManager.update(shootFromPodium.getValue()?1:0/*<-- temporary*/, currentSpeeds));
+        swerve.drive(currentSpeeds);
     }
 
     @Override

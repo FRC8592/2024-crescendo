@@ -61,25 +61,25 @@ public class Robot extends LoggedRobot {
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
 
-    private ButtonManager slowMode = new ButtonManager(false);
-    private ButtonManager resetGyro = new ButtonManager(false);
-    private ButtonManager autoCollect = new ButtonManager(false);
-    private ButtonManager robotOriented = new ButtonManager(false);
+    private ButtonManager slowMode = new ButtonManager();
+    private ButtonManager resetGyro = new ButtonManager();
+    private ButtonManager autoCollect = new ButtonManager();
+    private ButtonManager robotOriented = new ButtonManager();
 
     // operator controls
-    private ButtonManager ledAmpSignal = new ButtonManager(false);
-    private ButtonManager shootFromPodium = new ButtonManager(false);
-    private ButtonManager outake = new ButtonManager(false);
-    private ButtonManager intaking = new ButtonManager(false);
-    private ButtonManager stow = new ButtonManager(false);
-    private ButtonManager amp = new ButtonManager(false);
-    private ButtonManager climb = new ButtonManager(false);
-    private ButtonManager speakerAmp = new ButtonManager(false);
-    private ButtonManager manualRaiseClimber = new ButtonManager(false);
-    private ButtonManager manualLowerClimber = new ButtonManager(false);
+    private ButtonManager ledAmpSignal = new ButtonManager();
+    private ButtonManager shootFromPodium = new ButtonManager();
+    private ButtonManager outake = new ButtonManager();
+    private ButtonManager intaking = new ButtonManager();
+    private ButtonManager stow = new ButtonManager();
+    private ButtonManager amp = new ButtonManager();
+    private ButtonManager climb = new ButtonManager();
+    private ButtonManager speakerAmp = new ButtonManager();
+    private ButtonManager manualRaiseClimber = new ButtonManager();
+    private ButtonManager manualLowerClimber = new ButtonManager();
 
     private enum States{
-        //-1 means the code in the case will handle it
+        //-1 means the code in the case must handle it
 
         // Variables:
         //        intake roller speed,    elevator pivot angle,        elevator extension length,        shooter feeder speed,           shooter flywheel speed
@@ -110,8 +110,6 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotInit() {
-
-        //AdvantageKit
         Logger.recordMetadata("Crescendo", "MyProject"); // Set a metadata value
 
         if (isReal()) { // If running on a real robot
@@ -121,10 +119,6 @@ public class Robot extends LoggedRobot {
             Logger.start();
         }
         else { // If simulated
-            // setUseTiming(false); // Run as fast as possible
-            // String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-            // Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-            // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
             SmartDashboard.putData(FIELD);
         }
 
@@ -146,7 +140,7 @@ public class Robot extends LoggedRobot {
 
         drivePID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kP, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kI, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kD);
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
-        
+
         state = States.STOWED;
     }
 

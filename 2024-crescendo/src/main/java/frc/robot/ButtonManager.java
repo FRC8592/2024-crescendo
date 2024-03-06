@@ -11,14 +11,16 @@ public class ButtonManager {
     private boolean isToggleFallingEdge = false;
     private boolean isTrigger = false; // Locks onto `true` when `update()` is called with value `triggerCase`. Reset only with a method
     private boolean isTriggerRisingEdge = false;
-    private boolean triggerCase = true; // If `update()` is called with this value, `isTrigger` will be set to `true`
 
+    /**
+     * Class containing logic to make managing buttons easier. You must call {@code update()} with the raw value of the button every robot frame. With that requirement satisfied, this class tracks the following: <ul>
+     * <li> Whether the button is currently on a rising edge (in other words, whether this frame was called with {@code true} while the last was called with {@code false}).
+     * <li> Whether the button is on a falling edge (similar to a rising edge, but {@code false} after {@code true}).
+     * <li> A toggle, which starts at {@code false} and is flipped everytime a rising edge is triggered.
+     * <li> Rising and falling edges for the toggle.
+     * <li> A "trigger", which is a boolean that starts at {@code false} and is "locked" to {@code true} when {@code update(true)} is called. This can be reset with {@code resetTrigger()}.
+     */
     public ButtonManager() {}
-
-    public ButtonManager(boolean b) {
-        value = b;
-        lastFrame = b;
-    }
 
     public boolean isPressed() {
         return value;
@@ -38,7 +40,7 @@ public class ButtonManager {
         lastToggle = isToggle;
 
         isTriggerRisingEdge = false;
-        if(value == triggerCase && !isTrigger){
+        if(value && !isTrigger){
             isTrigger = true;
             isTriggerRisingEdge = true;
         }
@@ -99,14 +101,6 @@ public class ButtonManager {
      */
     public void resetTrigger(){
         this.isTrigger = false;
-    }
-
-    /**
-     * Sets the case for when the internal trigger is fired. This is {@code true} by default, meaning the trigger responds to {@code update()} being called with {@code true} as the argument.
-     * @param tCase
-     */
-    public void setTriggerCase(boolean tCase){
-        this.triggerCase = tCase;
     }
 
     /**

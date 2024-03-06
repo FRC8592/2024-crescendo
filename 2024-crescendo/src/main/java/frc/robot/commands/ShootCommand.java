@@ -34,16 +34,16 @@ public class ShootCommand extends Command{
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "ShootCommand");
 
-        elevator.setPivotAngleCustom(elevatorPivotAngle);
-        shooter.setShootVelocity(shootVelocity);
+        elevator.setPivotAngle(elevatorPivotAngle);
+        shooter.setFlywheelVelocity(shootVelocity);
 
-        if(shooter.isReady() && elevator.isTargetAngle()){
+        if(shooter.isReady() && elevator.isTargetPivotAngle()){
             timer.start();
             if(timer.get()>0.05){
-                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
+                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_VELOCITY);
             }
             else{
-                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
+                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
             }
         }
 
@@ -52,7 +52,7 @@ public class ShootCommand extends Command{
 
     @Override
     public void shutdown() {
-      shooter.stop();
+      shooter.stopFlywheels();
       shooter.stopFeeders();
       elevator.stow();
 

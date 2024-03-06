@@ -82,13 +82,13 @@ public class Robot extends LoggedRobot {
         //-1 means the code in the case will handle it
 
         // Variables:
-        //        intake roller speed,    elevator pivot angle,        elevator extension length,        shooter feeder speed,        shooter flywheel speed
-        STOWED   (0,                      ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_METERS_STOWED, 0,                           0                            ),
-        INTAKING (-1,                     ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_METERS_STOWED, SHOOTER.INTAKE_FEEDER_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED),
-        OUTAKING (INTAKE.OUTAKE_VELOCITY, -1,                          -1,                               SHOOTER.OUTAKE_FEEDER_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED),
-        AMP      (0,                      ELEVATOR.PIVOT_ANGLE_AMP,    ELEVATOR.EXTENSION_METERS_AMP,    -1,                          -1                           ),
-        CLIMB    (0,                      ELEVATOR.PIVOT_ANGLE_CLIMB,  -1,                               0,                           0                            ),
-        SHOOT    (0,                      -1,                          0,                                -1,                          -1                           ),
+        //        intake roller speed,    elevator pivot angle,        elevator extension length,        shooter feeder speed,           shooter flywheel speed
+        STOWED   (0,                      ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_LENGTH_STOWED, 0,                              0                                ),
+        INTAKING (-1,                     ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_LENGTH_STOWED, SHOOTER.INTAKE_FEEDER_VELOCITY, SHOOTER.INTAKE_FLYWHEEL_VELOCITY ),
+        OUTAKING (INTAKE.OUTAKE_VELOCITY, -1,                          -1,                               SHOOTER.OUTAKE_FEEDER_VELOCITY, SHOOTER.OUTAKE_FLYWHEEL_VELOCITY ),
+        AMP      (0,                      ELEVATOR.PIVOT_ANGLE_AMP,    ELEVATOR.EXTENSION_LENGTH_AMP,    -1,                             -1                               ),
+        CLIMB    (0,                      ELEVATOR.PIVOT_ANGLE_CLIMB,  -1,                               0,                              0                                ),
+        SHOOT    (0,                      -1,                          0,                                -1,                             -1                               ),
         ;
 
         public double intakeRollerSpeed;
@@ -164,7 +164,7 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putBoolean("hasNote()", shooter.noteBeamBreak.get());
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"FeederSpeedRPM", shooter.feederMotor.getVelocity());
-        Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getTopMotorVelocityRPM());
+        Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getIntakeVelocity());
 
         //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();
@@ -359,10 +359,10 @@ public class Robot extends LoggedRobot {
 
         // Set all the defaults. `-1`s are written in the switch statement
         if(state.intakeRollerSpeed != -1){intake.setIntakeVelocity(state.intakeRollerSpeed);}
-        if(state.elevatorPivotAngle != -1){elevator.setPivotAngleCustom(state.elevatorPivotAngle);}
-        if(state.elevatorExtensionLength != -1){elevator.setExtensionLengthCustom(state.elevatorExtensionLength);}
+        if(state.elevatorPivotAngle != -1){elevator.setPivotAngle(state.elevatorPivotAngle);}
+        if(state.elevatorExtensionLength != -1){elevator.setExtensionLength(state.elevatorExtensionLength);}
         if(state.shooterFeederSpeed != -1){shooter.setFeederVelocity(state.shooterFeederSpeed);}
-        if(state.shooterFlywheelSpeed != -1){shooter.setShootVelocity(state.shooterFlywheelSpeed);}
+        if(state.shooterFlywheelSpeed != -1){shooter.setFlywheelVelocity(state.shooterFlywheelSpeed);}
         switch (state) {
             case STOWED: //NOT SET: Nothing
                 if(speakerAmp.isRisingEdge() || shootFromPodium.isRisingEdge()){
@@ -372,25 +372,25 @@ public class Robot extends LoggedRobot {
 
             case SHOOT: //NOT SET: Elevator pivot angle, shooter feeder speed, shooter flywheel speed
                 if(speakerAmp.isPressed()){
-                    shooter.setShootVelocity(RangeTable.get(0).flywheelSpeed);
-                    elevator.setPivotAngleCustom(RangeTable.get(0).pivotAngle);
+                    shooter.setFlywheelVelocity(RangeTable.get(0).flywheelSpeed);
+                    elevator.setPivotAngle(RangeTable.get(0).pivotAngle);
                 }
                 else if(shootFromPodium.isPressed()){
-                    shooter.setShootVelocity(RangeTable.get(1).flywheelSpeed);
-                    elevator.setPivotAngleCustom(RangeTable.get(1).pivotAngle);
+                    shooter.setFlywheelVelocity(RangeTable.get(1).flywheelSpeed);
+                    elevator.setPivotAngle(RangeTable.get(1).pivotAngle);
                 }
                 else{
                     state = States.STOWED;
                     break; // Don't run anything after this
                 }
 
-                if(shooter.isReady() && elevator.isTargetAngle()){
-                    shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
+                if(shooter.isReady() && elevator.isTargetPivotAngle()){
+                    shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_VELOCITY);
                 }
                 break;
 
             case INTAKING: //NOT SET: Intake roller speed
-                if(elevator.isTargetAngle()){
+                if(elevator.isTargetPivotAngle()){
                     intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 }
                 else{
@@ -401,24 +401,24 @@ public class Robot extends LoggedRobot {
 
             case OUTAKING: //NOT SET: Elevator pivot angle, elevator extension length
                 // Freeze the elevator
-                elevator.setPivotAngleCustom(elevator.getPivotAngle());
-                elevator.setExtensionLengthCustom(elevator.getExtensionLength());
+                elevator.setPivotAngle(elevator.getPivotAngle());
+                elevator.setExtensionLength(elevator.getExtensionLength());
                 break;
 
             case AMP: //NOT SET: Shooter feeder speed, shooter flywheel speed
                 if(speakerAmp.isPressed()){
-                    shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_SPEED);
-                    shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED);
+                    shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_VELOCITY);
+                    shooter.setFlywheelVelocity(SHOOTER.AMP_FLYWHEEL_VELOCITY);
                 }
                 else{
                     shooter.setFeederVelocity(0);
-                    shooter.setShootVelocity(0);
+                    shooter.setFlywheelVelocity(0);
                 }
                 break;
 
             case CLIMB: //NOT SET: Elevator extension length
                 if(climb.isRisingEdge()){ // If this is the first frame that we're climbing
-                    elevator.setExtensionLengthCustom(ELEVATOR.EXTENSION_METERS_CLIMB);
+                    elevator.setExtensionLength(ELEVATOR.EXTENSION_LENGTH_CLIMB);
                 }
                 if(manualRaiseClimber.isPressed()){
                     elevator.extend();

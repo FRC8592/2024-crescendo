@@ -77,22 +77,12 @@ public final class Constants {
         public static final int BOTTOM_MOTOR_CAN_ID = 34;
 
         public static final double MOTOR_kP = 0.00015;
-        public static final double MOTOR_kI = 0.00; //TODO: We need a lot of this
+        public static final double MOTOR_kI = 0.00;
         public static final double MOTOR_kD = 0.015;
         public static final double MOTOR_kFF = 0.00016;
 
-        // public static final double SPEED_TOP = 1000; TODO: Currently in power mode. We should change back to velocity mode before our first regional
-        public static final double INTAKE_POWER = 0.75; //TODO: Delete this once we have velocity mode working
-        public static final double OUTAKE_POWER = -0.75;
-
         public static final double INTAKE_VELOCITY = 4500;
         public static final double OUTAKE_VELOCITY = -2500;
-
-        // NOTE: only one motor on now
-        // public static final double BOTTOM_MOTOR_kP = 0.0001;
-        // public static final double BOTTOM_MOTOR_kI = 0.000;
-        // public static final double BOTTOM_MOTOR_kD = 0.000;
-
     }
 
     public final class SHOOTER {
@@ -124,23 +114,21 @@ public final class Constants {
         public static final int FHYWHEEL_SPEED_ACCEPTABLE_RANGE = 100; // RPM. TODO: Decrease this when the PID is tuned better
 
 
-        public static final int AMP_FLYWHEEL_SPEED = -1000;
-        public static final int AMP_FEEDER_SPEED = -3000; //TODO: Figure out what this should actually be
+        public static final int AMP_FLYWHEEL_VELOCITY = -1000;
+        public static final int AMP_FEEDER_VELOCITY = -3000; //TODO: Adjust this as needed for better amp scoring
 
-        public static final int INTAKE_FLYWHEEL_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 2000;
+        public static final int INTAKE_FLYWHEEL_VELOCITY = 0;
+        public static final int INTAKE_FEEDER_VELOCITY = 2000;
 
         //No shooter speed because we use the range table
-        public static final int SHOOTING_FEEDER_SPEED = 1500;
+        public static final int SHOOTING_FEEDER_VELOCITY = 1500;
 
-        public static final int OUTAKE_FLYWHEEL_SPEED = -500; //TODO: Figure out what this should be.
-        public static final double OUTAKE_FEEDER_SPEED = -2000;
+        public static final int OUTAKE_FLYWHEEL_VELOCITY = -500; //TODO: Figure out what this should be.
+        public static final double OUTAKE_FEEDER_VELOCITY = -2000;
 
 
-        public static final double SHOOT_SCORE_TIME = 0.5; //TODO: Tune this
+        public static final double SHOOT_SCORE_TIME = 0.5; //TODO: Tune this; Auto has demonstrated that it's too short
         public static final double AMP_SCORE_TIME = 0.25; //TODO: Tune this
-
-        public static final double FEEDER_AMP_TOLERANCE = 100;
     }
 
 
@@ -168,23 +156,23 @@ public final class Constants {
         public static final double EXTENSION_FULLY_RETRACTED = 0.01; //When the extension is retracted below this value, we can lower the pivot to zero.
         public static final double EXTENSION_FORCE_RETRACT_THRESHOLD = 30; //The threshold for the protection code from the hooks on the elevator. See Elevator.java.
         public static final double RETRACT_THRESHOLD_TOLERANCE = 2; //If we're within this value of the threshold (or higher), the extension works.
-        public static final double ANGLE_TOLERANCE = 0.5; //Half a degree; used for the function that detects whether the pivot is at the target angle.
-        public static final double LENGTH_TOLERANCE = 0.005; //Half a centimeter; used for the function that detects whether the extension is at the target length.
+        public static final double PIVOT_ANGLE_TOLERANCE = 0.5; //Half a degree; used for the function that detects whether the pivot is at the target angle.
+        public static final double EXTENSION_LENGTH_TOLERANCE = 0.005; //Half a centimeter; used for the function that detects whether the extension is at the target length.
 
 
-        public static final double EXTENSION_METERS_MAX = 0.26; // TODO: Figure out what this should be
+        public static final double EXTENSION_LENGTH_MAX = 0.26; // TODO: Figure out what this should be
         public static final int PIVOT_ANGLE_MAX = 75; // TODO: Figure out what this should be
 
-        public static final double EXTENSION_METERS_MIN = 0;
+        public static final double EXTENSION_LENGTH_MIN = 0;
         public static final int PIVOT_ANGLE_MIN = 0;
 
-        public static final double EXTENSION_METERS_STOWED = 0;
+        public static final double EXTENSION_LENGTH_STOWED = 0;
         public static final int PIVOT_ANGLE_STOWED = 0;
 
-        public static final double EXTENSION_METERS_AMP = 0.27;
+        public static final double EXTENSION_LENGTH_AMP = 0.27;
         public static final int PIVOT_ANGLE_AMP = 45; // TODO: Adjust this angle
 
-        public static final double EXTENSION_METERS_CLIMB = 0.25;
+        public static final double EXTENSION_LENGTH_CLIMB = 0.25;
         public static final int PIVOT_ANGLE_CLIMB = 75; // TODO: Adjust this angle
 
 
@@ -200,7 +188,7 @@ public final class Constants {
                 CONVERSIONS.IN_TO_METERS;                   //then convert to meters.
 
         public static final double MAX_PIVOT_ROTATIONS = (PIVOT_ANGLE_MAX * PIVOT_GEAR_RATIO) / 360;
-        public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX / ELEVATOR_GEAR_RATIO;
+        public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_LENGTH_MAX / ELEVATOR_GEAR_RATIO;
     }
 
     public final class POWER {
@@ -292,9 +280,5 @@ public final class Constants {
         public static final double kP = 0;
         public static final double kI = 0;
         public static final double kD = 0;
-    }
-
-    public class MAIN_SUBSYSTEMS_MANAGER{
-        public static final String LOG_PATH = SHARED.LOG_FOLDER + "/MainSubsystems/";
     }
 }

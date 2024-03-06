@@ -15,16 +15,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import com.revrobotics.SparkPIDController;
 
 public class Shooter {
-    
-    // private final String shooterTableName = "shooter_table"; TODO: What are these three lines?
-    // private final NetworkTable table;
-    // private NetworkTableEntry shooterSpeedRPS;
-
     SparkFlexControl topShooterMotor;
     SparkFlexControl bottomShooterMotor;
-    // SparkPIDController leftShooterControl;
-    // SparkPIDController rightShooterControl;
-    DigitalInput noteBeamBreak; // beam break sensor top/bottom mounted
+    DigitalInput noteBeamBreak; // beam break sensor
 
     SparkFlexControl feederMotor;
 
@@ -42,7 +35,6 @@ public class Shooter {
         bottomShooterMotor = new SparkFlexControl(SHOOTER.BOTTOM_SHOOTER_MOTOR_CAN_ID, false);
         feederMotor = new SparkFlexControl(SHOOTER.FEEDER_MOTOR_CAN_ID, false); 
 
-        // table = NetworkTableInstance.getDefault().getTable(shooterTableName);
         topShooterMotor.setPIDF(SHOOTER.TOP_SHOOTER_MOTOR_kP, SHOOTER.TOP_SHOOTER_MOTOR_kI, SHOOTER.TOP_SHOOTER_MOTOR_kD, SHOOTER.TOP_SHOOTER_MOTOR_kF, 0);
         bottomShooterMotor.setPIDF(SHOOTER.BOTTOM_SHOOTER_MOTOR_kP, SHOOTER.BOTTOM_SHOOTER_MOTOR_kI, SHOOTER.BOTTOM_SHOOTER_MOTOR_kD, SHOOTER.BOTTOM_SHOOTER_MOTOR_kF, 0);
 
@@ -59,14 +51,13 @@ public class Shooter {
 
         topShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         bottomShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
-        // bottomShooterMotor.setInverted();
     }
 
     /**
      * set shooter motors speeds in terms of RPM
      * @param speedRPM
      */
-    public void setShootVelocity(double speedRPM){
+    public void setFlywheelVelocity(double speedRPM){
         topShooterMotor.setVelocity((int)speedRPM);
         bottomShooterMotor.setVelocity((int)speedRPM);
         toptargetSpeed = (int)speedRPM;
@@ -77,7 +68,7 @@ public class Shooter {
      * set shooter motors speeds in terms of percent output
      * @param power
      */
-    public void setShootPercentOutput(double power){
+    public void setFlywheelPower(double power){
         topShooterMotor.setPercentOutput(power);
         bottomShooterMotor.setPercentOutput(power);
     }
@@ -85,7 +76,7 @@ public class Shooter {
     /**
      * Stops the flywheels
      */
-    public void stop() {
+    public void stopFlywheels() {
         topShooterMotor.stop();
         bottomShooterMotor.stop();
     }
@@ -100,10 +91,10 @@ public class Shooter {
 
     /**
      * Sets velocity of the feeder wheels
-     * @param feeder_velocity feeder velocity in RPM
+     * @param feederVelocity feeder velocity in RPM
     */
-    public void setFeederVelocity(double feeder_velocity) {
-        feederMotor.setVelocity(feeder_velocity);
+    public void setFeederVelocity(double feederVelocity) {
+        feederMotor.setVelocity(feederVelocity);
     }
 
     /**
@@ -124,19 +115,6 @@ public class Shooter {
         }
         return hasNote;
     }
-
-    // /**
-    //  * sets speed and angle based on range table
-    //  * @param distanceToAprilTag
-    //  */
-    // public void setSpeedRangeTable(double distanceToAprilTag, Elevator elevator) {
-    //     int index = (int)(distanceToAprilTag / CONVERSIONS.METERS_TO_FEET);
-    //     double[] vals = SHOOTER.RANGE_TABLE[index];
-    //     double angle = vals[0];
-    //     int targetSpeed = (int)vals[1];
-    //     // setShootVelocity(targetSpeed);/
-    //     elevator.setPivotAngleCustom(angle);
-    // }
 
     /**
      * checks if flywheels are at target speed to shoot

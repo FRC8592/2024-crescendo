@@ -28,8 +28,8 @@ public class IntakeCommand extends Command {
         Logger.recordOutput("CurrentCommand", "IntakeCommand");
 
        //spins intake and feeder until beam sensor stops
-        intake.spinPercentOutput(INTAKE.INTAKE_POWER);
-        shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+        intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
+        shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_VELOCITY);
         timeoutTimer.start();
         return shooter.hasNote() || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds);
     }

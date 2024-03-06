@@ -55,7 +55,7 @@ public class Elevator {
         targetPivot = Math.max(Math.min(desiredPivot, ELEVATOR.PIVOT_ANGLE_MAX), ELEVATOR.PIVOT_ANGLE_MIN);
 
         // Keep the target extension length within bounds
-        targetExtension = Math.max(Math.min(desiredExtension, ELEVATOR.EXTENSION_METERS_MAX), ELEVATOR.EXTENSION_METERS_MIN);
+        targetExtension = Math.max(Math.min(desiredExtension, ELEVATOR.EXTENSION_LENGTH_MAX), ELEVATOR.EXTENSION_LENGTH_MIN);
 
         // If we're close to the threshold pivot angle (30°) and the extension isn't
         // fully retracted, keep the pivot at a safe height but allow the extension to
@@ -77,17 +77,7 @@ public class Elevator {
         pivotFollowMotor.setPositionSmartMotion(pivotRotations);
     }
 
-    //-------ELEVATOR CODE-------//
-
-    /**
-     * sets the speed of
-     * @param speed
-     */
-    public void percentOutputExtension(double speed){
-        extensionMotor.setPercentOutput(speed);
-    }
-
-    public void setExtensionLengthCustom(double position){
+    public void setExtensionLength(double position){
         desiredExtension = position;
     }
 
@@ -99,18 +89,7 @@ public class Elevator {
         return (extensionMotor.getPosition()*ELEVATOR.ELEVATOR_GEAR_RATIO);
     }
 
-    //-------PIVOT CODE-------//
-
-    /**
-     * sets the speed of
-     * @param speed
-     */
-    public void percentOutputPivot(double speed){
-        pivotMotor.setPercentOutput(speed);
-        pivotFollowMotor.setPercentOutput(speed);
-    }
-
-    public void setPivotAngleCustom(double angle) {
+    public void setPivotAngle(double angle) {
         desiredPivot = angle;
     }
 
@@ -123,12 +102,12 @@ public class Elevator {
         return ticksConverted;
     }
 
-    public boolean isTargetAngle() {
-        return Math.abs(getPivotAngle() - desiredPivot) < ELEVATOR.ANGLE_TOLERANCE;
+    public boolean isTargetPivotAngle() {
+        return Math.abs(getPivotAngle() - desiredPivot) < ELEVATOR.PIVOT_ANGLE_TOLERANCE;
     }
 
-    public boolean isTargetLength() {
-        return Math.abs(getExtensionLength() - desiredExtension) < ELEVATOR.LENGTH_TOLERANCE;
+    public boolean isTargetExtensionLength() {
+        return Math.abs(getExtensionLength() - desiredExtension) < ELEVATOR.EXTENSION_LENGTH_TOLERANCE;
     }
 
     //-------COMBINED CODE-------//
@@ -137,17 +116,17 @@ public class Elevator {
      * stows elevator and pivot 
      */
     public void stow() {
-        desiredExtension = ELEVATOR.EXTENSION_METERS_STOWED;
+        desiredExtension = ELEVATOR.EXTENSION_LENGTH_STOWED;
         desiredPivot = ELEVATOR.PIVOT_ANGLE_STOWED;
     }
 
     public void ampPosition() {
-        desiredExtension = ELEVATOR.EXTENSION_METERS_AMP;
+        desiredExtension = ELEVATOR.EXTENSION_LENGTH_AMP;
         desiredPivot = ELEVATOR.PIVOT_ANGLE_AMP;
     }
 
     public void climbPosition(){
-        desiredExtension = ELEVATOR.EXTENSION_METERS_CLIMB;
+        desiredExtension = ELEVATOR.EXTENSION_LENGTH_CLIMB;
         desiredPivot = ELEVATOR.PIVOT_ANGLE_CLIMB;
     }
 
@@ -169,7 +148,7 @@ public class Elevator {
 
     public void extend() {
         desiredExtension += ELEVATOR.MANUAL_EXTENSION_SPEED;
-        desiredExtension = Math.min(desiredExtension, ELEVATOR.EXTENSION_METERS_MAX);
+        desiredExtension = Math.min(desiredExtension, ELEVATOR.EXTENSION_LENGTH_MAX);
     }
 
     public void retract() {

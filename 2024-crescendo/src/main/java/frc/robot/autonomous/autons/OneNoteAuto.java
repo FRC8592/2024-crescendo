@@ -11,21 +11,12 @@ import frc.robot.commands.*;
 
 public class OneNoteAuto extends BaseAuto {
 
-    private TrajectoryConfig config = new TrajectoryConfig(1, 1);
-    private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
-
-    private SwerveTrajectory pathOne = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0),
-            AutonomousPositions.SUBWOOFER_MIDDLE.getPose(),
-            AutonomousPositions.WING_NOTE_2.getPose());
 
     @Override
     public void initialize() {
         queue = new CommandQueue(
-        new JointCommand(
-                new AutoCollectCommand(targeting, drive, shooter),
-                new IntakeCommand(intake, shooter)),
-        new DelayCommand(2),
-        new RotateCommand(drive, Rotation2d.fromDegrees(-90))
+                new ShootCommand(shooter, elevator, 3000, 5)    
+               
        );
     }
 

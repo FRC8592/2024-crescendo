@@ -214,7 +214,7 @@ public class FollowerCommand extends Command {
         Logger.recordOutput("CustomLogs/Autonomous/ActualPose", drive.getCurrentPos()); // Log where the robot actually
                                                                                         // is. This is still
                                                                                // dead-reckoning.
-        Robot.FIELD.getObject("RobotTrajectory").setTrajectory(trajectory.trajectory());
+        // Robot.FIELD.getObject("RobotTrajectory").setTrajectory(trajectory.trajectory());
         drive.drive(newSpeeds);
 
         return trajectory.isFinished(time) || finishedAiming;

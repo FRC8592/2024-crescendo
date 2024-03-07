@@ -37,22 +37,22 @@ public class ThreeWingNoteAuto extends BaseAuto{
     @Override
     public void initialize() {
        queue = new CommandQueue(
-        // new ShootCommand(shooter, elevator, 3000, 5), //shooting preloaded note
+        new ShootCommand(shooter, elevator, 3000, 5), //shooting preloaded note
         new JointCommand(//going to first note and intaking at the same time
                 new FollowerCommand(drive, noteOne)
                 // new IntakeCommand(intake, shooter)
         ),
-        // new ShootCommand(shooter, elevator, 2000, 25), //shooting first note at wing position
+        new ShootCommand(shooter, elevator, 3500, 28), //shooting first note at wing position
         new JointCommand(//going to and intaking second note
-                new FollowerCommand(drive, noteTwo)
-                // new IntakeCommand(intake, shooter)
+                new FollowerCommand(drive, noteTwo),
+                new IntakeCommand(intake, shooter)
         ),
-        // new ShootCommand(shooter, elevator, 3500, 25), //shooting second note at wing spot
+        new ShootCommand(shooter, elevator, 3500, 25), //shooting second note at wing spot
         new JointCommand(//going to and intaking thrid note
-                 new FollowerCommand(drive, noteThree)
-                //  new IntakeCommand(intake, shooter)
+                 new FollowerCommand(drive, noteThree),
+                 new IntakeCommand(intake, shooter)
         ),
-        new ShootCommand(shooter, elevator, 2000, 25) //shooting third note 
+        new ShootCommand(shooter, elevator, 3500, 28) //shooting third note 
        );
     }
 

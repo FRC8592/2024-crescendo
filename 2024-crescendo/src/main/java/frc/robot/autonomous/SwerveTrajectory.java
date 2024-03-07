@@ -35,30 +35,29 @@ public class SwerveTrajectory {
     private double acceptanceRange = 0.1;
 
     public SwerveTrajectory(Trajectory trajectory) {
-        mXPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
-        mYPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
-        mTurnPID = new ProfiledPIDController(0.5, 0, 0, new Constraints(4 * Math.PI, 2 * Math.PI)); // NOTE: UNUSED Probably should increase the P value or maybe even change constraints to degrees
-        mDrivePID = new HolonomicDriveController(mXPID, mYPID, mTurnPID);
+        // mXPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
+        // mYPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
+        // mTurnPID = new ProfiledPIDController(0.5, 0, 0, new Constraints(4 * Math.PI, 2 * Math.PI)); // NOTE: UNUSED Probably should increase the P value or maybe even change constraints to degrees
+        // mDrivePID = new HolonomicDriveController(mXPID, mYPID, mTurnPID);
 
-        mXPID.setTolerance(0.1, 0.1);
-        mYPID.setTolerance(0.1, 0.1);
-        mTurnPID.setTolerance(0.1, 0.1);
-        mTurnPID.enableContinuousInput(-Math.PI, Math.PI); // Might need to change to degrees
+        // mXPID.setTolerance(0.1, 0.1);
+        // mYPID.setTolerance(0.1, 0.1);
+        // mTurnPID.setTolerance(0.1, 0.1);
+        // mTurnPID.enableContinuousInput(-Math.PI, Math.PI); // Might need to change to degrees
 
-        turnPID = new PIDController(0.001, 0, 0); // NOTE: this is used        
-        turnPID.setTolerance(0.01);
-        // turnPID.enableContinuousInput(-Math.PI/2, Math.PI/2);
+        // turnPID = new PIDController(0.001, 0, 0); // NOTE: this is used        
+        // turnPID.setTolerance(0.01);
+        
+        // mDrivePID.setTolerance(new Pose2d(0.1, 0.1, Rotation2d.fromDegrees(5)));
 
-        mDrivePID.setTolerance(new Pose2d(0.1, 0.1, Rotation2d.fromDegrees(5)));
-
-        // rotation = trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getRotation();
-        rotation = new Rotation2d();
-        mTrajectory = trajectory;
+        // rotation = new Rotation2d();
+        // mTrajectory = trajectory;
 
         // boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
         // if (isRed){
         //     rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
         // }
+        this(trajectory, false);
     }
 
     public SwerveTrajectory(Trajectory trajectory, boolean vision) {
@@ -96,14 +95,13 @@ public class SwerveTrajectory {
      * @return the same {@code SwerveTrajectory} object back but with the added {@code Rotation2d} for easy usage
      */
     public SwerveTrajectory addRotation(Rotation2d rotation) {
-        this.rotation = Rotation2d.fromDegrees(rotation.getDegrees());
+        // this.rotation = Rotation2d.fromDegrees(rotation.getDegrees());
         
-        boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
-        if (isRed){
-            rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
-        }
-        
-        return this;
+        // boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+        // if (isRed){
+        //     this.rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
+        // }
+        return addRotation(rotation, 0, 0);
     }
 
     /**
@@ -115,10 +113,10 @@ public class SwerveTrajectory {
         turnDelay = delay;
         maxRotationVelocity = turnSpeed;
         
-        // boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
-        // if (isRed){
-        //     rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
-        // }
+        boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+        if (isRed){
+            this.rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
+        }
 
         return this;
     }

@@ -1,13 +1,14 @@
-package frc.robot.autonomous.autons;
+package frc.robot.autonomous.autons.WIP;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
+import frc.robot.autonomous.autons.BaseAuto;
 import frc.robot.commands.*;
 
-public class ThreeWingNoteVisionAuto extends BaseAuto {
+public class BlueThreeWingNoteVisionAuto extends BaseAuto {
 
     // Setting speed and acceleration of each path as shown
     private TrajectoryConfig config = new TrajectoryConfig(1, 1);

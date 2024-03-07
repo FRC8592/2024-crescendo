@@ -11,7 +11,7 @@ import frc.robot.Constants.*;
 import frc.robot.autonomous.*;
 import frc.robot.commands.*;
 
-public class Left2MidnotesAuto extends BaseAuto{
+public class NoteSteal extends BaseAuto{
     private TrajectoryConfig config = new TrajectoryConfig(2,1);
     private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
 

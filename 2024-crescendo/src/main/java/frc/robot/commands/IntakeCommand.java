@@ -31,6 +31,10 @@ public class IntakeCommand extends Command {
         intake.spinPercentOutput(INTAKE.INTAKE_POWER);
         shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
         timeoutTimer.start();
+        
+        if(!Robot.isReal()){
+            return true;
+        }
         return shooter.hasNote() || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds);
     }
 

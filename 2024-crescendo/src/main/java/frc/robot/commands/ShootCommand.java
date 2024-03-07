@@ -26,8 +26,7 @@ public class ShootCommand extends Command{
     public void initialize() {
         timer.reset();
         timeoutTimer.start();
-
-        SmartDashboard.putBoolean("SHOOTER_ACTIVE", true);
+        timer.start();
     }
 
     @Override
@@ -56,7 +55,6 @@ public class ShootCommand extends Command{
       shooter.stopFeeders();
       elevator.stow();
 
-      SmartDashboard.putBoolean("SHOOTER_ACTIVE", false);
     }
     
 }

@@ -3,7 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 
-public class LED {
+public class DotStarLED {
     private Timer timer;
     private DotStarManager dsm;
     public enum AnimationType {
@@ -44,7 +44,7 @@ public class LED {
         }
     }
 
-    public LED() {
+    public DotStarLED() {
         timer = new Timer();
         timer.start();
     }

@@ -122,7 +122,12 @@ public class Swerve {
     }
 
     public Pose2d getCurrentPos() {
-        return swerve.getCurrentPos();
+        if(Robot.isReal()){
+            return swerve.getCurrentPos();
+        }
+        else{
+            return Robot.FIELD.getRobotPose();
+        }
     }
 
     public Rotation2d getGyroscopeRotation() {
@@ -155,5 +160,9 @@ public class Swerve {
     
     public void zeroGyroscope() {
         swerve.zeroGyroscope();
+    }
+
+    public void setGyroscopeRotation(double yaw){
+        swerve.gyro.setYaw(yaw);
     }
 }

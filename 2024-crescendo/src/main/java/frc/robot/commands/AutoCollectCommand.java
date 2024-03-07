@@ -1,6 +1,9 @@
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.*;
 import frc.robot.Constants.*;
@@ -28,15 +31,19 @@ public class AutoCollectCommand extends Command {
 
     @Override
     public boolean execute() {
+        Logger.recordOutput("CurrentCommand", "AutoCollectCommand");
+        Logger.recordOutput("hasNote", shooter.hasNote());
+
         this.targeting.updateVision();
         this.drive.drive(targeting.driveToTarget(
                 new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD),
                 new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD),
                 NOTELOCK.DRIVE_TO_TARGET_ANGLE));
-        return true;
+        return !this.targeting.isTargetValid() || shooter.hasNote();
     }
 
     @Override
     public void shutdown() {
+        drive.drive(new ChassisSpeeds());
     }
 }

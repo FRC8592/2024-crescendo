@@ -7,7 +7,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Swerve;
@@ -88,6 +90,22 @@ public class FollowerCommand extends Command {
         this.timer = new Timer();
     }
 
+    public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Pose2d pTargetPose, LimelightTargeting targeting, PIDController internalPID) {
+        this.drive = pDrive;
+        this.trajectory = pTraj;
+        this.targetPose = pTargetPose;
+
+        if(DriverStation.getAlliance().get() == Alliance.Red) {
+            // flip if its red
+            this.targetPose = new Pose2d(16 - pTargetPose.getX(), pTargetPose.getY(), pTargetPose.getRotation());
+        }
+
+        this.targeting = targeting;
+        this.visionPID = internalPID;
+        // this.omegaSmoothing = new SmoothingFilter(1, 1, 1); // x, y, omega
+        this.timer = new Timer();
+    }
+
     // public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Rotation2d
     // pRot, boolean lockWheels) {
     // drive = pDrive;
@@ -118,6 +136,7 @@ public class FollowerCommand extends Command {
     public boolean execute() {
         ChassisSpeeds speeds = trajectory.sample(timer.get(), drive.getCurrentPos());
         double time = timer.get();
+        boolean finishedAiming = false;
 
         if (!Robot.isReal()) {
             simulateRobotPose(trajectory.trajectory().sample(time).poseMeters, speeds);
@@ -129,7 +148,10 @@ public class FollowerCommand extends Command {
             targeting.updateVision();
             double omegaVision;
             if (targeting.isTargetValid()) { // target in view
-                omegaVision = -targeting.turnRobot(0, visionPID, "tx", 2, 0.0);
+                omegaVision = targeting.turnRobot(0, visionPID, "tx", 2, 0.0);
+                if (omegaVision == 0) {
+                    finishedAiming = true;
+                }
                 // System.out.println("AprilTag Found, omega = " + omegaVision);
                 // SmartDashboard.putNumber("AprilTag Omega", omegaVision);
                 Logger.recordOutput("CustomLogs/Autonomous/VisionRotationTarget", omegaVision);
@@ -191,10 +213,11 @@ public class FollowerCommand extends Command {
         }
         Logger.recordOutput("CustomLogs/Autonomous/ActualPose", drive.getCurrentPos()); // Log where the robot actually
                                                                                         // is. This is still
-                                                                                        // dead-reckoning.
+                                                                               // dead-reckoning.
+        Robot.FIELD.getObject("RobotTrajectory").setTrajectory(trajectory.trajectory());
         drive.drive(newSpeeds);
 
-        return trajectory.isFinished(time);
+        return trajectory.isFinished(time) || finishedAiming;
     }
 
     @Override

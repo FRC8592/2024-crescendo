@@ -1,4 +1,19 @@
 {
+  "HALProvider": {
+    "Addressable LEDs": {
+      "0": {
+        "columns": 30
+      },
+      "window": {
+        "visible": true
+      }
+    },
+    "DIO": {
+      "window": {
+        "visible": true
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -12,6 +27,7 @@
         }
       },
       "/SmartDashboard/Field": {
+        "image": "/home/martin/Downloads/2024-field.png",
         "window": {
           "visible": true
         }

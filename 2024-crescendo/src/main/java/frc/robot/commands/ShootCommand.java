@@ -1,6 +1,9 @@
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Elevator;
 import frc.robot.Shooter;
 import frc.robot.Constants.*;
@@ -23,24 +26,28 @@ public class ShootCommand extends Command{
     public void initialize() {
         timer.reset();
         timeoutTimer.start();
+
+        SmartDashboard.putBoolean("SHOOTER_ACTIVE", true);
     }
 
     @Override
     public boolean execute() {
+        Logger.recordOutput("CurrentCommand", "ShootCommand");
+
         elevator.setPivotAngleCustom(elevatorPivotAngle);
         shooter.setShootVelocity(shootVelocity, shootVelocity);
 
-        if(shooter.isReady() && Math.abs(elevator.getPivotAngle() - elevatorPivotAngle) <= 0.5){
+        if(shooter.isReady() && elevator.isTargetAngle()){
             timer.start();
             if(timer.get()>0.05){
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
             }
             else{
-                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
+                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
             }
         }
 
-        return timer.get() > 1.5 || (timeoutSeconds != -1 && timeoutTimer.get() >= timeoutSeconds);
+        return timer.get() > 0.75 || (timeoutSeconds != -1 && timeoutTimer.get() >= timeoutSeconds);
     }
 
     @Override
@@ -48,6 +55,8 @@ public class ShootCommand extends Command{
       shooter.stop();
       shooter.stopFeeders();
       elevator.stow();
+
+      SmartDashboard.putBoolean("SHOOTER_ACTIVE", false);
     }
     
 }

@@ -26,7 +26,7 @@ public class Intake {
         // bottomMotor.config_kI(0, INTAKE.BOTTOM_MOTOR_kI);
         // bottomMotor.config_kD(0, INTAKE.BOTTOM_MOTOR_kD);
         topMotor = new SparkFlexControl(INTAKE.TOP_MOTOR_CAN_ID, true);
-        topMotor.setPIDF(INTAKE.TOP_MOTOR_kP, INTAKE.TOP_MOTOR_kI, INTAKE.TOP_MOTOR_kD, 0, 0);
+        topMotor.setPIDF(INTAKE.MOTOR_kP, INTAKE.MOTOR_kI, INTAKE.MOTOR_kD, INTAKE.MOTOR_kFF, 0);
         
         // bottomMotor = new SparkFlexControl(INTAKE.BOTTOM_MOTOR_CAN_ID,true);
         // bottomMotor.setPIDF(INTAKE.BOTTOM_MOTOR_kP, INTAKE.BOTTOM_MOTOR_kI, INTAKE.BOTTOM_MOTOR_kD, 0, 0);

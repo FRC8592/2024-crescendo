@@ -31,6 +31,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 
 import frc.robot.Constants.*;
+import frc.robot.MainSubsystemsManager.MainStates;
+import frc.robot.MainSubsystemsManager.SubStates;
 
 public class Robot extends LoggedRobot {
     
@@ -52,18 +54,33 @@ public class Robot extends LoggedRobot {
     private Intake intake;
     private Elevator elevator;
     private LimelightTargeting noteLock;
-    private PoseVision apriltagLockYaw;
-    private PoseVision apriltagLockY;
-    private PoseVision poseGetter;
-    private LED leds;
+    private LimelightTargeting apriltagVision;
+    // private PoseVision apriltagLockYaw;
+    // private PoseVision apriltagLockY;
+    // private PoseVision poseGetter;
+    private NeoPixelLED leds;
     private Power power;
     private PIDController turnPID;
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
-    private LimelightTargeting gameObjectVision;
-    private boolean intaking;
-    private boolean intakeToggleLastFrame = false;
+    private MainSubsystemsManager subsystemsManager;
 
+    private BooleanManager slowMode = new BooleanManager(false);
+    private BooleanManager resetGyro = new BooleanManager(false);
+    private BooleanManager autoCollect = new BooleanManager(false);
+    private BooleanManager robotOriented = new BooleanManager(false);
+
+    // operator controls
+    private BooleanManager ledAmpSignal = new BooleanManager(false);
+    private BooleanManager shootFromPodium = new BooleanManager(false);
+    private BooleanManager outake = new BooleanManager(false);
+    private BooleanManager intaking = new BooleanManager(false);
+    private BooleanManager stow = new BooleanManager(false);
+    private BooleanManager amp = new BooleanManager(false);
+    private BooleanManager climb = new BooleanManager(false);
+    private BooleanManager speakerAmp = new BooleanManager(false);
+    private BooleanManager manualRaiseClimber = new BooleanManager(false);
+    private BooleanManager manualLowerClimber = new BooleanManager(false);
 
     @Override
     public void robotInit() {
@@ -91,45 +108,24 @@ public class Robot extends LoggedRobot {
         pigeon = new NewtonPigeon2(new Pigeon2(PIGEON.CAN_ID));
         swerve = new Swerve(pigeon);
         power = new Power();
-        // leds = new LED();
+        leds = new NeoPixelLED();
         shooter = new Shooter();
-        shooter.setMotorsIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
-        poseGetter = new PoseVision(APRILTAG_VISION.kP,APRILTAG_VISION.kI,APRILTAG_VISION.kD,0);
+        // poseGetter = new PoseVision(APRILTAG_VISION.kP,APRILTAG_VISION.kI,APRILTAG_VISION.kD,0);
         intake = new Intake();
-        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR, NOTELOCK.CAMERA_HEIGHT,0,0,0);
+        noteLock = new LimelightTargeting(NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR,0,0,0,0);
         elevator = new Elevator();
-        smoothingFilter = new SmoothingFilter(1, 1, 1);
+        smoothingFilter = new SmoothingFilter(SWERVE.TRANSLATION_SMOOTHING_AMOUNT, SWERVE.TRANSLATION_SMOOTHING_AMOUNT, SWERVE.ROTATION_SMOOTHING_AMOUNT);
 
         elevator.resetEncoders();
 
-        drivePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
+        drivePID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kP, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kI, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kD);
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
-
-        SmartDashboard.putNumber("topShootSpeed", 4500);
-        SmartDashboard.putNumber("bottomShootSpeed", 4500);
-        SmartDashboard.putNumber("feederSpeedRPM", -500);
-        SmartDashboard.putNumber("feederSpeedShootRPM", -1000);
-
-        SmartDashboard.putNumber("PIVOT CUSTOM ANGLE", 45);
-
-        SmartDashboard.putNumber("FeederKp", SHOOTER.FEEDER_MOTOR_kP);
-        SmartDashboard.putNumber("FeederKi", SHOOTER.FEEDER_MOTOR_kI);
-        SmartDashboard.putNumber("FeederKd", SHOOTER.FEEDER_MOTOR_kD);
-        SmartDashboard.putNumber("FeederKff", SHOOTER.FEEDER_MOTOR_kF);
-
-        SmartDashboard.putNumber("IntakeKp", INTAKE.TOP_MOTOR_kP);
-        SmartDashboard.putNumber("IntakeKi", INTAKE.TOP_MOTOR_kI);
-        SmartDashboard.putNumber("IntakeKd", INTAKE.TOP_MOTOR_kD);
-        SmartDashboard.putNumber("IntakeKff",INTAKE.TOP_MOTOR_kFF);
-
-        SmartDashboard.putBoolean("hasNote()", false);
-
-        SmartDashboard.putBoolean("hasNote()", false);
+        
+        subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator);
     }
 
     @Override
     public void robotPeriodic() {
-
         Logger.recordOutput(SHOOTER.LOG_PATH+"TopMotorRPM", shooter.topShooterMotor.getVelocity());
         Logger.recordOutput(SHOOTER.LOG_PATH+"BottomMotorRPM", shooter.bottomShooterMotor.getVelocity());
 
@@ -138,20 +134,14 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterSpeedDifference (Bottom - Top)", shooter.bottomShooterMotor.getVelocity()-shooter.topShooterMotor.getVelocity());
 
-        Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.hasNote());
-        SmartDashboard.putBoolean("hasNote()", shooter.hasNote());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.noteBeamBreak.get());
+        SmartDashboard.putBoolean("hasNote()", shooter.noteBeamBreak.get());
+
+        Logger.recordOutput(SHOOTER.LOG_PATH+"FeederSpeedRPM", shooter.feederMotor.getVelocity());
+        Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getTopMotorVelocityRPM());
 
         //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();
-
-        
-        SmartDashboard.putNumber("elevator position in meters", elevator.getExtensionLength());
-        SmartDashboard.putNumber("elevator position in rotations", elevator.getExtensionLength()/ELEVATOR.ELEVATOR_GEAR_RATIO);
-
-        SmartDashboard.putNumber("pivot position in angle", elevator.getPivotAngle());
-        //SmartDashboard.putNumber("elevator position in ticks", elevator.getPivotAngle()*CONVERSIONS.ANGLE_DEGREES_TO_TICKS*CONVERSIONS.PIVOT_GEAR_RATIO);
-        SmartDashboard.putNumber("elevator position in Rotations", (elevator.getPivotAngle()*ELEVATOR.PIVOT_GEAR_RATIO)/360);
-        
     }
 
     @Override
@@ -178,8 +168,6 @@ public class Robot extends LoggedRobot {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setTeleopCurrentLimit();
-
-        intaking = false;
 
         // shooter.feederMotor.setPIDF(SmartDashboard.getNumber("FeederKp", 0),
         // SmartDashboard.getNumber("FeederKp", 0),
@@ -272,43 +260,39 @@ public class Robot extends LoggedRobot {
          * 
          */
         //Basic driving controls
-        double driveTranslateY = -driverController.getLeftY();
-        double driveTranslateX = -driverController.getLeftX();
-        double driveRotate = -driverController.getRightX();
-        boolean slowMode = driverController.getRightBumper();
-        boolean resetGyro = driverController.getBackButtonPressed();
-        boolean autoCollect = driverController.getLeftBumper();
-        // boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
+        double rawLeftY = -driverController.getLeftY();
+        double rawLeftX = -driverController.getLeftX();
+        double rawRightX = -driverController.getRightX();
+        double driveTranslateY = rawLeftY; //>= 0 ? (Math.pow(rawLeftY, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawLeftY, SWERVE.JOYSTICK_EXPONENT));
+        double driveTranslateX = rawLeftX; //>= 0 ? (Math.pow(rawLeftX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawLeftX, SWERVE.JOYSTICK_EXPONENT));
+        double driveRotate =     rawRightX >= 0 ? (Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT));
+        slowMode.update          (driverController.getRightBumper());
+        resetGyro.update         (driverController.getBackButton());
+        autoCollect.update       (driverController.getLeftBumper());
+        robotOriented.update     (driverController.getRightTriggerAxis() >0.1);
 
         //operator controls
         // shooter/feeder functions
-        boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
-        boolean shootFromPodium = operatorController.getLeftBumper(); 
+        shootFromPodium.update   (operatorController.getLeftBumper()); 
 
-        boolean outake = operatorController.getRightBumper();
-        boolean intakeToggle = operatorController.getLeftTriggerAxis() > 0.1 && !intakeToggleLastFrame;
-        intakeToggleLastFrame = operatorController.getLeftTriggerAxis() > 0.1;
+        outake.update            (operatorController.getRightBumper());
+        intaking.update          (operatorController.getLeftTriggerAxis()>0.1);
 
-        boolean stowed = operatorController.getAButtonPressed();
-        boolean ampPosition = operatorController.getXButton();
-        boolean maxClimbPosition = operatorController.getYButtonPressed();
-        boolean prime = operatorController.getBButtonPressed();
-        boolean manualRaiseClimber = operatorController.getPOV() == 0;
-        boolean manualLowerClimber = operatorController.getPOV() == 180;
-        boolean manualPivotUp = operatorController.getPOV() == 90;
-        boolean manualPivotDown = operatorController.getPOV() == 270;
-
-        if (intakeToggle) {
-            intaking = !intaking;
-        }
+        stow.update              (operatorController.getAButton());
+        amp.update               (operatorController.getXButton());
+        climb.update             (operatorController.getYButton());
+        speakerAmp.update        (operatorController.getRightTriggerAxis()>0.1);
+        manualRaiseClimber.update(operatorController.getPOV() == 0);
+        manualLowerClimber.update(operatorController.getPOV() == 180);
+        ledAmpSignal.update      (operatorController.getBackButton());
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
-        if(resetGyro){
+        if(resetGyro.getValue()){
             swerve.zeroGyroscope();
         }
 
-        if (slowMode) { //Slow Mode slows down the robot for better precision & control
+        if (slowMode.getValue()) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
                     driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
                     driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
@@ -320,88 +304,95 @@ public class Robot extends LoggedRobot {
                     driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
                     driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
         }
-        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, swerve.getGyroscopeRotation());
+        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented.getValue()?new Rotation2d():swerve.getGyroscopeRotation());
         noteLock.updateVision();
-        if(intaking){
-            intake.spinPercentOutput(INTAKE.INTAKE_POWER);
-            elevator.stow();
-            if (shooter.hasNote()) {  
-                intaking = false;
+
+        if (autoCollect.getValue()) { // Different from the others because it interacts with both the drivetrain and the main subsystems manager subsystems
+            if (!shooter.hasNote()) {
+                currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
+                if (autoCollect.isRisingEdge()) {
+                    subsystemsManager.intake(true);
+                }
+            }
+        }
+        else if (autoCollect.isFallingEdge()) {
+            subsystemsManager.intake(false);
+        }
+        else if (intaking.isRisingEdge()) {
+            subsystemsManager.intake(true);
+        }
+        else if (intaking.isFallingEdge()) {
+            subsystemsManager.intake(false);
+        }
+        else if (amp.isRisingEdge()) {
+            subsystemsManager.amp(true);
+        }
+        else if (stow.isRisingEdge()) {
+            subsystemsManager.home();
+        }
+        //Maybe add something here to trigger `subsystemsManager.forceHome()`
+        else if (climb.isRisingEdge()) {
+            subsystemsManager.climb(true);
+        }
+        //TODO: Figure out what to do with prime
+        else if (manualRaiseClimber.isRisingEdge()) {
+            subsystemsManager.climbExtend(true);
+        }
+        else if (manualRaiseClimber.isFallingEdge()) {
+            subsystemsManager.climbExtend(false);
+        }
+        else if (manualLowerClimber.isRisingEdge()) {
+            subsystemsManager.climbRetract(true);
+        }
+        else if (manualLowerClimber.isFallingEdge()) {
+            subsystemsManager.climbRetract(false);
+        }
+        else if (outake.isRisingEdge()) {
+            subsystemsManager.outake(true);
+        }
+        else if (outake.isFallingEdge()) {
+            subsystemsManager.outake(false);
+        }
+        else if (shootFromPodium.isRisingEdge()) {
+            //This whole control is temporary. We account for the change in angle using code in the subsystemsManager.update() line
+            subsystemsManager.speaker(true);
+        }
+        else if (shootFromPodium.isFallingEdge()) {
+            subsystemsManager.speaker(false);
+        }
+        else if (speakerAmp.isRisingEdge()) {
+            if (subsystemsManager.mainState == MainStates.AMP) {
+                subsystemsManager.score();
             }
             else {
-                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+                subsystemsManager.speaker(true);
             }
+        }
+        else if (speakerAmp.isFallingEdge()) {
+            if (subsystemsManager.mainState == MainStates.SPEAKER) {
+                subsystemsManager.speaker(false);
+            }
+        }
+        else if (speakerAmp.getValue()) {
+            subsystemsManager.score();
+        }
+        else if (shootFromPodium.getValue()) {
+            subsystemsManager.score();
         }
 
-        else if(autoCollect){
-            if (!shooter.hasNote()) {
-                currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
-                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-                intake.spinPercentOutput(INTAKE.INTAKE_POWER);
-                elevator.stow();
-            }
+        //LED management
+        if (ledAmpSignal.isRisingEdge()) {
+            leds.flashTimer.reset();
         }
-
-        else if(outake){
-            intake.spinPercentOutput(INTAKE.OUTAKE_POWER);
-            shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_VELOCITY);
-            shooter.setShootVelocity(SHOOTER.OUTAKE_SHOOTER_VELOCITY, -SHOOTER.OUTAKE_SHOOTER_VELOCITY);
+        if (ledAmpSignal.getValue()) {
+            leds.amp();
         }
-
-        else if (shoot) { // TODO: Create shoot method to shoot from any distance 
-            if (ampPosition) {
-                shooter.setShootVelocity(Constants.SHOOTER.AMP_SHOOTER_SPEED, Constants.SHOOTER.AMP_SHOOTER_SPEED);
-            } else {
-                RangeTable.RangeEntry entry = RangeTable.get(0);
-                shooter.setShootVelocity(entry.flywheelSpeed,entry.flywheelSpeed);
-                elevator.setPivotAngleCustom(entry.pivotAngle);
-            }
-            if (shooter.isReady()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
-                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
-            }
+        else if (shooter.hasNote) {
+            leds.notePickup();
+        } else {
+            leds.off();
         }
-
-        else if (shootFromPodium) { 
-            RangeTable.RangeEntry entry = RangeTable.get(0);
-            shooter.setShootVelocity(3500,3500); 
-            elevator.setPivotAngleCustom(29);
-            if (shooter.isReady() && elevator.isTargetAngle()) {// isReady returns whether the shooter angle and flywheel speeds are within a threshhold of where we asked them to be.
-                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // runs the feeder wheels
-            }
-        }
-
-        else{
-            if (stowed){
-                elevator.stow();
-            }
-            else if (prime){
-                elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 5));
-            }
-            else if (ampPosition){
-                elevator.ampPosition();
-            }
-            else if (maxClimbPosition) {
-                elevator.climbPosition();
-            }
-            else if (manualRaiseClimber){
-                elevator.extend();
-            }
-            else if (manualLowerClimber){
-                elevator.retract();
-            }
-            else if (manualPivotUp){
-                elevator.lift();
-            }
-            else if (manualPivotDown){
-                elevator.lower();
-            }
-            else{
-                intake.halt();
-                shooter.stopFeeders();
-                shooter.stop();
-            }
-        }
-        swerve.drive(currentSpeeds);
+        swerve.drive(subsystemsManager.update(shootFromPodium.getValue()?1:0/*<-- temporary*/, currentSpeeds));
     }
 
     @Override
@@ -410,179 +401,18 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledPeriodic() {
+        leds.disabled();
     }
 
     @Override
-    public void testInit() {
-        shooter.bottomShooterMotor.setPIDF(
-            SmartDashboard.getNumber("ShooterKp",  0),
-            SmartDashboard.getNumber("ShooterKi",  0),
-            SmartDashboard.getNumber("ShooterKd",  0),
-            SmartDashboard.getNumber("ShooterKff", 0), 0
-        );
-
-        shooter.topShooterMotor.setPIDF(
-            SmartDashboard.getNumber("ShooterKp",  0),
-            SmartDashboard.getNumber("ShooterKi",  0),
-            SmartDashboard.getNumber("ShooterKd",  0),
-            SmartDashboard.getNumber("ShooterKff", 0), 0
-        );
-
-        intake.topMotor.setPIDF(
-            SmartDashboard.getNumber("IntakeKp",  0),
-            SmartDashboard.getNumber("IntakeKi",  0),
-            SmartDashboard.getNumber("IntakeKd",  0),
-            SmartDashboard.getNumber("IntakeKff", 0), 0
-        );
-
-        // shooter.setAlliance(DriverStation.getAlliance().get());
-        swerve.setSteerAnglesToAbsEncoder();
-        swerve.setTeleopCurrentLimit();
-
-        SmartDashboard.putNumber("Measured Intake Top RPM", 0);
-        SmartDashboard.putNumber("Measured Intake Bottom RPM", 0);
-    }
+    public void testInit() {}
 
     @Override
     public void testPeriodic() {
-        driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis() * 255);
-        operatorController.setRumble(RumbleType.kBothRumble, operatorController.getLeftTriggerAxis() * 255);
+        // driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis() * 255);
+        // operatorController.setRumble(RumbleType.kBothRumble, operatorController.getLeftTriggerAxis() * 255);
+        SmartDashboard.putNumber("Robot Yaw", swerve.getGyroscopeRotation().getDegrees());
     } 
-
-    public void testDrivetrain(){
-        
-        //driver controls
-        double driveTranslateY = -driverController.getLeftY();
-        double driveTranslateX = -driverController.getLeftX();
-        double driveRotate = driverController.getRightX();
-        boolean slowMode = driverController.getRightBumper();
-        boolean resetGyro = driverController.getBackButtonPressed();
-        boolean robotOriented = driverController.getRightTriggerAxis() >0.1;
-        // boolean driveToNote = driverController.getLeftTriggerAxis() >0.1;
-
-        // Resets the gyroscope to 0 once b button is pressed
-        if(resetGyro){
-            swerve.zeroGyroscope();
-        }
-
-        //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
-        ChassisSpeeds currentSpeeds;
-        if (slowMode) { //Slow Mode slows down the robot for better precision & control
-            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    new ChassisSpeeds(
-                            driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                            driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()),
-                    !robotOriented?swerve.getGyroscopeRotation():new Rotation2d());
-        }
-        else {
-            currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    new ChassisSpeeds(
-                            driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                            driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()),
-                    !robotOriented?swerve.getGyroscopeRotation():new Rotation2d());
-        }
-        currentSpeeds = smoothingFilter.smooth(currentSpeeds);
-        swerve.drive(currentSpeeds);
-
-    }
-
-    public void testIntake(){
-        
-        //Intaking and Outaking controls
-        boolean outake = operatorController.getRightBumper();
-        boolean intaking = operatorController.getLeftTriggerAxis() > 0.1; // TODO: use dedicated deadband function
-        boolean fullPowerIntake = operatorController.getLeftBumper();
-
-         // intaking
-        if (intaking) {
-            // intake.spinPercentOutput(0.5);
-            intake.setIntakeVelocity(SmartDashboard.getNumber("Intake Top RPM", 0));
-        }
-        else if(outake){
-            intake.setIntakeVelocity(-2000);
-            shooter.setFeederVelocity(2000);
-            shooter.setShootVelocity(-2000, -2000);
-
-        }
-        // else if (fullPowerIntake) {
-        //     intake.spinPercentOutput(1.0);
-        // }
-        else {
-            intake.halt();
-        }
-
-    }
-
-    public void testShoot(){
-        boolean shoot = operatorController.getRightTriggerAxis() > 0.1;
-        boolean runFeeder = operatorController.getLeftBumper();
-
-         if (shoot) {
-            shooter.setShootVelocity((int) SmartDashboard.getNumber("topShootSpeed", 0), 
-                    (int) SmartDashboard.getNumber("bottomShootSpeed", 0));
-            if (shooter.isReady()) {// isReady returns whether the shooter angle and
-                // flywheel speeds are within a threshhold of where we asked them to be
-                shooter.setFeederVelocity(SmartDashboard.getNumber("feederSpeedShootRPM", 0)); // runs the feeder wheels
-                // if (!shooter.hasNote()) {
-                //     shooter.stop();
-                //     shooter.stopFeeders();
-                //     elevator.stow()
-                // }
-            }
-        } else if (runFeeder){
-            shooter.setFeederVelocity(SmartDashboard.getNumber("feederSpeedRPM", 0));
-        }
-        else {
-            shooter.setShootVelocity(0, 0);
-            shooter.setFeederSpeed(0);
-        }
-    }
-
-    // public void testElevator(){
-        
-    //     //elevator controls
-    //     boolean stowed = operatorController.getAButtonPressed();
-    //     boolean ampPosition = operatorController.getXButtonPressed();
-    //     boolean maxClimbPosition = operatorController.getYButtonPressed();
-    //     boolean prime = operatorController.getBButtonPressed();
-    //     boolean manualRaiseClimber = operatorController.getPOV() == 0;
-    //     boolean manualLowerClimber = operatorController.getPOV() == 180;
-    //     boolean manualPivotUp = operatorController.getPOV() == 90;
-    //     boolean manualPivotDown = operatorController.getPOV() == 270;
-       
-
-    //     if (stowed){
-    //         elevator.stow();
-    //     }
-    //     else if (prime){
-    //         elevator.setPivotAngleCustom(SmartDashboard.getNumber("PIVOT CUSTOM ANGLE", 0));
-    //     }
-    //     else if (ampPosition){
-    //         elevator.ampPosition();
-    //     }
-    //     else if (maxClimbPosition) {
-    //         elevator.climbPosition();
-    //     }
-    //     else if (manualRaiseClimber){
-    //         manualExtensionLength += 0.0001; //meters
-    //         elevator.setExtensionLengthCustom(manualExtensionLength);
-    //     }
-    //     else if (manualLowerClimber){
-    //         manualExtensionLength -= 0.0001; //meters
-    //         elevator.setExtensionLengthCustom(manualExtensionLength);
-    //     }
-    //     else if (manualPivotUp){
-    //         manualPivotAngle += 0.1; //degrees
-    //         elevator.setPivotAngleCustom(manualPivotAngle);
-    //     }
-    //     else if (manualPivotDown){
-    //         manualPivotAngle -= 0.1; //degrees
-    //         elevator.setPivotAngleCustom(manualPivotAngle);
-    //     }
-        
-        // }
 
     @Override
     public void simulationInit() {

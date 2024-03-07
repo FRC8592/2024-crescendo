@@ -119,12 +119,16 @@ public class Elevator {
      * @return
      */
     public double getPivotAngle() {
-        double ticksConverted = (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES)/ELEVATOR.PIVOT_GEAR_RATIO;
+        double ticksConverted = (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES_SPARKFLEX)/ELEVATOR.PIVOT_GEAR_RATIO;
         return ticksConverted;
     }
 
-    public boolean isTargetAngle(){
-        return Math.abs(getPivotAngle()-desiredPivot)<ELEVATOR.ANGLE_TOLERANCE;
+    public boolean isTargetAngle() {
+        return Math.abs(getPivotAngle() - desiredPivot) < ELEVATOR.ANGLE_TOLERANCE;
+    }
+
+    public boolean isTargetLength() {
+        return Math.abs(getExtensionLength() - desiredExtension) < ELEVATOR.LENGTH_TOLERANCE;
     }
 
     //-------COMBINED CODE-------//
@@ -171,15 +175,5 @@ public class Elevator {
     public void retract() {
         desiredExtension -= ELEVATOR.MANUAL_EXTENSION_SPEED;
         desiredExtension = Math.max(desiredExtension, 0);
-    }
-
-    public void lift() {
-        desiredPivot += ELEVATOR.MANUAL_PIVOT_SPEED;
-        desiredPivot = Math.min(desiredPivot, ELEVATOR.PIVOT_ANGLE_MAX);
-    }
-
-    public void lower() {
-        desiredPivot -= ELEVATOR.MANUAL_PIVOT_SPEED;
-        desiredPivot = Math.max(desiredPivot, 0);
     }
 }

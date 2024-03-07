@@ -14,11 +14,16 @@ public class AutonomousSelector {
     public Class<?>[] autos = {
         //putting all created autos in auto selector
         
-        OneNoteAuto.class,
+        TwoNoteVisionAuto.class,
         ThreeWingNoteAuto.class,
         SixNoteAuto.class,
-        NoteStealAuto.class
-        // SevenNoteAuto.class,
+        NoteStealAuto.class,
+        TwoNoteAuto.class,
+            RedThreeWingNoteVisionAuto.class,
+            ThreeWingNoteVisionAuto.class,
+        OneNoteAuto.class,
+        Left2MidnotesAuto.class,
+        DONTSELECT_RotateTestAuto.class
         // IWillNameThisLaterAuto.class,
     };
 
@@ -47,7 +52,10 @@ public class AutonomousSelector {
             BaseAuto selected = (BaseAuto) autonChooser.getSelected().getDeclaredConstructor().newInstance();
             return selected;
         } catch (Exception e) {
-            return null;
+             System.out.println(e.getMessage());
+             return null;
         }
+        // BaseAuto selected = (BaseAuto) autonChooser.getSelected().getDeclaredConstructor().newInstance();
+        // return selected;
     }
 }

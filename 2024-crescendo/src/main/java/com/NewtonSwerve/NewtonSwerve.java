@@ -17,7 +17,7 @@ public class NewtonSwerve {
     public static final double METERS_SECOND_TO_TICKS = ((2048 * 6.75 * 60) / (200 * Math.PI * 0.0508));
 
     // PASSED IN BY USER
-    private final Gyro gyro;
+    public final Gyro gyro;
     private final ModuleConfig config;
 
     /**

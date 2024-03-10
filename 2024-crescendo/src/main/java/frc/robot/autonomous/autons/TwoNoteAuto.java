@@ -5,11 +5,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
-import frc.robot.commands.CommandQueue;
-import frc.robot.commands.FollowerCommand;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.JointCommand;
-import frc.robot.commands.ShootCommand;
+import frc.robot.commands.*;
 
 public class TwoNoteAuto extends BaseAuto {
 
@@ -29,7 +25,7 @@ public class TwoNoteAuto extends BaseAuto {
             new IntakeCommand(intake, shooter),
             new FollowerCommand(drive, pathOne.addVision(targeting))
           ),
-          new ShootCommand(shooter, elevator, 3500, 25)
+          new AutoShootCommand(drive, poseVision, elevator, shooter)
        );
     }
 

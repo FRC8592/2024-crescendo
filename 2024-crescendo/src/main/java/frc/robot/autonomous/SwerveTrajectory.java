@@ -13,7 +13,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.*;
+import frc.robot.LimelightTargeting;
 import frc.robot.Robot;
+import frc.robot.Vision;
 
 /**
  * Custom Trajectory generator class based on the WPILib {@code Trajectory} class
@@ -26,39 +29,41 @@ public class SwerveTrajectory {
     private Trajectory mTrajectory;
     private TrajectoryConfig config = new TrajectoryConfig(0, 0).setEndVelocity(0).setStartVelocity(0);
     private Pose2d poseRobot = new Pose2d();
+    private LimelightTargeting vision;
+    private PIDController visionTranslatePID;
+    private PIDController visionRotatePID;
 
     private PIDController turnPID;
 
     private double maxRotationVelocity = Math.PI;
     private double turnDelay = 0.0;
-    private boolean vision = false;
+    public boolean isVision = false;
     private double acceptanceRange = 0.1;
 
     public SwerveTrajectory(Trajectory trajectory) {
-        mXPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
-        mYPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
-        mTurnPID = new ProfiledPIDController(0.5, 0, 0, new Constraints(4 * Math.PI, 2 * Math.PI)); // NOTE: UNUSED Probably should increase the P value or maybe even change constraints to degrees
-        mDrivePID = new HolonomicDriveController(mXPID, mYPID, mTurnPID);
+        // mXPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
+        // mYPID = new PIDController(3.0, 0, 0.0); // 0.1 0 -0.0002
+        // mTurnPID = new ProfiledPIDController(0.5, 0, 0, new Constraints(4 * Math.PI, 2 * Math.PI)); // NOTE: UNUSED Probably should increase the P value or maybe even change constraints to degrees
+        // mDrivePID = new HolonomicDriveController(mXPID, mYPID, mTurnPID);
 
-        mXPID.setTolerance(0.1, 0.1);
-        mYPID.setTolerance(0.1, 0.1);
-        mTurnPID.setTolerance(0.1, 0.1);
-        mTurnPID.enableContinuousInput(-Math.PI, Math.PI); // Might need to change to degrees
+        // mXPID.setTolerance(0.1, 0.1);
+        // mYPID.setTolerance(0.1, 0.1);
+        // mTurnPID.setTolerance(0.1, 0.1);
+        // mTurnPID.enableContinuousInput(-Math.PI, Math.PI); // Might need to change to degrees
 
-        turnPID = new PIDController(0.001, 0, 0); // NOTE: this is used        
-        turnPID.setTolerance(0.01);
-        // turnPID.enableContinuousInput(-Math.PI/2, Math.PI/2);
+        // turnPID = new PIDController(0.001, 0, 0); // NOTE: this is used        
+        // turnPID.setTolerance(0.01);
+        
+        // mDrivePID.setTolerance(new Pose2d(0.1, 0.1, Rotation2d.fromDegrees(5)));
 
-        mDrivePID.setTolerance(new Pose2d(0.1, 0.1, Rotation2d.fromDegrees(5)));
-
-        // rotation = trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getRotation();
-        rotation = new Rotation2d();
-        mTrajectory = trajectory;
+        // rotation = new Rotation2d();
+        // mTrajectory = trajectory;
 
         // boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
         // if (isRed){
         //     rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
         // }
+        this(trajectory, false);
     }
 
     public SwerveTrajectory(Trajectory trajectory, boolean vision) {
@@ -72,22 +77,24 @@ public class SwerveTrajectory {
         mTurnPID.setTolerance(0.1, 0.1);
         mTurnPID.enableContinuousInput(-Math.PI, Math.PI); // Might need to change to degrees
 
-        turnPID = new PIDController(0.05, 0, 0);
+        turnPID = new PIDController(0.01, 0, 0);
         turnPID.setTolerance(0.1);
         // turnPID.enableContinuousInput(-Math.PI/2, Math.PI/2);
 
         mDrivePID.setTolerance(new Pose2d(0.3, 0.3, Rotation2d.fromDegrees(5)));
+        visionTranslatePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
+        visionRotatePID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
 
         // rotation = trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getRotation();
         rotation = new Rotation2d();
         mTrajectory = trajectory;
 
-        this.vision = vision;
+        this.isVision = vision;
 
-        boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
-        if (isRed){
-            rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
-        }
+        // boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+        // if (isRed){
+        //     rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
+        // }
 
     }
 
@@ -96,14 +103,13 @@ public class SwerveTrajectory {
      * @return the same {@code SwerveTrajectory} object back but with the added {@code Rotation2d} for easy usage
      */
     public SwerveTrajectory addRotation(Rotation2d rotation) {
-        this.rotation = Rotation2d.fromDegrees(rotation.getDegrees());
+        // this.rotation = Rotation2d.fromDegrees(rotation.getDegrees());
         
-        boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
-        if (isRed){
-            rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
-        }
-        
-        return this;
+        // boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+        // if (isRed){
+        //     this.rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
+        // }
+        return addRotation(rotation, Math.PI, 0);
     }
 
     /**
@@ -117,7 +123,7 @@ public class SwerveTrajectory {
         
         // boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
         // if (isRed){
-        //     rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
+        //     this.rotation = Rotation2d.fromDegrees(180-rotation.getDegrees());
         // }
 
         return this;
@@ -154,8 +160,9 @@ public class SwerveTrajectory {
         return config.getEndVelocity();
     }
 
-    public SwerveTrajectory addVision() {
-        this.vision = true;
+    public SwerveTrajectory addVision(LimelightTargeting vision) {
+        this.isVision = true;
+        this.vision = vision;
         return this;
     }
 
@@ -172,10 +179,6 @@ public class SwerveTrajectory {
     public ChassisSpeeds sample(double pSeconds, Pose2d robotPose) {
         State state = mTrajectory.sample(pSeconds);
 
-        // if (DriverStation.getAlliance() == Alliance.Red) {
-        //     this.rotation = Rotation2d.fromDegrees(180 - rotation.getDegrees());
-        // }
-        SmartDashboard.putNumber("sample", rotation.getDegrees());
         ChassisSpeeds desired = mDrivePID.calculate(getInitialPose(), state, rotation);
         if (Robot.isReal()) {
             desired = mDrivePID.calculate(
@@ -183,32 +186,37 @@ public class SwerveTrajectory {
                 state, 
                 rotation
             );
-
-            // desired = ChassisSpeeds.fromFieldRelativeSpeeds(desired, robotPose.getRotation());
-            // SmartDashboard.putNumber("Current Heading", robotPose.getRotation().getDegrees());
         }
-
-        // SmartDashboard.putNumber("Error X", getEndingPose().getX() - robotPose.getX());
-        // SmartDashboard.putNumber("Error Y", getEndingPose().getY() - robotPose.getY());
-        // SmartDashboard.putNumber("Error Theta", rotation.getDegrees() - robotPose.getRotation().getDegrees());
-
-        // SmartDashboard.putNumber("Ending X", getEndingPose().getX());
-        // SmartDashboard.putNumber("Ending Y", getEndingPose().getY());
-        // SmartDashboard.putNumber("Ending Theta", rotation.getDegrees());
-
-        // SmartDashboard.putBoolean("AT SETPOINT", mDrivePID.atReference());
-
+    
         poseRobot = robotPose;
         double turn = turnPID.calculate(0, getErrorAngle(robotPose, new Pose2d(0, 0, rotation)));
-        turn = Math.max(-maxRotationVelocity, Math.min(maxRotationVelocity, pSeconds >= turnDelay ? turn : 0.0));
+        SmartDashboard.putNumber("Error angle", getErrorAngle(robotPose, new Pose2d(0, 0, rotation)));
         if(DriverStation.getAlliance().get() == Alliance.Red){
-            turn = turnPID.calculate(0, getErrorAngle(robotPose, new Pose2d(0, 0, Rotation2d.fromDegrees(180+rotation.getDegrees()))));
-            turn = Math.max(-maxRotationVelocity, Math.min(maxRotationVelocity, pSeconds >= turnDelay ? turn : 0.0));
+            turn = turnPID.calculate(0, getErrorAngle(robotPose, new Pose2d(0, 0, Rotation2d.fromDegrees(180-rotation.getDegrees()))));
         }
-        desired = new ChassisSpeeds(desired.vxMetersPerSecond, desired.vyMetersPerSecond, -turn);
+        turn = Math.max(-maxRotationVelocity, Math.min(maxRotationVelocity, pSeconds >= turnDelay ? turn : 0.0));
+        if(isVision){
+            vision.updateVision();
+            if(vision.isTargetValid()){
+                SmartDashboard.putNumber("TY", vision.processedDy);
+                if (vision.processedDy <= NOTELOCK.DY_LIMIT){
+                    double turnSpeed = visionRotatePID.calculate(vision.processedDx, 0);
+                    double ySpeed = -visionTranslatePID.calculate(vision.processedDy, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
+                    SmartDashboard.putNumber("Turn Speed", turnSpeed);
+                    SmartDashboard.putNumber("y speed", ySpeed);
+                    desired = new ChassisSpeeds(ySpeed, 0, turnSpeed);
+                } 
+                SmartDashboard.putNumber("Dy", vision.processedDy);
+            }
+        }
+        else{
+            desired = new ChassisSpeeds(desired.vxMetersPerSecond, desired.vyMetersPerSecond, turn);
+        }
+        SmartDashboard.putNumber("Auto Target Rotation", rotation.getDegrees());
         return desired;
     }
 
+    
     /**
      * @param time in seconds
      * @return whether the path has finished
@@ -219,7 +227,7 @@ public class SwerveTrajectory {
                 // ((Math.abs(getEndingPose().getX() - poseRobot.getX()) <= 0.1) &&
                 // (Math.abs(getEndingPose().getY() - poseRobot.getY()) <= 0.1)) 
                 // ||
-                time >= mTrajectory.getTotalTimeSeconds() || (Math.abs(getEndingPose().getX() - poseRobot.getX()) <= acceptanceRange && vision);
+                time >= mTrajectory.getTotalTimeSeconds() || (Math.abs(getEndingPose().getX() - poseRobot.getX()) <= acceptanceRange && isVision);
         } else {
             return time >= mTrajectory.getTotalTimeSeconds();
         }

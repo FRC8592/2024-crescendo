@@ -1,8 +1,8 @@
 package frc.robot.autonomous.autons;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import frc.robot.*;
-import frc.robot.LimelightTargeting;
 import frc.robot.commands.CommandQueue;
 
 public abstract class BaseAuto {
@@ -14,7 +14,8 @@ public abstract class BaseAuto {
     protected PoseVision poseVision;
     protected CommandQueue queue;
 
-    protected double scoreTime = 1; // Remove once actual intake/outtake on the robot
+    private TrajectoryConfig fastConfig = new TrajectoryConfig(1, 1);
+    private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
 
     /**
      * Add all running subsystems for use for all autonomous routines

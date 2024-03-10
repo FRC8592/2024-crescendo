@@ -13,19 +13,10 @@ public class AutonomousSelector {
 
     public Class<?>[] autos = {
         //putting all created autos in auto selector
-        
-        TwoNoteVisionAuto.class,
-        ThreeWingNoteAuto.class,
-        SixNoteAuto.class,
-        NoteStealAuto.class,
-        TwoNoteAuto.class,
-            RedThreeWingNoteVisionAuto.class,
-            ThreeWingNoteVisionAuto.class,
         OneNoteAuto.class,
-        Left2MidnotesAuto.class,
-        DONTSELECT_RotateTestAuto.class
-        // IWillNameThisLaterAuto.class,
-    };
+        TwoNoteAuto.class,
+        ThreeWingNoteAuto.class
+        };
 
     public AutonomousSelector() {
         autonChooser.setDefaultOption("DEFAULT - DO NOTHING", DoNothingAuto.class);

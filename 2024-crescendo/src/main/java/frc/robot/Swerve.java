@@ -14,6 +14,7 @@ import frc.robot.Constants.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Swerve {
     private Mk4ModuleConfiguration swerveConfig;

@@ -55,7 +55,7 @@ public class Robot extends LoggedRobot {
     private Intake intake;
     private Elevator elevator;
     private LimelightTargeting noteLock;
-    private LimelightTargeting apriltagVision;
+    // private LimelightTargeting apriltagVision;
     // private PoseVision apriltagLockYaw;
     // private PoseVision apriltagLockY;
     // private PoseVision poseGetter;
@@ -145,6 +145,9 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getTopMotorVelocityRPM());
 
         Logger.recordOutput(ELEVATOR.LOG_PATH+"PivotITerm",elevator.pivotMotor.motorControl.getIAccum());
+        Logger.recordOutput(SWERVE.LOG_PATH+"Robot position", swerve.getCurrentPos());
+        
+        SmartDashboard.putNumber("Robot Yaw", swerve.getGyroscopeRotation().getDegrees());
 
         //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();

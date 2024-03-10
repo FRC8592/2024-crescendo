@@ -9,7 +9,7 @@ import frc.robot.commands.CommandQueue;
 import frc.robot.commands.DelayCommand;
 import frc.robot.commands.FollowerCommand;
 
-public class IWillNameThisLaterAuto extends BaseAuto{
+public class AmpSideWallHugger extends BaseAuto{
 
     //setting speed and acceleration for paths
     private TrajectoryConfig config = new TrajectoryConfig(4, 2);

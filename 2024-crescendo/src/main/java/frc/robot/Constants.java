@@ -289,7 +289,7 @@ public final class Constants {
     }
 
     public class APRILTAG_VISION {
-        public static final double kP = 0;
+        public static final double kP = 1d;
         public static final double kI = 0;
         public static final double kD = 0;
     }

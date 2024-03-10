@@ -60,6 +60,7 @@ public class Robot extends LoggedRobot {
     // private PoseVision poseGetter;
     private NeoPixelLED leds;
     private Power power;
+    private PoseVision poseVision;
     private PIDController turnPID;
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
@@ -120,6 +121,8 @@ public class Robot extends LoggedRobot {
 
         drivePID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kP, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kI, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kD);
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
+
+        poseVision = new PoseVision(APRILTAG_VISION.kP, APRILTAG_VISION.kI, APRILTAG_VISION.kD, 0);
         
         subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator);
     }
@@ -378,6 +381,9 @@ public class Robot extends LoggedRobot {
         }
         else if (shootFromPodium.getValue()) {
             subsystemsManager.score();
+            double omega = poseVision.visual_servo(0, 1.0, 4, 0);
+            // set speeds
+            currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
 
         //LED management
@@ -405,13 +411,35 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void testInit() {}
+    public void testInit() {
+        SmartDashboard.putNumber("OAK tx", 0);
+        SmartDashboard.putNumber("OAK omega", 0);
+    }
 
     @Override
     public void testPeriodic() {
-        // driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis() * 255);
-        // operatorController.setRumble(RumbleType.kBothRumble, operatorController.getLeftTriggerAxis() * 255);
-        SmartDashboard.putNumber("Robot Yaw", swerve.getGyroscopeRotation().getDegrees());
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                new ChassisSpeeds(
+                        -driverController.getLeftY() * swerve.getMaxTranslateVelo() * 0.15,
+                        -driverController.getLeftX() * swerve.getMaxTranslateVelo() * 0.15,
+                        driverController.getRightX() * swerve.getMaxAngularVelo() * 0.15),
+                swerve.getGyroscopeRotation());
+        
+        if (driverController.getAButton()) {
+            double turn = turnPID.calculate(90, swerve.getGyroscopeRotation().getDegrees());
+                
+            // // calculate tx
+            // double tx = poseVision.getTagTx();
+            // // calculate omega
+            // double omega = poseVision.visual_servo(0, 1.0, 4, 0);
+            // // set speeds
+            // speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, omega);
+            // // log to shuffleboard
+            // SmartDashboard.putNumber("OAK tx", tx);
+            // SmartDashboard.putNumber("OAK omega", omega);
+        }
+        
+        swerve.drive(speeds);
     } 
 
     @Override

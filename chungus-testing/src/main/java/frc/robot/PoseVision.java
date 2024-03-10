@@ -1,5 +1,8 @@
 package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.util.LinkedList;
+
 import edu.wpi.first.math.controller.PIDController;
 
 
@@ -10,7 +13,13 @@ public class PoseVision {
     private double tag_y;
     private double tag_z;
     private double tag_yaw; 
-    private double curr_tag_id;
+    private int curr_tag_id;
+
+    private double tag2_x;
+    private double tag2_y;
+    private double tag2_z;
+    private double tag2_yaw; 
+    private int curr_tag2_id;
 
     private double kP;
     private double kI;
@@ -31,6 +40,7 @@ public class PoseVision {
         visual_servo_pid = new PIDController(kP, kI, kD);
     }
 
+    /* -- CURRENT TAG -- */
     public double getCurrTagX() {
         tag_x = SmartDashboard.getNumber("jetson_apriltag_x", 0.0);
         return tag_x;
@@ -46,8 +56,8 @@ public class PoseVision {
         return tag_z;
     }
 
-    public double getCurrTagID() {
-        curr_tag_id = SmartDashboard.getNumber("jetson_apriltag_id", 0.0);
+    public int getCurrTagID() {
+        curr_tag_id = (int)SmartDashboard.getNumber("jetson_apriltag_id", 0.0);
         return curr_tag_id;
     }
 
@@ -59,6 +69,54 @@ public class PoseVision {
     public boolean getTagInView() {
         boolean tagInView = SmartDashboard.getBoolean("jetson_tag_visible", false);
         return tagInView;
+    }
+
+    /* -- CURRENT TAG 2 (CHECK IF IN VIEW) -- */
+    public double getCurrTag2X() {
+        tag2_x = SmartDashboard.getNumber("jetson2_apriltag_x", 0.0);
+        return tag2_x;
+    }
+
+    public double getCurrTag2Y() {
+        tag2_y = SmartDashboard.getNumber("jetson2_apriltag_y", 0.0);
+        return tag2_y;
+    }
+
+    public double getCurrTag2Z() {
+        tag2_z = SmartDashboard.getNumber("jetson2_apriltag_z", 0.0);
+        return tag2_z;
+    }
+
+    public int getCurrTag2ID() {
+        curr_tag2_id = (int)SmartDashboard.getNumber("jetson2_apriltag_id", 0.0);
+        return curr_tag2_id;
+    }
+
+    public double getCurrTag2Yaw() {
+        tag2_yaw = SmartDashboard.getNumber("jetson2_apriltag_pitch", 0); // coordinate systems are weird
+        return tag2_yaw;
+    }
+
+    public boolean getTag2InView() {
+        boolean tagInView = SmartDashboard.getBoolean("jetson2_tag_visible", false);
+        return tagInView;
+    }
+
+    /* -- ABSOLUTE POSITIONING */
+    public double getX() {
+        return SmartDashboard.getNumber("vision_x", 0.0);
+    }
+
+    public double getY() {
+        return SmartDashboard.getNumber("vision_y", 0.0);
+    }
+
+    public double getZ() {
+        return SmartDashboard.getNumber("vision_z", 0.0);
+    }
+
+    public double getYaw() {
+        return SmartDashboard.getNumber("vision_yaw", 0.0);
     }
 
     /**
@@ -79,28 +137,67 @@ public class PoseVision {
     /**
      * Assume we have a tag in view. 
      * 
-     * @param servoTarget 1 for x, 2 for y, 3 for z, 4 for yaw, 5 for tx, see {@code VISUAL_SERVO_TARGETS}
+     * @param servoTarget 0 for x, 1 for y, 2 for z, 3 for yaw, 4 for tx, see {@code VISUAL_SERVO_TARGETS}
      * @return Variable of interest (e.g. v_x, v_y, omega, ...)
      */
     public double visual_servo(int servoTarget, double limit, int tag_id, double defaultValue) {
         // check to see if we're looking at the tag and if it's the right one
-        // if (getCurrTagID() != tag_id || !getTagInView()) {
-        //     // not looking at tag
-        //     return defaultValue;
-        // }
+        LinkedList<Integer> tag_ids = new LinkedList<Integer>();
+        if (getTagInView()) {
+            tag_ids.add(getCurrTagID());
+        }
+        if (getTag2InView()) {
+            tag_ids.add(getCurrTag2ID());
+        }
+
+        if (!tag_ids.contains(tag_id)) {
+            // not looking at tag
+            return defaultValue;
+        }
+
+        boolean useTagOne = true;
+        // find if tag or tag 2 is the one we're looking for
+        if (getCurrTagID() == tag_id) {
+            // tag 1 is the one we're looking for
+            useTagOne = true;
+        }
+        else {
+            // tag 2 is the one we're looking for
+            useTagOne = false;
+        }
 
         double curr_value;
         if (servoTarget == 0) {
-            curr_value = getCurrTagX();
+            if (useTagOne) {
+                curr_value = getCurrTagX();
+            }
+            else {
+                curr_value = getCurrTag2X();
+            }
         }
         else if (servoTarget == 1) {
-            curr_value = getCurrTagY();
+            if (useTagOne) {
+                curr_value = getCurrTagY();
+            }
+            else {
+                curr_value = getCurrTag2Y();
+            }
         }
         else if (servoTarget == 2) {
-            curr_value = getCurrTagZ(); 
+            if (useTagOne) {
+                curr_value = getCurrTagZ();
+            }
+            else {
+                curr_value = getCurrTag2Z();
+            }
         }
         else if (servoTarget == 3) {
-            curr_value = getCurrTagYaw();
+            if (useTagOne) {
+                curr_value = getCurrTagYaw();
+            }
+            else {
+                curr_value = getCurrTag2Yaw();
+            }
         }
         else if (servoTarget == 4) {
             curr_value = getTagTx();
@@ -141,12 +238,25 @@ public class PoseVision {
     }
 
     /**
-     * Manav pls add info
+     * Returns the distance to the apriltag in ground plane
+     * Returns -1 if tag ID not in view
      * @param id
-     * @return
+     * @return distance to apriltag (meters)
      */
     public double distanceToAprilTag(int id) {
-        return 0.0;
+        // check if it's tag 1 or tag 2, first check if it's in view
+        // return directly because we are more confidient in tag 1
+        if (getTagInView() && getCurrTagID() == id) {
+            // it's tag 1
+            return Math.sqrt(Math.pow(getCurrTagX(), 2) + Math.pow(getCurrTagZ(), 2));
+        }    
+        else if (getTag2InView() && getCurrTag2ID() == id) {
+            // it's tag 2
+            return Math.sqrt(Math.pow(getCurrTag2X(), 2) + Math.pow(getCurrTag2Z(), 2));
+        }
+        else {
+            return -1.0; // tag not in view
+        }
     }
     
     /**

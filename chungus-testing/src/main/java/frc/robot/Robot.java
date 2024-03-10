@@ -218,7 +218,7 @@ public class Robot extends LoggedRobot {
                 // calculate tx
                 double tx = poseVision.getTagTx();
                 // calculate omega
-                double omega = poseVision.visual_servo(5, 1.0, 4, 0);
+                double omega = poseVision.visual_servo(4, 1.0, 4, 0);
                 // set speeds
                 speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, omega);
 

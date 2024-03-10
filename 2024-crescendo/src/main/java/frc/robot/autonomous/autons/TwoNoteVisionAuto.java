@@ -26,7 +26,7 @@ public class TwoNoteVisionAuto extends BaseAuto {
 
     @Override
     public void initialize() {
-        LimelightTargeting speakerVision = new LimelightTargeting(APRILTAG_LIMELIGHT.LIMELIGHT_NAME, APRILTAG_LIMELIGHT.LOCK_ERROR, APRILTAG_LIMELIGHT.CLOSE_ERROR, APRILTAG_LIMELIGHT.CAMERA_HEIGHT, APRILTAG_LIMELIGHT.CAMERA_ANGLE, APRILTAG_LIMELIGHT.TARGET_HEIGHT);
+        // LimelightTargeting speakerVision = new LimelightTargeting(APRILTAG_LIMELIGHT.LIMELIGHT_NAME, APRILTAG_LIMELIGHT.LOCK_ERROR, APRILTAG_LIMELIGHT.CLOSE_ERROR, APRILTAG_LIMELIGHT.CAMERA_HEIGHT, APRILTAG_LIMELIGHT.CAMERA_ANGLE, APRILTAG_LIMELIGHT.TARGET_HEIGHT);
         PIDController speakerPID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_TURN_kP, APRILTAG_LIMELIGHT.SPEAKER_TURN_kI, APRILTAG_LIMELIGHT.SPEAKER_TURN_kD);
         speakerPID.setTolerance(APRILTAG_LIMELIGHT.LOCK_ERROR);
 
@@ -36,10 +36,7 @@ public class TwoNoteVisionAuto extends BaseAuto {
                         new IntakeCommand(intake, shooter),
                         new AutoCollectCommand(targeting, drive,
                                 shooter)),
-                new AutoAimCommand(drive, speakerVision, APRILTAG_LIMELIGHT.LOCK_ERROR),
-                // new RotateCommand(drive, Rotation2d.fromDegrees(0)),
-                // new TargetCommand(drive, AutonomousPositions.SUBWOOFER_MIDDLE.getPose(), config, speakerVision, speakerPID),
-                new ShootCommand(shooter, elevator, 4500, 29.5)
+                new AutoShootCommand(drive, poseVision, elevator, shooter)
                 );
     }
 

@@ -166,7 +166,7 @@ public class Robot extends LoggedRobot {
     public void autonomousInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
-        currentAuto.addModules(swerve, elevator, intake, shooter, noteLock);
+        currentAuto.addModules(swerve, elevator, intake, shooter, noteLock, poseVision);
         currentAuto.initialize();
         swerve.resetEncoder();
         swerve.resetPose(currentAuto.getStartPose());

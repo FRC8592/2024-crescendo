@@ -57,8 +57,8 @@ public class RangeTable {
 
 
     public static class RangeEntry {
-        int flywheelSpeed;
-        double pivotAngle;
+        public int flywheelSpeed;
+        public double pivotAngle;
 
         public RangeEntry(int speed, double angle) {
             flywheelSpeed = speed;

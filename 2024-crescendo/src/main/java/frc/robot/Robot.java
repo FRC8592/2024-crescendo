@@ -105,7 +105,7 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
-        pigeon = new NewtonPigeon2(new Pigeon2(PIGEON.CAN_ID));
+        pigeon = new NewtonPigeon2(new Pigeon2(CAN.PIGEON_CAN_ID));
         swerve = new Swerve(pigeon);
         power = new Power();
         leds = new NeoPixelLED();
@@ -153,7 +153,7 @@ public class Robot extends LoggedRobot {
         swerve.resetEncoder();
         swerve.resetPose(currentAuto.getStartPose());
         swerve.setSteerAnglesToAbsEncoder();
-        swerve.setAutoCurrentLimit();
+        swerve.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
         swerve.zeroGyroscope();
         swerve.drive(new ChassisSpeeds());
     }
@@ -167,7 +167,7 @@ public class Robot extends LoggedRobot {
     public void teleopInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
-        swerve.setTeleopCurrentLimit();
+        swerve.setThrottleCurrentLimit(POWER.SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT);
 
         // shooter.feederMotor.setPIDF(SmartDashboard.getNumber("FeederKp", 0),
         // SmartDashboard.getNumber("FeederKp", 0),

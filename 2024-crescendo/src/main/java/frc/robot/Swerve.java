@@ -31,9 +31,8 @@ public class Swerve {
         config.setWheelCircumference(SWERVE.WHEEL_CIRCUMFERENCE);
 
         // Max Values
-        config.setNominalVoltage(SWERVE.MAX_VOLTAGE);
+        config.setNominalVoltage(POWER.SWERVE_MAX_VOLTAGE);
         config.setMaxVelocityMetersPerSecond(SWERVE.MAX_VELOCITY_METERS_PER_SECOND);
-        config.setTelelopCurrentLimit(SWERVE.TELEOP_CURRENT_LIMIT);
 
         // // set PID constants
         config.setThrottlePID(SWERVE.THROTTLE_kP, SWERVE.THROTTLE_kI, SWERVE.THROTTLE_kD);
@@ -42,30 +41,30 @@ public class Swerve {
         //TODO: Check the swerve module type and comment/uncomment the next 44 lines to account for it
         SwerveModule m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(config,
                 Mk4iSwerveModuleHelper.GearRatio.L2,
-                SWERVE.BLACK_FRONT_LEFT_DRIVE_CAN,
-                SWERVE.BLACK_FRONT_LEFT_STEER_CAN,
-                SWERVE.BLACK_FRONT_LEFT_ENCODER_CAN,
+                CAN.SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID,
+                CAN.SWERVE_BLACK_FRONT_LEFT_STEER_CAN_ID,
+                CAN.SWERVE_BLACK_FRONT_LEFT_ENCODER_CAN_ID,
                 SWERVE.BLACK_FRONT_LEFT_STEER_OFFSET);
 
         SwerveModule m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(config,
                 Mk4iSwerveModuleHelper.GearRatio.L2,
-                SWERVE.ORANGE_FRONT_RIGHT_DRIVE_CAN, 
-                SWERVE.ORANGE_FRONT_RIGHT_STEER_CAN,
-                SWERVE.ORANGE_FRONT_RIGHT_ENCODER_CAN, 
+                CAN.SWERVE_ORANGE_FRONT_RIGHT_DRIVE_CAN_ID, 
+                CAN.SWERVE_ORANGE_FRONT_RIGHT_STEER_CAN_ID,
+                CAN.SWERVE_ORANGE_FRONT_RIGHT_ENCODER_CAN_ID, 
                 SWERVE.ORANGE_FRONT_RIGHT_STEER_OFFSET);
 
         SwerveModule m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(config,
                 Mk4iSwerveModuleHelper.GearRatio.L2,
-                SWERVE.TEAL_BACK_LEFT_DRIVE_CAN, 
-                SWERVE.TEAL_BACK_LEFT_STEER_CAN,
-                SWERVE.TEAL_BACK_LEFT_ENCODER_CAN, 
+                CAN.SWERVE_TEAL_BACK_LEFT_DRIVE_CAN_ID, 
+                CAN.SWERVE_TEAL_BACK_LEFT_STEER_CAN_ID,
+                CAN.SWERVE_TEAL_BACK_LEFT_ENCODER_CAN_ID, 
                 SWERVE.TEAL_BACK_LEFT_STEER_OFFSET);
 
         SwerveModule m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(config,
                 Mk4iSwerveModuleHelper.GearRatio.L2,
-                SWERVE.WHITE_BACK_RIGHT_DRIVE_CAN, 
-                SWERVE.WHITE_BACK_RIGHT_STEER_CAN,
-                SWERVE.WHITE_BACK_RIGHT_ENCODER_CAN, 
+                CAN.SWERVE_WHITE_BACK_RIGHT_DRIVE_CAN_ID, 
+                CAN.SWERVE_WHITE_BACK_RIGHT_STEER_CAN_ID,
+                CAN.SWERVE_WHITE_BACK_RIGHT_ENCODER_CAN_ID, 
                 SWERVE.WHITE_BACK_RIGHT_STEER_OFFSET);
 
         // SwerveModule m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,
@@ -138,12 +137,8 @@ public class Swerve {
         swerve.resetSteerAngles();
     }
 
-    public void setTeleopCurrentLimit() {
-        swerve.setTeleopCurrentLimit();
-    }
-
-    public void setAutoCurrentLimit() {
-        swerve.setAutoCurrentLimit();
+    public void setThrottleCurrentLimit(double limit) {
+        swerve.setThrottleCurrentLimit(limit);
     }
 
     public void resetPose(Pose2d pose) {

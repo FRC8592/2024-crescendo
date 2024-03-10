@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Constants.*;
 
 import com.NewtonSwerve.Gyro.Gyro;
 
@@ -30,12 +31,7 @@ public class NewtonSwerve {
 
     // Odometry object for swerve drive
     protected SwerveDriveOdometry odometry;
-
-    // FALCON SPECIFIC
     public static final double METERS_PER_SECOND_TO_TICKS = ((2048 * 6.75 * 60) / (200 * Math.PI * 0.0508));
-
-    private double MAX_SWERVE_DRIVE_TELEOP_CURRENT = 20.0; // Lower values will reduce acceleration
-    private double MAX_SWERVE_DRIVE_AUTO_CURRENT = 30.0; // Lower values will reduce acceleration
 
     // The maximum angular velocity of the robot in radians per second.
     private double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND;
@@ -50,13 +46,6 @@ public class NewtonSwerve {
         this.config = config;
 
         double MAX_VELOCITY_METERS_PER_SECOND = config.getMaxVelocityMetersPerSecond();
-
-        // set current limits
-        this.MAX_SWERVE_DRIVE_AUTO_CURRENT = !Double.isNaN(config.getAutoCurrentLimit()) ? config.getAutoCurrentLimit()
-                : this.MAX_SWERVE_DRIVE_AUTO_CURRENT;
-        this.MAX_SWERVE_DRIVE_TELEOP_CURRENT = !Double.isNaN(config.getTeleopCurrentLimit())
-                ? config.getTeleopCurrentLimit()
-                : this.MAX_SWERVE_DRIVE_TELEOP_CURRENT;
 
         // grab drivetrain dimensions
         double DRIVETRAIN_LENGTH_METERS = config.getDriveTrainLengthMeters();
@@ -218,19 +207,11 @@ public class NewtonSwerve {
     }
 
     // SET CURRENT LIMIT
-    private void setThrottleCurrentLimit(double currentLimit) {
+    public void setThrottleCurrentLimit(double currentLimit) {
         m_frontLeftModule.setThrottleCurrentLimit(currentLimit);
         m_frontRightModule.setThrottleCurrentLimit(currentLimit);
         m_backLeftModule.setThrottleCurrentLimit(currentLimit);
         m_backRightModule.setThrottleCurrentLimit(currentLimit);
-    }
-
-    public void setTeleopCurrentLimit() {
-        setThrottleCurrentLimit(MAX_SWERVE_DRIVE_TELEOP_CURRENT);
-    }
-
-    public void setAutoCurrentLimit() {
-        setThrottleCurrentLimit(MAX_SWERVE_DRIVE_AUTO_CURRENT);
     }
 
     public SwerveDriveKinematics getKinematics() {

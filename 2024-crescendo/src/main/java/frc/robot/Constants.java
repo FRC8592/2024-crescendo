@@ -22,6 +22,61 @@ public final class Constants {
         public static final int OPERATOR_PORT = 1;
     }
 
+    public final class CAN{
+        public static final int INTAKE_MOTOR_CAN_ID = 35;
+
+        public static final int TOP_SHOOTER_MOTOR_CAN_ID = 29;
+        public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 28;
+        public static final int FEEDER_MOTOR_CAN_ID = 31;
+
+        public static final int ELEVATOR_MOTOR_CAN_ID = 37;
+        public static final int PIVOT_MOTOR_CAN_ID = 36;
+        public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = 38;
+
+        public static final int PDH_CAN_ID = 1;
+
+        public static final int SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID = 14; 
+        public static final int SWERVE_BLACK_FRONT_LEFT_STEER_CAN_ID = 13; 
+        public static final int SWERVE_BLACK_FRONT_LEFT_ENCODER_CAN_ID = 15; 
+
+        public static final int SWERVE_ORANGE_FRONT_RIGHT_DRIVE_CAN_ID = 20;
+        public static final int SWERVE_ORANGE_FRONT_RIGHT_STEER_CAN_ID = 19;
+        public static final int SWERVE_ORANGE_FRONT_RIGHT_ENCODER_CAN_ID = 21;
+
+        public static final int SWERVE_TEAL_BACK_LEFT_DRIVE_CAN_ID = 11;
+        public static final int SWERVE_TEAL_BACK_LEFT_STEER_CAN_ID = 10;
+        public static final int SWERVE_TEAL_BACK_LEFT_ENCODER_CAN_ID = 12;
+
+        public static final int SWERVE_WHITE_BACK_RIGHT_DRIVE_CAN_ID = 17;
+        public static final int SWERVE_WHITE_BACK_RIGHT_STEER_CAN_ID = 16;
+        public static final int SWERVE_WHITE_BACK_RIGHT_ENCODER_CAN_ID = 18;
+
+        public static final int PIGEON_CAN_ID = 17;
+    }
+
+    public final class POWER {
+        public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Power/";
+
+        public static final double INTAKE_MOTOR_CURRENT_LIMIT = 30.0;
+
+        public static final double TOP_SHOOTER_MOTOR_CURRENT_LIMIT = 30.0;
+        public static final double BOTTOM_SHOOTER_MOTOR_CURRENT_LIMIT = 30.0;
+        public static final double FEEDER_MOTOR_CURRENT_LIMIT = 30.0;
+
+        public static final double ELEVATOR_MOTOR_CURRENT_LIMIT = 60.0;
+        public static final double PIVOT_MOTOR_CURRENT_LIMIT = 40.0;
+        public static final double PIVOT_FOLLOW_MOTOR_CURRENT_LIMIT = 40.0;
+
+        public static final double SWERVE_MAX_VOLTAGE = 12.0;
+        public static final double SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 60.0;
+        public static final double SWERVE_AUTO_THROTTLE_CURRENT_LIMIT = 60.0;
+        public static final double SWERVE_AZIMUTH_CURRENT_LIMIT = 40.0;
+
+        public static final int VOLTAGE_SMOOTHING_LENGTH = 50; // TODO: Arbitrary (needs testing)
+        public static final double DISABLED_LOW_BATTERY_VOLTAGE = 11.5; // TODO: Arbitrary (needs testing)
+        public static final double TELEOP_LOW_BATTERY_VOLTAGE = 10.5; // TODO: Arbitrary (needs testing)
+    }
+
     public final class NOTELOCK {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/NoteLock/";
 
@@ -73,8 +128,6 @@ public final class Constants {
 
     public final class INTAKE {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Intake/";
-        public static final int TOP_MOTOR_CAN_ID = 35;
-        public static final int BOTTOM_MOTOR_CAN_ID = 34;
 
         public static final double MOTOR_kP = 0.00015;
         public static final double MOTOR_kI = 0.00; //TODO: We need a lot of this
@@ -98,9 +151,6 @@ public final class Constants {
     public final class SHOOTER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Shooter/";
 
-        public static final int TOP_SHOOTER_MOTOR_CAN_ID = 29;
-        public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 28;
-        public static final int FEEDER_MOTOR_CAN_ID = 31;
         public static final int NOTE_BEAM_BREAK_DIO_PORT = 0;
 
         public static final double FEEDER_MOTOR_kP = 0.00001; //TODO: Tune this; start with 0.00001;
@@ -146,11 +196,6 @@ public final class Constants {
 
     public final class ELEVATOR {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
-
-
-        public static final int EXTENSION_MOTOR_CAN_ID = 37;
-        public static final int PIVOT_MOTOR_CAN_ID = 36;
-        public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = 38; 
 
 
         public static final double PIVOT_kP = 0.000001;
@@ -203,17 +248,6 @@ public final class Constants {
         public static final double MAX_EXTENSION_ROTATIONS = EXTENSION_METERS_MAX / ELEVATOR_GEAR_RATIO;
     }
 
-    public final class POWER {
-        public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Power/";
-
-
-        public static final int PDH_CAN_ID = 1;
-
-
-        public static final int VOLTAGE_SMOOTHING_LENGTH = 50; // TODO: Arbitrary (needs testing)
-        public static final double DISABLED_LOW_BATTERY_VOLTAGE = 11.5; // TODO: Arbitrary (needs testing)
-        public static final double TELEOP_LOW_BATTERY_VOLTAGE = 10.5; // TODO: Arbitrary (needs testing)
-    }
 
     public final class LEDS { //TODO: Merge the LED code once we get the LEDs working physically
         public static final int LED_LENGTH = 8;
@@ -224,23 +258,6 @@ public final class Constants {
     }
 
     public final class SWERVE {
-        public static final int BLACK_FRONT_LEFT_DRIVE_CAN = 14; 
-        public static final int BLACK_FRONT_LEFT_STEER_CAN = 13; 
-        public static final int BLACK_FRONT_LEFT_ENCODER_CAN = 15; 
-
-        public static final int ORANGE_FRONT_RIGHT_DRIVE_CAN = 20;
-        public static final int ORANGE_FRONT_RIGHT_STEER_CAN = 19;
-        public static final int ORANGE_FRONT_RIGHT_ENCODER_CAN = 21;
-
-        public static final int TEAL_BACK_LEFT_DRIVE_CAN = 11;
-        public static final int TEAL_BACK_LEFT_STEER_CAN = 10;
-        public static final int TEAL_BACK_LEFT_ENCODER_CAN = 12;
-
-        public static final int WHITE_BACK_RIGHT_DRIVE_CAN = 17;
-        public static final int WHITE_BACK_RIGHT_STEER_CAN = 16;
-        public static final int WHITE_BACK_RIGHT_ENCODER_CAN = 18;
-
-
         public static final double THROTTLE_kP = 0.02;
         public static final double THROTTLE_kI = 0.0;
         public static final double THROTTLE_kD = 0.01;
@@ -267,8 +284,6 @@ public final class Constants {
         public static final double ROTATE_POWER_SLOW = 0.2; // Scaling for teleop driving. 1.0 is maximum
 
 
-        public static final double MAX_VOLTAGE = 12.0;
-        public static final double TELEOP_CURRENT_LIMIT = 15.0; 
         public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.5;
         public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
                 Math.hypot(SWERVE.DRIVE_TRAIN_WIDTH / 2.0, DRIVE_TRAIN_LENGTH / 2.0);
@@ -277,10 +292,6 @@ public final class Constants {
         public static final int ROTATION_SMOOTHING_AMOUNT = 1; // TODO: Currently unset, tune this
 
         public static final double JOYSTICK_EXPONENT = 2;
-    }
-
-    public final class PIGEON {
-        public static final int CAN_ID = 17;
     }
 
     public final class ROBOT {

@@ -31,8 +31,8 @@ public class Elevator {
         pivotMotor.setInverted();
         pivotMotor.motorControl.setIZone(ELEVATOR.PIVOT_IZONE * ELEVATOR.PIVOT_GEAR_RATIO); // pivot degrees
 
-        pivotMotor.setMaxVelocity(5000, 0);
-        pivotFollowMotor.setMaxVelocity(5000, 0);
+        pivotMotor.setMaxVelocity(6500, 0);
+        pivotFollowMotor.setMaxVelocity(6500, 0);
 
         extensionMotor.setMaxVelocity(5000, 0);
 

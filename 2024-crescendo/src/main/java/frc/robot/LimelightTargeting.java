@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.CONVERSIONS;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -176,6 +175,11 @@ public class LimelightTargeting {
         return changeInAngleError;
     }
 
+    public void setPipeline(int id) {
+        NetworkTableInstance.getDefault().getTable(limelightName).getEntry("pipeline").setNumber(id);
+    }
+
+    
     /**
      * Gives distance from the robot to the target in inches
      * Com
@@ -278,4 +282,7 @@ public class LimelightTargeting {
     public String getVisionName() {
         return this.limelightName;
     }
+
+
+
 }

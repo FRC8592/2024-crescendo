@@ -38,6 +38,7 @@ public class Robot extends LoggedRobot {
     
     //Used in simulation
     public static Field2d FIELD = new Field2d();
+    public Alliance alliance;
     
     //Controllers
     private XboxController driverController;
@@ -414,10 +415,16 @@ public class Robot extends LoggedRobot {
     public void testInit() {
         SmartDashboard.putNumber("OAK tx", 0);
         SmartDashboard.putNumber("OAK omega", 0);
+        if (DriverStation.getAlliance().isPresent()) {
+            alliance = DriverStation.getAlliance().get();
+        }
+        
+        
     }
 
     @Override
     public void testPeriodic() {
+        noteLock.updateVision();
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 new ChassisSpeeds(
                         -driverController.getLeftY() * swerve.getMaxTranslateVelo() * 0.15,
@@ -426,19 +433,28 @@ public class Robot extends LoggedRobot {
                 swerve.getGyroscopeRotation());
         
         if (driverController.getAButton()) {
-            double turn = turnPID.calculate(90, swerve.getGyroscopeRotation().getDegrees());
-                
-            // // calculate tx
-            // double tx = poseVision.getTagTx();
-            // // calculate omega
-            // double omega = poseVision.visual_servo(0, 1.0, 4, 0);
-            // // set speeds
-            // speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, omega);
-            // // log to shuffleboard
-            // SmartDashboard.putNumber("OAK tx", tx);
-            // SmartDashboard.putNumber("OAK omega", omega);
-        }
+            noteLock.setPipeline(1);
+            subsystemsManager.amp(true);
+            double turn = Math.min(Math.max(turnPID.calculate(swerve.getGyroscopeRotation().getDegrees(), 90)));
+            
+            
+            /*
+            1. Look for april tag id 5 or the other one
+            2. Lock onto and rotate using gyroscope
+            3
         
+            
+            */  
+            speeds.omegaRadiansPerSecond = turn;
+            if (noteLock.targetValid) {
+                speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                        noteLock.turnRobot(0, drivePID, "tx", swerve.getMaxTranslateVelo() * 0.15, 0), 
+                        -driverController.getLeftX() * swerve.getMaxTranslateVelo() * 0.15,
+                        turn),
+                    swerve.getGyroscopeRotation());
+            }
+        }
         swerve.drive(speeds);
     } 
 

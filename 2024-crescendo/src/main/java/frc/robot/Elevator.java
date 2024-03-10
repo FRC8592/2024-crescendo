@@ -9,7 +9,7 @@ import frc.robot.Constants.*;
 
 public class Elevator {
     private SparkFlexControl extensionMotor;
-    private SparkFlexControl pivotMotor;
+    public SparkFlexControl pivotMotor;
     private SparkFlexControl pivotFollowMotor;
     private AbsoluteEncoder pivotEncoder;
 
@@ -29,9 +29,10 @@ public class Elevator {
         extensionMotor.setPIDF(ELEVATOR.EXTENSION_kP, ELEVATOR.EXTENSION_kI, ELEVATOR.EXTENSION_kD, ELEVATOR.EXTENSION_kFF, 0);
 
         pivotMotor.setInverted();
+        pivotMotor.motorControl.setIZone(ELEVATOR.PIVOT_IZONE * ELEVATOR.PIVOT_GEAR_RATIO); // pivot degrees
 
-        pivotMotor.setMaxVelocity(5000, 0);
-        pivotFollowMotor.setMaxVelocity(5000, 0);
+        pivotMotor.setMaxVelocity(6500, 0);
+        pivotFollowMotor.setMaxVelocity(6500, 0);
 
         extensionMotor.setMaxVelocity(5000, 0);
 

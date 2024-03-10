@@ -8,7 +8,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.*;
 import frc.robot.Constants.APRILTAG_LIMELIGHT;
 import org.littletonrobotics.junction.Logger;
-import frc.robot.PoseVision.TargetVariable;
 
 
 public class AutoTargetCommand extends Command {
@@ -34,10 +33,8 @@ public class AutoTargetCommand extends Command {
     @Override
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "AutoTargetCommand");
-        double omega = vision.target(TargetVariable.LEFT_RIGHT_ROTATION, 3/*TODO: I'll assume rad/frame for now, but I have no idea. It could be deg/frame*/, 
-                4, 0);
-        double vy = vision.target(TargetVariable.FORWARD_BACK_POSITION, 3/*TODO: Again, no idea on the units. Probably in/frame*/, 
-                4, 0);
+        double omega = vision.visual_servo(0, 3, 4, 0);
+        double vy = vision.visual_servo(0, 3, 4, 0);
         drive.drive(new ChassisSpeeds(vy, 0, omega));
         //return false for now, since TODO there's no method to get position relative to a specified ID
         return false;//(Math.abs(vision.processedDx)<APRILTAG_LIMELIGHT.LOCK_ERROR) && (Math.abs(vision.processedDy - APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET) < APRILTAG_LIMELIGHT.CLOSE_ERROR); // && is target valid

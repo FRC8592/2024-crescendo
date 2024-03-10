@@ -58,7 +58,7 @@ public class SparkFlexControl {
         motorControl.setD(D, slotID);
         motorControl.setFF(FF, slotID);
         motorControl.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal,slotID);
-        motorControl.setSmartMotionAllowedClosedLoopError(0.25, slotID);
+        motorControl.setSmartMotionAllowedClosedLoopError(0.02, slotID); // NOTE: THIS TOLERNACE IS IMPORTANT!!!!
     }
 
     public double getVelocity(){

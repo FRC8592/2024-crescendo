@@ -154,10 +154,11 @@ public final class Constants {
         public static final int PIVOT_FOLLOW_MOTOR_CAN_ID = 38; 
 
 
-        public static final double PIVOT_kP = 0.000001;
-        public static final double PIVOT_kI = 0;
+        public static final double PIVOT_kP = 0.000001; //OLD: 0.000001
+        public static final double PIVOT_kI = 0.000001;
         public static final double PIVOT_kD = 0;
         public static final double PIVOT_kFF = 0.00025;
+        public static final double PIVOT_IZONE = 1.0; // angle in deg
 
         public static final double EXTENSION_kP = 0.000001;
         public static final double EXTENSION_kI = 0.0;
@@ -169,7 +170,7 @@ public final class Constants {
         public static final double EXTENSION_FULLY_RETRACTED = 0.01; //When the extension is retracted below this value, we can lower the pivot to zero.
         public static final double EXTENSION_FORCE_RETRACT_THRESHOLD = 30; //The threshold for the protection code from the hooks on the elevator. See Elevator.java.
         public static final double RETRACT_THRESHOLD_TOLERANCE = 2; //If we're within this value of the threshold (or higher), the extension works.
-        public static final double ANGLE_TOLERANCE = 0.5; //Half a degree; used for the function that detects whether the pivot is at the target angle.
+        public static final double ANGLE_TOLERANCE = 0.03; //Half a degree; used for the function that detects whether the pivot is at the target angle.
         public static final double LENGTH_TOLERANCE = 0.005; //Half a centimeter; used for the function that detects whether the extension is at the target length.
 
 
@@ -195,7 +196,7 @@ public final class Constants {
         public static final double PIVOT_GEAR_RATIO = (12.0 / 5.0) * 75.0; // 12/5 is the ratio of the large pulley to small pulley. 75 is from the gearbox.
 
         public static final double DIAMETER_OF_ELEVATOR_SPROCKET = 1.885; //inches
-        public static final double ELEVATOR_GEAR_RATIO =
+        public static final double ELEVATOR_GEAR_RATIO = 
                 (1 / 48.0) *                                //Multiply by the gearbox ratio,
                 DIAMETER_OF_ELEVATOR_SPROCKET * Math.PI *   //then multiply by πd (same as 2πr) to get circumference in inches,
                 CONVERSIONS.IN_TO_METERS;                   //then convert to meters.
@@ -289,8 +290,8 @@ public final class Constants {
         public static final double JOYSTICK_DEADBAND = 0.01; //TODO: Implement this
     }
 
-    public class MG_APRILTAG_VISION {
-        public static final double kP = 0;
+    public class APRILTAG_VISION {
+        public static final double kP = 1d;
         public static final double kI = 0;
         public static final double kD = 0;
     }

@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.NewtonSwerve.DriveController;
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
 
@@ -60,6 +61,7 @@ public class Robot extends LoggedRobot {
     // private PoseVision poseGetter;
     private NeoPixelLED leds;
     private Power power;
+    private PoseVision poseVision;
     private PIDController turnPID;
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
@@ -120,6 +122,8 @@ public class Robot extends LoggedRobot {
 
         drivePID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kP, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kI, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kD);
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
+
+        poseVision = new PoseVision(APRILTAG_VISION.kP, APRILTAG_VISION.kI, APRILTAG_VISION.kD, 0);
         
         subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator);
     }
@@ -140,8 +144,22 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput(SHOOTER.LOG_PATH+"FeederSpeedRPM", shooter.feederMotor.getVelocity());
         Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getTopMotorVelocityRPM());
 
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"PivotITerm",elevator.pivotMotor.motorControl.getIAccum());
+
         //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();
+
+        // NOTE: FOR TESTING PURPOSES. 
+        if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
+                SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
+        }
+        else if (poseVision.getTag2InView() && poseVision.getCurrTag2ID() == 4) {
+            SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTag2Z());
+        }
+        else {
+            SmartDashboard.putNumber("Tag 4 Z", -1.0);
+        }
+        
     }
 
     @Override
@@ -378,6 +396,9 @@ public class Robot extends LoggedRobot {
         }
         else if (shootFromPodium.getValue()) {
             subsystemsManager.score();
+            double omega = poseVision.visual_servo(0, 1.0, 4, 0);
+            // set speeds
+            currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
 
         //LED management
@@ -405,13 +426,62 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void testInit() {}
+    public void testInit() {
+        // SmartDashboard.putNumber("Tag 4 Z", 0);
+        // SmartDashboard.putNumber("Target Z (m)", 0);
+        SmartDashboard.putNumber("Elevator Custom Angle", 0);
+        SmartDashboard.putNumber("Shooter Speed", 4500);
+    }
 
     @Override
     public void testPeriodic() {
-        // driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis() * 255);
-        // operatorController.setRumble(RumbleType.kBothRumble, operatorController.getLeftTriggerAxis() * 255);
-        SmartDashboard.putNumber("Robot Yaw", swerve.getGyroscopeRotation().getDegrees());
+        /*
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                new ChassisSpeeds(
+                        -driverController.getLeftY() * swerve.getMaxTranslateVelo() * 0.15,
+                        -driverController.getLeftX() * swerve.getMaxTranslateVelo() * 0.15,
+                        driverController.getRightX() * swerve.getMaxAngularVelo() * 0.15),
+                swerve.getGyroscopeRotation());
+
+        if (driverController.getBackButton()) {
+            swerve.zeroGyroscope();
+        }
+        */
+
+        if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
+                SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
+        }
+        else if (poseVision.getTag2InView() && poseVision.getCurrTag2ID() == 4) {
+            SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTag2Z());
+        }
+        else {
+            SmartDashboard.putNumber("Tag 4 Z", -1.0);
+        }
+        
+        if (driverController.getAButton()) {
+            // set elevator
+            elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Custom Angle", 0));
+            shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Speed", 0), (int)SmartDashboard.getNumber("Shooter Speed", 0));
+            if (shooter.isReady() && elevator.isTargetAngle()) {
+                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // shoot
+            } 
+
+            // // calculate tx
+            // double tx = poseVision.getTagTx();
+            // // calculate omega
+            // double omega = poseVision.visual_servo(0, 1.0, 4, 0);
+            // // set speeds
+            // speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, omega);
+            // // log to shuffleboard
+            // SmartDashboard.putNumber("OAK tx", tx);
+            // SmartDashboard.putNumber("OAK omega", omega);
+        }
+        else {
+            elevator.setPivotAngleCustom(0);
+            shooter.stop(); shooter.stopFeeders();
+        }
+        
+        // swerve.drive(speeds);
     } 
 
     @Override

@@ -7,24 +7,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.*;
 import frc.robot.Constants.APRILTAG_LIMELIGHT;
+import frc.robot.PoseVision.TargetVariable;
+
 import org.littletonrobotics.junction.Logger;
 
 
 public class AutoAimCommand extends Command {
-    private PIDController turnPID;
-    private PIDController drivePID;
     private Swerve drive;
-    private LimelightTargeting targeting;
+    private PoseVision vision;
     private double tolerance;
 
-    public AutoAimCommand(Swerve drive, LimelightTargeting vision, double tolerance) {
-        turnPID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_TURN_kP, APRILTAG_LIMELIGHT.SPEAKER_TURN_kI, APRILTAG_LIMELIGHT.SPEAKER_TURN_kD);
-        drivePID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kP, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kI, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kD);
+    public AutoAimCommand(Swerve drive, PoseVision vision, double tolerance) {
         this.drive = drive;
-        this.targeting = vision;
+        this.vision = vision;
         this.tolerance = tolerance;
-        turnPID.setTolerance(tolerance);
-        turnPID.setIZone(APRILTAG_LIMELIGHT.SPEAKER_TURN_IZONE);
     }
     @Override
     public void initialize() {
@@ -33,12 +29,10 @@ public class AutoAimCommand extends Command {
     @Override
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "AutoAimCommand");
-
-        targeting.updateVision();
-        double omega = targeting.turnRobot(0.0, turnPID, "tx", 2.0, 0.0);
-        double vy = -targeting.turnRobot(0, drivePID, "ty", 2.0, APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET);
-        drive.drive(new ChassisSpeeds(vy, 0, omega));
-        return (Math.abs(targeting.processedDx)<APRILTAG_LIMELIGHT.LOCK_ERROR) && (Math.abs(targeting.processedDy - APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET) < APRILTAG_LIMELIGHT.CLOSE_ERROR); // && is target valid
+        double omega = vision.target(TargetVariable.LEFT_RIGHT_ROTATION, 3, 4, 0);
+        drive.drive(new ChassisSpeeds(0, 0, omega));
+        //Return false in leu of using the nonexistent getPositionRelativeToTag (or something like that) function
+        return false;//(Math.abs(vision.processedDx)<APRILTAG_LIMELIGHT.LOCK_ERROR) && (Math.abs(vision.processedDy - APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET) < APRILTAG_LIMELIGHT.CLOSE_ERROR); // && is target valid
     }
     @Override
     public void shutdown() {

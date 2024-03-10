@@ -17,20 +17,21 @@ public class PoseVision {
     private double kD;
     private double setpoint;
     
-    private PIDController visual_servo_pid;
+    private PIDController targetingPID;
 
-    public String[] VISUAL_SERVO_TARGETS = {
-        "RELATIVE_X", // left-right
-        "RELATIVE_Y", // up-down (will probably never need this)
-        "RELATIVE_Z", // forward distance to apriltag projected out from the tag or camera
-        "RELATIVE_YAW" // e.g. even if mis-aligned, robot is pointing in same direction as apriltag
-    };
-
-    public PoseVision(double kP, double kI, double kD, double setpoint) {
-        // instantate PID controller given constants in constructor        
-        visual_servo_pid = new PIDController(kP, kI, kD);
+    public enum TargetVariable{
+        LEFT_RIGHT_POSITION,
+        UP_DOWN_POSITION,
+        FORWARD_BACK_POSITION,
+        LEFT_RIGHT_ROTATION
     }
 
+    public PoseVision(double kP, double kI, double kD, double setpoint) { //TODO: Make separate PIDs for position targeting and rotation targeting
+        // instantate PID controller given constants in constructor        
+        targetingPID = new PIDController(kP, kI, kD);
+    }
+
+    //TODO: Units for all the getCurrTag_ functions
     public double getCurrTagX() {
         tag_x = SmartDashboard.getNumber("jetson_apriltag_x", 0.0);
         return tag_x;
@@ -67,7 +68,11 @@ public class PoseVision {
      * @param servoTarget 1 for x, 2 for y, 3 for z, 4 for yaw, see {@code VISUAL_SERVO_TARGETS}
      * @return Variable of interest (e.g. v_x, v_y, omega, ...)
      */
-    public double visual_servo(int servoTarget, double limit, int tag_id, double defaultValue) {
+    //TODO: This function won't work unless the Orange Pi magically knows to use the tag we want.
+    //TODO: e.g. we ask for 4, and the Oak sees that tag, but getCurrTagID() returns 3 because
+    //TODO: the Oak also sees 3 and 3 is the closer of the two. How do we specify which tag to look at?
+    //TODO: Or do we have the processing power to get a list of tags and all their relative coordinates?
+    public double target(TargetVariable servoTarget, double limit, int tag_id, double defaultValue) {
         // check to see if we're looking at the tag and if it's the right one
         if (getCurrTagID() != tag_id || !getTagInView()) {
             // not looking at tag
@@ -75,23 +80,23 @@ public class PoseVision {
         }
 
         double curr_value;
-        if (servoTarget == 0) {
-            curr_value = getCurrTagX();
-        }
-        else if (servoTarget == 1) {
-            curr_value = getCurrTagY();
-        }
-        else if (servoTarget == 2) {
-            curr_value = getCurrTagZ(); 
-        }
-        else if (servoTarget == 3) {
-            curr_value = getCurrTagYaw();
-        }
-        else {
-            return 0.0; // TODO: better edge case behaviour
+        switch(servoTarget){
+            case LEFT_RIGHT_POSITION:
+                curr_value = getCurrTagX();
+                break;
+            case UP_DOWN_POSITION:
+                curr_value = getCurrTagY();
+                break;
+            case FORWARD_BACK_POSITION:
+                curr_value = getCurrTagZ();
+                break;
+            case LEFT_RIGHT_ROTATION:
+                curr_value = getCurrTagYaw();
+            default:
+                return 0.0; // TODO: better edge case behavior
         }
 
-        double out = visual_servo_pid.calculate(curr_value, setpoint);
+        double out = targetingPID.calculate(curr_value, setpoint);
         out = Math.max(out, -limit);
         out = Math.min(out, limit);
 

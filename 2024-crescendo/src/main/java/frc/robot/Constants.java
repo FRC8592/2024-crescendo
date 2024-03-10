@@ -44,12 +44,13 @@ public final class Constants {
         public static final double DRIVE_TO_TARGET_ANGLE = -20;
         public static final double TELEOP_DRIVE_TO_TARGET_ANGLE = -24;
 
-        //Turn PID constants (NOT drive-to)
+        //PID constants tuned for autolocking to speaker for limelight. TODO tune these for Manav's camera and put them in the MG_APRILTAG_VISION class
         public static final double TURN_kP = 0.03;
         public static final double TURN_kI = 0;
         public static final double TURN_kD = 0;
     }
 
+    //TODO: None of this class should be needed anymore
     public final class APRILTAG_LIMELIGHT {
         public static final String LIMELIGHT_NAME = "limelight-target"; // TODO idk what this is
         
@@ -288,7 +289,7 @@ public final class Constants {
         public static final double JOYSTICK_DEADBAND = 0.01; //TODO: Implement this
     }
 
-    public class APRILTAG_VISION {
+    public class MG_APRILTAG_VISION {
         public static final double kP = 0;
         public static final double kI = 0;
         public static final double kD = 0;

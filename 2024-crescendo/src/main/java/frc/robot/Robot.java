@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.NewtonSwerve.DriveController;
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
 
@@ -143,8 +144,22 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput(SHOOTER.LOG_PATH+"FeederSpeedRPM", shooter.feederMotor.getVelocity());
         Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getTopMotorVelocityRPM());
 
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"PivotITerm",elevator.pivotMotor.motorControl.getIAccum());
+
         //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();
+
+        // NOTE: FOR TESTING PURPOSES. 
+        if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
+                SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
+        }
+        else if (poseVision.getTag2InView() && poseVision.getCurrTag2ID() == 4) {
+            SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTag2Z());
+        }
+        else {
+            SmartDashboard.putNumber("Tag 4 Z", -1.0);
+        }
+        
     }
 
     @Override
@@ -412,22 +427,45 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        SmartDashboard.putNumber("OAK tx", 0);
-        SmartDashboard.putNumber("OAK omega", 0);
+        // SmartDashboard.putNumber("Tag 4 Z", 0);
+        // SmartDashboard.putNumber("Target Z (m)", 0);
+        SmartDashboard.putNumber("Elevator Custom Angle", 0);
+        SmartDashboard.putNumber("Shooter Speed", 4500);
     }
 
     @Override
     public void testPeriodic() {
+        /*
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 new ChassisSpeeds(
                         -driverController.getLeftY() * swerve.getMaxTranslateVelo() * 0.15,
                         -driverController.getLeftX() * swerve.getMaxTranslateVelo() * 0.15,
                         driverController.getRightX() * swerve.getMaxAngularVelo() * 0.15),
                 swerve.getGyroscopeRotation());
+
+        if (driverController.getBackButton()) {
+            swerve.zeroGyroscope();
+        }
+        */
+
+        if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
+                SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
+        }
+        else if (poseVision.getTag2InView() && poseVision.getCurrTag2ID() == 4) {
+            SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTag2Z());
+        }
+        else {
+            SmartDashboard.putNumber("Tag 4 Z", -1.0);
+        }
         
         if (driverController.getAButton()) {
-            double turn = turnPID.calculate(90, swerve.getGyroscopeRotation().getDegrees());
-                
+            // set elevator
+            elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Custom Angle", 0));
+            shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Speed", 0), (int)SmartDashboard.getNumber("Shooter Speed", 0));
+            if (shooter.isReady() && elevator.isTargetAngle()) {
+                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // shoot
+            } 
+
             // // calculate tx
             // double tx = poseVision.getTagTx();
             // // calculate omega
@@ -438,8 +476,12 @@ public class Robot extends LoggedRobot {
             // SmartDashboard.putNumber("OAK tx", tx);
             // SmartDashboard.putNumber("OAK omega", omega);
         }
+        else {
+            elevator.setPivotAngleCustom(0);
+            shooter.stop(); shooter.stopFeeders();
+        }
         
-        swerve.drive(speeds);
+        // swerve.drive(speeds);
     } 
 
     @Override

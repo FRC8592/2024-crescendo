@@ -41,8 +41,9 @@ public final class Constants {
         public static final double DRIVE_TO_DRIVE_kI = 0;
         public static final double DRIVE_TO_DRIVE_kD = 0.01;
 
-        public static final double DRIVE_TO_TARGET_ANGLE = -20;
+        public static final double DRIVE_TO_TARGET_ANGLE = -24;
         public static final double TELEOP_DRIVE_TO_TARGET_ANGLE = -24;
+        public static final double DY_LIMIT = -10;
 
         //Turn PID constants (NOT drive-to)
         public static final double TURN_kP = 0.03;
@@ -224,6 +225,7 @@ public final class Constants {
     }
 
     public final class SWERVE {
+        public static final String LOG_PATH = SHARED.LOG_FOLDER+"/Swerve/";
         public static final int BLACK_FRONT_LEFT_DRIVE_CAN = 14; 
         public static final int BLACK_FRONT_LEFT_STEER_CAN = 13; 
         public static final int BLACK_FRONT_LEFT_ENCODER_CAN = 15; 

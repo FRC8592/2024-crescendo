@@ -217,7 +217,7 @@ public class FollowerCommand extends Command {
         // Robot.FIELD.getObject("RobotTrajectory").setTrajectory(trajectory.trajectory());
         drive.drive(newSpeeds);
 
-        return trajectory.isFinished(time) || finishedAiming;
+        return trajectory.isFinished(time) || trajectory.isVision;
     }
 
     @Override

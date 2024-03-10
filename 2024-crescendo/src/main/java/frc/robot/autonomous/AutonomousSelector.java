@@ -16,8 +16,7 @@ public class AutonomousSelector {
         OneNoteAuto.class,
         TwoNoteAuto.class,
         ThreeWingNoteAuto.class
-        
-    };
+        };
 
     public AutonomousSelector() {
         autonChooser.setDefaultOption("DEFAULT - DO NOTHING", DoNothingAuto.class);

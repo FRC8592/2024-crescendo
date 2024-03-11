@@ -2,6 +2,9 @@ package frc.robot.commands;
 
 import java.util.LinkedList;
 import java.util.Queue;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,8 +47,10 @@ public class CommandQueue {
      */
     public void run() {
         if (!isFinished()) {
-            // SmartDashboard.putString("Current Running Command", queue.peek().tag() == ""
-            // ? "DEFAULT COMMAND" : queue.peek().tag());
+            SmartDashboard.putString("Current Running Command", queue.peek().tag() == ""
+            ? "DEFAULT COMMAND" : queue.peek().tag());
+            Logger.recordOutput("CustomLogs/Autonomous/Status", queue.peek().tag() == ""
+            ? "NOT SET" : queue.peek().tag());
 
             // if command has been executed reset and get ready for the next command
             if (queue.peek().execute()) {

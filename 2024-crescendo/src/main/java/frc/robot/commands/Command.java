@@ -30,8 +30,9 @@ public abstract class Command {
      * Sets a traceable tag for the given command; useful for cherry-picking a
      * certain command out of the queue
      */
-    public void setTag(String tag) {
+    public Command setTag(String tag) {
         this.tag = tag;
+        return this;
     }
 
     /**

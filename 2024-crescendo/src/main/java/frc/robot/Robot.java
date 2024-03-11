@@ -103,6 +103,8 @@ public class Robot extends LoggedRobot {
             // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
             SmartDashboard.putData(FIELD);
         }
+        SmartDashboard.putNumber("Elevator Custom Angle", 0);
+        SmartDashboard.putNumber("Shooter Speed", 4500);
 
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
@@ -403,6 +405,10 @@ public class Robot extends LoggedRobot {
             // set speeds
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
+        if(driverController.getLeftTriggerAxis()>0.1){
+            double omega = poseVision.visual_servo(0, 1.0, 4, 0);
+            currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
+        }
 
         //LED management
         if (ledAmpSignal.isRisingEdge()) {
@@ -416,7 +422,7 @@ public class Robot extends LoggedRobot {
         } else {
             leds.off();
         }
-        swerve.drive(subsystemsManager.update(shootFromPodium.getValue()?1:0/*<-- temporary*/, currentSpeeds));
+        swerve.drive(subsystemsManager.update(poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ()*5:0, currentSpeeds));
     }
 
     @Override
@@ -432,8 +438,6 @@ public class Robot extends LoggedRobot {
     public void testInit() {
         // SmartDashboard.putNumber("Tag 4 Z", 0);
         // SmartDashboard.putNumber("Target Z (m)", 0);
-        SmartDashboard.putNumber("Elevator Custom Angle", 0);
-        SmartDashboard.putNumber("Shooter Speed", 4500);
     }
 
     @Override
@@ -450,7 +454,7 @@ public class Robot extends LoggedRobot {
             swerve.zeroGyroscope();
         }
         */
-
+        leds.off();
         if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
                 SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
         }
@@ -465,6 +469,8 @@ public class Robot extends LoggedRobot {
             // set elevator
             elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Custom Angle", 0));
             shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Speed", 0), (int)SmartDashboard.getNumber("Shooter Speed", 0));
+            Logger.recordOutput(ELEVATOR.LOG_PATH+"IsPivotReady", elevator.isTargetAngle());
+            Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterIsReady",shooter.isReady());
             if (shooter.isReady() && elevator.isTargetAngle()) {
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // shoot
             } 

@@ -112,7 +112,7 @@ public final class Constants {
 
         public static final double TOP_SHOOTER_MOTOR_kP = 0.0000825;
         public static final double TOP_SHOOTER_MOTOR_kI = 0.0000001;
-        public static final double TOP_SHOOTER_MOTOR_kD = 0.0000001;
+        public static final double TOP_SHOOTER_MOTOR_kD = 0.00000015;
         public static final double TOP_SHOOTER_MOTOR_kF = 0.000149; // feed-forward
 
         public static final double BOTTOM_SHOOTER_MOTOR_kP = TOP_SHOOTER_MOTOR_kP;
@@ -123,7 +123,7 @@ public final class Constants {
         public static final double SHOOTER_MOTOR_IZONE = 100; // RPM for the range within which the I term will be effective
 
 
-        public static final int FHYWHEEL_SPEED_ACCEPTABLE_RANGE = 100; // RPM. TODO: Decrease this when the PID is tuned better
+        public static final int FHYWHEEL_SPEED_ACCEPTABLE_RANGE = 50; // RPM. TODO: Decrease this when the PID is tuned better
 
 
         public static final int AMP_FLYWHEEL_SPEED = -1000;
@@ -171,7 +171,7 @@ public final class Constants {
         public static final double EXTENSION_FULLY_RETRACTED = 0.01; //When the extension is retracted below this value, we can lower the pivot to zero.
         public static final double EXTENSION_FORCE_RETRACT_THRESHOLD = 30; //The threshold for the protection code from the hooks on the elevator. See Elevator.java.
         public static final double RETRACT_THRESHOLD_TOLERANCE = 2; //If we're within this value of the threshold (or higher), the extension works.
-        public static final double ANGLE_TOLERANCE = 0.03; //Half a degree; used for the function that detects whether the pivot is at the target angle.
+        public static final double ANGLE_TOLERANCE = 0.1; //Half a degree; used for the function that detects whether the pivot is at the target angle.
         public static final double LENGTH_TOLERANCE = 0.005; //Half a centimeter; used for the function that detects whether the extension is at the target length.
 
 

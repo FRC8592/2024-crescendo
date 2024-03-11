@@ -70,6 +70,13 @@ public class NeoPixelLED {
         ledStrip.setData(ledBuffer);
     }
 
+    public void red() {
+        for(int i = 0; i < LED_LENGTH; i++) {
+            ledBuffer.setRGB(i, 255,0,0);
+        }
+        ledStrip.setData(ledBuffer);
+    }
+    
     public void disabled() {
         for(int i = 0; i < LED_LENGTH; i++) {
             ledBuffer.setRGB(i, 0, 255, 0);

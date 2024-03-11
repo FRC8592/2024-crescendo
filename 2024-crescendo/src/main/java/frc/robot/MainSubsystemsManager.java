@@ -71,6 +71,7 @@ public class MainSubsystemsManager {
             default: // Stop all the wheels and stow the elevator
                 elevator.stow();
                 stopWheels();
+                timer.stop();
                 timer.reset();
                 break;
             case SPEAKER:
@@ -81,11 +82,12 @@ public class MainSubsystemsManager {
                     case INIT: //Single-frame initialization case
                         intake.spinPercentOutput(0);
                         subState = SubStates.PREP;
+                        timer.stop();
                         timer.reset();
                         break;
                     case SCORE: // Note that this runs READY and PREP's code too because there's no `break;` after this code
                         timer.start();
-                        if(timer.get()<0.05){
+                        if(timer.get()<0.1){
                             shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
                         }
                         else{
@@ -118,6 +120,7 @@ public class MainSubsystemsManager {
                     case INIT:
                         stopWheels();
                         subState = SubStates.PREP;
+                        timer.stop();
                         timer.reset();
                         break;
                     case SCORE: //Note that this runs READY and PREP's code too
@@ -151,6 +154,7 @@ public class MainSubsystemsManager {
                     case INIT:
                         stopWheels();
                         elevator.climbPosition();
+                        timer.stop();
                         timer.reset();
                         subState = SubStates.PREP;
                         break;

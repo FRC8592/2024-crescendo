@@ -5,8 +5,11 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.*;
 import frc.robot.Constants.APRILTAG_LIMELIGHT;
+import frc.robot.Constants.SHOOTER;
+
 import org.littletonrobotics.junction.Logger;
 import frc.robot.RangeTable.RangeEntry;
 
@@ -16,6 +19,7 @@ public class AutoShootCommand extends Command {
     private PoseVision vision;
     private Elevator elevator;
     private Shooter shooter;
+    private Timer timer;
 
 
     public AutoShootCommand(Swerve drive, PoseVision vision, Elevator elevator, Shooter shooter) {
@@ -23,6 +27,7 @@ public class AutoShootCommand extends Command {
         this.vision = vision;
         this.elevator = elevator;
         this.shooter = shooter;
+        this.timer = new Timer();
     }
     @Override
     public void initialize() {
@@ -36,10 +41,25 @@ public class AutoShootCommand extends Command {
         elevator.setPivotAngleCustom(entry.pivotAngle);
         shooter.setShootVelocity(entry.flywheelSpeed, entry.flywheelSpeed);
         drive.drive(new ChassisSpeeds(0, 0, omega));
-        return (Math.abs(vision.getCurrTagX())<APRILTAG_LIMELIGHT.LOCK_ERROR); // && is target valid
+        if (Math.abs(vision.getCurrTagX())<APRILTAG_LIMELIGHT.LOCK_ERROR && shooter.isReady() && elevator.isTargetAngle()){
+            this.timer.start();
+            if(this.timer.get() < 0.1){
+                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
+            }
+            else if(this.timer.get() < SHOOTER.SHOOT_SCORE_TIME){
+                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
+            }
+            else{
+                return true; // end the command
+            }
+        }
+        return false;
     }
-    @Override
+
     public void shutdown() {
-        initialize();
+        drive.drive(new ChassisSpeeds());
+        elevator.stow();
+        shooter.stop();
+        shooter.stopFeeders();
     }
 }

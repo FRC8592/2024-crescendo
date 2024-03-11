@@ -29,7 +29,6 @@ public class RangeTable {
             new RangeEntry(0, 0), //4.0
             new RangeEntry(0, 0), //4.2
             new RangeEntry(0, 0),
-            
     };
     public static boolean valid;
 
@@ -51,7 +50,7 @@ public class RangeTable {
         Logger.recordOutput("CustomLogs/RangeTable/InputDistance", distance);
         //TODO: Uncomment when we get a real range table
         valid = true;
-        int wholeMeters = (int)distance;
+        int wholeMeters = (int)(distance);
         double decimal = distance - Math.floor(distance);
         if (RANGE_TABLE.length > 0) {
             if (wholeMeters < RANGE_TABLE.length) {
@@ -101,6 +100,5 @@ public class RangeTable {
             Logger.recordOutput("CustomLogs/RangeTable/GeneratedFlywheelSpeed", generated.flywheelSpeed);
             return generated;
         }
-
     }
 }

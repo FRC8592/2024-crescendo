@@ -25,7 +25,7 @@ public class TwoNoteAuto extends BaseAuto {
             new IntakeCommand(intake, shooter),
             new FollowerCommand(drive, pathOne.addVision(targeting))
           ).setTag("Intake while driving to middle wing note..."),
-          new AutoShootCommand(drive, poseVision, elevator, shooter).setTag("Autoshoot intaken note")
+          new ShootCommand(shooter, elevator, 3500, 25)
        );
     }
 

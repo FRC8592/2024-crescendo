@@ -139,7 +139,7 @@ public final class Constants {
         public static final double OUTAKE_FEEDER_SPEED = -2000;
 
 
-        public static final double SHOOT_SCORE_TIME = 0.5; //TODO: Tune this
+        public static final double SHOOT_SCORE_TIME = 0.75; //TODO: Tune this
         public static final double AMP_SCORE_TIME = 0.25; //TODO: Tune this
 
         public static final double FEEDER_AMP_TOLERANCE = 100;

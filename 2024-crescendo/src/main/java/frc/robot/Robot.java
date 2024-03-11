@@ -183,6 +183,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousPeriodic() {
+        leds.red();
         currentAuto.periodic();
     }
 
@@ -422,7 +423,7 @@ public class Robot extends LoggedRobot {
         } else {
             leds.off();
         }
-        swerve.drive(subsystemsManager.update(poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ()*5:0, currentSpeeds));
+        swerve.drive(subsystemsManager.update(poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ():0, currentSpeeds));
     }
 
     @Override

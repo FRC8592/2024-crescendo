@@ -17,9 +17,13 @@ public class SparkFlexControl {
     public RelativeEncoder motorEncoder;
     public SparkPIDController motorControl;
 
-
-    public SparkFlexControl(int MOTOR_CAN_ID, boolean coastMode){
-        motor = new CANSparkFlex(MOTOR_CAN_ID, MotorType.kBrushless);
+    /**
+     * Create a Newton2 controller for a NEO Vortex (with Spark Flex)
+     * @param motorCanID
+     * @param coastMode If true, the motor coasts when asked to apply 0 power. Otherwise, it brakes.
+     */
+    public SparkFlexControl(int motorCanID, boolean coastMode){
+        motor = new CANSparkFlex(motorCanID, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motorControl = motor.getPIDController();
         motorEncoder = motor.getEncoder();
@@ -100,6 +104,7 @@ public class SparkFlexControl {
     public void follow(SparkFlexControl sfc, boolean inverted) {
         this.motor.follow(sfc.motor, inverted);
     }
-
-
+    public void setCurrentLimit(int stallLimit, int fullRPMLimit){
+        this.motor.setSmartCurrentLimit(stallLimit, fullRPMLimit);
+    }
 }

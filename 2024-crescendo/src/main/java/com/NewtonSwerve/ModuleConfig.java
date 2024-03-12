@@ -2,11 +2,6 @@ package com.NewtonSwerve;
 
 public abstract class ModuleConfig {
     protected double nominalVoltage = 12.0;
-    protected double driveCurrentLimit = 80.0;
-    protected double steerCurrentLimit = 20.0;
-
-    protected double teleopCurrentLimit = Double.NaN;
-    protected double autoCurrentLimit = Double.NaN;
 
     protected double maxVelocityMetersPerSecond = 4.5;
 
@@ -97,37 +92,4 @@ public abstract class ModuleConfig {
     public void setMaxVelocityMetersPerSecond(double maxVelocityMetersPerSecond) {
         this.maxVelocityMetersPerSecond = maxVelocityMetersPerSecond;
     }
-
-    public double getDriveCurrentLimit() {
-        return driveCurrentLimit;
-    }
-
-    public void setDriveCurrentLimit(double driveCurrentLimit) {
-        this.driveCurrentLimit = driveCurrentLimit;
-    }
-
-    public double getSteerCurrentLimit() {
-        return steerCurrentLimit;
-    }
-
-    public void setSteerCurrentLimit(double steerCurrentLimit) {
-        this.steerCurrentLimit = steerCurrentLimit;
-    }
-
-    public double getTeleopCurrentLimit() {
-        return this.teleopCurrentLimit;
-    }
-
-    public void setTelelopCurrentLimit(double newLimit) {
-        this.teleopCurrentLimit = newLimit;
-    }
-
-    public double getAutoCurrentLimit() {
-        return this.autoCurrentLimit;
-    }
-
-    public void setAutoCurrentLimit(double newLimit) {
-        this.autoCurrentLimit = newLimit;
-    }
-
 }

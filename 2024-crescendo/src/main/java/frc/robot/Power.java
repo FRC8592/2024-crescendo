@@ -48,7 +48,7 @@ public class Power {
     //
     public Power() {
         // Create new Rev Power Distribution object
-       revPDH = new PowerDistribution(POWER.PDH_CAN_ID, PowerDistribution.ModuleType.kRev);
+       revPDH = new PowerDistribution(CAN.PDH_CAN_ID, PowerDistribution.ModuleType.kRev);
         
         // Create the shuffleboard tab for power data
         powerTab = Shuffleboard.getTab("Power");

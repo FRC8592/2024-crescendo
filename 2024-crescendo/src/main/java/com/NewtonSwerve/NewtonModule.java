@@ -1,7 +1,7 @@
 package com.NewtonSwerve;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.NewtonSwerve.SwerveModule;
 
@@ -48,11 +48,12 @@ public class NewtonModule {
     }
 
     public void setThrottleCurrentLimit(double currentLimit) {
-        this.getThrottleMotor().configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, currentLimit, 0, 0));
+        this.getThrottleMotor().configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, currentLimit, 0, 0));
+        this.getThrottleMotor().configClosedloopRamp(0.02);
     }
 
     public double getAppliedCurrent() {
-        return this.getThrottleMotor().getSupplyCurrent();
+        return this.getThrottleMotor().getStatorCurrent();
     }
 
     public double getThrottleVelocity(SwerveModule module) {

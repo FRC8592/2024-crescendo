@@ -68,7 +68,7 @@ public final class Constants {
         public static final double PIVOT_FOLLOW_MOTOR_CURRENT_LIMIT = 40.0;
 
         public static final double SWERVE_MAX_VOLTAGE = 12.0;
-        public static final double SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 60.0;
+        public static final double SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 80.0;
         public static final double SWERVE_AUTO_THROTTLE_CURRENT_LIMIT = 60.0;
         public static final double SWERVE_AZIMUTH_CURRENT_LIMIT = 40.0;
 
@@ -288,7 +288,7 @@ public final class Constants {
         public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
                 Math.hypot(SWERVE.DRIVE_TRAIN_WIDTH / 2.0, DRIVE_TRAIN_LENGTH / 2.0);
 
-        public static final int TRANSLATION_SMOOTHING_AMOUNT = 1; // TODO: Currently unset, tune this
+        public static final int TRANSLATION_SMOOTHING_AMOUNT = 3; // TODO: Currently unset, tune this
         public static final int ROTATION_SMOOTHING_AMOUNT = 1; // TODO: Currently unset, tune this
 
         public static final double JOYSTICK_EXPONENT = 2;

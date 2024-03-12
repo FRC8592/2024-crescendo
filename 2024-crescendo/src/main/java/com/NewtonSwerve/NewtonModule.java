@@ -49,6 +49,7 @@ public class NewtonModule {
 
     public void setThrottleCurrentLimit(double currentLimit) {
         this.getThrottleMotor().configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, currentLimit, 0, 0));
+        this.getThrottleMotor().configClosedloopRamp(0.02);
     }
 
     public double getAppliedCurrent() {

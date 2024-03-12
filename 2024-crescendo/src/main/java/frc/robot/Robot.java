@@ -435,7 +435,10 @@ public class Robot extends LoggedRobot {
         if (driverController.getAButton()) {
             noteLock.setPipeline(1);
             subsystemsManager.amp(true);
-            double turn = Math.min(Math.max(turnPID.calculate(swerve.getGyroscopeRotation().getDegrees(), 90)));
+            double turn = turnPID.calculate(swerve.getGyroscopeRotation().getDegrees(), -90);
+
+
+
             
             
             /*
@@ -455,6 +458,11 @@ public class Robot extends LoggedRobot {
                     swerve.getGyroscopeRotation());
             }
         }
+            else{
+                subsystemsManager.amp(false);
+            }
+            subsystemsManager.update(0, speeds);
+
         swerve.drive(speeds);
     } 
 

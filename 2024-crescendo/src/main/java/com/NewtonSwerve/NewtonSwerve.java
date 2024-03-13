@@ -39,6 +39,8 @@ public class NewtonSwerve {
     // Set up the kinematics module based on physical drivetrain characteristics
     private SwerveDriveKinematics m_kinematics;
 
+    public SwerveModulePosition[] currentPositions;
+
     public NewtonSwerve(ModuleConfig config, Gyro gyro, SwerveModule frontLeft, SwerveModule frontRight,
             SwerveModule backLeft, SwerveModule backRight) {
 
@@ -71,10 +73,10 @@ public class NewtonSwerve {
         this.m_backLeftModule = new NewtonModule(backLeft, WHEEL_CIRCUMFERENCE);
         this.m_backRightModule = new NewtonModule(backRight, WHEEL_CIRCUMFERENCE);
 
+        this.currentPositions = new SwerveModulePosition[] {new SwerveModulePosition(), new SwerveModulePosition(),
+            new SwerveModulePosition(), new SwerveModulePosition()};
         // intialize odometry
-        this.odometry = new SwerveDriveOdometry(m_kinematics, new Rotation2d(),
-                new SwerveModulePosition[] { new SwerveModulePosition(), new SwerveModulePosition(),
-                        new SwerveModulePosition(), new SwerveModulePosition() });
+        this.odometry = new SwerveDriveOdometry(m_kinematics, new Rotation2d(), currentPositions);
     }
 
     // public NewtonSwerve(ModuleConfig config, Gyro gyro, NewtonModule frontLeft,
@@ -177,10 +179,12 @@ public class NewtonSwerve {
         m_backLeftModule.setModule(states[2].angle.getRadians(), metersPerSecondToTicks(backLeftVelo));
         m_backRightModule.setModule(states[3].angle.getRadians(), metersPerSecondToTicks(backRightVelo));
 
-        this.odometry.update(this.getGyroscopeRotation(),
-                new SwerveModulePosition[] { m_frontLeftModule.getModulePosition(),
-                        m_frontRightModule.getModulePosition(), m_backLeftModule.getModulePosition(),
-                        m_backRightModule.getModulePosition() });
+        currentPositions = new SwerveModulePosition[] {m_frontLeftModule.getModulePosition(),
+            m_frontRightModule.getModulePosition(), m_backLeftModule.getModulePosition(),
+            m_backRightModule.getModulePosition()};
+
+
+        this.odometry.update(this.getGyroscopeRotation(), currentPositions);
     }
 
     // zero the absolute encoder for all modules

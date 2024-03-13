@@ -253,6 +253,8 @@ public final class Constants {
 
 
     public final class LEDS { //TODO: Merge the LED code once we get the LEDs working physically
+        public static final String LOG_PATH = SHARED.LOG_FOLDER+"/LEDs/";
+
         public static final int LED_LENGTH = 8;
         public static final double MINIMUM_VOLTAGE = 9.0;
         public static final int PULSE_METHOD_SPEED = 5;
@@ -305,6 +307,7 @@ public final class Constants {
     }
 
     public class APRILTAG_VISION {
+        public static final String LOG_PATH = SHARED.LOG_FOLDER+"/MG Vision/";
         public static final double kP = 1d;
         public static final double kI = 0;
         public static final double kD = 0;

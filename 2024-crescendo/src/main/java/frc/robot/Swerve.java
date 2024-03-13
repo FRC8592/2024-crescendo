@@ -1,5 +1,7 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.NewtonSwerve.NewtonSwerve;
 import com.NewtonSwerve.SwerveModule;
 // import com.NewtonSwerve.Gyro.NewtonPigeon2;
@@ -105,7 +107,7 @@ public class Swerve {
     }
 
     public void drive(ChassisSpeeds speeds) {
-        this.lastSpeeds = speeds;
+        Logger.recordOutput(SWERVE.LOG_PATH+"Module Positions (Read)", swerve.currentPositions);
         swerve.drive(speeds);
     }
 

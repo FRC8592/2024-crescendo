@@ -7,8 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.*;
-import frc.robot.Constants.APRILTAG_LIMELIGHT;
-import frc.robot.Constants.SHOOTER;
+import frc.robot.Constants.*;
 
 import org.littletonrobotics.junction.Logger;
 import frc.robot.RangeTable.RangeEntry;
@@ -44,7 +43,7 @@ public class AutoShootCommand extends Command {
         elevator.setPivotAngleCustom(entry.pivotAngle);
         shooter.setShootVelocity(entry.flywheelSpeed, entry.flywheelSpeed);
         drive.drive(new ChassisSpeeds(0, 0, omega));
-        if (Math.abs(vision.getCurrTagX())<APRILTAG_LIMELIGHT.LOCK_ERROR && shooter.isReady() && elevator.isTargetAngle()){
+        if (Math.abs(vision.getCurrTagX())<APRILTAG_VISION.LEFT_RIGHT_LOCK_TOLERANCE && shooter.isReady() && elevator.isTargetAngle()){
             Logger.recordOutput("AutoShootCommand Shooting", true);
             this.timer.start();
             if(this.timer.get() < 0.1){

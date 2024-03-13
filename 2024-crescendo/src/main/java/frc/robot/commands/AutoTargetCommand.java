@@ -6,25 +6,18 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.*;
-import frc.robot.Constants.APRILTAG_LIMELIGHT;
 import org.littletonrobotics.junction.Logger;
 
 
 public class AutoTargetCommand extends Command {
-    private PIDController turnPID;
-    private PIDController drivePID;
     private Swerve drive;
     private PoseVision vision;
     private double tolerance;
 
     public AutoTargetCommand(Swerve drive, PoseVision vision, double tolerance) {
-        turnPID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_TURN_kP, APRILTAG_LIMELIGHT.SPEAKER_TURN_kI, APRILTAG_LIMELIGHT.SPEAKER_TURN_kD);
-        drivePID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kP, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kI, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kD);
         this.drive = drive;
         this.vision = vision;
         this.tolerance = tolerance;
-        turnPID.setTolerance(tolerance);
-        turnPID.setIZone(APRILTAG_LIMELIGHT.SPEAKER_TURN_IZONE);
     }
     @Override
     public void initialize() {

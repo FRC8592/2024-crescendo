@@ -8,7 +8,6 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import frc.robot.Swerve;
-import frc.robot.Constants.APRILTAG_LIMELIGHT;
 import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
 import frc.robot.commands.*;
@@ -26,10 +25,6 @@ public class TwoNoteVisionAuto extends BaseAuto {
 
     @Override
     public void initialize() {
-        // LimelightTargeting speakerVision = new LimelightTargeting(APRILTAG_LIMELIGHT.LIMELIGHT_NAME, APRILTAG_LIMELIGHT.LOCK_ERROR, APRILTAG_LIMELIGHT.CLOSE_ERROR, APRILTAG_LIMELIGHT.CAMERA_HEIGHT, APRILTAG_LIMELIGHT.CAMERA_ANGLE, APRILTAG_LIMELIGHT.TARGET_HEIGHT);
-        PIDController speakerPID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_TURN_kP, APRILTAG_LIMELIGHT.SPEAKER_TURN_kI, APRILTAG_LIMELIGHT.SPEAKER_TURN_kD);
-        speakerPID.setTolerance(APRILTAG_LIMELIGHT.LOCK_ERROR);
-
         queue = new CommandQueue(
                 new ShootCommand(shooter, elevator, 3000, 5),
                 new JointCommand(

@@ -106,27 +106,27 @@ public final class Constants {
         public static final double TURN_kD = 0;
     }
 
-    //TODO: None of this class should be needed anymore
-    public final class APRILTAG_LIMELIGHT {
-        public static final String LIMELIGHT_NAME = "limelight-target"; // TODO idk what this is
+    // //TODO: None of this class should be needed anymore
+    // public final class APRILTAG_LIMELIGHT {
+    //     public static final String LIMELIGHT_NAME = "limelight-target"; // TODO idk what this is
         
-        // for auto lock to speaker
-        public static final double SPEAKER_TURN_kP = 0.05;
-        public static final double SPEAKER_TURN_kI = 0.032;
-        public static final double SPEAKER_TURN_kD = 0;
-        public static final double SPEAKER_TURN_IZONE = 5;
+    //     // for auto lock to speaker
+    //     public static final double SPEAKER_TURN_kP = 0.05;
+    //     public static final double SPEAKER_TURN_kI = 0.032;
+    //     public static final double SPEAKER_TURN_kD = 0;
+    //     public static final double SPEAKER_TURN_IZONE = 5;
 
-        public static final double SPEAKER_DRIVE_kP = 0.2;
-        public static final double SPEAKER_DRIVE_kI = 0.3;
-        public static final double SPEAKER_DRIVE_kD = 0;
-        public static final double SPEAKER_TY_TARGET = 13.5;
+    //     public static final double SPEAKER_DRIVE_kP = 0.2;
+    //     public static final double SPEAKER_DRIVE_kI = 0.3;
+    //     public static final double SPEAKER_DRIVE_kD = 0;
+    //     public static final double SPEAKER_TY_TARGET = 13.5;
 
-        public static final double LOCK_ERROR = 1.0;
-        public static final double CLOSE_ERROR = 0.1;
-        public static final double CAMERA_HEIGHT = 0;
-        public static final double CAMERA_ANGLE = 0;
-        public static final double TARGET_HEIGHT = 0;
-    }
+    //     public static final double LOCK_ERROR = 1.0;
+    //     public static final double CLOSE_ERROR = 0.1;
+    //     public static final double CAMERA_HEIGHT = 0;
+    //     public static final double CAMERA_ANGLE = 0;
+    //     public static final double TARGET_HEIGHT = 0;
+    // }
 
     public final class INTAKE {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Intake/";
@@ -295,8 +295,8 @@ public final class Constants {
         public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
                 Math.hypot(SWERVE.DRIVE_TRAIN_WIDTH / 2.0, DRIVE_TRAIN_LENGTH / 2.0);
 
-        public static final int TRANSLATION_SMOOTHING_AMOUNT = 3; // TODO: Currently unset, tune this
-        public static final int ROTATION_SMOOTHING_AMOUNT = 1; // TODO: Currently unset, tune this
+        public static final int TRANSLATION_SMOOTHING_AMOUNT = 3;
+        public static final int ROTATION_SMOOTHING_AMOUNT = 1;
 
         public static final double JOYSTICK_EXPONENT = 2;
     }
@@ -308,9 +308,12 @@ public final class Constants {
 
     public class APRILTAG_VISION {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/MG Vision/";
+
         public static final double kP = 1d;
         public static final double kI = 0;
         public static final double kD = 0;
+
+        public static final double LEFT_RIGHT_LOCK_TOLERANCE = 1.0; //TODO: Figure out what units this is in and tune it
     }
 
     public class MAIN_SUBSYSTEMS_MANAGER{

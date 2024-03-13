@@ -304,12 +304,12 @@ public final class Constants {
     public class APRILTAG_VISION {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/MG Vision/";
 
-        public static final double kP = 1d;
-        public static final double kI = 0;
-        public static final double kD = 0;
+        public static final double LEFT_RIGHT_ROTATION_kP = 1d;
+        public static final double LEFT_RIGHT_ROTATION_kI = 0;
+        public static final double LEFT_RIGHT_ROTATION_kD = 0;
 
-        public static final double LEFT_RIGHT_LOCK_TOLERANCE = 1.0; //TODO: Figure out what units this is in and tune it
-        public static final double LEFT_RIGHT_TURN_LIMIT = 1.0; //Radians/
+        public static final double LEFT_RIGHT_ROTATION_LOCK_TOLERANCE = 1.0; //TODO: Figure out what units this is in and tune it
+        public static final double LEFT_RIGHT_ROTATION_TURN_LIMIT = 1.0; //Radians/
     }
 
     public class MAIN_SUBSYSTEMS_MANAGER{

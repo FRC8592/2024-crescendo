@@ -140,7 +140,7 @@ public class FollowerCommand extends Command {
         if (vision != null) { // if we have vision
             double omegaVision;
             if (vision.distanceToAprilTag(4) != -1) { //If it is -1, it means we can't see the tag. TODO Replace this method with something less janky
-                omegaVision = vision.visual_servo(0, APRILTAG_VISION.LEFT_RIGHT_TURN_LIMIT, 4, 0);
+                omegaVision = vision.visual_servo(0, APRILTAG_VISION.LEFT_RIGHT_ROTATION_TURN_LIMIT, 4, 0);
                 if (omegaVision == 0) {
                     finishedAiming = true;
                 }

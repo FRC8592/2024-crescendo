@@ -149,7 +149,7 @@ public class Robot extends LoggedRobot {
         driveToDrivePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
         driveToTurnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
 
-        poseVision = new PoseVision(APRILTAG_VISION.kP, APRILTAG_VISION.kI, APRILTAG_VISION.kD, 0);
+        poseVision = new PoseVision(APRILTAG_VISION.LEFT_RIGHT_ROTATION_kP, APRILTAG_VISION.LEFT_RIGHT_ROTATION_kI, APRILTAG_VISION.LEFT_RIGHT_ROTATION_kD, 0);
         
         subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator);
     }

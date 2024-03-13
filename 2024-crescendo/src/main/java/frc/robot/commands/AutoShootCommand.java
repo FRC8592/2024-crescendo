@@ -43,7 +43,7 @@ public class AutoShootCommand extends Command {
         elevator.setPivotAngleCustom(entry.pivotAngle);
         shooter.setShootVelocity(entry.flywheelSpeed, entry.flywheelSpeed);
         drive.drive(new ChassisSpeeds(0, 0, omega));
-        if (Math.abs(vision.getCurrTagX())<APRILTAG_VISION.LEFT_RIGHT_LOCK_TOLERANCE && shooter.isReady() && elevator.isTargetAngle()){
+        if (Math.abs(vision.getCurrTagX())<APRILTAG_VISION.LEFT_RIGHT_ROTATION_LOCK_TOLERANCE && shooter.isReady() && elevator.isTargetAngle()){
             Logger.recordOutput("AutoShootCommand Shooting", true);
             this.timer.start();
             if(this.timer.get() < 0.1){

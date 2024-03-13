@@ -263,7 +263,27 @@ public class PoseVision {
             return -1.0; // tag not in view
         }
     }
-    
+
+    /**
+     * Returns the left-right offset from the apriltag. Returns -1.0 if the tag isn't in view
+     * @param id target april tag ID
+     * @return left-right offset from the tag
+     */
+    public double offsetFromTag(int id) {
+        // check if it's tag 1 or tag 2, first check if it's in view
+        // return directly because we are more confidient in tag 1
+        if (getTagInView() && getCurrTagID() == id) {
+            // it's tag 1
+            return getCurrTagX();
+        }    
+        else if (getTag2InView() && getCurrTag2ID() == id) {
+            // it's tag 2
+            return getCurrTag2X();
+        }
+        else {
+            return -1.0; // tag not in view
+        }
+    }
     /**
      * sets the alliance to blue or red!!
      * Manav plz fix this

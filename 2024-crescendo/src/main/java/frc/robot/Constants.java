@@ -99,11 +99,6 @@ public final class Constants {
         public static final double DRIVE_TO_TARGET_ANGLE = -24;
         public static final double TELEOP_DRIVE_TO_TARGET_ANGLE = -24;
         public static final double DY_LIMIT = -10;
-
-        //PID constants tuned for autolocking to speaker for limelight. TODO tune these for Manav's camera and put them in the MG_APRILTAG_VISION class
-        public static final double TURN_kP = 0.03;
-        public static final double TURN_kI = 0;
-        public static final double TURN_kD = 0;
     }
 
     // //TODO: None of this class should be needed anymore
@@ -314,6 +309,7 @@ public final class Constants {
         public static final double kD = 0;
 
         public static final double LEFT_RIGHT_LOCK_TOLERANCE = 1.0; //TODO: Figure out what units this is in and tune it
+        public static final double LEFT_RIGHT_TURN_LIMIT = 1.0; //Radians/
     }
 
     public class MAIN_SUBSYSTEMS_MANAGER{

@@ -11,20 +11,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
-import frc.robot.Swerve;
-import frc.robot.Constants.NOTELOCK;
-import frc.robot.Robot;
-import frc.robot.SmoothingFilter;
-import frc.robot.LimelightTargeting;
+import frc.robot.*;
+import frc.robot.Constants.*;
 import frc.robot.autonomous.SwerveTrajectory;
-import frc.robot.SmoothingFilter;
 
 public class FollowerCommand extends Command {
     private Swerve drive;
     private SwerveTrajectory trajectory;
     private Timer timer;
-    private LimelightTargeting targeting;
+    private PoseVision vision;
     private PIDController visionPID;
     // private Rotation2d endRotation;
     private Pose2d targetPose;
@@ -64,11 +59,10 @@ public class FollowerCommand extends Command {
         // endRotation = pRot;
     }
 
-    public FollowerCommand(Swerve drive, LimelightTargeting targeting, SwerveTrajectory pTraj) {
+    public FollowerCommand(Swerve drive, PoseVision vision, SwerveTrajectory pTraj) {
         this.drive = drive;
-        this.targeting = targeting;
+        this.vision = vision;
         trajectory = pTraj;
-        visionPID = new PIDController(NOTELOCK.TURN_kP, NOTELOCK.TURN_kI, NOTELOCK.TURN_kD);
         timer = new Timer();
         targetPose = null;
     }
@@ -80,17 +74,16 @@ public class FollowerCommand extends Command {
         this.timer = new Timer();
     }
 
-    public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Pose2d pTargetPose, LimelightTargeting targeting) {
+    public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Pose2d pTargetPose, PoseVision vision) {
         this.drive = pDrive;
         this.trajectory = pTraj;
         this.targetPose = pTargetPose;
-        this.targeting = targeting;
-        this.visionPID = new PIDController(NOTELOCK.TURN_kP, NOTELOCK.TURN_kI, NOTELOCK.TURN_kD);
+        this.vision = vision;
         // this.omegaSmoothing = new SmoothingFilter(1, 1, 1); // x, y, omega
         this.timer = new Timer();
     }
 
-    public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Pose2d pTargetPose, LimelightTargeting targeting, PIDController internalPID) {
+    public FollowerCommand(Swerve pDrive, SwerveTrajectory pTraj, Pose2d pTargetPose, PoseVision vision, PIDController internalPID) {
         this.drive = pDrive;
         this.trajectory = pTraj;
         this.targetPose = pTargetPose;
@@ -100,7 +93,7 @@ public class FollowerCommand extends Command {
             this.targetPose = new Pose2d(16 - pTargetPose.getX(), pTargetPose.getY(), pTargetPose.getRotation());
         }
 
-        this.targeting = targeting;
+        this.vision = vision;
         this.visionPID = internalPID;
         // this.omegaSmoothing = new SmoothingFilter(1, 1, 1); // x, y, omega
         this.timer = new Timer();
@@ -144,25 +137,22 @@ public class FollowerCommand extends Command {
         ChassisSpeeds newSpeeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond,
                 speeds.omegaRadiansPerSecond);
         Pose2d idealPose = new Pose2d();
-        if (targeting != null) { // if we have vision
-            targeting.updateVision();
+        if (vision != null) { // if we have vision
             double omegaVision;
-            if (targeting.isTargetValid()) { // target in view
-                omegaVision = targeting.turnRobot(0, visionPID, "tx", 2, 0.0);
+            if (vision.distanceToAprilTag(4) != -1) { //If it is -1, it means we can't see the tag. TODO Replace this method with something less janky
+                omegaVision = vision.visual_servo(0, APRILTAG_VISION.LEFT_RIGHT_TURN_LIMIT, 4, 0);
                 if (omegaVision == 0) {
                     finishedAiming = true;
                 }
                 // System.out.println("AprilTag Found, omega = " + omegaVision);
                 // SmartDashboard.putNumber("AprilTag Omega", omegaVision);
                 Logger.recordOutput("CustomLogs/Autonomous/VisionRotationTarget", omegaVision);
-                Logger.recordOutput("CustomLogs/Autonomous/VisionOffset", targeting.tx.getDouble(0.0));
+                Logger.recordOutput("CustomLogs/Autonomous/VisionOffset", vision.offsetFromTag(4));
                 Logger.recordOutput("CustomLogs/Autonomous/GyroscopeRotation",
                         drive.getCurrentPos().getRotation().getDegrees());
                 idealPose = new Pose2d(trajectory.trajectory().sample(time).poseMeters.getTranslation(), // Same translation as the target from the trajectory
-                        drive.getCurrentPos().getRotation().plus(Rotation2d.fromDegrees(-targeting.tx.getDouble(0.0)))); // Current rotation plus the offset from the april tag target
+                        drive.getCurrentPos().getRotation().plus(Rotation2d.fromDegrees(-vision.offsetFromTag(4)))); // Current rotation plus the offset from the april tag target
                 Logger.recordOutput("CustomLogs/Autonomous/SeesAprilTag", true);
-                Logger.recordOutput("CustomLogs/Autonomous/TargetX", targeting.tx.getDouble(0.0));
-                Logger.recordOutput("CustomLogs/Autonomous/TargetY", targeting.ty.getDouble(0.0));
             } else {
                 Logger.recordOutput("CustomLogs/Autonomous/SeesAprilTag", false);
                 if (targetPose != null) { // have a target pose

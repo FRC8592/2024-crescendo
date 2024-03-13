@@ -101,28 +101,6 @@ public final class Constants {
         public static final double DY_LIMIT = -10;
     }
 
-    // //TODO: None of this class should be needed anymore
-    // public final class APRILTAG_LIMELIGHT {
-    //     public static final String LIMELIGHT_NAME = "limelight-target"; // TODO idk what this is
-        
-    //     // for auto lock to speaker
-    //     public static final double SPEAKER_TURN_kP = 0.05;
-    //     public static final double SPEAKER_TURN_kI = 0.032;
-    //     public static final double SPEAKER_TURN_kD = 0;
-    //     public static final double SPEAKER_TURN_IZONE = 5;
-
-    //     public static final double SPEAKER_DRIVE_kP = 0.2;
-    //     public static final double SPEAKER_DRIVE_kI = 0.3;
-    //     public static final double SPEAKER_DRIVE_kD = 0;
-    //     public static final double SPEAKER_TY_TARGET = 13.5;
-
-    //     public static final double LOCK_ERROR = 1.0;
-    //     public static final double CLOSE_ERROR = 0.1;
-    //     public static final double CAMERA_HEIGHT = 0;
-    //     public static final double CAMERA_ANGLE = 0;
-    //     public static final double TARGET_HEIGHT = 0;
-    // }
-
     public final class INTAKE {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Intake/";
 
@@ -131,18 +109,8 @@ public final class Constants {
         public static final double MOTOR_kD = 0.015;
         public static final double MOTOR_kFF = 0.00016;
 
-        // public static final double SPEED_TOP = 1000; TODO: Currently in power mode. We should change back to velocity mode before our first regional
-        public static final double INTAKE_POWER = 0.75; //TODO: Delete this once we have velocity mode working
-        public static final double OUTAKE_POWER = -0.75;
-
         public static final double INTAKE_VELOCITY = 4500;
         public static final double OUTAKE_VELOCITY = -2500;
-
-        // NOTE: only one motor on now
-        // public static final double BOTTOM_MOTOR_kP = 0.0001;
-        // public static final double BOTTOM_MOTOR_kI = 0.000;
-        // public static final double BOTTOM_MOTOR_kD = 0.000;
-
     }
 
     public final class SHOOTER {
@@ -274,10 +242,10 @@ public final class Constants {
         public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI;
 
 
-        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(145.02+180); // 
-        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(339.785-180); // 
-        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(62.93+180);    // 
-        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(3.867+180); // 
+        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(145.02+180);
+        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(339.785-180);
+        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(62.93+180);
+        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(3.867+180);
 
 
         public static final double TRANSLATE_POWER_FAST = 1.0; // Scaling for teleop driving. 1.0 is maximum

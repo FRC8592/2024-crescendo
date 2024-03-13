@@ -253,11 +253,11 @@ public class PoseVision {
         // return directly because we are more confidient in tag 1
         if (getTagInView() && getCurrTagID() == id) {
             // it's tag 1
-            return Math.sqrt(Math.pow(getCurrTagX(), 2) + Math.pow(getCurrTagZ(), 2));
+            return getCurrTagZ();
         }    
         else if (getTag2InView() && getCurrTag2ID() == id) {
             // it's tag 2
-            return Math.sqrt(Math.pow(getCurrTag2X(), 2) + Math.pow(getCurrTag2Z(), 2));
+            return getCurrTag2Z();
         }
         else {
             return -1.0; // tag not in view

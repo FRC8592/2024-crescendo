@@ -37,11 +37,15 @@ public class AutoShootCommand extends Command {
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "AutoShootCommand");
         double omega = vision.visual_servo(0, 3, 4, 0); //TODO: make sure this works on both sides with the tag ID
-        RangeEntry entry = RangeTable.get(vision.getCurrTagZ());
+        Logger.recordOutput("AutoShootCommand Omega", omega);
+        double distance = vision.distanceToAprilTag(4);
+        RangeEntry entry = RangeTable.get(distance);
+        Logger.recordOutput("Distance to Tag 4", distance);
         elevator.setPivotAngleCustom(entry.pivotAngle);
         shooter.setShootVelocity(entry.flywheelSpeed, entry.flywheelSpeed);
         drive.drive(new ChassisSpeeds(0, 0, omega));
         if (Math.abs(vision.getCurrTagX())<APRILTAG_LIMELIGHT.LOCK_ERROR && shooter.isReady() && elevator.isTargetAngle()){
+            Logger.recordOutput("AutoShootCommand Shooting", true);
             this.timer.start();
             if(this.timer.get() < 0.1){
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
@@ -52,6 +56,9 @@ public class AutoShootCommand extends Command {
             else{
                 return true; // end the command
             }
+        }
+        else{
+            Logger.recordOutput("AutoShootCommand Shooting", false);
         }
         return false;
     }

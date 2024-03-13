@@ -73,7 +73,11 @@ public class CommandQueue {
      * @return if the queue has completed
      */
     public boolean isFinished() {
-        return queue.size() <= 0;
+        boolean hasFinished = queue.size() <= 0;
+        if(hasFinished){
+            Logger.recordOutput("CurrentCommand", "AUTO DONE");
+        }
+        return hasFinished;
     }
 
     /**

@@ -37,7 +37,7 @@ public class ShootCommand extends Command{
         SmartDashboard.putBoolean("Shooter is ready", shooter.isReady());
         if(shooter.isReady() && elevator.isTargetAngle()){
             timer.start();
-            if(timer.get()>0.05){
+            if(timer.get()>0.1){
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
             }
             else{

@@ -15,6 +15,7 @@ public class AutonomousSelector {
         //putting all created autos in auto selector
         OneNoteAuto.class,
         TwoNoteAuto.class,
+        TwoNoteVisionAuto.class,
         ThreeWingNoteAuto.class
         };
 

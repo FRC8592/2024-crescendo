@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,6 +35,9 @@ import java.util.ArrayList;
 import frc.robot.Constants.*;
 import frc.robot.MainSubsystemsManager.MainStates;
 import frc.robot.MainSubsystemsManager.SubStates;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Robot extends LoggedRobot {
     
@@ -75,6 +79,7 @@ public class Robot extends LoggedRobot {
     // operator controls
     private BooleanManager ledAmpSignal = new BooleanManager(false);
     private BooleanManager shootFromPodium = new BooleanManager(false);
+    private BooleanManager rangeTableShoot = new BooleanManager(false);
     private BooleanManager outake = new BooleanManager(false);
     private BooleanManager intaking = new BooleanManager(false);
     private BooleanManager stow = new BooleanManager(false);
@@ -83,15 +88,34 @@ public class Robot extends LoggedRobot {
     private BooleanManager speakerAmp = new BooleanManager(false);
     private BooleanManager manualRaiseClimber = new BooleanManager(false);
     private BooleanManager manualLowerClimber = new BooleanManager(false);
-
     @Override
     public void robotInit() {
 
         //AdvantageKit
         Logger.recordMetadata("Crescendo", "MyProject"); // Set a metadata value
-
+        
         if (isReal()) { // If running on a real robot
-            Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+            String eventName = DriverStation.getEventName() != ""?DriverStation.getEventName()+"_":"";
+            String matchType;
+            switch (DriverStation.getMatchType()) {
+                default: // Default falls through to None
+                case None:
+                    matchType = "";
+                    break;
+                case Practice:
+                    matchType = "PRACTICE_";
+                    break;
+                case Qualification:
+                    matchType = "QUALS_";
+                    break;
+                case Elimination:
+                    matchType = "ELIM_";
+                    break;
+            }
+            String matchNumber = DriverStation.getMatchNumber()>0?String.valueOf(DriverStation.getMatchNumber())+"_":"";
+            String time = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss").format(LocalDateTime.now());
+            String path = "/U/"+eventName+matchType+matchNumber+time+".wpilog";
+            Logger.addDataReceiver(new WPILOGWriter(path)); // Log to a USB stick
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
             new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
             Logger.start();
@@ -164,7 +188,7 @@ public class Robot extends LoggedRobot {
         else {
             SmartDashboard.putNumber("Tag 4 Z", -1.0);
         }
-        
+        Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
     }
 
     @Override
@@ -297,7 +321,8 @@ public class Robot extends LoggedRobot {
 
         //operator controls
         // shooter/feeder functions
-        shootFromPodium.update   (operatorController.getLeftBumper()); 
+        shootFromPodium.update   (operatorController.getLeftBumper());
+        rangeTableShoot.update   (operatorController.getBButton());
 
         outake.update            (operatorController.getRightBumper());
         intaking.update          (operatorController.getLeftTriggerAxis()>0.1);
@@ -312,6 +337,8 @@ public class Robot extends LoggedRobot {
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
+        RangeTable.RangeEntry entry = new RangeTable.RangeEntry(0, 0);
+
         if(resetGyro.getValue()){
             swerve.zeroGyroscope();
         }
@@ -397,12 +424,25 @@ public class Robot extends LoggedRobot {
                 subsystemsManager.speaker(false);
             }
         }
+        else if (rangeTableShoot.isRisingEdge()){
+            subsystemsManager.speaker(true);
+        }
+        else if(rangeTableShoot.isFallingEdge()){
+            subsystemsManager.speaker(false);
+        }
+        else if (rangeTableShoot.getValue()){
+            double distance = poseVision.getCurrTagZ();
+            entry = RangeTable.get(distance==-1.0?0:distance*5);
+            subsystemsManager.score();
+        }
         else if (speakerAmp.getValue()) {
+            entry = new RangeTable.RangeEntry(3000, 5);
             subsystemsManager.score();
         }
         else if (shootFromPodium.getValue()) {
             subsystemsManager.score();
             double omega = poseVision.visual_servo(0, 1.0, 4, 0);
+            entry = new RangeTable.RangeEntry(4500, 30.5);
             // set speeds
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
@@ -423,7 +463,8 @@ public class Robot extends LoggedRobot {
         } else {
             leds.off();
         }
-        swerve.drive(subsystemsManager.update(poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ():0, currentSpeeds));
+        //poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ():
+        swerve.drive(subsystemsManager.update(entry.flywheelSpeed, entry.pivotAngle, currentSpeeds));
     }
 
     @Override
@@ -437,61 +478,37 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        // SmartDashboard.putNumber("Tag 4 Z", 0);
-        // SmartDashboard.putNumber("Target Z (m)", 0);
+        swerve.drive(new ChassisSpeeds());
     }
 
     @Override
     public void testPeriodic() {
-        /*
-        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                new ChassisSpeeds(
-                        -driverController.getLeftY() * swerve.getMaxTranslateVelo() * 0.15,
-                        -driverController.getLeftX() * swerve.getMaxTranslateVelo() * 0.15,
-                        driverController.getRightX() * swerve.getMaxAngularVelo() * 0.15),
-                swerve.getGyroscopeRotation());
-
-        if (driverController.getBackButton()) {
-            swerve.zeroGyroscope();
-        }
-        */
-        leds.off();
-        if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
-                SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
-        }
-        else if (poseVision.getTag2InView() && poseVision.getCurrTag2ID() == 4) {
-            SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTag2Z());
-        }
-        else {
-            SmartDashboard.putNumber("Tag 4 Z", -1.0);
-        }
+        swerve.drive(new ChassisSpeeds());
+        // leds.off();
+        // if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
+        //         SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
+        // }
+        // else if (poseVision.getTag2InView() && poseVision.getCurrTag2ID() == 4) {
+        //     SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTag2Z());
+        // }
+        // else {
+        //     SmartDashboard.putNumber("Tag 4 Z", -1.0);
+        // }
         
-        if (driverController.getAButton()) {
-            // set elevator
-            elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Custom Angle", 0));
-            shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Speed", 0), (int)SmartDashboard.getNumber("Shooter Speed", 0));
-            Logger.recordOutput(ELEVATOR.LOG_PATH+"IsPivotReady", elevator.isTargetAngle());
-            Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterIsReady",shooter.isReady());
-            if (shooter.isReady() && elevator.isTargetAngle()) {
-                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // shoot
-            } 
-
-            // // calculate tx
-            // double tx = poseVision.getTagTx();
-            // // calculate omega
-            // double omega = poseVision.visual_servo(0, 1.0, 4, 0);
-            // // set speeds
-            // speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, omega);
-            // // log to shuffleboard
-            // SmartDashboard.putNumber("OAK tx", tx);
-            // SmartDashboard.putNumber("OAK omega", omega);
-        }
-        else {
-            elevator.setPivotAngleCustom(0);
-            shooter.stop(); shooter.stopFeeders();
-        }
-        
-        // swerve.drive(speeds);
+        // if (driverController.getAButton()) {
+        //     // set elevator
+        //     elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Custom Angle", 0));
+        //     shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Speed", 0), (int)SmartDashboard.getNumber("Shooter Speed", 0));
+        //     Logger.recordOutput(ELEVATOR.LOG_PATH+"IsPivotReady", elevator.isTargetAngle());
+        //     Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterIsReady",shooter.isReady());
+        //     if (shooter.isReady() && elevator.isTargetAngle()) {
+        //         shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // shoot
+        //     }
+        // }
+        // else {
+        //     elevator.setPivotAngleCustom(0);
+        //     shooter.stop(); shooter.stopFeeders();
+        // }
     } 
 
     @Override

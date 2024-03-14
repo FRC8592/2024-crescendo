@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.*;
 import frc.robot.Constants.APRILTAG_LIMELIGHT;
 import frc.robot.Constants.SHOOTER;
@@ -39,12 +40,14 @@ public class AutoShootCommand extends Command {
         double omega = vision.visual_servo(0, 3, 4, 0); //TODO: make sure this works on both sides with the tag ID
         Logger.recordOutput("AutoShootCommand Omega", omega);
         double distance = vision.distanceToAprilTag(4);
+        if(distance == -1)
         RangeEntry entry = RangeTable.get(distance);
         Logger.recordOutput("Distance to Tag 4", distance);
         elevator.setPivotAngleCustom(entry.pivotAngle);
         shooter.setShootVelocity(entry.flywheelSpeed, entry.flywheelSpeed);
         drive.drive(new ChassisSpeeds(0, 0, omega));
         if (Math.abs(vision.getCurrTagX())<APRILTAG_LIMELIGHT.LOCK_ERROR && shooter.isReady() && elevator.isTargetAngle()){
+            SmartDashboard.putNumber("Ready To Shoot", distance);
             Logger.recordOutput("AutoShootCommand Shooting", true);
             this.timer.start();
             if(this.timer.get() < 0.1){

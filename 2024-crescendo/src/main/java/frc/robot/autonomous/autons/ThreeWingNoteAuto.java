@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
+import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.CommandQueue;
 import frc.robot.commands.DelayCommand;
 import frc.robot.commands.FollowerCommand;
@@ -39,20 +40,20 @@ public class ThreeWingNoteAuto extends BaseAuto{
        queue = new CommandQueue(
         new ShootCommand(shooter, elevator, 3000, 5), //shooting preloaded note
         new JointCommand(//going to first note and intaking at the same time
-                new FollowerCommand(drive, noteOne),
-                new IntakeCommand(intake, shooter).setTimeout(3)
+                new FollowerCommand(drive, noteOne.addVision(targeting)),
+                new IntakeCommand(intake, shooter)
         ),
-        new ShootCommand(shooter, elevator, 3500, 26), //shooting first note at wing position
+        new AutoShootCommand(drive, poseVision, elevator, shooter), //shooting first note at wing position
         new JointCommand(//going to and intaking second note
-                new FollowerCommand(drive, noteTwo),
-                new IntakeCommand(intake, shooter).setTimeout(3)
+                new FollowerCommand(drive, noteTwo.addVision(targeting)),
+                new IntakeCommand(intake, shooter)
         ),
-        new ShootCommand(shooter, elevator, 3500, 25), //shooting second note at wing spot
+        new AutoShootCommand(drive, poseVision, elevator, shooter), //shooting second note at wing spot
         new JointCommand(//going to and intaking thrid note
-                 new FollowerCommand(drive, noteThree),
-                 new IntakeCommand(intake, shooter).setTimeout(3)
+                 new FollowerCommand(drive, noteThree.addVision(targeting)),
+                 new IntakeCommand(intake, shooter)
         ),
-        new ShootCommand(shooter, elevator, 3500, 28) //shooting third note 
+        new AutoShootCommand(drive, poseVision, elevator, shooter) //shooting third note 
        );
     }
 

@@ -52,6 +52,10 @@ public class RangeTable {
         //TODO: Uncomment when we get a real range table
         valid = true;
         int wholeMeters = (int)(distance);
+        if(distance <= 0){
+            valid=false;
+            return new RangeEntry(0,0);
+        }
         double decimal = distance - Math.floor(distance);
         if (RANGE_TABLE.length > 0) {
             if (wholeMeters < RANGE_TABLE.length) {

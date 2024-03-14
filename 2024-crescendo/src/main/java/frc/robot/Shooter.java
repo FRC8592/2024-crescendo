@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 
 import com.revrobotics.SparkPIDController;
 
@@ -20,18 +21,28 @@ public class Shooter {
     // private final NetworkTable table;
     // private NetworkTableEntry shooterSpeedRPS;
 
-    SparkFlexControl topShooterMotor;
-    SparkFlexControl bottomShooterMotor;
+    public SparkFlexControl topShooterMotor;
+    public SparkFlexControl bottomShooterMotor;
     // SparkPIDController leftShooterControl;
     // SparkPIDController rightShooterControl;
-    DigitalInput noteBeamBreak; // beam break sensor top/bottom mounted
+    public DigitalInput noteBeamBreak; // beam break sensor top/bottom mounted
 
-    SparkFlexControl feederMotor;
+    public SparkFlexControl feederMotor;
 
     int toptargetSpeed = 0;
     int bottomTargetSpeed = 0;
 
-    public boolean hasNote; 
+    public boolean hasNote;
+
+    public enum IntakeStates{
+        INTAKING,
+        REPOSITION,
+        NOTHING
+    }
+
+    private Timer movebackTimer;
+
+    public IntakeStates state;
 
     /**
      * Shooter object constructor
@@ -59,7 +70,34 @@ public class Shooter {
 
         topShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         bottomShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
-        // bottomShooterMotor.setInverted();
+
+        movebackTimer = new Timer();
+    }
+
+    public void intakeUpdate(){ // We only put a state machine on intaking
+        switch (state) {
+            case NOTHING:
+            default:
+                break;
+            case INTAKING:
+                setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+                setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+                if(hasNote()){ //TODO: Note that this depends on hasNote working properly. It should on the new shooter, but it will be prone to random issues at the time of writing this code
+                    state = IntakeStates.REPOSITION;
+                    movebackTimer.start();
+                }
+                break;
+            case REPOSITION:
+                setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+                if(!movebackTimer.hasElapsed(SHOOTER.REPOSITION_TIME)){ //Note the ! at the start of the condition
+                    setFeederVelocity(SHOOTER.REPOSITION_SPEED);
+                }
+                else{
+                    setFeederVelocity(0);
+                    state = IntakeStates.NOTHING;
+                }
+                break;
+        }
     }
 
     /**
@@ -67,6 +105,7 @@ public class Shooter {
      * @param speedRPM
      */
     public void setShootVelocity(int topspeedRPM, int bottomspeedRPM){
+        state = IntakeStates.NOTHING; // Stop whatever intake thing we're doing to avoid sending the motor multiple commands at the same time
         topShooterMotor.setVelocity(topspeedRPM);
         bottomShooterMotor.setVelocity(bottomspeedRPM);
         toptargetSpeed = topspeedRPM;
@@ -77,7 +116,8 @@ public class Shooter {
      * set shooter motors speeds in terms of percent output
      * @param power
      */
-    public void setShootPercentOutput(double power){
+    public void setShootPower(double power){
+        state = IntakeStates.NOTHING;
         topShooterMotor.setPercentOutput(power);
         bottomShooterMotor.setPercentOutput(power);
     }
@@ -86,30 +126,34 @@ public class Shooter {
      * Stops the flywheels
      */
     public void stop() {
+        state = IntakeStates.NOTHING;
         topShooterMotor.stop();
         bottomShooterMotor.stop();
     }
 
     /**
      * Sets speed of the feeder wheels in terms of percent output
-     * @param speed power
+     * @param power
      */
-    public void setFeederSpeed(double speed) {
-        feederMotor.setPercentOutput(speed);
+    public void setFeederPower(double power) {
+        state = IntakeStates.NOTHING;
+        feederMotor.setPercentOutput(power);
     }
 
     /**
      * Sets velocity of the feeder wheels
-     * @param feeder_velocity feeder velocity in RPM
+     * @param feederVelocity feeder velocity in RPM
     */
-    public void setFeederVelocity(double feeder_velocity) {
-        feederMotor.setVelocity(feeder_velocity);
+    public void setFeederVelocity(double feederVelocity) {
+        state = IntakeStates.NOTHING;
+        feederMotor.setVelocity(feederVelocity);
     }
 
     /**
      * stops feeder wheels from moving
      */
     public void stopFeeders() {
+        state = IntakeStates.NOTHING;
         feederMotor.stop();
     }
 
@@ -153,5 +197,12 @@ public class Shooter {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Starts the intake state machine; run the feeders until we have a note, then back it off a little. All methods other than {@code intake()}, {@code hasNote()}, {@code isReady()}, and {@code intakeUpdate()} will cancel whatever the state machine is doing and prioritize that method's function.
+     */
+    public void intake(){
+        this.state = IntakeStates.INTAKING;
     }
 }

@@ -4,7 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
-            // new RangeEntry(3000, 5), //Speaker //TODO: Fill this out with real data
+            // new RangeEntry(3000, 5), //Speaker
             // new RangeEntry(4500, 30.5) //Podium
             new RangeEntry(0, 0), //0m
             new RangeEntry(0, 0), //0.2m

@@ -176,17 +176,17 @@ public class MainSubsystemsManager {
                         subState = SubStates.NOTHING;
                         break;
                     case INIT:
-                        shooter.setShootPercentOutput(0); // Not using stopWheels here because we want to run the intake and feeder wheels
+                        shooter.setShootPower(0); // Not using stopWheels here because we want to run the intake and feeder wheels
                         subState = SubStates.PREP;
                         timer.reset();
                         break;
                     case INTAKE:
                         intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
-                        shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
                         break;
                     case PREP:
                         elevator.stow();
                         if (elevator.isTargetAngle()) {
+                            shooter.intake(); // Note that state HOME cancels this, so there's no need to worry about the feeders running when they're not supposed to
                             subState = SubStates.INTAKE;
                         }
                         break;
@@ -204,8 +204,8 @@ public class MainSubsystemsManager {
     }
 
     private void stopWheels() { // Stops the flywheels, feeder wheels, and intake wheels
-        shooter.setFeederSpeed(0);
-        shooter.setShootPercentOutput(0);
+        shooter.setFeederPower(0);
+        shooter.setShootPower(0);
         intake.spinPercentOutput(0);
     }
     

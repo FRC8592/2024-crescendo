@@ -21,6 +21,7 @@ public class IntakeCommand extends Command {
     @Override
     public void initialize() {
         this.timeoutTimer.start();
+        shooter.intake();
     }
 
     @Override
@@ -29,13 +30,11 @@ public class IntakeCommand extends Command {
 
        //spins intake and feeder until beam sensor stops
         intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
-        shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-        timeoutTimer.start();
-        
         if(!Robot.isReal()){
             return true;
         }
-        return shooter.hasNote() || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds);
+        return shooter.state == Shooter.IntakeStates.NOTHING // Waits until the note is fully in position
+                || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds);
     }
 
     @Override

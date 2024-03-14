@@ -19,6 +19,7 @@ public class AutoShootCommand extends Command {
     private Elevator elevator;
     private Shooter shooter;
     private Timer timer;
+    private Timer pullBackTimer;
 
 
     public AutoShootCommand(Swerve drive, PoseVision vision, Elevator elevator, Shooter shooter) {
@@ -27,10 +28,12 @@ public class AutoShootCommand extends Command {
         this.elevator = elevator;
         this.shooter = shooter;
         this.timer = new Timer();
+        this.pullBackTimer = new Timer();
     }
     @Override
     public void initialize() {
         drive.drive(new ChassisSpeeds());
+        pullBackTimer.start();
     }
     @Override
     public boolean execute() {
@@ -38,18 +41,20 @@ public class AutoShootCommand extends Command {
         double omega = vision.visual_servo(0, 3, 4, 0); //TODO: make sure this works on both sides with the tag ID
         Logger.recordOutput("AutoShootCommand Omega", omega);
         double distance = vision.distanceToAprilTag(4);
-        RangeEntry entry = RangeTable.get(distance);
-        Logger.recordOutput("Distance to Tag 4", distance);
+        RangeEntry entry;
+        if(distance != -1.0){
+            entry = RangeTable.get(distance*5);
+        }
+        else{
+            entry = new RangeEntry(0,0);
+        }
         elevator.setPivotAngleCustom(entry.pivotAngle);
         shooter.setShootVelocity(entry.flywheelSpeed, entry.flywheelSpeed);
         drive.drive(new ChassisSpeeds(0, 0, omega));
         if (Math.abs(vision.getCurrTagX())<APRILTAG_VISION.LEFT_RIGHT_ROTATION_LOCK_TOLERANCE && shooter.isReady() && elevator.isTargetAngle()){
             Logger.recordOutput("AutoShootCommand Shooting", true);
             this.timer.start();
-            if(this.timer.get() < 0.1){
-                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
-            }
-            else if(this.timer.get() < SHOOTER.SHOOT_SCORE_TIME){
+            if(this.timer.get() < SHOOTER.SHOOT_SCORE_TIME){
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
             }
             else{
@@ -57,6 +62,12 @@ public class AutoShootCommand extends Command {
             }
         }
         else{
+            if(pullBackTimer.get() < 0.05){
+                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
+            }
+            else{
+                shooter.stopFeeders();
+            }
             Logger.recordOutput("AutoShootCommand Shooting", false);
         }
         return false;

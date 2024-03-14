@@ -29,8 +29,7 @@ public class TwoNoteVisionAuto extends BaseAuto {
                 new ShootCommand(shooter, elevator, 3000, 5),
                 new JointCommand(
                         new IntakeCommand(intake, shooter),
-                        new AutoCollectCommand(targeting, drive,
-                                shooter)),
+                        new AutoCollectCommand(targeting, drive, shooter)),
                 new AutoShootCommand(drive, poseVision, elevator, shooter)
                 );
     }

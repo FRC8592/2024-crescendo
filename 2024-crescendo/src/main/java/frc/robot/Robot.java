@@ -68,6 +68,7 @@ public class Robot extends LoggedRobot {
     private PoseVision poseVision;
     private PIDController driveToTurnPID;
     private PIDController driveToDrivePID;
+    private PIDController turnToTargetPID;
     private SmoothingFilter smoothingFilter;
     private MainSubsystemsManager subsystemsManager;
 
@@ -148,6 +149,7 @@ public class Robot extends LoggedRobot {
 
         driveToDrivePID = new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD);
         driveToTurnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
+        turnToTargetPID = new PIDController(SWERVE.TURN_TO_TARGET_kP, SWERVE.TURN_TO_TARGET_kI, SWERVE.TURN_TO_TARGET_kD);
 
         poseVision = new PoseVision(APRILTAG_VISION.LEFT_RIGHT_ROTATION_kP, APRILTAG_VISION.LEFT_RIGHT_ROTATION_kI, APRILTAG_VISION.LEFT_RIGHT_ROTATION_kD, 0);
         
@@ -164,14 +166,15 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterSpeedDifference (Bottom - Top)", shooter.bottomShooterMotor.getVelocity()-shooter.topShooterMotor.getVelocity());
 
-        Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.noteBeamBreak.get());
-        SmartDashboard.putBoolean("hasNote()", shooter.noteBeamBreak.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Beam Break Raw Value", shooter.noteBeamBreak.get());
+        SmartDashboard.putBoolean("Beam Break Raw Value", shooter.noteBeamBreak.get());
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"FeederSpeedRPM", shooter.feederMotor.getVelocity());
         Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getTopMotorVelocityRPM());
 
         Logger.recordOutput(ELEVATOR.LOG_PATH+"PivotITerm",elevator.pivotMotor.motorControl.getIAccum());
         Logger.recordOutput(SWERVE.LOG_PATH+"Robot position", swerve.getCurrentPos());
+        Logger.recordOutput(APRILTAG_VISION.LOG_PATH+"Distance to Tag 4", poseVision.distanceToAprilTag(4));
         
         SmartDashboard.putNumber("Robot Yaw", swerve.getGyroscopeRotation().getDegrees());
 
@@ -463,8 +466,7 @@ public class Robot extends LoggedRobot {
         } else {
             leds.off();
         }
-        //poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ():
-        swerve.drive(subsystemsManager.update(entry.flywheelSpeed, entry.pivotAngle, currentSpeeds));
+        swerve.drive(subsystemsManager.update(entry.flywheelSpeed, entry.pivotAngle, currentSpeeds));//, turnToTargetPID);
     }
 
     @Override

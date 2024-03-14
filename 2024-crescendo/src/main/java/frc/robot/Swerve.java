@@ -12,7 +12,7 @@ import com.NewtonSwerve.Mk4.Mk4SwerveModuleHelper;
 import com.NewtonSwerve.Mk4.Mk4iSwerveModuleHelper;
 import com.ctre.phoenix.sensors.Pigeon2;
 import frc.robot.Constants.*;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -22,6 +22,7 @@ public class Swerve {
     private Mk4ModuleConfiguration swerveConfig;
     private NewtonSwerve swerve;
     private ChassisSpeeds lastSpeeds;
+    private Rotation2d targetRotation;
 
     public Swerve(Gyro gyro) {
         lastSpeeds = new ChassisSpeeds();
@@ -111,6 +112,30 @@ public class Swerve {
         swerve.drive(speeds);
     }
 
+    /**
+     * Drive with targeted rotation to (hopefully) fix the random rotation problems we've been seeing
+     * @param speeds ChassisSpeeds object containing normal robot movement
+     * @param turnPID PID controller for turning
+     */
+    public void targetedRotationDrive(ChassisSpeeds speeds, PIDController turnPID){
+        this.targetRotation = this.targetRotation.plus(Rotation2d.fromRadians(speeds.omegaRadiansPerSecond/50d)); // Divide the radians-per-second measurement by 50 to convert to radians per frame
+        double rotationDegrees;
+        if(this.targetRotation.getDegrees() >= this.getGyroscopeRotation().getDegrees()){ // Rotating in a positive direction
+            if(this.targetRotation.getDegrees() > 360 && this.getGyroscopeRotation().getDegrees() < 180){
+                //This runs if the target rotation is greater than 360 and the gyroscope reading has wrapped around to 0.
+                this.targetRotation = this.targetRotation.minus(Rotation2d.fromDegrees(360));
+            }
+        }
+        else{
+            if(this.targetRotation.getDegrees() < 0 && this.getGyroscopeRotation().getDegrees() > 180){
+                //This runs if the target rotation is less than 0 and the gyroscope reading has wrapped around to 360.
+                this.targetRotation = this.targetRotation.plus(Rotation2d.fromDegrees(360));
+            }
+        }
+        rotationDegrees = turnPID.calculate(swerve.getGyroscopeRotation().getDegrees(), this.targetRotation.getDegrees());
+        this.drive(new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, Rotation2d.fromDegrees(rotationDegrees).getRadians()));
+    }
+
     public double getYaw() {
         return swerve.getYaw();
     }
@@ -157,6 +182,7 @@ public class Swerve {
     }
     
     public void zeroGyroscope() {
+        this.targetRotation = new Rotation2d();
         swerve.zeroGyroscope();
     }
 

@@ -236,6 +236,9 @@ public final class Constants {
         public static final double STEER_kI = 0.0;
         public static final double STEER_kD = 0.1;
 
+        public static final double TURN_TO_TARGET_kP = 0.2; //TODO: Tune this
+        public static final double TURN_TO_TARGET_kI = 0.0; //TODO: Tune this
+        public static final double TURN_TO_TARGET_kD = 0.1; //TODO: Tune this
 
         public static final double DRIVE_TRAIN_WIDTH = 0.527; // meters
         public static final double DRIVE_TRAIN_LENGTH = 0.478; // meters 

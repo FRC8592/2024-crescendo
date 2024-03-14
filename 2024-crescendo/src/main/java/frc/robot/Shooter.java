@@ -1,4 +1,6 @@
 package frc.robot;
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -110,7 +112,7 @@ public class Shooter {
      * stops feeder wheels from moving
      */
     public void stopFeeders() {
-        feederMotor.stop();
+        feederMotor.setVelocity(0);
     }
 
     /**

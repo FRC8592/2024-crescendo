@@ -40,7 +40,9 @@ public class AutoShootCommand extends Command {
         double omega = vision.visual_servo(0, 3, 4, 0); //TODO: make sure this works on both sides with the tag ID
         Logger.recordOutput("AutoShootCommand Omega", omega);
         double distance = vision.distanceToAprilTag(4);
-        if(distance == -1)
+        if(distance == -1){
+            distance = 0;
+        }
         RangeEntry entry = RangeTable.get(distance);
         Logger.recordOutput("Distance to Tag 4", distance);
         elevator.setPivotAngleCustom(entry.pivotAngle);

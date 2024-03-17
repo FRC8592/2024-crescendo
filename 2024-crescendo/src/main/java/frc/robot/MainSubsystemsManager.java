@@ -88,12 +88,7 @@ public class MainSubsystemsManager {
                         break;
                     case SCORE: // Note that this runs READY and PREP's code too because there's no `break;` after this code
                         timer.start();
-                        if(timer.get()<0.1){
-                            shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
-                        }
-                        else{
-                            shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
-                        }
+                        shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
                         if (timer.get() > SHOOTER.SHOOT_SCORE_TIME && false /*never stop automatically*/) { //If we have spent enough time shooting
                             timer.stop();
                             timer.reset();
@@ -106,7 +101,7 @@ public class MainSubsystemsManager {
                     case PREP:
                         shooter.setTargetSpeed((int)rangeTableFlywheels, (int)rangeTableFlywheels);
                         elevator.setPivotAngleCustom(rangeTablePivot);
-                        if (shooter.isReady() && elevator.isTargetAngle() && subState == SubStates.PREP/*TODO add a "vision working" condition*/) { // Remember, this is run in the SCORE case as well. We don't want to reset to READY while 
+                        if (shooter.readyToShoot() && elevator.isTargetAngle() && subState == SubStates.PREP/*TODO add a "vision working" condition*/) { // Remember, this is run in the SCORE case as well. We don't want to reset to READY while 
                             subState = SubStates.READY;                                                                                             // scoring, so we make sure we're running in the PREP case before setting to READY.
                         }
                         break;

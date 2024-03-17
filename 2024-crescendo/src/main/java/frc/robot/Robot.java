@@ -167,6 +167,9 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putBoolean("Top Beam Break", shooter.topBeamBreak.get());
         SmartDashboard.putBoolean("Bottom Beam Break", shooter.bottomBeamBreak.get());
 
+        Logger.recordOutput("Top Beam Break", shooter.topBeamBreak.get());
+        Logger.recordOutput("Bottom Beam Break", shooter.bottomBeamBreak.get());
+
         Logger.recordOutput(SHOOTER.LOG_PATH+"FeederSpeedRPM", shooter.feederMotor.getVelocity());
         Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getTopMotorVelocityRPM());
 
@@ -437,7 +440,7 @@ public class Robot extends LoggedRobot {
             subsystemsManager.score();
         }
         else if (speakerAmp.getValue()) {
-            entry = new RangeTable.RangeEntry(3000, 5);
+            entry = new RangeTable.RangeEntry(3500, 0);
             subsystemsManager.score();
         }
         else if (shootFromPodium.getValue()) {
@@ -479,37 +482,41 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        swerve.drive(new ChassisSpeeds());
+        SmartDashboard.putNumber("Shooter Motors P", SHOOTER.LEFT_SHOOTER_MOTOR_kP);
+        SmartDashboard.putNumber("Shooter Motors I", SHOOTER.LEFT_SHOOTER_MOTOR_kI);
+        SmartDashboard.putNumber("Shooter Motors D", SHOOTER.LEFT_SHOOTER_MOTOR_kD);
+        SmartDashboard.putNumber("Shooter Motors F", SHOOTER.LEFT_SHOOTER_MOTOR_kF);
+        SmartDashboard.putNumber("Shooter Motors Velocity", 0);
     }
 
-    @Override
+    double oldMotorkP = 0;
+    double oldMotorkI = 0;
+    double oldMotorkD = 0;
+    double oldMotorkF = 0;
     public void testPeriodic() {
-        swerve.drive(new ChassisSpeeds());
-        // leds.off();
-        // if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
-        //         SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
-        // }
-        // else if (poseVision.getTag2InView() && poseVision.getCurrTag2ID() == 4) {
-        //     SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTag2Z());
-        // }
-        // else {
-        //     SmartDashboard.putNumber("Tag 4 Z", -1.0);
-        // }
-        
-        // if (driverController.getAButton()) {
-        //     // set elevator
-        //     elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Custom Angle", 0));
-        //     shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Speed", 0), (int)SmartDashboard.getNumber("Shooter Speed", 0));
-        //     Logger.recordOutput(ELEVATOR.LOG_PATH+"IsPivotReady", elevator.isTargetAngle());
-        //     Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterIsReady",shooter.isReady());
-        //     if (shooter.isReady() && elevator.isTargetAngle()) {
-        //         shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // shoot
-        //     }
-        // }
-        // else {
-        //     elevator.setPivotAngleCustom(0);
-        //     shooter.stop(); shooter.stopFeeders();
-        // }
+        double shooterMotorkP = SmartDashboard.getNumber("Shooter Motors P", 0);
+        double shooterMotorkI = SmartDashboard.getNumber("Shooter Motors I", 0);
+        double shooterMotorkD = SmartDashboard.getNumber("Shooter Motors D", 0);
+        double shooterMotorkF = SmartDashboard.getNumber("Shooter Motors F", 0);
+        double shooterMotorVelocity = SmartDashboard.getNumber("Shooter Motors Velocity", 0);
+        if(oldMotorkP != shooterMotorkP
+                || oldMotorkI != shooterMotorkI
+                || oldMotorkD != shooterMotorkD
+                || oldMotorkF != shooterMotorkF){
+            shooter.leftShooterMotor.setPIDF(shooterMotorkP, shooterMotorkI, shooterMotorkD, shooterMotorkF, 0);
+        }
+        oldMotorkP = shooterMotorkP;
+        oldMotorkI = shooterMotorkI;
+        oldMotorkD = shooterMotorkD;
+        oldMotorkF = shooterMotorkF;
+        if(driverController.getAButton()){
+            shooter.leftShooterMotor.setVelocity(shooterMotorVelocity);
+        }
+        else{
+            shooter.leftShooterMotor.stop();
+        }
+        Logger.recordOutput("Shooter Flywheel Speed", shooter.leftShooterMotor.getVelocity());
+        leds.red();
     } 
 
     @Override

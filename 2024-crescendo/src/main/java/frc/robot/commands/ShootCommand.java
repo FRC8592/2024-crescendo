@@ -34,8 +34,8 @@ public class ShootCommand extends Command{
 
         elevator.setPivotAngleCustom(elevatorPivotAngle);
         shooter.setShootVelocity(shootVelocity, shootVelocity);
-        SmartDashboard.putBoolean("Shooter is ready", shooter.isReady());
-        if(shooter.isReady() && elevator.isTargetAngle()){
+        SmartDashboard.putBoolean("Shooter is ready", shooter.readyToShoot());
+        if(shooter.readyToShoot() && elevator.isTargetAngle()){
             timer.start();
             if(timer.get()>0.1){
                 shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);

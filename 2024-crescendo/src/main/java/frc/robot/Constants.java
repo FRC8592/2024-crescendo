@@ -57,20 +57,20 @@ public final class Constants {
     public final class POWER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Power/";
 
-        public static final double INTAKE_MOTOR_CURRENT_LIMIT = 30.0;
+        public static final int INTAKE_MOTOR_CURRENT_LIMIT = 60;
 
-        public static final double TOP_SHOOTER_MOTOR_CURRENT_LIMIT = 30.0;
-        public static final double BOTTOM_SHOOTER_MOTOR_CURRENT_LIMIT = 30.0;
-        public static final double FEEDER_MOTOR_CURRENT_LIMIT = 30.0;
+        public static final int LEFT_SHOOTER_MOTOR_CURRENT_LIMIT = 60;
+        public static final int RIGHT_SHOOTER_MOTOR_CURRENT_LIMIT = 60;
+        public static final int FEEDER_MOTOR_CURRENT_LIMIT = 60;
 
-        public static final double ELEVATOR_MOTOR_CURRENT_LIMIT = 60.0;
-        public static final double PIVOT_MOTOR_CURRENT_LIMIT = 40.0;
-        public static final double PIVOT_FOLLOW_MOTOR_CURRENT_LIMIT = 40.0;
+        public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 60;
+        public static final int PIVOT_MOTOR_CURRENT_LIMIT = 40;
+        public static final int PIVOT_FOLLOW_MOTOR_CURRENT_LIMIT = 40;
 
-        public static final double SWERVE_MAX_VOLTAGE = 12.0;
-        public static final double SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 80.0;
-        public static final double SWERVE_AUTO_THROTTLE_CURRENT_LIMIT = 60.0;
-        public static final double SWERVE_AZIMUTH_CURRENT_LIMIT = 40.0;
+        public static final int SWERVE_MAX_VOLTAGE = 12;
+        public static final int SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 80;
+        public static final int SWERVE_AUTO_THROTTLE_CURRENT_LIMIT = 60;
+        public static final int SWERVE_AZIMUTH_CURRENT_LIMIT = 40;
 
         public static final int VOLTAGE_SMOOTHING_LENGTH = 50; // TODO: Arbitrary (needs testing)
         public static final double DISABLED_LOW_BATTERY_VOLTAGE = 11.5; // TODO: Arbitrary (needs testing)
@@ -161,17 +161,17 @@ public final class Constants {
         public static final double FEEDER_MOTOR_kD = 0.0;
         public static final double FEEDER_MOTOR_kF = 0.00018;
 
-        public static final double LEFT_SHOOTER_MOTOR_kP = 0.0000825;
-        public static final double LEFT_SHOOTER_MOTOR_kI = 0.0000001;
-        public static final double LEFT_SHOOTER_MOTOR_kD = 0.00000015;
-        public static final double LEFT_SHOOTER_MOTOR_kF = 0.000149; // feed-forward
+        public static final double LEFT_SHOOTER_MOTOR_kP = 0.0003;
+        public static final double LEFT_SHOOTER_MOTOR_kI = 0.0000012;
+        public static final double LEFT_SHOOTER_MOTOR_kD = 0.01;
+        public static final double LEFT_SHOOTER_MOTOR_kF = 0.000155; // feed-forward
 
         public static final double RIGHT_SHOOTER_MOTOR_kP = LEFT_SHOOTER_MOTOR_kP;
         public static final double RIGHT_SHOOTER_MOTOR_kI = LEFT_SHOOTER_MOTOR_kI;
         public static final double RIGHT_SHOOTER_MOTOR_kD = LEFT_SHOOTER_MOTOR_kD;
         public static final double RIGHT_SHOOTER_MOTOR_kF = LEFT_SHOOTER_MOTOR_kF;
 
-        public static final double SHOOTER_MOTOR_IZONE = 100; // RPM for the range within which the I term will be effective
+        public static final double SHOOTER_MOTOR_IZONE = 200; // RPM for the range within which the I term will be effective
 
 
         public static final int FHYWHEEL_SPEED_ACCEPTABLE_RANGE = 50; // RPM. TODO: Decrease this when the PID is tuned better
@@ -195,8 +195,7 @@ public final class Constants {
 
         public static final double FEEDER_AMP_TOLERANCE = 100;
 
-        public static final double REPOSITION_TIME = 0.1; // Run the shooter backwards for this amount of time after intaking
-        public static final double REPOSITION_SPEED = -2000;
+        public static final double REPOSITION_SPEED = 1000;
     }
 
 

@@ -156,16 +156,16 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
-        Logger.recordOutput(SHOOTER.LOG_PATH+"TopMotorRPM", shooter.topShooterMotor.getVelocity());
-        Logger.recordOutput(SHOOTER.LOG_PATH+"BottomMotorRPM", shooter.bottomShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"TopMotorRPM", shooter.leftShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"BottomMotorRPM", shooter.rightShooterMotor.getVelocity());
 
         Logger.recordOutput(ELEVATOR.LOG_PATH+"ExtensionMeters", elevator.getExtensionLength());
         Logger.recordOutput(ELEVATOR.LOG_PATH+"AngleDegrees", elevator.getPivotAngle());
 
-        Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterSpeedDifference (Bottom - Top)", shooter.bottomShooterMotor.getVelocity()-shooter.topShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterSpeedDifference (Bottom - Top)", shooter.rightShooterMotor.getVelocity()-shooter.leftShooterMotor.getVelocity());
 
-        Logger.recordOutput(SHOOTER.LOG_PATH+"HasNote", shooter.noteBeamBreak.get());
-        SmartDashboard.putBoolean("hasNote()", shooter.noteBeamBreak.get());
+        SmartDashboard.putBoolean("Top Beam Break", shooter.topBeamBreak.get());
+        SmartDashboard.putBoolean("Bottom Beam Break", shooter.bottomBeamBreak.get());
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"FeederSpeedRPM", shooter.feederMotor.getVelocity());
         Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getTopMotorVelocityRPM());
@@ -189,6 +189,7 @@ public class Robot extends LoggedRobot {
             SmartDashboard.putNumber("Tag 4 Z", -1.0);
         }
         Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
+        shooter.update();
     }
 
     @Override
@@ -359,7 +360,7 @@ public class Robot extends LoggedRobot {
         noteLock.updateVision();
 
         if (autoCollect.getValue()) { // Different from the others because it interacts with both the drivetrain and the main subsystems manager subsystems
-            if (!shooter.hasNote()) {
+            if (!shooter.hasNote) {
                 currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
                 if (autoCollect.isRisingEdge()) {
                     subsystemsManager.intake(true);

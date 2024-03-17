@@ -32,14 +32,14 @@ public class AutoCollectCommand extends Command {
     @Override
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "AutoCollectCommand");
-        Logger.recordOutput("hasNote", shooter.hasNote());
+        Logger.recordOutput("hasNote", shooter.hasNote);
 
         this.targeting.updateVision();
         this.drive.drive(targeting.driveToTarget(
                 new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD),
                 new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD),
                 NOTELOCK.DRIVE_TO_TARGET_ANGLE));
-        return !this.targeting.isTargetValid() || shooter.hasNote();
+        return !this.targeting.isTargetValid() || shooter.hasNote;
     }
 
     @Override

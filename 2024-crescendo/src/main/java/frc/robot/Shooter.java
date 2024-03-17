@@ -1,4 +1,6 @@
 package frc.robot;
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -21,82 +23,109 @@ public class Shooter {
     // private final NetworkTable table;
     // private NetworkTableEntry shooterSpeedRPS;
 
-    public SparkFlexControl topShooterMotor;
-    public SparkFlexControl bottomShooterMotor;
+    public SparkFlexControl leftShooterMotor;
+    public SparkFlexControl rightShooterMotor;
     // SparkPIDController leftShooterControl;
     // SparkPIDController rightShooterControl;
-    public DigitalInput noteBeamBreak; // beam break sensor top/bottom mounted
+    public DigitalInput bottomBeamBreak; // Detects the note when incoming
+    public DigitalInput topBeamBreak; // Detects the note outgoing
 
     public SparkFlexControl feederMotor;
 
-    int toptargetSpeed = 0;
-    int bottomTargetSpeed = 0;
+    int leftTargetSpeed = 0;
+    int rightTargetSpeed = 0;
 
-    public boolean hasNote;
+    public boolean hasNote = false;
 
-    public enum IntakeStates{
+    public enum States{
         INTAKING,
         REPOSITION,
-        NOTHING
+        NOTHING,
+        SHOOT,
+        OUTAKE
     }
 
     private Timer movebackTimer;
 
-    public IntakeStates state;
+    public States state;
 
     /**
      * Shooter object constructor
      */
     public Shooter() {
-        topShooterMotor = new SparkFlexControl(CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
-        topShooterMotor.setInverted();
-        bottomShooterMotor = new SparkFlexControl(CAN.BOTTOM_SHOOTER_MOTOR_CAN_ID, false);
+        leftShooterMotor = new SparkFlexControl(CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
+        leftShooterMotor.setInverted();
+        rightShooterMotor = new SparkFlexControl(CAN.BOTTOM_SHOOTER_MOTOR_CAN_ID, false);
         feederMotor = new SparkFlexControl(CAN.FEEDER_MOTOR_CAN_ID, false);
 
         // table = NetworkTableInstance.getDefault().getTable(shooterTableName);
-        topShooterMotor.setPIDF(SHOOTER.TOP_SHOOTER_MOTOR_kP, SHOOTER.TOP_SHOOTER_MOTOR_kI, SHOOTER.TOP_SHOOTER_MOTOR_kD, SHOOTER.TOP_SHOOTER_MOTOR_kF, 0);
-        bottomShooterMotor.setPIDF(SHOOTER.BOTTOM_SHOOTER_MOTOR_kP, SHOOTER.BOTTOM_SHOOTER_MOTOR_kI, SHOOTER.BOTTOM_SHOOTER_MOTOR_kD, SHOOTER.BOTTOM_SHOOTER_MOTOR_kF, 0);
+        leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP, SHOOTER.LEFT_SHOOTER_MOTOR_kI, SHOOTER.LEFT_SHOOTER_MOTOR_kD, SHOOTER.LEFT_SHOOTER_MOTOR_kF, 0);
+        rightShooterMotor.setPIDF(SHOOTER.RIGHT_SHOOTER_MOTOR_kP, SHOOTER.RIGHT_SHOOTER_MOTOR_kI, SHOOTER.RIGHT_SHOOTER_MOTOR_kD, SHOOTER.RIGHT_SHOOTER_MOTOR_kF, 0);
 
         feederMotor.setPIDF(SHOOTER.FEEDER_MOTOR_kP, SHOOTER.FEEDER_MOTOR_kI, SHOOTER.FEEDER_MOTOR_kD, SHOOTER.FEEDER_MOTOR_kF, 0);
         feederMotor.setInverted();
 
-        bottomShooterMotor.setPercentOutput(0);
-        topShooterMotor.setPercentOutput(0);
+        rightShooterMotor.setPercentOutput(0);
+        leftShooterMotor.setPercentOutput(0);
         feederMotor.setPercentOutput(0);
 
-        noteBeamBreak = new DigitalInput(SHOOTER.NOTE_BEAM_BREAK_DIO_PORT);
+        bottomBeamBreak = new DigitalInput(SHOOTER.BOTTOM_BEAM_BREAK_DIO_PORT);
+        topBeamBreak = new DigitalInput(SHOOTER.TOP_BEAM_BREAK_DIO_PORT);
 
-        bottomShooterMotor.follow(topShooterMotor, true);
+        rightShooterMotor.follow(leftShooterMotor, true);
 
-        topShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
-        bottomShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
+        leftShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
+        rightShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
 
         movebackTimer = new Timer();
+        state = States.NOTHING;
     }
 
-    public void intakeUpdate(){ // We only put a state machine on intaking
+    public void update(){
+        hasNote();
+        Logger.recordOutput("Shooter state", state.toString());
         switch (state) {
-            case NOTHING:
             default:
+                break;
+            case NOTHING:
                 break;
             case INTAKING:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
                 setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-                if(hasNote()){ //TODO: Note that this depends on hasNote working properly. It should on the new shooter, but it will be prone to random issues at the time of writing this code
-                    state = IntakeStates.REPOSITION;
+                if(hasNote){ //TODO: Note that this depends on hasNote working properly. It should on the new shooter, but it will be prone to random issues at the time of writing this code
+                    state = States.REPOSITION;
                     movebackTimer.start();
                 }
                 break;
             case REPOSITION:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-                if(!movebackTimer.hasElapsed(SHOOTER.REPOSITION_TIME)){ //Note the ! at the start of the condition
-                    setFeederVelocity(SHOOTER.REPOSITION_SPEED);
+                feederMotor.setVelocity(SHOOTER.REPOSITION_SPEED);
+                if (!topBeamBreak.get()){
+                    stopFeeders();
+                    stop();
+                    state = States.NOTHING;
                 }
-                else{
-                    setFeederVelocity(0);
-                    state = IntakeStates.NOTHING;
+                
+                break;
+            case SHOOT:
+                setShootVelocity(leftTargetSpeed, rightTargetSpeed);
+                if(isReady()){
+                    feederMotor.setVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
+                }
+                if (!hasNote) {
+                    stop();
+                    stopFeeders();
+                    state = States.NOTHING;
                 }
                 break;
+            case OUTAKE:
+                setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
+                setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
+                if(hasNote){ //TODO: Note that this depends on hasNote working properly. It should on the new shooter, but it will be prone to random issues at the time of writing this code
+                    state = States.NOTHING;
+                }
+                break;
+            
         }
     }
 
@@ -104,12 +133,11 @@ public class Shooter {
      * set shooter motors speeds in terms of RPM
      * @param speedRPM
      */
-    public void setShootVelocity(int topspeedRPM, int bottomspeedRPM){
-        state = IntakeStates.NOTHING; // Stop whatever intake thing we're doing to avoid sending the motor multiple commands at the same time
-        topShooterMotor.setVelocity(topspeedRPM);
-        bottomShooterMotor.setVelocity(bottomspeedRPM);
-        toptargetSpeed = topspeedRPM;
-        bottomTargetSpeed = bottomspeedRPM;
+    public void setShootVelocity(int leftSpeedRPM, int rightSpeedRPM){
+        leftTargetSpeed = leftSpeedRPM;
+        rightTargetSpeed = rightSpeedRPM;
+        leftShooterMotor.setVelocity(leftSpeedRPM);
+        rightShooterMotor.setVelocity(rightSpeedRPM);
     }
 
     /**
@@ -117,18 +145,16 @@ public class Shooter {
      * @param power
      */
     public void setShootPower(double power){
-        state = IntakeStates.NOTHING;
-        topShooterMotor.setPercentOutput(power);
-        bottomShooterMotor.setPercentOutput(power);
+        leftShooterMotor.setPercentOutput(power);
+        rightShooterMotor.setPercentOutput(power);
     }
 
     /**
      * Stops the flywheels
      */
     public void stop() {
-        state = IntakeStates.NOTHING;
-        topShooterMotor.stop();
-        bottomShooterMotor.stop();
+        leftShooterMotor.stop();
+        rightShooterMotor.stop();
     }
 
     /**
@@ -136,7 +162,6 @@ public class Shooter {
      * @param power
      */
     public void setFeederPower(double power) {
-        state = IntakeStates.NOTHING;
         feederMotor.setPercentOutput(power);
     }
 
@@ -145,7 +170,6 @@ public class Shooter {
      * @param feederVelocity feeder velocity in RPM
     */
     public void setFeederVelocity(double feederVelocity) {
-        state = IntakeStates.NOTHING;
         feederMotor.setVelocity(feederVelocity);
     }
 
@@ -153,7 +177,6 @@ public class Shooter {
      * stops feeder wheels from moving
      */
     public void stopFeeders() {
-        state = IntakeStates.NOTHING;
         feederMotor.stop();
     }
 
@@ -161,12 +184,24 @@ public class Shooter {
      * Checks whether note is in shooter
      * @return hasNote (boolean)
      */
-    public boolean hasNote() {
-        boolean currentlyHasNote = !noteBeamBreak.get(); // true if beam is BROKEN! thus note beam is not broken, no note
-        if (currentlyHasNote) {
-            hasNote = true;
+    public void hasNote() { //TODO: redo this function for the new shooter.
+        boolean topBeamBreakReading = !topBeamBreak.get(); //beam break return the opposite of whether it sees something.
+        boolean bottomBeamBreakReading = !bottomBeamBreak.get();
+        if (state == States.INTAKING){
+            if (bottomBeamBreakReading){
+                hasNote = true;
+            }
         }
-        return hasNote;
+        else if (state == States.SHOOT){
+            if (!topBeamBreakReading){ // notice the exclamation point
+                hasNote = false;
+            }
+        }
+        else if (state == States.OUTAKE){
+            if (bottomBeamBreakReading){
+                hasNote = false;
+            }
+        }
     }
 
     // /**
@@ -189,10 +224,10 @@ public class Shooter {
      * @apiNote You must call this method before shooting
      */
     public boolean isReady() {
-        SmartDashboard.putNumber("topShooterRPM", topShooterMotor.getVelocity());
-        SmartDashboard.putNumber("bottomShooterRPM", bottomShooterMotor.getVelocity());
-        if (Math.abs(topShooterMotor.getVelocity() - toptargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE&&
-                Math.abs(bottomShooterMotor.getVelocity() - bottomTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE) {
+        SmartDashboard.putNumber("topShooterRPM", leftShooterMotor.getVelocity());
+        SmartDashboard.putNumber("bottomShooterRPM", rightShooterMotor.getVelocity());
+        if (Math.abs(leftShooterMotor.getVelocity() - leftTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE&&
+                Math.abs(rightShooterMotor.getVelocity() - rightTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE) {
             hasNote = false;
             return true;
         }
@@ -203,6 +238,17 @@ public class Shooter {
      * Starts the intake state machine; run the feeders until we have a note, then back it off a little. All methods other than {@code intake()}, {@code hasNote()}, {@code isReady()}, and {@code intakeUpdate()} will cancel whatever the state machine is doing and prioritize that method's function.
      */
     public void intake(){
-        this.state = IntakeStates.INTAKING;
+        this.state = States.INTAKING;
+    }
+
+    public void setTargetSpeed(int left, int right){
+        leftTargetSpeed = left;
+        rightTargetSpeed = right;
+    }
+    public void intakeStop(){
+        state = States.NOTHING;
+    }
+    public void shoot(){
+        state = States.SHOOT;
     }
 }

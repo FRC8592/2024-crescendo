@@ -33,7 +33,7 @@ public class IntakeCommand extends Command {
         if(!Robot.isReal()){
             return true;
         }
-        return shooter.state == Shooter.IntakeStates.NOTHING // Waits until the note is fully in position
+        return shooter.state == Shooter.States.NOTHING // Waits until the note is fully in position
                 || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds);
     }
 

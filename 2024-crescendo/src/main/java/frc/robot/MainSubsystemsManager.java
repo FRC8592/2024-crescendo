@@ -82,6 +82,7 @@ public class MainSubsystemsManager {
                     case INIT: //Single-frame initialization case
                         intake.spinPercentOutput(0);
                         subState = SubStates.PREP;
+                        shooter.shoot();
                         timer.stop();
                         timer.reset();
                         break;
@@ -103,7 +104,7 @@ public class MainSubsystemsManager {
                         }
                     case READY: //This does nothing for now; TODO make this autodetect if the vision system fails and go back to PREP
                     case PREP:
-                        shooter.setShootVelocity((int)rangeTableFlywheels, (int)rangeTableFlywheels);
+                        shooter.setTargetSpeed((int)rangeTableFlywheels, (int)rangeTableFlywheels);
                         elevator.setPivotAngleCustom(rangeTablePivot);
                         if (shooter.isReady() && elevator.isTargetAngle() && subState == SubStates.PREP/*TODO add a "vision working" condition*/) { // Remember, this is run in the SCORE case as well. We don't want to reset to READY while 
                             subState = SubStates.READY;                                                                                             // scoring, so we make sure we're running in the PREP case before setting to READY.
@@ -204,6 +205,7 @@ public class MainSubsystemsManager {
     }
 
     private void stopWheels() { // Stops the flywheels, feeder wheels, and intake wheels
+        shooter.intakeStop();
         shooter.setFeederPower(0);
         shooter.setShootPower(0);
         intake.spinPercentOutput(0);

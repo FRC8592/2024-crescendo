@@ -153,22 +153,23 @@ public final class Constants {
     public final class SHOOTER {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Shooter/";
 
-        public static final int NOTE_BEAM_BREAK_DIO_PORT = 0;
+        public static final int BOTTOM_BEAM_BREAK_DIO_PORT = 0;
+        public static final int TOP_BEAM_BREAK_DIO_PORT = 1;
 
         public static final double FEEDER_MOTOR_kP = 0.00001; //TODO: Tune this; start with 0.00001;
         public static final double FEEDER_MOTOR_kI = 0.0;
         public static final double FEEDER_MOTOR_kD = 0.0;
         public static final double FEEDER_MOTOR_kF = 0.00018;
 
-        public static final double TOP_SHOOTER_MOTOR_kP = 0.0000825;
-        public static final double TOP_SHOOTER_MOTOR_kI = 0.0000001;
-        public static final double TOP_SHOOTER_MOTOR_kD = 0.00000015;
-        public static final double TOP_SHOOTER_MOTOR_kF = 0.000149; // feed-forward
+        public static final double LEFT_SHOOTER_MOTOR_kP = 0.0000825;
+        public static final double LEFT_SHOOTER_MOTOR_kI = 0.0000001;
+        public static final double LEFT_SHOOTER_MOTOR_kD = 0.00000015;
+        public static final double LEFT_SHOOTER_MOTOR_kF = 0.000149; // feed-forward
 
-        public static final double BOTTOM_SHOOTER_MOTOR_kP = TOP_SHOOTER_MOTOR_kP;
-        public static final double BOTTOM_SHOOTER_MOTOR_kI = TOP_SHOOTER_MOTOR_kI;
-        public static final double BOTTOM_SHOOTER_MOTOR_kD = TOP_SHOOTER_MOTOR_kD;
-        public static final double BOTTOM_SHOOTER_MOTOR_kF = TOP_SHOOTER_MOTOR_kF;
+        public static final double RIGHT_SHOOTER_MOTOR_kP = LEFT_SHOOTER_MOTOR_kP;
+        public static final double RIGHT_SHOOTER_MOTOR_kI = LEFT_SHOOTER_MOTOR_kI;
+        public static final double RIGHT_SHOOTER_MOTOR_kD = LEFT_SHOOTER_MOTOR_kD;
+        public static final double RIGHT_SHOOTER_MOTOR_kF = LEFT_SHOOTER_MOTOR_kF;
 
         public static final double SHOOTER_MOTOR_IZONE = 100; // RPM for the range within which the I term will be effective
 

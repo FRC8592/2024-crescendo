@@ -56,7 +56,7 @@ public class AutoShootCommand extends Command {
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
             }
             else if(this.timer.get() < SHOOTER.SHOOT_SCORE_TIME){
-                shooter.setShootVelocity(entry.flywheelSpeed, entry.flywheelSpeed);
+                shooter.setShootVelocity(entry.leftFlywheelSpeed, entry.leftFlywheelSpeed);
                 if(shooter.readyToShoot()){
                     shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
                 }

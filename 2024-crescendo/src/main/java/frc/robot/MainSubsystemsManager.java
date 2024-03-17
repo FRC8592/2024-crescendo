@@ -64,7 +64,7 @@ public class MainSubsystemsManager {
      * @param originalSpeeds ChassisSpeeds object derived exclusively from the controllers. {@code update()} will modify this as needed for the current function, then return it.
      * @return {@code originalSpeeds}, with any needed modifications for the current function.
      */
-    public ChassisSpeeds update(double rangeTableFlywheels, double rangeTablePivot, ChassisSpeeds originalSpeeds) {
+    public ChassisSpeeds update(double rtLeftFlywheel, double rtRightFlywheel, double rangeTablePivot, ChassisSpeeds originalSpeeds) {
         ChassisSpeeds modifiedSpeeds = null; // We check if this object is a `null` reference at the end of the loop. We return originalSpeeds if so; otherwise, we return modifiedSpeeds.
         switch (mainState) { // State machine for the general mode
             case HOME: // No break, so `HOME` runs `default` code
@@ -99,7 +99,7 @@ public class MainSubsystemsManager {
                         }
                     case READY: //This does nothing for now; TODO make this autodetect if the vision system fails and go back to PREP
                     case PREP:
-                        shooter.setTargetSpeed((int)rangeTableFlywheels, (int)rangeTableFlywheels);
+                        shooter.setTargetSpeed((int)rtLeftFlywheel, (int)rtRightFlywheel);
                         elevator.setPivotAngleCustom(rangeTablePivot);
                         if (shooter.readyToShoot() && elevator.isTargetAngle() && subState == SubStates.PREP/*TODO add a "vision working" condition*/) { // Remember, this is run in the SCORE case as well. We don't want to reset to READY while 
                             subState = SubStates.READY;                                                                                             // scoring, so we make sure we're running in the PREP case before setting to READY.

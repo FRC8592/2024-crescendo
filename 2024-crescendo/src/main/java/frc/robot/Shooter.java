@@ -76,8 +76,6 @@ public class Shooter {
         bottomBeamBreak = new DigitalInput(SHOOTER.BOTTOM_BEAM_BREAK_DIO_PORT);
         topBeamBreak = new DigitalInput(SHOOTER.TOP_BEAM_BREAK_DIO_PORT);
 
-        rightShooterMotor.follow(leftShooterMotor, true);
-
         leftShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         rightShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
 

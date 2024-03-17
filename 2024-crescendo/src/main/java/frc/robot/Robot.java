@@ -32,6 +32,8 @@ import frc.robot.autonomous.autons.*;
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 
+import javax.xml.stream.util.StreamReaderDelegate;
+
 import frc.robot.Constants.*;
 import frc.robot.MainSubsystemsManager.MainStates;
 import frc.robot.MainSubsystemsManager.SubStates;
@@ -128,7 +130,8 @@ public class Robot extends LoggedRobot {
             SmartDashboard.putData(FIELD);
         }
         SmartDashboard.putNumber("Elevator Custom Angle", 0);
-        SmartDashboard.putNumber("Shooter Speed", 4500);
+        SmartDashboard.putNumber("Shooter Left Speed", 0);
+        SmartDashboard.putNumber("Shooter Right Speed", 0);
 
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
@@ -341,7 +344,7 @@ public class Robot extends LoggedRobot {
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
-        RangeTable.RangeEntry entry = new RangeTable.RangeEntry(0, 0);
+        RangeTable.RangeEntry entry = new RangeTable.RangeEntry(0, 0, 0);
 
         if(resetGyro.getValue()){
             swerve.zeroGyroscope();
@@ -440,13 +443,13 @@ public class Robot extends LoggedRobot {
             subsystemsManager.score();
         }
         else if (speakerAmp.getValue()) {
-            entry = new RangeTable.RangeEntry(3500, 0);
+            entry = new RangeTable.RangeEntry(3500, (int)(3500*0.8), 0);
             subsystemsManager.score();
         }
         else if (shootFromPodium.getValue()) {
             subsystemsManager.score();
             double omega = poseVision.visual_servo(0, 1.0, 4, 0);
-            entry = new RangeTable.RangeEntry(4500, 30.5);
+            entry = new RangeTable.RangeEntry(4500, (int)(4500*0.8), 30.5);
             // set speeds
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
@@ -468,7 +471,7 @@ public class Robot extends LoggedRobot {
             leds.off();
         }
         //poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ():
-        swerve.drive(subsystemsManager.update(entry.flywheelSpeed, entry.pivotAngle, currentSpeeds));
+        swerve.drive(subsystemsManager.update(entry.leftFlywheelSpeed, entry.rightFlywheelSpeed, entry.pivotAngle, currentSpeeds));
     }
 
     @Override
@@ -482,40 +485,66 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
-        SmartDashboard.putNumber("Shooter Motors P", SHOOTER.LEFT_SHOOTER_MOTOR_kP);
-        SmartDashboard.putNumber("Shooter Motors I", SHOOTER.LEFT_SHOOTER_MOTOR_kI);
-        SmartDashboard.putNumber("Shooter Motors D", SHOOTER.LEFT_SHOOTER_MOTOR_kD);
-        SmartDashboard.putNumber("Shooter Motors F", SHOOTER.LEFT_SHOOTER_MOTOR_kF);
-        SmartDashboard.putNumber("Shooter Motors Velocity", 0);
+        // SmartDashboard.putNumber("Shooter Motors P", SHOOTER.LEFT_SHOOTER_MOTOR_kP);
+        // SmartDashboard.putNumber("Shooter Motors I", SHOOTER.LEFT_SHOOTER_MOTOR_kI);
+        // SmartDashboard.putNumber("Shooter Motors D", SHOOTER.LEFT_SHOOTER_MOTOR_kD);
+        // SmartDashboard.putNumber("Shooter Motors F", SHOOTER.LEFT_SHOOTER_MOTOR_kF);
+        // SmartDashboard.putNumber("Shooter Motors Velocity", 0);
     }
 
-    double oldMotorkP = 0;
-    double oldMotorkI = 0;
-    double oldMotorkD = 0;
-    double oldMotorkF = 0;
+    // double oldMotorkP = 0;
+    // double oldMotorkI = 0;
+    // double oldMotorkD = 0;
+    // double oldMotorkF = 0;
     public void testPeriodic() {
-        double shooterMotorkP = SmartDashboard.getNumber("Shooter Motors P", 0);
-        double shooterMotorkI = SmartDashboard.getNumber("Shooter Motors I", 0);
-        double shooterMotorkD = SmartDashboard.getNumber("Shooter Motors D", 0);
-        double shooterMotorkF = SmartDashboard.getNumber("Shooter Motors F", 0);
-        double shooterMotorVelocity = SmartDashboard.getNumber("Shooter Motors Velocity", 0);
-        if(oldMotorkP != shooterMotorkP
-                || oldMotorkI != shooterMotorkI
-                || oldMotorkD != shooterMotorkD
-                || oldMotorkF != shooterMotorkF){
-            shooter.leftShooterMotor.setPIDF(shooterMotorkP, shooterMotorkI, shooterMotorkD, shooterMotorkF, 0);
+        // double shooterMotorkP = SmartDashboard.getNumber("Shooter Motors P", 0);
+        // double shooterMotorkI = SmartDashboard.getNumber("Shooter Motors I", 0);
+        // double shooterMotorkD = SmartDashboard.getNumber("Shooter Motors D", 0);
+        // double shooterMotorkF = SmartDashboard.getNumber("Shooter Motors F", 0);
+        // double shooterMotorVelocity = SmartDashboard.getNumber("Shooter Motors Velocity", 0);
+        // if(oldMotorkP != shooterMotorkP
+        //         || oldMotorkI != shooterMotorkI
+        //         || oldMotorkD != shooterMotorkD
+        //         || oldMotorkF != shooterMotorkF){
+        //     shooter.leftShooterMotor.setPIDF(shooterMotorkP, shooterMotorkI, shooterMotorkD, shooterMotorkF, 0);
+        // }
+        // oldMotorkP = shooterMotorkP;
+        // oldMotorkI = shooterMotorkI;
+        // oldMotorkD = shooterMotorkD;
+        // oldMotorkF = shooterMotorkF;
+        // if(driverController.getAButton()){
+        //     shooter.leftShooterMotor.setVelocity(shooterMotorVelocity);
+        // }
+        // else{
+        //     shooter.leftShooterMotor.stop();
+        // }
+        // Logger.recordOutput("Shooter Flywheel Speed", shooter.leftShooterMotor.getVelocity());
+
+        if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
+                SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
         }
-        oldMotorkP = shooterMotorkP;
-        oldMotorkI = shooterMotorkI;
-        oldMotorkD = shooterMotorkD;
-        oldMotorkF = shooterMotorkF;
-        if(driverController.getAButton()){
-            shooter.leftShooterMotor.setVelocity(shooterMotorVelocity);
+        else if (poseVision.getTag2InView() && poseVision.getCurrTag2ID() == 4) {
+            SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTag2Z());
         }
-        else{
-            shooter.leftShooterMotor.stop();
+        else {
+            SmartDashboard.putNumber("Tag 4 Z", -1.0);
         }
-        Logger.recordOutput("Shooter Flywheel Speed", shooter.leftShooterMotor.getVelocity());
+        
+        if (driverController.getAButton()) {
+            // set elevator
+            elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Custom Angle", 0));
+            shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Left Speed", 0), (int)SmartDashboard.getNumber("Shooter Right Speed", 0));
+            Logger.recordOutput(ELEVATOR.LOG_PATH+"IsPivotReady", elevator.isTargetAngle());
+            Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterIsReady",shooter.readyToShoot());
+            if (shooter.readyToShoot() && elevator.isTargetAngle()) {
+                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // shoot
+            }
+        }
+        else {
+            elevator.setPivotAngleCustom(0);
+            shooter.stop(); shooter.stopFeeders();
+        }
+
         leds.red();
     } 
 

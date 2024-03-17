@@ -6,29 +6,29 @@ public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
             // new RangeEntry(3000, 5), //Speaker
             // new RangeEntry(4500, 30.5) //Podium
-            new RangeEntry(0, 0), //0m
-            new RangeEntry(0, 0), //0.2m
-            new RangeEntry(0, 0), //0.4
-            new RangeEntry(0, 0), //0.6
-            new RangeEntry(0, 0), //0.8
-            new RangeEntry(0, 0), //1.0
-            new RangeEntry(0, 0), //1.2
-            new RangeEntry(0, 0), //1.4
-            new RangeEntry(0, 0), //1.6
-            new RangeEntry(4000, 19), //1.8
-            new RangeEntry(4000, 21), //2.0
-            new RangeEntry(4000, 25), //2.2
-            new RangeEntry(4000, 27.5), //2.4
-            new RangeEntry(4000, 30), //2.6
-            new RangeEntry(4500, 32), //2.8
-            new RangeEntry(4500, 34), //3.0
-            new RangeEntry(4750, 34.75), //3.2
-            new RangeEntry(4750, 36), //3.4
-            new RangeEntry(4750, 37), //3.6
-            new RangeEntry(4750, 37), //3.8
-            new RangeEntry(0, 0), //4.0
-            new RangeEntry(0, 0), //4.2
-            new RangeEntry(0, 0),
+            new RangeEntry(0, 0, 0), //0m
+            new RangeEntry(0, 0, 0), //0.2m
+            new RangeEntry(0, 0, 0), //0.4
+            new RangeEntry(0, 0, 0), //0.6
+            new RangeEntry(0, 0, 0), //0.8
+            new RangeEntry(0, 0, 0), //1.0
+            new RangeEntry(0, 0, 0), //1.2
+            new RangeEntry(3000, 0, 0), //1.4
+            new RangeEntry(0, 0, 0), //1.6
+            new RangeEntry(0, 0, 0), //1.8
+            new RangeEntry(0, 0, 0), //2.0
+            new RangeEntry(0, 0, 0), //2.2
+            new RangeEntry(0, 0, 0), //2.4
+            new RangeEntry(0, 0, 0), //2.6
+            new RangeEntry(0, 0, 0), //2.8
+            new RangeEntry(0, 0, 0), //3.0
+            new RangeEntry(0, 0, 0), //3.2
+            new RangeEntry(0, 0, 0), //3.4
+            new RangeEntry(0, 0, 0), //3.6
+            new RangeEntry(0, 0, 0), //3.8
+            new RangeEntry(0, 0, 0), //4.0
+            new RangeEntry(0, 0, 0), //4.2
+            new RangeEntry(0, 0, 0),
     };
     public static boolean valid;
 
@@ -54,7 +54,7 @@ public class RangeTable {
         int wholeMeters = (int)(distance);
         if(distance <= 0){
             valid=false;
-            return new RangeEntry(0,0);
+            return new RangeEntry(0,0,0);
         }
         double decimal = distance - Math.floor(distance);
         if (RANGE_TABLE.length > 0) {
@@ -72,7 +72,7 @@ public class RangeTable {
         } else {
             valid = false;
             System.out.println("ERROR: Range table is empty");
-            return new RangeEntry(0, 0);
+            return new RangeEntry(0, 0, 0);
         }
     }
 
@@ -82,11 +82,13 @@ public class RangeTable {
 
 
     public static class RangeEntry {
-        public int flywheelSpeed;
+        public int leftFlywheelSpeed;
+        public int rightFlywheelSpeed;
         public double pivotAngle;
 
-        public RangeEntry(int speed, double angle) {
-            flywheelSpeed = speed;
+        public RangeEntry(int left, int right, double angle) {
+            leftFlywheelSpeed = left;
+            rightFlywheelSpeed = right;
             pivotAngle = angle;
         }
 
@@ -97,12 +99,14 @@ public class RangeTable {
          * @return
          */
         public RangeEntry interpolate(RangeEntry rEntry, double value) {
-            double speedUnit = rEntry.flywheelSpeed - this.flywheelSpeed;
+            double leftSpeedUnit = rEntry.leftFlywheelSpeed - this.leftFlywheelSpeed;
+            double rightSpeedUnit = rEntry.leftFlywheelSpeed - this.leftFlywheelSpeed;
             double angleUnit = rEntry.pivotAngle - this.pivotAngle;
-            RangeEntry generated = new RangeEntry((int) (this.flywheelSpeed + (speedUnit * value)),
+            RangeEntry generated = new RangeEntry((int) (this.leftFlywheelSpeed + (leftSpeedUnit * value)),
+                    (int) (this.rightFlywheelSpeed + (rightSpeedUnit * value)),
                     (this.pivotAngle + (angleUnit * value)));
             Logger.recordOutput("CustomLogs/RangeTable/GeneratedPivotAngle", generated.pivotAngle);
-            Logger.recordOutput("CustomLogs/RangeTable/GeneratedFlywheelSpeed", generated.flywheelSpeed);
+            Logger.recordOutput("CustomLogs/RangeTable/GeneratedFlywheelSpeed", generated.leftFlywheelSpeed);
             return generated;
         }
     }

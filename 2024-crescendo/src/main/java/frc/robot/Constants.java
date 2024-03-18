@@ -1,5 +1,8 @@
 package frc.robot;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public final class Constants {
     public final class SHARED {
         public static final String LOG_FOLDER = "CustomLogs";
@@ -317,6 +320,11 @@ public final class Constants {
         public static final double kP = 1d;
         public static final double kI = 0;
         public static final double kD = 0;
+
+        // red, blue
+        public static final ArrayList<Integer> SPEAKER_AIM_TAGS = new ArrayList<>(Arrays.asList(4, 7));
+        public static final ArrayList<Integer> AMP_AIM_TAGS = new ArrayList<>(Arrays.asList(5, 6));
+        public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
     }
 
     public class MAIN_SUBSYSTEMS_MANAGER{

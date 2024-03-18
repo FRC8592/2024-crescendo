@@ -438,7 +438,7 @@ public class Robot extends LoggedRobot {
             subsystemsManager.speaker(false);
         }
         else if (rangeTableShoot.getValue()){
-            double distance = poseVision.distanceToAprilTag(4);
+            double distance = poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
             entry = RangeTable.get(distance==-1.0?0:distance);
             subsystemsManager.score();
         }
@@ -448,13 +448,13 @@ public class Robot extends LoggedRobot {
         }
         else if (shootFromPodium.getValue()) {
             subsystemsManager.score();
-            double omega = poseVision.visual_servo(0, 1.0, 4, 0);
+            double omega = poseVision.visual_servo(0, 1.0, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
             entry = new RangeTable.RangeEntry(4500, (int)(4500*0.8), 30.5);
             // set speeds
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
         if(driverController.getLeftTriggerAxis()>0.1){
-            double omega = poseVision.visual_servo(0, 1.0, 4, 0);
+            double omega = poseVision.visual_servo(0, 1.0, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
 

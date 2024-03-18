@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.*;
 import frc.robot.Constants.APRILTAG_LIMELIGHT;
+import frc.robot.Constants.APRILTAG_VISION;
 import frc.robot.Constants.SHOOTER;
 
 import org.littletonrobotics.junction.Logger;
@@ -39,9 +40,9 @@ public class AutoShootCommand extends Command {
     @Override
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "AutoShootCommand");
-        double omega = vision.visual_servo(0, 3, 4, 0); //TODO: make sure this works on both sides with the tag ID
+        double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
         Logger.recordOutput("AutoShootCommand Omega", omega);
-        double distance = vision.distanceToAprilTag(4);
+        double distance = vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
         RangeEntry entry = RangeTable.get(distance);
         Logger.recordOutput("Distance to Tag 4", distance);
         elevator.setPivotAngleCustom(entry.pivotAngle);

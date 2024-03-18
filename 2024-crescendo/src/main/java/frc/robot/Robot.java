@@ -67,6 +67,7 @@ public class Robot extends LoggedRobot {
     private Power power;
     private PoseVision poseVision;
     private PIDController turnPID;
+    private PIDController driftCorrectionPID; 
     private PIDController drivePID;
     private SmoothingFilter smoothingFilter;
     private MainSubsystemsManager subsystemsManager;
@@ -88,6 +89,8 @@ public class Robot extends LoggedRobot {
     private BooleanManager speakerAmp = new BooleanManager(false);
     private BooleanManager manualRaiseClimber = new BooleanManager(false);
     private BooleanManager manualLowerClimber = new BooleanManager(false);
+    private boolean notTurning = false;
+    double targetYaw;
     @Override
     public void robotInit() {
 
@@ -148,6 +151,7 @@ public class Robot extends LoggedRobot {
 
         drivePID = new PIDController(APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kP, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kI, APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kD);
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
+        driftCorrectionPID = new PIDController(NOTELOCK.TURN_kP, NOTELOCK.TURN_kI, NOTELOCK.TURN_kD); // TOOD: Tune these values, make constants
 
         poseVision = new PoseVision(APRILTAG_VISION.kP, APRILTAG_VISION.kI, APRILTAG_VISION.kD, 0);
         
@@ -347,17 +351,40 @@ public class Robot extends LoggedRobot {
             swerve.zeroGyroscope();
         }
 
+        // correction for slow drift as the robot moves when omega = 0
+        if (Math.abs(rawRightX) < 0.01 && !notTurning) { // we aren't turning on purpose, and don't already have a target yaw
+            targetYaw = swerve.getGyroscopeRotation().getDegrees(); // reference this
+            notTurning = true;
+            Logger.recordOutput("Fixed Yaw", targetYaw);
+        }
+        else {
+            notTurning = false; // we are, in fact, turning
+        }
+
+        double omega;
+        if (notTurning) { // use PID to keep current yaw at targetYaw
+            omega = driftCorrectionPID.calculate(swerve.getGyroscopeRotation().getDegrees(), targetYaw);
+        }
+        else if (slowMode.getValue()) {
+            omega = driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo();
+        }
+        else {
+            omega = driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo();
+        }
+        Logger.recordOutput("Omega", omega);
+        Logger.recordOutput("notTurning", notTurning);
+
         if (slowMode.getValue()) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
                     driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
                     driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                    driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()));
+                    omega));
         }
         else {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
                     driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
                     driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                    driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
+                    omega));
         }
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented.getValue()?new Rotation2d():swerve.getGyroscopeRotation());
         noteLock.updateVision();
@@ -445,13 +472,13 @@ public class Robot extends LoggedRobot {
         }
         else if (shootFromPodium.getValue()) {
             subsystemsManager.score();
-            double omega = poseVision.visual_servo(0, 1.0, 4, 0);
+            omega = poseVision.visual_servo(0, 1.0, 4, 0);
             entry = new RangeTable.RangeEntry(4500, 30.5);
             // set speeds
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
         if(driverController.getLeftTriggerAxis()>0.1){
-            double omega = poseVision.visual_servo(0, 1.0, 4, 0);
+            omega = poseVision.visual_servo(0, 1.0, 4, 0);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
 

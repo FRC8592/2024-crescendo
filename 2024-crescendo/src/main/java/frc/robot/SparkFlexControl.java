@@ -39,6 +39,10 @@ public class SparkFlexControl {
         motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
     }
 
+    public void setVelocity(double RPM, int slotID){
+        motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity, slotID); 
+    }
+
     public void setPosition(double rotations){
         motorControl.setReference(rotations, com.revrobotics.CANSparkBase.ControlType.kPosition); 
     }

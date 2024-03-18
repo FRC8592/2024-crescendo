@@ -13,14 +13,14 @@ public class RangeTable {
             new RangeEntry(0, 0, 0), //0.8
             new RangeEntry(0, 0, 0), //1.0
             new RangeEntry(0, 0, 0), //1.2
-            new RangeEntry(3000, 0, 0), //1.4
-            new RangeEntry(0, 0, 0), //1.6
-            new RangeEntry(0, 0, 0), //1.8
-            new RangeEntry(0, 0, 0), //2.0
-            new RangeEntry(0, 0, 0), //2.2
-            new RangeEntry(0, 0, 0), //2.4
-            new RangeEntry(0, 0, 0), //2.6
-            new RangeEntry(0, 0, 0), //2.8
+            new RangeEntry(0, 0, 0), //1.4
+            new RangeEntry(3500, 2700, 6), //1.6
+            new RangeEntry(3500, 2700, 9), //1.8
+            new RangeEntry(3500, 2700, 13), //2.0
+            new RangeEntry(4000, 3000, 18), //2.2
+            new RangeEntry(4000, 3000, 19), //2.4
+            new RangeEntry(4000, 3000, 22), //2.6
+            new RangeEntry(4500, 3500, 27.5), //2.8
             new RangeEntry(0, 0, 0), //3.0
             new RangeEntry(0, 0, 0), //3.2
             new RangeEntry(0, 0, 0), //3.4

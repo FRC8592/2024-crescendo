@@ -39,13 +39,15 @@ public class Shooter {
 
     public enum States{
         INTAKING,
-        REPOSITION,
+        STAGE,
+        REVERSE,
         NOTHING,
         SHOOT,
         OUTAKE
     }
 
     private Timer shootTimer;
+    private Timer reverseTimer;
 
     public States state;
 
@@ -63,6 +65,7 @@ public class Shooter {
         rightShooterMotor.setPIDF(SHOOTER.RIGHT_SHOOTER_MOTOR_kP, SHOOTER.RIGHT_SHOOTER_MOTOR_kI, SHOOTER.RIGHT_SHOOTER_MOTOR_kD, SHOOTER.RIGHT_SHOOTER_MOTOR_kF, 0);
 
         feederMotor.setPIDF(SHOOTER.FEEDER_MOTOR_kP, SHOOTER.FEEDER_MOTOR_kI, SHOOTER.FEEDER_MOTOR_kD, SHOOTER.FEEDER_MOTOR_kF, 0);
+        feederMotor.setPIDF(SHOOTER.FEEDER_MOTOR_SHOOT_kP, SHOOTER.FEEDER_MOTOR_SHOOT_kI, SHOOTER.FEEDER_MOTOR_SHOOT_kD, SHOOTER.FEEDER_MOTOR_SHOOT_kF, 1);
         feederMotor.setInverted();
 
         rightShooterMotor.setCurrentLimit(POWER.RIGHT_SHOOTER_MOTOR_CURRENT_LIMIT, POWER.RIGHT_SHOOTER_MOTOR_CURRENT_LIMIT);
@@ -82,6 +85,10 @@ public class Shooter {
         shootTimer = new Timer();
         shootTimer.reset();
         shootTimer.stop();
+
+        reverseTimer = new Timer();
+        reverseTimer.reset();
+        reverseTimer.stop();
         state = States.NOTHING;
     }
 
@@ -99,27 +106,43 @@ public class Shooter {
             default:
                 break;
             case NOTHING:
+                feederMotor.motorControl.setIAccum(0);
+                feederMotor.setVelocity(0);
                 break;
             case INTAKING:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
                 setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
                 if(!bottomBeamBreak.get()){ //Notice the exclamation point; the beam-break returns an inverted "is it tripped"
-                    state = States.REPOSITION;
+                    feederMotor.setVelocity(SHOOTER.STAGE_SPEED);
+                    state = States.STAGE;
                 }
                 break;
-            case REPOSITION:
+            case STAGE:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-                feederMotor.setVelocity(SHOOTER.REPOSITION_SPEED);
-                if (!topBeamBreak.get()){
-                    stopFeeders();
+                feederMotor.setVelocity(SHOOTER.STAGE_SPEED);
+                if (!topBeamBreak.get()){ //Tripped
                     stop();
+                    feederMotor.setPercentOutput(-1);
+                    reverseTimer.reset();
+                    reverseTimer.start();
+                    state = States.REVERSE;
+                }
+                break;
+            case REVERSE:
+                if(reverseTimer.get()<0.08){
+                    feederMotor.setPercentOutput(-1);
+                }
+                else{
+                    feederMotor.setVelocity(0);
                     state = States.NOTHING;
                 }
                 break;
+
+
             case SHOOT:
                 setShootVelocity(leftTargetSpeed, rightTargetSpeed);
                 if(readyToShoot()){
-                    feederMotor.setVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
+                    feederMotor.setVelocity(SHOOTER.SHOOTING_FEEDER_SPEED, 1);
                     Logger.recordOutput("Feeder Setpoint", SHOOTER.SHOOTING_FEEDER_SPEED);
                     if (topBeamBreak.get()) { // "If top beam break is not tripped"
                         shootTimer.start();

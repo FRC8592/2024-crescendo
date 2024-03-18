@@ -177,7 +177,12 @@ public class MainSubsystemsManager {
                         timer.reset();
                         break;
                     case INTAKE:
-                        intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
+                        if(shooter.state == Shooter.States.INTAKING || shooter.state == Shooter.States.STAGE){ //The two states where the feeders go up
+                            intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
+                        }
+                        else{
+                            intake.setIntakeVelocity(0);
+                        }
                         break;
                     case PREP:
                         elevator.stow();

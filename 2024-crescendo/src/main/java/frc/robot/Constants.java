@@ -131,7 +131,7 @@ public final class Constants {
     public final class INTAKE {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Intake/";
 
-        public static final double MOTOR_kP = 0.00015;
+        public static final double MOTOR_kP = 0.0003;
         public static final double MOTOR_kI = 0.00; //TODO: We need a lot of this
         public static final double MOTOR_kD = 0.015;
         public static final double MOTOR_kFF = 0.00016;
@@ -156,13 +156,13 @@ public final class Constants {
         public static final int BOTTOM_BEAM_BREAK_DIO_PORT = 0;
         public static final int TOP_BEAM_BREAK_DIO_PORT = 1;
 
-        public static final double FEEDER_MOTOR_kP = 0.00001; //TODO: Tune this; start with 0.00001;
+        public static final double FEEDER_MOTOR_kP = 0.00001;
         public static final double FEEDER_MOTOR_kI = 0.0;
         public static final double FEEDER_MOTOR_kD = 0.0;
         public static final double FEEDER_MOTOR_kF = 0.00018;
 
-        public static final double FEEDER_MOTOR_SHOOT_kP = 0.0001; //TODO: Tune this; start with 0.00001;
-        public static final double FEEDER_MOTOR_SHOOT_kI = 0.0001;
+        public static final double FEEDER_MOTOR_SHOOT_kP = 0.001;
+        public static final double FEEDER_MOTOR_SHOOT_kI = 0.000;//1;
         public static final double FEEDER_MOTOR_SHOOT_kD = 0.0;
         public static final double FEEDER_MOTOR_SHOOT_kF = 0.00018;
 
@@ -186,10 +186,11 @@ public final class Constants {
         public static final int AMP_FEEDER_SPEED = -3000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 1000;
+        public static final int INTAKE_FEEDER_SPEED = 2000;
 
         //No shooter speed because we use the range table
-        public static final int SHOOTING_FEEDER_SPEED = 2500;
+        // public static final int SHOOTING_FEEDER_SPEED = 2500;
+        public static final double SHOOTING_FEEDER_POWER = 0.5;
 
         public static final int OUTAKE_FLYWHEEL_SPEED = -500; //TODO: Figure out what this should be.
         public static final double OUTAKE_FEEDER_SPEED = -2000;
@@ -200,7 +201,7 @@ public final class Constants {
 
         public static final double FEEDER_AMP_TOLERANCE = 100;
 
-        public static final double STAGE_SPEED = INTAKE_FEEDER_SPEED;
+        public static final double STAGE_FEEDER_SPEED = 250;
         public static final double ALIGN_SPEED = -500;
     }
 

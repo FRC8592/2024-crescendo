@@ -448,10 +448,7 @@ public class Robot extends LoggedRobot {
         }
         else if (shootFromPodium.getValue()) {
             subsystemsManager.score();
-            double omega = poseVision.visual_servo(0, 1.0, 4, 0);
-            entry = new RangeTable.RangeEntry(4500, (int)(4500*0.8), 30.5);
-            // set speeds
-            currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
+            entry = RangeTable.get(2.83);
         }
         if(driverController.getLeftTriggerAxis()>0.1){
             double omega = poseVision.visual_servo(0, 1.0, 4, 0);
@@ -465,7 +462,7 @@ public class Robot extends LoggedRobot {
         if (ledAmpSignal.getValue()) {
             leds.amp();
         }
-        else if (shooter.hasNote) {
+        else if (!shooter.bottomBeamBreak.get()) {
             leds.notePickup();
         } else {
             leds.off();
@@ -541,12 +538,12 @@ public class Robot extends LoggedRobot {
 
         if (driverController.getAButton()) {
             // set elevator
-            elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Angle", 0));
-            shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Left", 0), (int)SmartDashboard.getNumber("Shooter Right", 0));
+            elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Custom Angle", 0));
+            shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Left Speed", 0), (int)SmartDashboard.getNumber("Shooter Right Speed", 0));
             Logger.recordOutput(ELEVATOR.LOG_PATH+"IsPivotReady", elevator.isTargetAngle());
             Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterIsReady",shooter.readyToShoot());
             if (shooter.readyToShoot() && elevator.isTargetAngle()) {
-                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED); // shoot
+                shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER); // shoot
             }
         }
         else {

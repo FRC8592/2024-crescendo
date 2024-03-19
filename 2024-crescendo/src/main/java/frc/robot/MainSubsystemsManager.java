@@ -88,7 +88,6 @@ public class MainSubsystemsManager {
                         break;
                     case SCORE: // Note that this runs READY and PREP's code too because there's no `break;` after this code
                         timer.start();
-                        shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
                         if (timer.get() > SHOOTER.SHOOT_SCORE_TIME && false /*never stop automatically*/) { //If we have spent enough time shooting
                             timer.stop();
                             timer.reset();

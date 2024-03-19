@@ -38,7 +38,7 @@ public class ShootCommand extends Command{
         if(shooter.readyToShoot() && elevator.isTargetAngle()){
             timer.start();
             if(timer.get()>0.1){
-                shooter.setFeederVelocity(SHOOTER.SHOOTING_FEEDER_SPEED);
+                shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
             }
             else{
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);

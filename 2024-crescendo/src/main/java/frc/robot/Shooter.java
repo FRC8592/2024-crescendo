@@ -39,6 +39,7 @@ public class Shooter {
 
     public enum States{
         INTAKING,
+        WAIT_TO_STAGE,
         STAGE,
         REVERSE,
         NOTHING,
@@ -48,6 +49,7 @@ public class Shooter {
 
     private Timer shootTimer;
     private Timer reverseTimer;
+    private Timer waitToStageTimer;
 
     public States state;
 
@@ -89,6 +91,10 @@ public class Shooter {
         reverseTimer = new Timer();
         reverseTimer.reset();
         reverseTimer.stop();
+
+        waitToStageTimer = new Timer();
+        waitToStageTimer.reset();
+        waitToStageTimer.stop();
         state = States.NOTHING;
     }
 
@@ -107,25 +113,34 @@ public class Shooter {
                 break;
             case NOTHING:
                 feederMotor.motorControl.setIAccum(0);
-                feederMotor.setVelocity(0);
                 break;
             case INTAKING:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
                 setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
                 if(!bottomBeamBreak.get()){ //Notice the exclamation point; the beam-break returns an inverted "is it tripped"
-                    feederMotor.setVelocity(SHOOTER.STAGE_SPEED);
+                    waitToStageTimer.reset();
+                    waitToStageTimer.start();
+                    state = States.WAIT_TO_STAGE;
+                }
+                break;
+            case WAIT_TO_STAGE:
+                if(waitToStageTimer.get()<0.04){
+                    feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+                }
+                else{
                     state = States.STAGE;
                 }
                 break;
             case STAGE:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-                feederMotor.setVelocity(SHOOTER.STAGE_SPEED);
+                feederMotor.setVelocity(SHOOTER.STAGE_FEEDER_SPEED, 1);
                 if (!topBeamBreak.get()){ //Tripped
                     stop();
-                    feederMotor.setPercentOutput(-1);
-                    reverseTimer.reset();
-                    reverseTimer.start();
-                    state = States.REVERSE;
+                    stopFeeders();
+                    // feederMotor.setPercentOutput(-1);
+                    // reverseTimer.reset();
+                    // reverseTimer.start();
+                    state = States.NOTHING;
                 }
                 break;
             case REVERSE:
@@ -142,17 +157,15 @@ public class Shooter {
             case SHOOT:
                 setShootVelocity(leftTargetSpeed, rightTargetSpeed);
                 if(readyToShoot()){
-                    feederMotor.setVelocity(SHOOTER.SHOOTING_FEEDER_SPEED, 1);
-                    Logger.recordOutput("Feeder Setpoint", SHOOTER.SHOOTING_FEEDER_SPEED);
-                    if (topBeamBreak.get()) { // "If top beam break is not tripped"
-                        shootTimer.start();
-                        if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
-                            stop();
-                            stopFeeders();
-                            shootTimer.stop();
-                            shootTimer.reset();
-                            state = States.NOTHING;
-                        }
+                    feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);
+                    Logger.recordOutput("Feeder Setpoint", SHOOTER.SHOOTING_FEEDER_POWER);
+                    shootTimer.start();
+                    if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
+                        stop();
+                        stopFeeders();
+                        shootTimer.stop();
+                        shootTimer.reset();
+                        state = States.NOTHING;
                     }
                 }
                 break;
@@ -281,6 +294,9 @@ public class Shooter {
         state = States.NOTHING;
     }
     public void shoot(){
+        feederMotor.motorControl.setIAccum(0);
+        shootTimer.stop();
+        shootTimer.reset();
         state = States.SHOOT;
     }
 }

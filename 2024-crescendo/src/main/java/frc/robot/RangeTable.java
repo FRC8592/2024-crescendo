@@ -6,14 +6,14 @@ public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
             // new RangeEntry(3000, 5), //Speaker
             // new RangeEntry(4500, 30.5) //Podium
-            new RangeEntry(0, 0, 0), //0m
-            new RangeEntry(0, 0, 0), //0.2m
-            new RangeEntry(0, 0, 0), //0.4
-            new RangeEntry(0, 0, 0), //0.6
-            new RangeEntry(0, 0, 0), //0.8
-            new RangeEntry(0, 0, 0), //1.0
-            new RangeEntry(0, 0, 0), //1.2
-            new RangeEntry(0, 0, 0), //1.4
+            new RangeEntry(3500, 2700, 6), //0m
+            new RangeEntry(3500, 2700, 6), //0.2m
+            new RangeEntry(3500, 2700, 6), //0.4
+            new RangeEntry(3500, 2700, 6), //0.6
+            new RangeEntry(3500, 2700, 6), //0.8
+            new RangeEntry(3500, 2700, 6), //1.0
+            new RangeEntry(3500, 2700, 6), //1.2
+            new RangeEntry(3500, 2700, 6), //1.4
             new RangeEntry(3500, 2700, 6), //1.6
             new RangeEntry(3500, 2700, 9), //1.8
             new RangeEntry(3500, 2700, 13), //2.0
@@ -21,14 +21,12 @@ public class RangeTable {
             new RangeEntry(4000, 3000, 19), //2.4
             new RangeEntry(4000, 3000, 22), //2.6
             new RangeEntry(4500, 3500, 27.5), //2.8
-            new RangeEntry(0, 0, 0), //3.0
-            new RangeEntry(0, 0, 0), //3.2
-            new RangeEntry(0, 0, 0), //3.4
-            new RangeEntry(0, 0, 0), //3.6
-            new RangeEntry(0, 0, 0), //3.8
-            new RangeEntry(0, 0, 0), //4.0
-            new RangeEntry(0, 0, 0), //4.2
-            new RangeEntry(0, 0, 0),
+            new RangeEntry(4500, 3500, 27.5), //3.0
+            new RangeEntry(4500, 3500, 27.5), //3.2
+            new RangeEntry(4500, 3500, 29), //3.4
+            new RangeEntry(5000, 3500, 31), //3.6
+            new RangeEntry(5500, 3500, 32), //3.8
+            new RangeEntry(5500, 3500, 33), //4.0
     };
     public static boolean valid;
 

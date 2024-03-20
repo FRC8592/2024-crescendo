@@ -12,6 +12,7 @@ import frc.robot.Constants.SHOOTER;
 public class IntakeCommand extends Command {
     private Intake intake;
     private Shooter shooter;
+    private double bottomSensorTripTimeout = -1;
     public IntakeCommand(Intake intake, Shooter shooter){
         this.intake = intake;
         this.shooter = shooter;
@@ -30,11 +31,25 @@ public class IntakeCommand extends Command {
 
        //spins intake and feeder until beam sensor stops
         intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
+        if(!shooter.bottomBeamBreak.get()){ // Notice the exclamation point
+            this.bottomSensorTripTimeout=-1; // This makes sure we don't time out if we catch the bottom beam break (successfully got a note) and then lose it
+        }
         if(!Robot.isReal()){
             return true;
         }
         return shooter.state == Shooter.States.NOTHING // Waits until the note is fully in position
-                || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds);
+                || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds)
+                || (this.bottomSensorTripTimeout != -1 && this.timeoutTimer.get() >= this.bottomSensorTripTimeout); // The beam breaks return the opposite of whether they're tripped
+    }
+
+    /**
+     * The command will time-out after spending this long with nothing happening on the intake beam break.
+     * @param timeout
+     * @return
+     */
+    public IntakeCommand setBottomSensorTripTimeout(double timeout){
+        this.bottomSensorTripTimeout = timeout;
+        return this;
     }
 
     @Override

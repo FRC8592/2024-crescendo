@@ -18,7 +18,8 @@ public class AutonomousSelector {
         MiddleOneNoteAuto.class,
         TwoNoteAuto.class,
         TwoNoteVisionAuto.class,
-        ThreeWingNoteAuto.class
+        ThreeWingNoteAuto.class,
+        SourceTwoMidNoteAuto.class
         };
 
     public AutonomousSelector() {

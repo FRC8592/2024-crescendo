@@ -20,10 +20,10 @@ public class TwoNoteAuto extends BaseAuto {
     @Override
     public void initialize() {
        queue = new CommandQueue(
-          new ShootCommand(shooter, elevator, 3000, 5).setTag("Score preloaded note..."),
+          new ShootCommand(shooter, elevator, 1.4).setTag("Score preloaded note..."),
           new JointCommand(
             new IntakeCommand(intake, shooter),
-            new FollowerCommand(drive, pathOne.addVision(targeting))
+            new FollowerCommand(drive, pathOne.addVision(targeting, -10))
           ).setTag("Intake while driving to middle wing note..."),
          new AutoShootCommand(drive, poseVision, elevator, shooter)
        );

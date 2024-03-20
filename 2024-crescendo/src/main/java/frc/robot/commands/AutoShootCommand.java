@@ -40,7 +40,7 @@ public class AutoShootCommand extends Command {
     @Override
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "AutoShootCommand");
-        double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
+        double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0.5);
         Logger.recordOutput("AutoShootCommand Omega", omega);
         double distance = vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
         RangeEntry entry = RangeTable.get(distance);
@@ -48,7 +48,7 @@ public class AutoShootCommand extends Command {
         elevator.setPivotAngleCustom(entry.pivotAngle);
         // shooter.setShootVelocity(0, 0);
         drive.drive(new ChassisSpeeds(0, 0, omega));
-        if ((Math.abs(vision.getCurrTagX())<APRILTAG_LIMELIGHT.LOCK_ERROR && elevator.isTargetAngle()) || isShooting){
+        if ((Math.abs(vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS))<APRILTAG_VISION.X_ROT_LOCK_ERROR && elevator.isTargetAngle()) || isShooting){
             isShooting = true;
             SmartDashboard.putNumber("Ready To Shoot", distance);
             Logger.recordOutput("AutoShootCommand Shooting", true);
@@ -56,7 +56,7 @@ public class AutoShootCommand extends Command {
             if(this.timer.get() < 0.05){
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
             }
-            else if(this.timer.get() < SHOOTER.SHOOT_SCORE_TIME){
+            else if(this.timer.get() < SHOOTER.SHOOT_SCORE_TIME+0.5){
                 shooter.setShootVelocity(entry.leftFlywheelSpeed, entry.leftFlywheelSpeed);
                 if(shooter.readyToShoot()){
                     shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);

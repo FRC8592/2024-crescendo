@@ -5,20 +5,21 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Elevator;
+import frc.robot.RangeTable;
 import frc.robot.Shooter;
 import frc.robot.Constants.*;
 
 public class ShootCommand extends Command{
     private Shooter shooter;
     private Elevator elevator;
-    private int shootVelocity;
+    private double expectedRange;
     private double elevatorPivotAngle;
     private Timer timer = new Timer();
 
-    public ShootCommand(Shooter shooter, Elevator elevator, int shootVelocity, double elevatorPivotAngle){
+    public ShootCommand(Shooter shooter, Elevator elevator, double expectedRange){
         this.shooter = shooter;
         this.elevator = elevator;
-        this.shootVelocity = shootVelocity;
+        this.expectedRange = expectedRange;
         this.elevatorPivotAngle = elevatorPivotAngle;
     }
     
@@ -32,8 +33,9 @@ public class ShootCommand extends Command{
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "ShootCommand");
 
-        elevator.setPivotAngleCustom(elevatorPivotAngle);
-        shooter.setShootVelocity(shootVelocity, shootVelocity);
+        RangeTable.RangeEntry entry = RangeTable.get(expectedRange);
+        elevator.setPivotAngleCustom(entry.pivotAngle);
+        shooter.setShootVelocity(entry.leftFlywheelSpeed, entry.rightFlywheelSpeed);
         SmartDashboard.putBoolean("Shooter is ready", shooter.readyToShoot());
         if(shooter.readyToShoot() && elevator.isTargetAngle()){
             timer.start();

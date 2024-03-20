@@ -1,5 +1,7 @@
 package frc.robot.autonomous;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -32,6 +34,8 @@ public class SwerveTrajectory {
     private LimelightTargeting vision;
     private PIDController visionTranslatePID;
     private PIDController visionRotatePID;
+
+    private double visionAngleTolerance;
 
     private PIDController turnPID;
 
@@ -160,8 +164,9 @@ public class SwerveTrajectory {
         return config.getEndVelocity();
     }
 
-    public SwerveTrajectory addVision(LimelightTargeting vision) {
+    public SwerveTrajectory addVision(LimelightTargeting vision, double angleTolerance) {
         this.isVision = true;
+        this.visionAngleTolerance = angleTolerance;
         this.vision = vision;
         return this;
     }
@@ -178,7 +183,7 @@ public class SwerveTrajectory {
      */
     public ChassisSpeeds sample(double pSeconds, Pose2d robotPose) {
         State state = mTrajectory.sample(pSeconds);
-
+        Logger.recordOutput("SwerveTrajectory/TargetRotation", rotation.getRadians());
         ChassisSpeeds desired = mDrivePID.calculate(getInitialPose(), state, rotation);
         if (Robot.isReal()) {
             desired = mDrivePID.calculate(
@@ -190,27 +195,34 @@ public class SwerveTrajectory {
     
         poseRobot = robotPose;
         double turn = turnPID.calculate(0, getErrorAngle(robotPose, new Pose2d(0, 0, rotation)));
-        SmartDashboard.putNumber("Error angle", getErrorAngle(robotPose, new Pose2d(0, 0, rotation)));
         if(DriverStation.getAlliance().get() == Alliance.Red){
             turn = turnPID.calculate(0, getErrorAngle(robotPose, new Pose2d(0, 0, Rotation2d.fromDegrees(180-rotation.getDegrees()))));
         }
         turn = Math.max(-maxRotationVelocity, Math.min(maxRotationVelocity, pSeconds >= turnDelay ? turn : 0.0));
+        desired = new ChassisSpeeds(desired.vxMetersPerSecond, desired.vyMetersPerSecond, turn);
         if(isVision){
             vision.updateVision();
             if(vision.isTargetValid()){
+                Logger.recordOutput("SwerveTrajectory/Vision Valid", true);
                 SmartDashboard.putNumber("TY", vision.processedDy);
-                if (vision.processedDy <= NOTELOCK.DY_LIMIT){
+                if (vision.processedDy <= this.visionAngleTolerance){
+                    Logger.recordOutput("SwerveTrajectory/Y Position in Range", true);
                     double turnSpeed = visionRotatePID.calculate(vision.processedDx, 0);
                     double ySpeed = -visionTranslatePID.calculate(vision.processedDy, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
                     SmartDashboard.putNumber("Turn Speed", turnSpeed);
                     SmartDashboard.putNumber("y speed", ySpeed);
+                    Logger.recordOutput("SwerveTrajectory/Turn⧸Strafe Speed", turnSpeed);
+                    Logger.recordOutput("SwerveTrajectory/Forward-Back Translate Speed", ySpeed);
                     desired = new ChassisSpeeds(ySpeed, 0, turnSpeed);
-                } 
+                }
+                else{
+                    Logger.recordOutput("SwerveTrajectory/Y Position in Range", false);
+                }
                 SmartDashboard.putNumber("Dy", vision.processedDy);
             }
-        }
-        else{
-            desired = new ChassisSpeeds(desired.vxMetersPerSecond, desired.vyMetersPerSecond, turn);
+            else{
+                Logger.recordOutput("SwerveTrajectory/Vision Valid", false);
+            }
         }
         SmartDashboard.putNumber("Auto Target Rotation", rotation.getDegrees());
         return desired;

@@ -6,14 +6,14 @@ public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
             // new RangeEntry(3000, 5), //Speaker
             // new RangeEntry(4500, 30.5) //Podium
-            new RangeEntry(3500, 2700, 6), //0m
-            new RangeEntry(3500, 2700, 6), //0.2m
-            new RangeEntry(3500, 2700, 6), //0.4
-            new RangeEntry(3500, 2700, 6), //0.6
-            new RangeEntry(3500, 2700, 6), //0.8
-            new RangeEntry(3500, 2700, 6), //1.0
-            new RangeEntry(3500, 2700, 6), //1.2
-            new RangeEntry(3500, 2700, 6), //1.4
+            new RangeEntry(3500, 2700, 0), //0m
+            new RangeEntry(3500, 2700, 0), //0.2m
+            new RangeEntry(3500, 2700, 0), //0.4
+            new RangeEntry(3500, 2700, 0), //0.6
+            new RangeEntry(3500, 2700, 0), //0.8
+            new RangeEntry(3500, 2700, 0), //1.0
+            new RangeEntry(3500, 2700, 0), //1.2
+            new RangeEntry(3500, 2700, 0), //1.4
             new RangeEntry(3500, 2700, 6), //1.6
             new RangeEntry(3500, 2700, 9), //1.8
             new RangeEntry(3500, 2700, 13), //2.0

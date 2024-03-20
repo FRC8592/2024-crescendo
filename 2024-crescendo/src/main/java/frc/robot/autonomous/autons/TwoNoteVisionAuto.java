@@ -31,7 +31,7 @@ public class TwoNoteVisionAuto extends BaseAuto {
         speakerPID.setTolerance(APRILTAG_LIMELIGHT.LOCK_ERROR);
 
         queue = new CommandQueue(
-                new ShootCommand(shooter, elevator, 3000, 5),
+                new ShootCommand(shooter, elevator, 1.4),
                 new JointCommand(
                         new IntakeCommand(intake, shooter),
                         new AutoCollectCommand(targeting, drive,

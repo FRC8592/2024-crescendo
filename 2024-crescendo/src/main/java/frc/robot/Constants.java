@@ -101,10 +101,9 @@ public final class Constants {
 
         public static final double DRIVE_TO_TARGET_ANGLE = -24;
         public static final double TELEOP_DRIVE_TO_TARGET_ANGLE = -24;
-        public static final double DY_LIMIT = -10;
+        public static final double DY_LIMIT = -20;
 
-        //PID constants tuned for autolocking to speaker for limelight. TODO tune these for Manav's camera and put them in the MG_APRILTAG_VISION class
-        public static final double TURN_kP = 0.03;
+        public static final double TURN_kP = 0.0075;
         public static final double TURN_kI = 0;
         public static final double TURN_kD = 0;
     }
@@ -124,7 +123,7 @@ public final class Constants {
         public static final double SPEAKER_DRIVE_kD = 0;
         public static final double SPEAKER_TY_TARGET = 13.5;
 
-        public static final double LOCK_ERROR = 1.0;
+        public static final double LOCK_ERROR = 0.1;
         public static final double CLOSE_ERROR = 0.1;
         public static final double CAMERA_HEIGHT = 0;
         public static final double CAMERA_ANGLE = 0;
@@ -326,6 +325,8 @@ public final class Constants {
         public static final ArrayList<Integer> SPEAKER_AIM_TAGS = new ArrayList<>(Arrays.asList(4, 7));
         public static final ArrayList<Integer> AMP_AIM_TAGS = new ArrayList<>(Arrays.asList(5, 6));
         public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
+
+        public static final double X_ROT_LOCK_ERROR = 0.2;
     }
 
     public class MAIN_SUBSYSTEMS_MANAGER{

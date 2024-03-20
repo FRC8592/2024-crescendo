@@ -9,14 +9,18 @@ import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
 import frc.robot.commands.*;
 
-public class OneNoteAuto extends BaseAuto {
-
+public class SourceOneNoteAuto extends BaseAuto {
+    private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
+    private SwerveTrajectory pathOne = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0),
+    AutonomousPositions.SUBWOOFER_DOWN.getPose(),
+    AutonomousPositions.WING_NOTE_3.getPose()
+    );
 
     @Override
     public void initialize() {
         queue = new CommandQueue(
-                new ShootCommand(shooter, elevator, 3000, 5)    
-               
+                new ShootCommand(shooter, elevator, 1.4),
+                new FollowerCommand(drive, pathOne)
        );
     }
 

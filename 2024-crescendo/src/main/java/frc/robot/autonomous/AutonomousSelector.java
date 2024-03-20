@@ -13,7 +13,9 @@ public class AutonomousSelector {
 
     public Class<?>[] autos = {
         //putting all created autos in auto selector
-        OneNoteAuto.class,
+        AmpOneNoteAuto.class,
+        SourceOneNoteAuto.class,
+        MiddleOneNoteAuto.class,
         TwoNoteAuto.class,
         TwoNoteVisionAuto.class,
         ThreeWingNoteAuto.class

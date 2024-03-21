@@ -97,15 +97,17 @@ public class Shooter {
     }
 
     public void update(){
-        Logger.recordOutput("Shooter state", state.toString());
-        Logger.recordOutput("Left Target Speed", leftTargetSpeed);
-        Logger.recordOutput("Right Target Speed", rightTargetSpeed);
-        Logger.recordOutput("Right Shooter Speed", rightShooterMotor.getVelocity());
-        Logger.recordOutput("Left Shooter Speed", leftShooterMotor.getVelocity());
-        Logger.recordOutput("Feeder Speed", feederMotor.getVelocity());
-        Logger.recordOutput("Has Note", hasNote);
-        Logger.recordOutput("IsReady", readyToShoot());
-        Logger.recordOutput("Timer output", shootTimer.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterState", state.toString());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftTargetSpeed", leftTargetSpeed);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightTargetSpeed", rightTargetSpeed);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightShooterSpeed", rightShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftShooterSpeed", leftShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/FeederSpeed", feederMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"ReadyToShoot", readyToShoot());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"ShootTimer", shootTimer.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"KeepRammingTimer", keepRammingTimer.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"BottomBeamBreak", bottomBeamBreak.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"TopBeamBreak", topBeamBreak.get());
         switch (state) {
             default:
                 break;
@@ -154,7 +156,6 @@ public class Shooter {
                 setShootVelocity(leftTargetSpeed, rightTargetSpeed);
                 if(readyToShoot()){
                     feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);
-                    Logger.recordOutput("Feeder Setpoint", SHOOTER.SHOOTING_FEEDER_POWER);
                     shootTimer.start();
                     if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
                         stop();

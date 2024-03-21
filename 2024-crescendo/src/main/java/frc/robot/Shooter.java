@@ -38,18 +38,20 @@ public class Shooter {
     public boolean hasNote = false;
 
     public enum States{
-        INTAKING,
-        WAIT_TO_STAGE,
-        STAGE,
-        REVERSE,
+        INTAKING, //Unloaded (no note)
+        RAM_TO_SHOOTERS, // Once we get a note, push the note into the shooter flywheels
+        KEEP_RAMMING, // RAM_TO_SHOOTERS stops once the top beam break trips, so this runs for a moment to make sure the note is all the way up
+        BACK_OFF_TO_SENSOR, // This state pulls the note down until the top sensor sees it
+        BACK_OFF_FROM_SENSOR, // And this one continues to pull the note down until we don't see it anymore. The result is that
+                              // the note ends up positioned just before the top beam-break.
+
         NOTHING,
         SHOOT,
         OUTAKE
     }
 
     private Timer shootTimer;
-    private Timer reverseTimer;
-    private Timer waitToStageTimer;
+    private Timer keepRammingTimer;
 
     public States state;
 
@@ -88,13 +90,9 @@ public class Shooter {
         shootTimer.reset();
         shootTimer.stop();
 
-        reverseTimer = new Timer();
-        reverseTimer.reset();
-        reverseTimer.stop();
-
-        waitToStageTimer = new Timer();
-        waitToStageTimer.reset();
-        waitToStageTimer.stop();
+        keepRammingTimer = new Timer();
+        keepRammingTimer.reset();
+        keepRammingTimer.stop();
         state = States.NOTHING;
     }
 
@@ -118,41 +116,39 @@ public class Shooter {
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
                 setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
                 if(!bottomBeamBreak.get()){ //Notice the exclamation point; the beam-break returns an inverted "is it tripped"
-                    waitToStageTimer.reset();
-                    waitToStageTimer.start();
-                    state = States.WAIT_TO_STAGE;
-                }
+                state = States.RAM_TO_SHOOTERS;
+            }
                 break;
-            case WAIT_TO_STAGE:
-                if(waitToStageTimer.get()<0.04){
-                    feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-                }
-                else{
-                    state = States.STAGE;
-                }
-                break;
-            case STAGE:
+            case RAM_TO_SHOOTERS:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-                feederMotor.setVelocity(SHOOTER.STAGE_FEEDER_SPEED, 1);
-                if (!topBeamBreak.get()){ //Tripped
-                    stop();
-                    stopFeeders();
-                    // feederMotor.setPercentOutput(-1);
-                    // reverseTimer.reset();
-                    // reverseTimer.start();
-                    state = States.NOTHING;
+                feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 1);
+                if(!topBeamBreak.get()){
+                    keepRammingTimer.reset();
+                    keepRammingTimer.start();
+                    state = States.KEEP_RAMMING;
                 }
                 break;
-            case REVERSE:
-                if(reverseTimer.get()<0.08){
-                    feederMotor.setPercentOutput(-1);
-                }
-                else{
-                    feederMotor.setVelocity(0);
-                    state = States.NOTHING;
+            
+            case KEEP_RAMMING:
+                setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+                feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 1);
+                if (keepRammingTimer.get() > SHOOTER.KEEP_RAMMING_TIME){
+                    state = States.BACK_OFF_TO_SENSOR;
                 }
                 break;
-
+                
+            case BACK_OFF_TO_SENSOR:
+                feederMotor.setVelocity(SHOOTER.ALIGN_SPEED, 1);
+                if(!topBeamBreak.get()){
+                    state = States.BACK_OFF_FROM_SENSOR;
+                } 
+                break;
+                
+            case BACK_OFF_FROM_SENSOR:
+                feederMotor.setVelocity(SHOOTER.ALIGN_SPEED, 1);
+                if(topBeamBreak.get()){
+                    state = States.NOTHING;
+                }
 
             case SHOOT:
                 setShootVelocity(leftTargetSpeed, rightTargetSpeed);

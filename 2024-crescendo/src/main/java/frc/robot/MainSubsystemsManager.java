@@ -176,7 +176,7 @@ public class MainSubsystemsManager {
                         timer.reset();
                         break;
                     case INTAKE:
-                        if(shooter.state == Shooter.States.INTAKING || shooter.state == Shooter.States.STAGE){ //The two states where the feeders go up
+                        if(shooter.state == Shooter.States.INTAKING || shooter.state == Shooter.States.RAM_TO_SHOOTERS){ //The two states where the feeders go up
                             intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                         }
                         else{

@@ -516,32 +516,32 @@ public class Robot extends LoggedRobot {
         
 
         
-        // if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
-        //         SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
-        // }
-        // else if (poseVision.getTag2InView() && poseVision.getCurrTag2ID() == 4) {
-        //     SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTag2Z());
-        // }
-        // else {
-        //     SmartDashboard.putNumber("Tag 4 Z", -1.0);
-        // }
+        if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
+                SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
+        }
+        else if (poseVision.getTag2InView() && poseVision.getCurrTag2ID() == 4) {
+            SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTag2Z());
+        }
+        else {
+            SmartDashboard.putNumber("Tag 4 Z", -1.0);
+        }
 
-        // if (driverController.getAButton()) {
-        //     // set elevator
-        //     elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Custom Angle", 0));
-        //     shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Left Speed", 0), (int)SmartDashboard.getNumber("Shooter Right Speed", 0));
-        //     Logger.recordOutput(ELEVATOR.LOG_PATH+"IsPivotReady", elevator.isTargetAngle());
-        //     Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterIsReady",shooter.readyToShoot());
-        //     if (shooter.readyToShoot() && elevator.isTargetAngle()) {
-        //         shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER); // shoot
-        //     }
-        // }
-        // else {
-        //     elevator.setPivotAngleCustom(0);
-        //     shooter.stopFlywheels(); shooter.stopFeeders();
-        // }
+        if (driverController.getAButton()) {
+            // set elevator
+            elevator.setPivotAngleCustom(SmartDashboard.getNumber("Elevator Custom Angle", 0));
+            shooter.setShootVelocity((int)SmartDashboard.getNumber("Shooter Left Speed", 0), (int)SmartDashboard.getNumber("Shooter Right Speed", 0));
+            Logger.recordOutput(ELEVATOR.LOG_PATH+"IsPivotReady", elevator.isTargetAngle());
+            Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterIsReady",shooter.readyToShoot());
+            if (shooter.readyToShoot() && elevator.isTargetAngle()) {
+                shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER); // shoot
+            }
+        }
+        else {
+            elevator.setPivotAngleCustom(0);
+            shooter.stopFlywheels(); shooter.stopFeeders();
+        }
 
-        driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis()*255);
+        // driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis()*255);
 
         leds.red();
     } 

@@ -204,7 +204,9 @@ public final class Constants {
         public static final double FEEDER_AMP_TOLERANCE = 100;
 
         public static final double STAGE_FEEDER_SPEED = 250;
-        public static final double ALIGN_SPEED = -500;
+        public static final double ALIGN_SPEED = -250;
+
+        public static final double KEEP_RAMMING_TIME = 0.1;
     }
 
 

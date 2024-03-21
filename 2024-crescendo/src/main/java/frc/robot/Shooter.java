@@ -38,18 +38,20 @@ public class Shooter {
     public boolean hasNote = false;
 
     public enum States{
-        INTAKING,
-        WAIT_TO_STAGE,
-        STAGE,
-        REVERSE,
+        INTAKING, //Unloaded (no note)
+        RAM_TO_SHOOTERS, // Once we get a note, push the note into the shooter flywheels
+        KEEP_RAMMING, // RAM_TO_SHOOTERS stops once the top beam break trips, so this runs for a moment to make sure the note is all the way up
+        BACK_OFF_TO_SENSOR, // This state pulls the note down until the top sensor sees it
+        BACK_OFF_FROM_SENSOR, // And this one continues to pull the note down until we don't see it anymore. The result is that
+                              // the note ends up positioned just before the top beam-break.
+
         NOTHING,
         SHOOT,
         OUTAKE
     }
 
     private Timer shootTimer;
-    private Timer reverseTimer;
-    private Timer waitToStageTimer;
+    private Timer keepRammingTimer;
 
     public States state;
 
@@ -88,26 +90,24 @@ public class Shooter {
         shootTimer.reset();
         shootTimer.stop();
 
-        reverseTimer = new Timer();
-        reverseTimer.reset();
-        reverseTimer.stop();
-
-        waitToStageTimer = new Timer();
-        waitToStageTimer.reset();
-        waitToStageTimer.stop();
+        keepRammingTimer = new Timer();
+        keepRammingTimer.reset();
+        keepRammingTimer.stop();
         state = States.NOTHING;
     }
 
     public void update(){
-        Logger.recordOutput("Shooter state", state.toString());
-        Logger.recordOutput("Left Target Speed", leftTargetSpeed);
-        Logger.recordOutput("Right Target Speed", rightTargetSpeed);
-        Logger.recordOutput("Right Shooter Speed", rightShooterMotor.getVelocity());
-        Logger.recordOutput("Left Shooter Speed", leftShooterMotor.getVelocity());
-        Logger.recordOutput("Feeder Speed", feederMotor.getVelocity());
-        Logger.recordOutput("Has Note", hasNote);
-        Logger.recordOutput("IsReady", readyToShoot());
-        Logger.recordOutput("Timer output", shootTimer.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterState", state.toString());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftTargetSpeed", leftTargetSpeed);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightTargetSpeed", rightTargetSpeed);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightShooterSpeed", rightShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftShooterSpeed", leftShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/FeederSpeed", feederMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"ReadyToShoot", readyToShoot());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"ShootTimer", shootTimer.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"KeepRammingTimer", keepRammingTimer.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"BottomBeamBreak", bottomBeamBreak.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"TopBeamBreak", topBeamBreak.get());
         switch (state) {
             default:
                 break;
@@ -118,47 +118,44 @@ public class Shooter {
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
                 setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
                 if(!bottomBeamBreak.get()){ //Notice the exclamation point; the beam-break returns an inverted "is it tripped"
-                    waitToStageTimer.reset();
-                    waitToStageTimer.start();
-                    state = States.WAIT_TO_STAGE;
-                }
+                state = States.RAM_TO_SHOOTERS;
+            }
                 break;
-            case WAIT_TO_STAGE:
-                if(waitToStageTimer.get()<0.04){
-                    feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-                }
-                else{
-                    state = States.STAGE;
-                }
-                break;
-            case STAGE:
+            case RAM_TO_SHOOTERS:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-                feederMotor.setVelocity(SHOOTER.STAGE_FEEDER_SPEED, 1);
-                if (!topBeamBreak.get()){ //Tripped
-                    stop();
-                    stopFeeders();
-                    // feederMotor.setPercentOutput(-1);
-                    // reverseTimer.reset();
-                    // reverseTimer.start();
-                    state = States.NOTHING;
+                feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 1);
+                if(!topBeamBreak.get()){
+                    keepRammingTimer.reset();
+                    keepRammingTimer.start();
+                    state = States.KEEP_RAMMING;
                 }
                 break;
-            case REVERSE:
-                if(reverseTimer.get()<0.08){
-                    feederMotor.setPercentOutput(-1);
-                }
-                else{
-                    feederMotor.setVelocity(0);
-                    state = States.NOTHING;
+            
+            case KEEP_RAMMING:
+                setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+                feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 1);
+                if (keepRammingTimer.get() > SHOOTER.KEEP_RAMMING_TIME){
+                    state = States.BACK_OFF_TO_SENSOR;
                 }
                 break;
-
+                
+            case BACK_OFF_TO_SENSOR:
+                feederMotor.setVelocity(SHOOTER.ALIGN_SPEED, 1);
+                if(!topBeamBreak.get()){
+                    state = States.BACK_OFF_FROM_SENSOR;
+                } 
+                break;
+                
+            case BACK_OFF_FROM_SENSOR:
+                feederMotor.setVelocity(SHOOTER.ALIGN_SPEED, 1);
+                if(topBeamBreak.get()){
+                    state = States.NOTHING;
+                }
 
             case SHOOT:
                 setShootVelocity(leftTargetSpeed, rightTargetSpeed);
                 if(readyToShoot()){
                     feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);
-                    Logger.recordOutput("Feeder Setpoint", SHOOTER.SHOOTING_FEEDER_POWER);
                     shootTimer.start();
                     if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
                         stop();

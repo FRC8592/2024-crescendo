@@ -154,7 +154,7 @@ public class Robot extends LoggedRobot {
 
         poseVision = new PoseVision(APRILTAG_VISION.kP, APRILTAG_VISION.kI, APRILTAG_VISION.kD, 0);
         
-        subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator);
+        subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator, leds);
     }
 
     @Override
@@ -186,7 +186,7 @@ public class Robot extends LoggedRobot {
             SmartDashboard.putNumber("Tag 4 Z", -1.0);
         }
         Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
-        shooter.update();
+        shooter.update(leds);
     }
 
     @Override
@@ -214,6 +214,7 @@ public class Robot extends LoggedRobot {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setThrottleCurrentLimit(POWER.SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT);
+        leds.off();
 
         // shooter.feederMotor.setPIDF(SmartDashboard.getNumber("FeederKp", 0),
         // SmartDashboard.getNumber("FeederKp", 0),
@@ -452,11 +453,6 @@ public class Robot extends LoggedRobot {
         }
         if (ledAmpSignal.getValue()) {
             leds.amp();
-        }
-        else if (!shooter.bottomBeamBreak.get()) {
-            leds.notePickup();
-        } else {
-            leds.off();
         }
         //poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ():
         swerve.drive(subsystemsManager.update(entry.leftFlywheelSpeed, entry.rightFlywheelSpeed, entry.pivotAngle, currentSpeeds));

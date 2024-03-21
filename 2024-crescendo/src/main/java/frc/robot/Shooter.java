@@ -23,6 +23,7 @@ public class Shooter {
     // private final NetworkTable table;
     // private NetworkTableEntry shooterSpeedRPS;
 
+
     public SparkFlexControl leftShooterMotor;
     public SparkFlexControl rightShooterMotor;
     // SparkPIDController leftShooterControl;
@@ -96,7 +97,7 @@ public class Shooter {
         state = States.NOTHING;
     }
 
-    public void update(){
+    public void update(NeoPixelLED readyToShootLED){
         Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterState", state.toString());
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftTargetSpeed", leftTargetSpeed);
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightTargetSpeed", rightTargetSpeed);
@@ -149,8 +150,12 @@ public class Shooter {
             case BACK_OFF_FROM_SENSOR:
                 feederMotor.setVelocity(SHOOTER.ALIGN_SPEED, 1);
                 if(topBeamBreak.get()){
+                    feederMotor.setVelocity(0);
                     state = States.NOTHING;
+                    readyToShootLED.notePickup();
                 }
+                
+                break;
 
             case SHOOT:
                 setShootVelocity(leftTargetSpeed, rightTargetSpeed);
@@ -163,6 +168,7 @@ public class Shooter {
                         shootTimer.stop();
                         shootTimer.reset();
                         state = States.NOTHING;
+                        readyToShootLED.off();
                     }
                 }
                 break;

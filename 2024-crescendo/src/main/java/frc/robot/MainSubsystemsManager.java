@@ -37,11 +37,13 @@ public class MainSubsystemsManager {
     private Elevator elevator;
     private Timer timer = new Timer(); //Used for shooting timeouts
     private PIDController turnToSpeakerController; // Will be used later for auto-aiming at the speaker.
+    private NeoPixelLED leds;
 
-    public MainSubsystemsManager(Intake intake, Shooter shooter, Elevator elevator) {
+    public MainSubsystemsManager(Intake intake, Shooter shooter, Elevator elevator, NeoPixelLED leds) {
         this.intake = intake;
         this.shooter = shooter;
         this.elevator = elevator;
+        this.leds = leds;        
     }
 
     /*
@@ -129,6 +131,7 @@ public class MainSubsystemsManager {
                             shooter.hasNote = false;
                             // mainState = MainStates.HOME;
                             subState = SubStates.INIT;
+                            leds.off();
                             break;
                         }
                     case READY:
@@ -196,6 +199,9 @@ public class MainSubsystemsManager {
                 intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
                 shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
+                if(shooter.bottomBeamBreak.get()){
+                    leds.off();
+                }
                 break;
         }
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH + "MainState", mainState.name());

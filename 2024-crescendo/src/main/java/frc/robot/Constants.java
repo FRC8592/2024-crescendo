@@ -99,7 +99,7 @@ public final class Constants {
         public static final double DRIVE_TO_DRIVE_kI = 0;
         public static final double DRIVE_TO_DRIVE_kD = 0.01;
 
-        public static final double DRIVE_TO_TARGET_ANGLE = -24;
+        public static final double DRIVE_TO_TARGET_ANGLE = -22;
         public static final double TELEOP_DRIVE_TO_TARGET_ANGLE = -24;
         public static final double DY_LIMIT = -20;
 

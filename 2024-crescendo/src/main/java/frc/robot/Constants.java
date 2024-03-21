@@ -163,7 +163,7 @@ public final class Constants {
         public static final double FEEDER_MOTOR_kD = 0.0;
         public static final double FEEDER_MOTOR_kF = 0.00018;
 
-        public static final double FEEDER_MOTOR_SHOOT_kP = 0.001;
+        public static final double FEEDER_MOTOR_SHOOT_kP = 0.0005;
         public static final double FEEDER_MOTOR_SHOOT_kI = 0.000;//1;
         public static final double FEEDER_MOTOR_SHOOT_kD = 0.0;
         public static final double FEEDER_MOTOR_SHOOT_kF = 0.00018;
@@ -188,7 +188,7 @@ public final class Constants {
         public static final int AMP_FEEDER_SPEED = -3000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 2000;
+        public static final int INTAKE_FEEDER_SPEED = 1000;
 
         //No shooter speed because we use the range table
         // public static final int SHOOTING_FEEDER_SPEED = 2500;
@@ -204,7 +204,7 @@ public final class Constants {
         public static final double FEEDER_AMP_TOLERANCE = 100;
 
         public static final double STAGE_FEEDER_SPEED = 250;
-        public static final double ALIGN_SPEED = -250;
+        public static final double ALIGN_SPEED = -100;
 
         public static final double KEEP_RAMMING_TIME = 0.1;
     }

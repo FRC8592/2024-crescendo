@@ -11,9 +11,11 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 
 import com.revrobotics.SparkPIDController;
 
@@ -45,7 +47,7 @@ public class Shooter {
         BACK_OFF_TO_SENSOR, // This state pulls the note down until the top sensor sees it
         BACK_OFF_FROM_SENSOR, // And this one continues to pull the note down until we don't see it anymore. The result is that
                               // the note ends up positioned just before the top beam-break.
-
+        RUMBLE_AFTER_INTAKE,
         NOTHING,
         SHOOT,
         OUTAKE
@@ -53,6 +55,7 @@ public class Shooter {
 
     private Timer shootTimer;
     private Timer keepRammingTimer;
+    private Timer rumbleTimer;
 
     public States state;
 
@@ -91,13 +94,17 @@ public class Shooter {
         shootTimer.reset();
         shootTimer.stop();
 
+        rumbleTimer = new Timer();
+        rumbleTimer.reset();
+        rumbleTimer.stop();
+
         keepRammingTimer = new Timer();
         keepRammingTimer.reset();
         keepRammingTimer.stop();
         state = States.NOTHING;
     }
 
-    public void update(NeoPixelLED readyToShootLED){
+    public void update(NeoPixelLED readyToShootLED, XboxController operatorController){
         Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterState", state.toString());
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftTargetSpeed", leftTargetSpeed);
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightTargetSpeed", rightTargetSpeed);
@@ -114,6 +121,7 @@ public class Shooter {
                 break;
             case NOTHING:
                 feederMotor.motorControl.setIAccum(0);
+                operatorController.setRumble(RumbleType.kBothRumble, 0);
                 break;
             case INTAKING:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
@@ -151,10 +159,16 @@ public class Shooter {
                 feederMotor.setVelocity(SHOOTER.ALIGN_SPEED, 1);
                 if(topBeamBreak.get()){
                     feederMotor.setVelocity(0);
-                    state = States.NOTHING;
+                    state = States.RUMBLE_AFTER_INTAKE;
                     readyToShootLED.notePickup();
                 }
-                
+                break;
+
+            case RUMBLE_AFTER_INTAKE:
+                operatorController.setRumble(RumbleType.kBothRumble, 255);
+                if(rumbleTimer.hasElapsed(0.4)){
+                    operatorController.setRumble(RumbleType.kBothRumble, 0);
+                }
                 break;
 
             case SHOOT:
@@ -163,7 +177,7 @@ public class Shooter {
                     feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);
                     shootTimer.start();
                     if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
-                        stop();
+                        stopFlywheels();
                         stopFeeders();
                         shootTimer.stop();
                         shootTimer.reset();
@@ -205,7 +219,7 @@ public class Shooter {
     /**
      * Stops the flywheels
      */
-    public void stop() {
+    public void stopFlywheels() {
         leftShooterMotor.stop();
         rightShooterMotor.stop();
     }

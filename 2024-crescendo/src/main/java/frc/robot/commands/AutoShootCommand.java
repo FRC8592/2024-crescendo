@@ -79,7 +79,7 @@ public class AutoShootCommand extends Command {
     public void shutdown() {
         drive.drive(new ChassisSpeeds());
         elevator.stow();
-        shooter.stop();
+        shooter.stopFlywheels();
         shooter.stopFeeders();
     }
 }

@@ -186,7 +186,7 @@ public class Robot extends LoggedRobot {
             SmartDashboard.putNumber("Tag 4 Z", -1.0);
         }
         Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
-        shooter.update(leds);
+        shooter.update(leds, operatorController);
     }
 
     @Override
@@ -513,6 +513,9 @@ public class Robot extends LoggedRobot {
         // }
         // Logger.recordOutput("Feeder Speed", shooter.leftShooterMotor.getVelocity());
 
+        
+
+        
         if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
                 SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
         }
@@ -535,8 +538,10 @@ public class Robot extends LoggedRobot {
         }
         else {
             elevator.setPivotAngleCustom(0);
-            shooter.stop(); shooter.stopFeeders();
+            shooter.stopFlywheels(); shooter.stopFeeders();
         }
+
+        // driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis()*255);
 
         leds.red();
     } 

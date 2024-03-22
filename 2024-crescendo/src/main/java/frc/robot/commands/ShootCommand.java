@@ -52,7 +52,7 @@ public class ShootCommand extends Command{
 
     @Override
     public void shutdown() {
-      shooter.stop();
+      shooter.stopFlywheels();
       shooter.stopFeeders();
       elevator.stow();
 

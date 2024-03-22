@@ -186,7 +186,7 @@ public class Robot extends LoggedRobot {
             SmartDashboard.putNumber("Tag 4 Z", -1.0);
         }
         Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
-        shooter.update(leds, operatorController);
+        shooter.update(leds);
     }
 
     @Override

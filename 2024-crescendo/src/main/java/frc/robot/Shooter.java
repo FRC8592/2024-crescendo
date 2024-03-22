@@ -104,7 +104,7 @@ public class Shooter {
         state = States.NOTHING;
     }
 
-    public void update(NeoPixelLED readyToShootLED, XboxController operatorController){
+    public void update(NeoPixelLED readyToShootLED){
         Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterState", state.toString());
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftTargetSpeed", leftTargetSpeed);
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightTargetSpeed", rightTargetSpeed);
@@ -121,7 +121,6 @@ public class Shooter {
                 break;
             case NOTHING:
                 feederMotor.motorControl.setIAccum(0);
-                operatorController.setRumble(RumbleType.kBothRumble, 0);
                 break;
             case INTAKING:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
@@ -161,18 +160,8 @@ public class Shooter {
                 feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
                 if(topBeamBreak.get()){
                     feederMotor.setVelocity(0);
-                    rumbleTimer.reset();
-                    rumbleTimer.start();
-                    state = States.RUMBLE_AFTER_INTAKE;
-                    readyToShootLED.notePickup();
-                }
-                break;
-
-            case RUMBLE_AFTER_INTAKE:
-                operatorController.setRumble(RumbleType.kBothRumble, 255);
-                if(rumbleTimer.hasElapsed(0.4)){
-                    operatorController.setRumble(RumbleType.kBothRumble, 0);
                     state = States.NOTHING;
+                    readyToShootLED.notePickup();
                 }
                 break;
 

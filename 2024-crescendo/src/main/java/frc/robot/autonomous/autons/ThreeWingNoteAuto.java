@@ -18,7 +18,7 @@ import frc.robot.commands.ShootCommand;
 public class ThreeWingNoteAuto extends BaseAuto{
 
     //Setting speed and acceleration of each path as shown
-    private TrajectoryConfig config = new TrajectoryConfig(1, 1);
+    private TrajectoryConfig config = new TrajectoryConfig(2, 1);
     private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
    
     private SwerveTrajectory noteOne_1 = AutonomousPositions.generate(config.setStartVelocity(0).setEndVelocity(0), 
@@ -35,7 +35,7 @@ public class ThreeWingNoteAuto extends BaseAuto{
 
     private SwerveTrajectory noteThree_1 = AutonomousPositions.generate(config.setReversed(true).setStartVelocity(0).setEndVelocity(2), 
             AutonomousPositions.WING_NOTE_2.translate(0.1, -0.1,Rotation2d.fromDegrees(0)),
-            AutonomousPositions.WING_NOTE_1.translate(-0.5, -0.5, Rotation2d.fromDegrees(-90)));
+            AutonomousPositions.WING_NOTE_1.translate(-0.5, -0.5, Rotation2d.fromDegrees(-90))).addRotation(Rotation2d.fromDegrees(30));
 
     private SwerveTrajectory noteThree_2 = AutonomousPositions.generate(config.setReversed(true).setStartVelocity(2).setEndVelocity(0),
             AutonomousPositions.WING_NOTE_1.translate(-0.5, -0.5, Rotation2d.fromDegrees(-90)),

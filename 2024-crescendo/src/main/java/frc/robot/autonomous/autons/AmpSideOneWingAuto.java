@@ -21,9 +21,10 @@ public class AmpSideOneWingAuto extends BaseAuto {
         queue = new CommandQueue(
                 new ShootCommand(shooter, elevator, 1.4),
                 new JointCommand(
-                    new FollowerCommand(drive, pathOne.addVision(targeting, -10)),
+                    new FollowerCommand(drive, pathOne.addVision(targeting, -5)),
                     new IntakeCommand(intake, shooter)
                 ),
+                new RotateCommand(drive, Rotation2d.fromDegrees(45)),
                 new AutoShootCommand(drive, poseVision, elevator, shooter)
 
        );

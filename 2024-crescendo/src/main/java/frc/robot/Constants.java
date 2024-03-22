@@ -320,9 +320,10 @@ public final class Constants {
     }
 
     public class APRILTAG_VISION {
-        public static final double kP = 1d;
-        public static final double kI = 0;
-        public static final double kD = 0;
+        public static final double kP = 1.25d;
+        public static final double kI = 0.75;
+        public static final double kD = 0.005;
+        public static final double iZone = 0.3;
 
         // red, blue
         public static final ArrayList<Integer> SPEAKER_AIM_TAGS = new ArrayList<>(Arrays.asList(4, 7));

@@ -1,5 +1,6 @@
 package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.APRILTAG_VISION;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class PoseVision {
     public PoseVision(double kP, double kI, double kD, double setpoint) {
         // instantate PID controller given constants in constructor        
         visual_servo_pid = new PIDController(kP, kI, kD);
+        visual_servo_pid.setIZone(APRILTAG_VISION.iZone);
     }
 
     /* -- CURRENT TAG -- */

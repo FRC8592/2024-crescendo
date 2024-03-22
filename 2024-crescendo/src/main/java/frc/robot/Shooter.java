@@ -149,16 +149,20 @@ public class Shooter {
                 break;
                 
             case BACK_OFF_TO_SENSOR:
-                feederMotor.setVelocity(SHOOTER.ALIGN_SPEED, 1);
+                setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
+                feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
                 if(!topBeamBreak.get()){
                     state = States.BACK_OFF_FROM_SENSOR;
                 } 
                 break;
                 
             case BACK_OFF_FROM_SENSOR:
-                feederMotor.setVelocity(SHOOTER.ALIGN_SPEED, 1);
+                setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
+                feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
                 if(topBeamBreak.get()){
                     feederMotor.setVelocity(0);
+                    rumbleTimer.reset();
+                    rumbleTimer.start();
                     state = States.RUMBLE_AFTER_INTAKE;
                     readyToShootLED.notePickup();
                 }
@@ -168,6 +172,7 @@ public class Shooter {
                 operatorController.setRumble(RumbleType.kBothRumble, 255);
                 if(rumbleTimer.hasElapsed(0.4)){
                     operatorController.setRumble(RumbleType.kBothRumble, 0);
+                    state = States.NOTHING;
                 }
                 break;
 

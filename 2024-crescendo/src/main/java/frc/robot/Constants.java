@@ -204,7 +204,8 @@ public final class Constants {
         public static final double FEEDER_AMP_TOLERANCE = 100;
 
         public static final double STAGE_FEEDER_SPEED = 250;
-        public static final double ALIGN_SPEED = -100;
+        public static final double ALIGN_FEEDER_SPEED = -150;
+        public static final int ALIGN_FLYWHEEL_SPEED = -150;
 
         public static final double KEEP_RAMMING_TIME = 0.1;
     }
@@ -328,7 +329,7 @@ public final class Constants {
         public static final ArrayList<Integer> AMP_AIM_TAGS = new ArrayList<>(Arrays.asList(5, 6));
         public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
 
-        public static final double X_ROT_LOCK_ERROR = 0.2;
+        public static final double X_ROT_LOCK_ERROR = 0.1;
     }
 
     public class MAIN_SUBSYSTEMS_MANAGER{

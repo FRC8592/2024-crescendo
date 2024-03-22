@@ -18,11 +18,11 @@ public class RangeTable {
             new RangeEntry(3500, 2700, 9), //1.8
             new RangeEntry(3500, 2700, 13), //2.0
             new RangeEntry(4000, 3000, 18), //2.2
-            new RangeEntry(4000, 3000, 19), //2.4
+            new RangeEntry(4000, 3000, 20), //2.4
             new RangeEntry(4250, 3250, 24), //2.6
             new RangeEntry(4500, 3500, 27.5), //2.8
-            new RangeEntry(4500, 3500, 27.5), //3.0
-            new RangeEntry(4500, 3500, 27.5), //3.2
+            new RangeEntry(4500, 3500, 28), //3.0
+            new RangeEntry(4500, 3500, 28), //3.2
             new RangeEntry(4500, 3500, 29), //3.4
             new RangeEntry(5000, 3500, 31), //3.6
             new RangeEntry(5500, 3500, 32), //3.8

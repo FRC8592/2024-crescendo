@@ -30,7 +30,12 @@ public class IntakeCommand extends Command {
         Logger.recordOutput("CurrentCommand", "IntakeCommand");
 
        //spins intake and feeder until beam sensor stops
-        intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
+        if(shooter.state == Shooter.States.INTAKING || shooter.state == Shooter.States.RAM_TO_SHOOTERS){
+            intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
+        }
+        else {
+            intake.setIntakeVelocity(0);
+        }
         if(!shooter.bottomBeamBreak.get()){ // Notice the exclamation point
             this.bottomSensorTripTimeout=-1; // This makes sure we don't time out if we catch the bottom beam break (successfully got a note) and then lose it
         }

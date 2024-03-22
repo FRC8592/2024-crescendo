@@ -454,6 +454,9 @@ public class Robot extends LoggedRobot {
         if (ledAmpSignal.getValue()) {
             leds.amp();
         }
+        if(ledAmpSignal.isFallingEdge()){
+            leds.off();
+        }
         //poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ():
         swerve.drive(subsystemsManager.update(entry.leftFlywheelSpeed, entry.rightFlywheelSpeed, entry.pivotAngle, currentSpeeds));
     }

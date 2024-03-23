@@ -208,7 +208,7 @@ public class SwerveTrajectory {
                 if (vision.processedDy <= this.visionAngleTolerance){
                     Logger.recordOutput("SwerveTrajectory/Y Position in Range", true);
                     double turnSpeed = visionRotatePID.calculate(vision.processedDx, 0);
-                    double ySpeed = -visionTranslatePID.calculate(vision.processedDy, NOTELOCK.DRIVE_TO_TARGET_ANGLE);
+                    double ySpeed = -visionTranslatePID.calculate(vision.processedDy, NOTELOCK.AUTO_DRIVE_TO_TARGET_ANGLE);
                     SmartDashboard.putNumber("Turn Speed", turnSpeed);
                     SmartDashboard.putNumber("y speed", ySpeed);
                     Logger.recordOutput("SwerveTrajectory/Turn⧸Strafe Speed", turnSpeed);

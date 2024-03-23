@@ -99,7 +99,7 @@ public final class Constants {
         public static final double DRIVE_TO_DRIVE_kI = 0;
         public static final double DRIVE_TO_DRIVE_kD = 0.01;
 
-        public static final double DRIVE_TO_TARGET_ANGLE = -23;
+        public static final double AUTO_DRIVE_TO_TARGET_ANGLE = -24;
         public static final double TELEOP_DRIVE_TO_TARGET_ANGLE = -24;
         public static final double DY_LIMIT = -20;
 
@@ -235,7 +235,7 @@ public final class Constants {
         public static final double LENGTH_TOLERANCE = 0.005; //Half a centimeter; used for the function that detects whether the extension is at the target length.
 
 
-        public static final double EXTENSION_METERS_MAX = 0.26; // TODO: Figure out what this should be
+        public static final double EXTENSION_METERS_MAX = 0.279; // TODO: Figure out what this should be
         public static final int PIVOT_ANGLE_MAX = 75; // TODO: Figure out what this should be
 
         public static final double EXTENSION_METERS_MIN = 0;
@@ -247,7 +247,7 @@ public final class Constants {
         public static final double EXTENSION_METERS_AMP = 0.27;
         public static final int PIVOT_ANGLE_AMP = 45; // TODO: Adjust this angle
 
-        public static final double EXTENSION_METERS_CLIMB = 0.25;
+        public static final double EXTENSION_METERS_CLIMB = 0.279;
         public static final int PIVOT_ANGLE_CLIMB = 75; // TODO: Adjust this angle
 
 

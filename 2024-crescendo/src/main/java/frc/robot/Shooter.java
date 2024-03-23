@@ -47,7 +47,7 @@ public class Shooter {
         BACK_OFF_TO_SENSOR, // This state pulls the note down until the top sensor sees it
         BACK_OFF_FROM_SENSOR, // And this one continues to pull the note down until we don't see it anymore. The result is that
                               // the note ends up positioned just before the top beam-break.
-        RUMBLE_AFTER_INTAKE,
+        FLYWHEEL_TARGET_SPEED,
         NOTHING,
         SHOOT,
         OUTAKE
@@ -121,6 +121,7 @@ public class Shooter {
                 break;
             case NOTHING:
                 feederMotor.motorControl.setIAccum(0);
+                setShootVelocity(leftTargetSpeed, rightTargetSpeed);
                 break;
             case INTAKING:
                 setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
@@ -160,11 +161,15 @@ public class Shooter {
                 feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
                 if(topBeamBreak.get()){
                     feederMotor.setVelocity(0);
+                    setShootVelocity(0, 0);
                     state = States.NOTHING;
                     readyToShootLED.notePickup();
                 }
                 break;
 
+            case FLYWHEEL_TARGET_SPEED:
+                setShootVelocity(leftTargetSpeed, rightTargetSpeed);
+                break;
             case SHOOT:
                 setShootVelocity(leftTargetSpeed, rightTargetSpeed);
                 if(readyToShoot()){
@@ -308,5 +313,8 @@ public class Shooter {
         shootTimer.stop();
         shootTimer.reset();
         state = States.SHOOT;
+    }
+    public void flywheelTargetSpeed(){
+        
     }
 }

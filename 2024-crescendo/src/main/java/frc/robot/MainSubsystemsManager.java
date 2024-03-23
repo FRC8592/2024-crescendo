@@ -84,7 +84,6 @@ public class MainSubsystemsManager {
                     case INIT: //Single-frame initialization case
                         intake.spinPercentOutput(0);
                         subState = SubStates.PREP;
-                        shooter.shoot();
                         timer.stop();
                         timer.reset();
                         break;
@@ -254,6 +253,9 @@ public class MainSubsystemsManager {
     public boolean score() {
         if (subState == SubStates.READY) {
             subState = SubStates.SCORE;
+            if(mainState == MainStates.SPEAKER){
+                shooter.shoot();
+            }
             return true;
         }
         else {
@@ -298,6 +300,7 @@ public class MainSubsystemsManager {
             if (mainState == MainStates.SPEAKER) {
                 mainState = MainStates.HOME;
                 subState = SubStates.NOTHING;
+                shooter.setTargetSpeed(0, 0);
                 return true;
             }
         }

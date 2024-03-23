@@ -38,7 +38,7 @@ public class AutoCollectCommand extends Command {
         this.drive.drive(targeting.driveToTarget(
                 new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD),
                 new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD),
-                NOTELOCK.DRIVE_TO_TARGET_ANGLE));
+                NOTELOCK.AUTO_DRIVE_TO_TARGET_ANGLE));
         return !this.targeting.isTargetValid() || shooter.hasNote;
     }
 

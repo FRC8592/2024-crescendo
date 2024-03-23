@@ -5,6 +5,8 @@ import frc.robot.Constants.APRILTAG_VISION;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -301,8 +303,10 @@ public class PoseVision {
         }
 
         double out = visual_servo_pid.calculate(curr_value, setpoint);
+        Logger.recordOutput(APRILTAG_VISION.LOG_PATH+"VisualServoPID-Output", out);
         out = Math.max(out, -limit);
         out = Math.min(out, limit);
+        Logger.recordOutput(APRILTAG_VISION.LOG_PATH+"VS-PID-OutputClamped", out);
 
         return out;
     }

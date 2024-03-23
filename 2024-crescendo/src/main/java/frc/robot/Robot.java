@@ -163,6 +163,9 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput(ELEVATOR.LOG_PATH+"ExtensionMeters", elevator.getExtensionLength());
         Logger.recordOutput(ELEVATOR.LOG_PATH+"AngleDegrees", elevator.getPivotAngle());
 
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"IsTargetAngle", elevator.isTargetAngle());
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"isTargetLength", elevator.isTargetLength());
+
         SmartDashboard.putBoolean("Top Beam Break", shooter.topBeamBreak.get());
         SmartDashboard.putBoolean("Bottom Beam Break", shooter.bottomBeamBreak.get());
 
@@ -439,8 +442,8 @@ public class Robot extends LoggedRobot {
         else if(jukeShot.isFallingEdge()){
             subsystemsManager.speaker(false);
         }
-        else if (jukeShot.getValue()){
-            entry = new RangeTable.RangeEntry(3500, 2700, 31); //TODO: Tune this on the practice field
+        else if (jukeShot.getValue() && !jukeShot.isRisingEdge()){ // Don't run on the first frame the control is pressed.
+            entry = new RangeTable.RangeEntry(4500, 3500, 32); //TODO: Tune this on the practice field
             subsystemsManager.score();
         }
         else if (rangeTableShoot.getValue()){

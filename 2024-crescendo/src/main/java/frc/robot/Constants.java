@@ -99,7 +99,7 @@ public final class Constants {
         public static final double DRIVE_TO_DRIVE_kI = 0;
         public static final double DRIVE_TO_DRIVE_kD = 0.01;
 
-        public static final double DRIVE_TO_TARGET_ANGLE = -22;
+        public static final double DRIVE_TO_TARGET_ANGLE = -23;
         public static final double TELEOP_DRIVE_TO_TARGET_ANGLE = -24;
         public static final double DY_LIMIT = -20;
 
@@ -229,7 +229,7 @@ public final class Constants {
 
         //Protection control config
         public static final double EXTENSION_FULLY_RETRACTED = 0.01; //When the extension is retracted below this value, we can lower the pivot to zero.
-        public static final double EXTENSION_FORCE_RETRACT_THRESHOLD = 30; //The threshold for the protection code from the hooks on the elevator. See Elevator.java.
+        public static final double EXTENSION_FORCE_RETRACT_THRESHOLD = 15; //The threshold for the protection code from the hooks on the elevator. See Elevator.java.
         public static final double RETRACT_THRESHOLD_TOLERANCE = 2; //If we're within this value of the threshold (or higher), the extension works.
         public static final double ANGLE_TOLERANCE = 0.1; //Half a degree; used for the function that detects whether the pivot is at the target angle.
         public static final double LENGTH_TOLERANCE = 0.005; //Half a centimeter; used for the function that detects whether the extension is at the target length.
@@ -330,7 +330,7 @@ public final class Constants {
         public static final ArrayList<Integer> AMP_AIM_TAGS = new ArrayList<>(Arrays.asList(5, 6));
         public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
 
-        public static final double X_ROT_LOCK_ERROR = 0.1;
+        public static final double X_ROT_LOCK_ERROR = 0.15;
     }
 
     public class MAIN_SUBSYSTEMS_MANAGER{

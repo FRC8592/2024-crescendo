@@ -90,6 +90,7 @@ public class Robot extends LoggedRobot {
     private BooleanManager speakerAmp = new BooleanManager(false);
     private BooleanManager manualRaiseClimber = new BooleanManager(false);
     private BooleanManager manualLowerClimber = new BooleanManager(false);
+    private BooleanManager jukeShot = new BooleanManager(false);
     @Override
     public void robotInit() {
 
@@ -213,6 +214,7 @@ public class Robot extends LoggedRobot {
     public void teleopInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         swerve.setSteerAnglesToAbsEncoder();
+        //swerve.zeroGyoscope();
         swerve.setThrottleCurrentLimit(POWER.SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT);
         leds.off();
 
@@ -333,6 +335,7 @@ public class Robot extends LoggedRobot {
         manualRaiseClimber.update(operatorController.getPOV() == 0);
         manualLowerClimber.update(operatorController.getPOV() == 180);
         ledAmpSignal.update      (operatorController.getBackButton());
+        jukeShot.update          (operatorController.getStartButton());
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
@@ -429,6 +432,16 @@ public class Robot extends LoggedRobot {
         else if(rangeTableShoot.isFallingEdge()){
             subsystemsManager.speaker(false);
         }
+        else if(jukeShot.isRisingEdge()){
+            subsystemsManager.speaker(true);
+        }
+        else if(jukeShot.isFallingEdge()){
+            subsystemsManager.speaker(false);
+        }
+        else if (jukeShot.getValue()){
+            entry = new RangeTable.RangeEntry(3500, 2700, 31); //TODO: Tune this on the practice field
+            subsystemsManager.score();
+        }
         else if (rangeTableShoot.getValue()){
             double distance = poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
             entry = RangeTable.get(distance==-1.0?0:distance);
@@ -458,7 +471,7 @@ public class Robot extends LoggedRobot {
             leds.off();
         }
         //poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ():
-        swerve.drive(subsystemsManager.update(entry.leftFlywheelSpeed, entry.rightFlywheelSpeed, entry.pivotAngle, currentSpeeds));
+        swerve.drive(subsystemsManager.update(entry.leftFlywheelSpeed, entry.rightFlywheelSpeed, entry.pivotAngle, jukeShot.getValue() ? ELEVATOR.EXTENSION_METERS_MAX : 0, currentSpeeds));
     }
 
     @Override

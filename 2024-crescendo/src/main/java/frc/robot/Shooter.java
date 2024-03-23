@@ -176,7 +176,6 @@ public class Shooter {
                         shootTimer.stop();
                         shootTimer.reset();
                         state = States.NOTHING;
-                        readyToShootLED.off();
                     }
                 }
                 break;

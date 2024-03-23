@@ -90,6 +90,7 @@ public class MainSubsystemsManager {
                         break;
                     case SCORE: // Note that this runs READY and PREP's code too because there's no `break;` after this code
                         timer.start();
+                        leds.off();
                         if (timer.get() > SHOOTER.SHOOT_SCORE_TIME && false /*never stop automatically*/) { //If we have spent enough time shooting
                             timer.stop();
                             timer.reset();
@@ -121,6 +122,7 @@ public class MainSubsystemsManager {
                         timer.reset();
                         break;
                     case SCORE: //Note that this runs READY and PREP's code too
+                        leds.off();
                         if(Math.abs(shooter.feederMotor.getVelocity()-SHOOTER.AMP_FEEDER_SPEED)<SHOOTER.FEEDER_AMP_TOLERANCE){
                             timer.start();
                         }

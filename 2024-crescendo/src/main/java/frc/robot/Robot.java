@@ -187,6 +187,7 @@ public class Robot extends LoggedRobot {
             SmartDashboard.putNumber("Tag 4 Z", -1.0);
         }
         Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
+        Logger.recordOutput(APRILTAG_VISION.LOG_PATH+"X offset (m)", poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS));
         shooter.update(leds);
     }
 

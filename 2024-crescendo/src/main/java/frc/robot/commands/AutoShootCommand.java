@@ -46,6 +46,7 @@ public class AutoShootCommand extends Command {
         RangeEntry entry = RangeTable.get(distance);
         Logger.recordOutput("Distance to Tag 4", distance);
         elevator.setPivotAngleCustom(entry.pivotAngle);
+        shooter.setShootVelocity(entry.leftFlywheelSpeed, entry.leftFlywheelSpeed);
         // shooter.setShootVelocity(0, 0);
         drive.drive(new ChassisSpeeds(0, 0, omega));
         if ((Math.abs(vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS))<APRILTAG_VISION.X_ROT_LOCK_ERROR && elevator.isTargetAngle()) || isShooting){
@@ -53,11 +54,7 @@ public class AutoShootCommand extends Command {
             SmartDashboard.putNumber("Ready To Shoot", distance);
             Logger.recordOutput("AutoShootCommand Shooting", true);
             this.timer.start();
-            if(this.timer.get() < 0.05){
-                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
-            }
-            else if(this.timer.get() < SHOOTER.SHOOT_SCORE_TIME+0.5){
-                shooter.setShootVelocity(entry.leftFlywheelSpeed, entry.leftFlywheelSpeed);
+            if(this.timer.get() < SHOOTER.SHOOT_SCORE_TIME){
                 if(shooter.readyToShoot()){
                     shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
                 }

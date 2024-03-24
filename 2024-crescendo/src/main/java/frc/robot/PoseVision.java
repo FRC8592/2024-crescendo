@@ -233,27 +233,27 @@ public class PoseVision {
      */
     public double visual_servo(int servoTarget, double limit, List<Integer> valid_tag_ids, double defaultValue) {
         // check to see if we're looking at the tag and if it's the right one
-        LinkedList<Integer> tag_ids = new LinkedList<Integer>();
+        LinkedList<Integer> visible_tag_ids = new LinkedList<Integer>();
         if (getTagInView()) {
-            tag_ids.add(getCurrTagID());
+            visible_tag_ids.add(getCurrTagID());
         }
         if (getTag2InView()) {
-            tag_ids.add(getCurrTag2ID());
+            visible_tag_ids.add(getCurrTag2ID());
         }
 
-        int tag_id = -1;
-        for (int target_tag_id : tag_ids) { // for tag in tags we care about
-            if (tag_ids.contains(target_tag_id)) { // if we're not looking at the tag
-                tag_id = target_tag_id;
+        int current_tag_id = -1;
+        for (int target_tag_id : valid_tag_ids) { // for tag in tags we care about
+            if (visible_tag_ids.contains(target_tag_id)) { // if we're not looking at the tag
+                current_tag_id = target_tag_id;
             }
         }
-        if (tag_id == -1) { // if we're not looking at any of the tags
+        if (current_tag_id == -1) { // if we're not looking at any of the tags
             return defaultValue;
         }
 
         boolean useTagOne = true;
         // find if tag or tag 2 is the one we're looking for
-        if (getCurrTagID() == tag_id) {
+        if (getCurrTagID() == current_tag_id) {
             // tag 1 is the one we're looking for
             useTagOne = true;
         }

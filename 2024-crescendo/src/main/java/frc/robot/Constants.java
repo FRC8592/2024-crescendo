@@ -321,10 +321,10 @@ public final class Constants {
 
     public class APRILTAG_VISION {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/MGVision/";
-        public static final double kP = 1.25d;
+        public static final double kP = 1.25;
         public static final double kI = 1.75;
         public static final double kD = 0.005;
-        public static final double iZone = 0.3;
+        public static final double iZone = 0.5;
 
         // red, blue
         public static final ArrayList<Integer> SPEAKER_AIM_TAGS = new ArrayList<>(Arrays.asList(4, 7));

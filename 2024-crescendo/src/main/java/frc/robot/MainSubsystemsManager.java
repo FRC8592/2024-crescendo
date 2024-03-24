@@ -299,7 +299,6 @@ public class MainSubsystemsManager {
             if (mainState == MainStates.SPEAKER) {
                 mainState = MainStates.HOME;
                 subState = SubStates.NOTHING;
-                shooter.setTargetSpeed(0, 0);
                 return true;
             }
         }

@@ -77,6 +77,7 @@ public class Robot extends LoggedRobot {
     private BooleanManager resetGyro = new BooleanManager(false);
     private BooleanManager autoCollect = new BooleanManager(false);
     private BooleanManager robotOriented = new BooleanManager(false);
+    private BooleanManager autoAim = new BooleanManager(false);
 
     // operator controls
     private BooleanManager ledAmpSignal = new BooleanManager(false);
@@ -87,7 +88,7 @@ public class Robot extends LoggedRobot {
     private BooleanManager stow = new BooleanManager(false);
     private BooleanManager amp = new BooleanManager(false);
     private BooleanManager climb = new BooleanManager(false);
-    private BooleanManager speakerAmp = new BooleanManager(false);
+    private BooleanManager score = new BooleanManager(false);
     private BooleanManager manualRaiseClimber = new BooleanManager(false);
     private BooleanManager manualLowerClimber = new BooleanManager(false);
     private BooleanManager jukeShot = new BooleanManager(false);
@@ -322,7 +323,8 @@ public class Robot extends LoggedRobot {
         slowMode.update          (driverController.getRightBumper());
         resetGyro.update         (driverController.getBackButton());
         autoCollect.update       (driverController.getLeftBumper());
-        robotOriented.update     (driverController.getRightTriggerAxis() >0.1);
+        robotOriented.update     (driverController.getRightTriggerAxis() > 0.1);
+        autoAim.update           (driverController.getLeftTriggerAxis() > 0.1);
 
         //operator controls
         // shooter/feeder functions
@@ -335,7 +337,7 @@ public class Robot extends LoggedRobot {
         stow.update              (operatorController.getAButton());
         amp.update               (operatorController.getXButton());
         climb.update             (operatorController.getYButton());
-        speakerAmp.update        (operatorController.getRightTriggerAxis()>0.1);
+        score.update             (operatorController.getRightTriggerAxis()>0.1);
         manualRaiseClimber.update(operatorController.getPOV() == 0);
         manualLowerClimber.update(operatorController.getPOV() == 180);
         ledAmpSignal.update      (operatorController.getBackButton());
@@ -387,11 +389,9 @@ public class Robot extends LoggedRobot {
         else if (stow.isRisingEdge()) {
             subsystemsManager.home();
         }
-        //Maybe add something here to trigger `subsystemsManager.forceHome()`
         else if (climb.isRisingEdge()) {
             subsystemsManager.climb(true);
         }
-        //TODO: Figure out what to do with prime
         else if (manualRaiseClimber.isRisingEdge()) {
             subsystemsManager.climbExtend(true);
         }
@@ -410,56 +410,51 @@ public class Robot extends LoggedRobot {
         else if (outake.isFallingEdge()) {
             subsystemsManager.outake(false);
         }
+
+        //All controls in this block must reset each other (and `score`) when being used
         else if (shootFromPodium.isRisingEdge()) {
-            //This whole control is temporary. We account for the change in angle using code in the subsystemsManager.update() line
             subsystemsManager.speaker(true);
-        }
-        else if (shootFromPodium.isFallingEdge()) {
-            subsystemsManager.speaker(false);
-        }
-        else if (speakerAmp.isRisingEdge()) {
-            if (subsystemsManager.mainState == MainStates.AMP) {
-                subsystemsManager.score();
-            }
-            else {
-                subsystemsManager.speaker(true);
-            }
-        }
-        else if (speakerAmp.isFallingEdge()) {
-            if (subsystemsManager.mainState == MainStates.SPEAKER) {
-                subsystemsManager.speaker(false);
-            }
+            rangeTableShoot.resetTrigger();
+            jukeShot.resetTrigger();
+            score.resetTrigger();
         }
         else if (rangeTableShoot.isRisingEdge()){
             subsystemsManager.speaker(true);
-        }
-        else if(rangeTableShoot.isFallingEdge()){
-            subsystemsManager.speaker(false);
+            shootFromPodium.resetTrigger();
+            jukeShot.resetTrigger();
+            score.resetTrigger();
         }
         else if(jukeShot.isRisingEdge()){
             subsystemsManager.speaker(true);
+            shootFromPodium.resetTrigger();
+            rangeTableShoot.resetTrigger();
+            score.resetTrigger();
         }
-        else if(jukeShot.isFallingEdge()){
-            subsystemsManager.speaker(false);
+
+        else if (score.getValue()) {
+            if(!rangeTableShoot.isTriggered() && !shootFromPodium.isTriggered() && !jukeShot.isTriggered()){ // If we don't have another shot ready, start getting ready for a speaker shot anyway. We use the constants for a subwoofer shot later.
+                subsystemsManager.speaker(true);
+            }
+            else{
+                score.resetTrigger(); //When we don't do this, we use the subwoofer angle and speeds.
+            }
+            subsystemsManager.score();
         }
-        else if (jukeShot.getValue()){ // Don't run on the first frame the control is pressed.
+        else if (score.isTriggered()) {
+            entry = RangeTable.get(1.4); // Distance in a subwoofer shot
+        }
+        else if (jukeShot.isTriggered()){
             entry = new RangeTable.RangeEntry(4500, 3500, 32);
-            subsystemsManager.score();
         }
-        else if (rangeTableShoot.getValue()){
+        else if (rangeTableShoot.isTriggered()){
             double distance = poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
-            entry = RangeTable.get(distance==-1.0?0:distance);
-            subsystemsManager.score();
+            entry = distance!=-1.0 ? RangeTable.get(distance) : new RangeTable.RangeEntry(0, 0, 0); // Avoid shooting out of play if we think we can range table shoot when the camera is down
         }
-        else if (speakerAmp.getValue()) {
-            entry = new RangeTable.RangeEntry(3500, (int)(3500*0.8), 0);
-            subsystemsManager.score();
-        }
-        else if (shootFromPodium.getValue()) {
-            subsystemsManager.score();
+        else if (shootFromPodium.isTriggered()) {
             entry = RangeTable.get(2.83);
         }
-        if(driverController.getLeftTriggerAxis()>0.1){
+
+        if(autoAim.getValue()){
             double omega = poseVision.visual_servo(0, 1.0, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }

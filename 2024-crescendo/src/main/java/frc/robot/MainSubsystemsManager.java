@@ -86,10 +86,12 @@ public class MainSubsystemsManager {
                         subState = SubStates.PREP;
                         timer.stop();
                         timer.reset();
+                        shooter.shootPrep();
                         break;
                     case SCORE: // Note that this runs READY and PREP's code too because there's no `break;` after this code
                         timer.start();
                         leds.off();
+                        shooter.shoot(); // Only does anything if we're not already shooting, so it's okay to call this in a loop
                         if (timer.get() > SHOOTER.SHOOT_SCORE_TIME && false /*never stop automatically*/) { //If we have spent enough time shooting
                             timer.stop();
                             timer.reset();
@@ -253,9 +255,6 @@ public class MainSubsystemsManager {
     public boolean score() {
         if (subState == SubStates.READY) {
             subState = SubStates.SCORE;
-            if(mainState == MainStates.SPEAKER){
-                shooter.shoot();
-            }
             return true;
         }
         else {

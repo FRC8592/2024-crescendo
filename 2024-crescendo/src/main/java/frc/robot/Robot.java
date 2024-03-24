@@ -442,8 +442,8 @@ public class Robot extends LoggedRobot {
         else if(jukeShot.isFallingEdge()){
             subsystemsManager.speaker(false);
         }
-        else if (jukeShot.getValue() && !jukeShot.isRisingEdge()){ // Don't run on the first frame the control is pressed.
-            entry = new RangeTable.RangeEntry(4500, 3500, 32); //TODO: Tune this on the practice field
+        else if (jukeShot.getValue()){ // Don't run on the first frame the control is pressed.
+            entry = new RangeTable.RangeEntry(4500, 3500, 32);
             subsystemsManager.score();
         }
         else if (rangeTableShoot.getValue()){

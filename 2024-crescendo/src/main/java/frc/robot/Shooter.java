@@ -162,6 +162,7 @@ public class Shooter {
                     feederMotor.setVelocity(0);
                     setShootVelocity(0, 0);
                     state = States.NOTHING;
+                    Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.4, 1)); // It didn't like `new Rumble.RumbleBump()`, and this is what ended up compiling
                     readyToShootLED.notePickup();
                 }
                 break;

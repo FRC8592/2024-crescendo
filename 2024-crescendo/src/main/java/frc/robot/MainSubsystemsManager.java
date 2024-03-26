@@ -46,20 +46,6 @@ public class MainSubsystemsManager {
         this.leds = leds;        
     }
 
-    /*
-     * GENERAL RULES FOR WRITING CODE WITH THE NEW LOGIC:
-     *
-     *
-     * 1. Everything related to controls goes in Robot.java. MainSubsystemsManager assumes that whatever input it recieves is valid (although it shouldn't assume that the input doesn't ask the robot to break rules or mess something up)
-     * 
-     * 2. For cases where we can pysically run something but shouldn't (e.g. stowing while scoring in the amp), there should be a check in the method that sets the state.
-     * 
-     * 3. All code in the main state machine (`update()`) assumes that it is allowed to run and depends on the state-setters for that assumption. There shouldn't be any "are we allowed to do this?" checks there.
-     *
-     * 4. All main states have an INIT state that run initialization code and then switches the sub-state to PREP; all state-setters other than HOME set the sub-state to INIT.
-     *
-     * 6. All state-setters return whether they set the state as requested.
-     */
     /**
      * Update the state machine for the shooter, elevator, and intake
      * @param distanceToSpeaker Distance from the speaker tag in inches from vision. This can be anything if not shooting into the speaker with a range table.
@@ -88,7 +74,7 @@ public class MainSubsystemsManager {
                         timer.reset();
                         shooter.shootPrep();
                         break;
-                    case SCORE: // Note that this runs READY and PREP's code too because there's no `break;` after this code
+                    case SCORE: // Note that this runs READY and PREP's code too because there's no `break;` after this case
                         timer.start();
                         leds.off();
                         shooter.shoot(); // Only does anything if we're not already shooting, so it's okay to call this in a loop
@@ -100,7 +86,13 @@ public class MainSubsystemsManager {
                             subState = SubStates.NOTHING;
                             break;
                         }
-                    case READY: //This does nothing for now; TODO make this autodetect if the vision system fails and go back to PREP
+                    case READY: //TODO make this autodetect if the vision system fails and go back to PREP
+                        if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
+                            Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25)); //Softly rumble to confirm we're ready to fire
+                        }
+                        if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
+                            Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25)); //Rumble the driver controller as well so the driver knows we can shoot
+                        }
                     case PREP:
                         shooter.setTargetSpeed((int)rtLeftFlywheel, (int)rtRightFlywheel);
                         elevator.setExtensionLengthCustom(speakerScoreExtension);

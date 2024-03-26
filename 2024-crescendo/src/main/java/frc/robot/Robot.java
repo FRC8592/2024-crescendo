@@ -157,6 +157,8 @@ public class Robot extends LoggedRobot {
         poseVision = new PoseVision(APRILTAG_VISION.kP, APRILTAG_VISION.kI, APRILTAG_VISION.kD, 0);
         
         subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator, leds);
+
+        Rumble.init();
     }
 
     @Override
@@ -193,6 +195,7 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
         Logger.recordOutput(APRILTAG_VISION.LOG_PATH+"X offset (m)", poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS));
         shooter.update(leds);
+        Rumble.update(driverController, operatorController);
     }
 
     @Override
@@ -419,10 +422,17 @@ public class Robot extends LoggedRobot {
             score.resetTrigger();
         }
         else if (rangeTableShoot.isRisingEdge()){
-            subsystemsManager.speaker(true);
-            shootFromPodium.resetTrigger();
-            jukeShot.resetTrigger();
-            score.resetTrigger();
+            if(poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS) != -1){
+                subsystemsManager.speaker(true);
+                shootFromPodium.resetTrigger();
+                jukeShot.resetTrigger();
+                score.resetTrigger();
+            }
+            else{ // Create a dzzz-dzzz effect on the controller to confirm that the range shot didn't work
+                Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.2, 1));
+                Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.2, 0));
+                Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.2, 1));
+            }
         }
         else if(jukeShot.isRisingEdge()){
             subsystemsManager.speaker(true);

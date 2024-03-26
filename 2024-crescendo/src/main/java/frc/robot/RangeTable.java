@@ -47,7 +47,6 @@ public class RangeTable {
     public static RangeEntry get(double distance) {
         distance*=5;
         Logger.recordOutput("CustomLogs/RangeTable/InputDistance", distance);
-        //TODO: Uncomment when we get a real range table
         valid = true;
         int wholeMeters = (int)(distance);
         if(distance <= 0){

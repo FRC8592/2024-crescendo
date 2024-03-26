@@ -30,6 +30,27 @@ public class MainSubsystemsManager {
         NOTHING
     }
 
+    private enum MechanismState {
+        STOWED,
+        STOWING,
+        INTAKING,
+        ADJUSTING_1,
+        ADJUSTING_2,
+        LOADED,
+        OUTTAKING,
+        PRIMING,
+        PRIMED,
+        SHOOTING,
+        PRIMING_AMP,
+        AMP_PRIMED,
+        AMP_SCORING,
+        CLIMB_PRIME,
+        CLIMB_EXTEND,
+        CLIMB_RETRACT
+    }
+
+    private MechanismState mechanismState = MechanismState.STOWED;
+
     public MainStates mainState = MainStates.HOME;
     public SubStates subState = SubStates.NOTHING;
     private Intake intake;
@@ -391,6 +412,114 @@ public class MainSubsystemsManager {
                     subState = SubStates.NOTHING;
                 }
             }
+        }
+    }
+
+    public void runMechanismStateMachine(boolean userIntake, boolean userClimb, boolean userOuttaking,
+                                         boolean userPriming, boolean userAmpPriming, boolean userShoot, boolean userExtending,
+                                         boolean userRetracting, boolean userStow){
+        if(userStow){
+            this.mechanismState = MechanismState.STOWING;
+        }
+        
+        switch(this.mechanismState){
+            case STOWING:
+                elevator.setElevatorPosition(0, 0);
+                if(elevator.isAtTargetPosition()){
+                    this.mechanismState = MechanismState.STOWED;
+                }
+                break;
+            case STOWED:
+                if(userIntake){
+                    this.mechanismState = MechanismState.INTAKING;
+                } else if(userClimb){
+                    this.mechanismState = MechanismState.CLIMB_PRIME;
+                } else if (userOuttaking){
+                    this.mechanismState = MechanismState.OUTTAKING;
+                }
+                break;
+            case INTAKING:
+                if(shooter.isBottomBeamBreakTripped()){
+                    this.mechanismState = MechanismState.ADJUSTING_1;
+                } 
+                break;
+            case ADJUSTING_1:
+                if(shooter.isTopBeamBreakTripped()){
+                    this.mechanismState = MechanismState.ADJUSTING_2;
+                }
+                break;
+            case ADJUSTING_2:
+                if(!shooter.isTopBeamBreakTripped()){
+                    this.mechanismState = MechanismState.LOADED;
+                }
+                break;
+            case LOADED:
+                if(userOuttaking){
+                    this.mechanismState = MechanismState.OUTTAKING;
+                } else if(userClimb){
+                    this.mechanismState = MechanismState.CLIMB_PRIME;
+                } else if(userPriming){
+                    this.mechanismState = MechanismState.PRIMING;
+                } else if(userAmpPriming){
+                    this.mechanismState = MechanismState.PRIMING_AMP;
+                }
+                break;
+            case OUTTAKING:
+                if(!userOuttaking){
+                    this.mechanismState = MechanismState.STOWING;
+                }
+                break;
+
+            case PRIMING:
+                if(shooter.readyToShoot() && elevator.isAtTargetPosition()){
+                    this.mechanismState = MechanismState.PRIMED;
+                }
+                break;
+            case PRIMED:
+                if(userShoot){
+                    this.mechanismState = MechanismState.SHOOTING;
+                }
+                break;
+            case SHOOTING:
+                if(!userShoot){
+                    this.mechanismState = MechanismState.STOWING;
+                }
+                break;
+
+            case PRIMING_AMP:
+                if(elevator.isAtTargetPosition()){
+                    this.mechanismState = MechanismState.AMP_PRIMED;
+                }
+                break;
+            case AMP_PRIMED:
+                if(userShoot){
+                    this.mechanismState = MechanismState.AMP_SCORING;
+                }
+                break;
+            case AMP_SCORING:
+                if(!userShoot){
+                    this.mechanismState = MechanismState.STOWING;
+                }
+                break;
+
+            case CLIMB_PRIME:
+                if(userExtending){
+                    this.mechanismState = MechanismState.CLIMB_EXTEND;
+                } else if(userRetracting){
+                    this.mechanismState = MechanismState.CLIMB_RETRACT;
+                }
+                break;
+            case CLIMB_EXTEND:
+                if(!userExtending){
+                    this.mechanismState = MechanismState.CLIMB_PRIME;
+                }
+                break;
+            case CLIMB_RETRACT:
+                if(!userRetracting){
+                    this.mechanismState = MechanismState.CLIMB_PRIME;
+                }
+                break;
+            
         }
     }
 }

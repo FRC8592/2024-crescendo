@@ -319,4 +319,12 @@ public class Shooter {
     public void shootPrep(){
         this.state = States.SHOOT_PREP;
     }
+
+    public boolean isBottomBeamBreakTripped(){
+        return !bottomBeamBreak.get(); //The beam break pulls low when triggered (notice exclamation point)
+    }
+
+    public boolean isTopBeamBreakTripped(){
+        return !topBeamBreak.get(); //The beam break pulls low when triggered (notice exclamation point)
+    }
 }

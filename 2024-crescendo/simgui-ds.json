@@ -1,14 +1,4 @@
 {
-  "Joysticks": {
-    "window": {
-      "visible": false
-    }
-  },
-  "System Joysticks": {
-    "window": {
-      "visible": false
-    }
-  },
   "keyboardJoysticks": [
     {
       "axisConfig": [
@@ -101,7 +91,11 @@
   ],
   "robotJoysticks": [
     {
+      "guid": "Keyboard1"
+    },
+    {
       "guid": "Keyboard0"
     }
-  ]
+  ],
+  "useEstopHotkey": true
 }

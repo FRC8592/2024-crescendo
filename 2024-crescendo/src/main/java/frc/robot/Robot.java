@@ -414,7 +414,15 @@ public class Robot extends LoggedRobot {
             subsystemsManager.outake(false);
         }
 
-        //All controls in this block must reset each other (and `score`) when being used
+        else if (score.isRisingEdge()){
+            if(!rangeTableShoot.isTriggered() && !shootFromPodium.isTriggered() && !jukeShot.isTriggered()){ // If we don't have another shot ready, start getting ready for a speaker shot anyway. We use the constants for a subwoofer shot later.
+                subsystemsManager.speaker(true);
+            }
+            else{
+                score.resetTrigger(); //When we don't do this, we use the subwoofer angle and speeds.
+            }
+        }
+        //All controls in this block must reset each other and `score` when being used
         else if (shootFromPodium.isRisingEdge()) {
             subsystemsManager.speaker(true);
             rangeTableShoot.resetTrigger();
@@ -422,11 +430,11 @@ public class Robot extends LoggedRobot {
             score.resetTrigger();
         }
         else if (rangeTableShoot.isRisingEdge()){
+            subsystemsManager.speaker(true);
+            shootFromPodium.resetTrigger();
+            jukeShot.resetTrigger();
+            score.resetTrigger();
             if(poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS) != -1){
-                subsystemsManager.speaker(true);
-                shootFromPodium.resetTrigger();
-                jukeShot.resetTrigger();
-                score.resetTrigger();
             }
             else{ // Create a dzzz-dzzz effect on the controller to confirm that the range shot didn't work
                 Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.2, 1));
@@ -442,13 +450,10 @@ public class Robot extends LoggedRobot {
         }
 
         else if (score.getValue()) {
-            if(!rangeTableShoot.isTriggered() && !shootFromPodium.isTriggered() && !jukeShot.isTriggered()){ // If we don't have another shot ready, start getting ready for a speaker shot anyway. We use the constants for a subwoofer shot later.
-                subsystemsManager.speaker(true);
-            }
-            else{
-                score.resetTrigger(); //When we don't do this, we use the subwoofer angle and speeds.
-            }
             subsystemsManager.score();
+            if (score.isTriggered()) { // This has to be here because the other `score.isTriggered()` case is exclusive with `score.getValue()`
+                entry = RangeTable.get(1.4);
+            }
         }
         else if (score.isTriggered()) {
             entry = RangeTable.get(1.4); // Distance in a subwoofer shot

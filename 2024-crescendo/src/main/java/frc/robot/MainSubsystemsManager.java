@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.*;
 
 public class MainSubsystemsManager {
@@ -202,6 +203,9 @@ public class MainSubsystemsManager {
         }
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH + "MainState", mainState.name());
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH + "SubState", subState.name());
+
+        SmartDashboard.putString(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH + "MainState", mainState.name());
+        SmartDashboard.putString(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH + "SubState", subState.name());
         return modifiedSpeeds == null ? originalSpeeds : modifiedSpeeds;
     }
 

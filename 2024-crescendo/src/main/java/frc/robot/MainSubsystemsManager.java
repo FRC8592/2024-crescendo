@@ -45,8 +45,7 @@ public class MainSubsystemsManager {
         AMP_PRIMED,
         AMP_SCORING,
         CLIMB_PRIME,
-        CLIMB_EXTEND,
-        CLIMB_RETRACT
+        CLIMB
     }
 
     private MechanismState mechanismState = MechanismState.STOWED;
@@ -417,43 +416,57 @@ public class MainSubsystemsManager {
 
     public void runMechanismStateMachine(boolean userIntake, boolean userClimb, boolean userOuttaking,
                                          boolean userPriming, boolean userAmpPriming, boolean userShoot, boolean userExtending,
-                                         boolean userRetracting, boolean userStow){
+                                         boolean userRetracting, boolean userStow, RangeTable.RangeEntry userRange){
         if(userStow){
             this.mechanismState = MechanismState.STOWING;
         }
-        
+
         switch(this.mechanismState){
             case STOWING:
                 elevator.setElevatorPosition(0, 0);
+                shooter.stopFlywheels();
+                shooter.stopFeeders();
+                intake.spinPercentOutput(0);
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.STOWED;
                 }
                 break;
             case STOWED:
+                //TODO: NOTIFY DRIVERS
                 if(userIntake){
                     this.mechanismState = MechanismState.INTAKING;
                 } else if(userClimb){
                     this.mechanismState = MechanismState.CLIMB_PRIME;
                 } else if (userOuttaking){
                     this.mechanismState = MechanismState.OUTTAKING;
+                } else if (!elevator.isAtTargetPosition()){
+                    this.mechanismState = MechanismState.STOWING;
                 }
                 break;
             case INTAKING:
+                intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
+                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+                shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
                 if(shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.ADJUSTING_1;
                 } 
                 break;
             case ADJUSTING_1:
+                shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
+                shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
                 if(shooter.isTopBeamBreakTripped()){
                     this.mechanismState = MechanismState.ADJUSTING_2;
                 }
                 break;
             case ADJUSTING_2:
-                if(!shooter.isTopBeamBreakTripped()){
+                shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
+                shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+                if(!shooter.isTopBeamBreakTripped()){ //if beam break NOT tripped, exclamation point
                     this.mechanismState = MechanismState.LOADED;
                 }
                 break;
             case LOADED:
+                //TODO: NOTIFY DRIVERS
                 if(userOuttaking){
                     this.mechanismState = MechanismState.OUTTAKING;
                 } else if(userClimb){
@@ -465,58 +478,73 @@ public class MainSubsystemsManager {
                 }
                 break;
             case OUTTAKING:
+                intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
+                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
+                shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
                 if(!userOuttaking){
                     this.mechanismState = MechanismState.STOWING;
                 }
                 break;
 
             case PRIMING:
+                shooter.setTargetSpeed((int)userRange.leftFlywheelSpeed, (int)userRange.rightFlywheelSpeed);
+                elevator.setElevatorPosition(userRange.pivotAngle, 0);
                 if(shooter.readyToShoot() && elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.PRIMED;
                 }
                 break;
             case PRIMED:
+                // Notify Drivers
                 if(userShoot){
                     this.mechanismState = MechanismState.SHOOTING;
+                } else if(!shooter.readyToShoot() || !elevator.isAtTargetPosition()){
+                    this.mechanismState = MechanismState.PRIMING;
                 }
                 break;
             case SHOOTING:
+                shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
                 if(!userShoot){
                     this.mechanismState = MechanismState.STOWING;
                 }
                 break;
 
             case PRIMING_AMP:
+                shooter.stopFlywheels();
+                elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP);
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.AMP_PRIMED;
                 }
                 break;
             case AMP_PRIMED:
+                // Notify Drivers
                 if(userShoot){
                     this.mechanismState = MechanismState.AMP_SCORING;
                 }
                 break;
             case AMP_SCORING:
+                shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED, SHOOTER.AMP_FLYWHEEL_SPEED);
+                shooter.setFeederPower(SHOOTER.AMP_FEEDER_SPEED);
                 if(!userShoot){
-                    this.mechanismState = MechanismState.STOWING;
+                    this.mechanismState = MechanismState.AMP_PRIMED;
                 }
                 break;
 
             case CLIMB_PRIME:
+                shooter.stopFlywheels();
+                elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_CLIMB, ELEVATOR.EXTENSION_METERS_CLIMB);
+                if(elevator.isAtTargetPosition()){
+                    this.mechanismState = MechanismState.CLIMB;
+                }
+                break;
+            
+            //It allows the user to manually extend and retract the elevator
+
+            case CLIMB:
                 if(userExtending){
-                    this.mechanismState = MechanismState.CLIMB_EXTEND;
-                } else if(userRetracting){
-                    this.mechanismState = MechanismState.CLIMB_RETRACT;
-                }
-                break;
-            case CLIMB_EXTEND:
-                if(!userExtending){
-                    this.mechanismState = MechanismState.CLIMB_PRIME;
-                }
-                break;
-            case CLIMB_RETRACT:
-                if(!userRetracting){
-                    this.mechanismState = MechanismState.CLIMB_PRIME;
+                    elevator.extend();
+                } 
+                else if(userRetracting){
+                    elevator.retract();
                 }
                 break;
             

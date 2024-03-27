@@ -156,8 +156,7 @@ public class Shooter {
                 break;
                 
             case BACK_OFF_FROM_SENSOR:
-                setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
-                feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+                
                 if(topBeamBreak.get()){
                     feederMotor.setVelocity(0);
                     setShootVelocity(0, 0);

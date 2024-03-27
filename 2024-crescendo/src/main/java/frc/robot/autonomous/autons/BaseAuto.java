@@ -12,6 +12,7 @@ public abstract class BaseAuto {
     protected LimelightTargeting targeting;
     protected Shooter shooter;
     protected PoseVision poseVision;
+    protected MainSubsystemsManager subsystemsManager;
     protected CommandQueue queue;
 
     private TrajectoryConfig fastConfig = new TrajectoryConfig(1, 1);
@@ -21,13 +22,14 @@ public abstract class BaseAuto {
      * Add all running subsystems for use for all autonomous routines
      * @param pDrive {@code Swerve} object
      */
-    public void addModules(Swerve pDrive, Elevator pLift, Intake pIntake, Shooter pShooter, LimelightTargeting pTargeting, PoseVision pPoseVision) {
+    public void addModules(Swerve pDrive, Elevator pLift, Intake pIntake, Shooter pShooter, LimelightTargeting pTargeting, PoseVision pPoseVision, MainSubsystemsManager pSubsystemsManager) {
         drive = pDrive;
         elevator = pLift;
         intake = pIntake;
         targeting = pTargeting;
         shooter = pShooter;
         poseVision = pPoseVision;
+        subsystemsManager = pSubsystemsManager;
     }
 
     /**

@@ -4,47 +4,46 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Intake;
+import frc.robot.MainSubsystemsManager;
 import frc.robot.Robot;
 import frc.robot.Shooter;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.SHOOTER;
+import frc.robot.MainSubsystemsManager.MechanismState;
 
 public class IntakeCommand extends Command {
-    private Intake intake;
-    private Shooter shooter;
+    private MainSubsystemsManager subsystemsManager;
     private double bottomSensorTripTimeout = -1;
-    public IntakeCommand(Intake intake, Shooter shooter){
-        this.intake = intake;
-        this.shooter = shooter;
+    public IntakeCommand(MainSubsystemsManager subsystemsManager){
+        this.subsystemsManager = subsystemsManager;
     }
 
 
     @Override
     public void initialize() {
         this.timeoutTimer.start();
-        shooter.intake();
+        subsystemsManager.setState(MechanismState.INTAKING);
     }
 
     @Override
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "IntakeCommand");
 
-       //spins intake and feeder until beam sensor stops
-        if(shooter.state == Shooter.States.INTAKING || shooter.state == Shooter.States.RAM_TO_SHOOTERS){
-            intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
-        }
-        else {
-            intake.setIntakeVelocity(0);
-        }
-        if(!shooter.bottomBeamBreak.get()){ // Notice the exclamation point
-            this.bottomSensorTripTimeout=-1; // This makes sure we don't time out if we catch the bottom beam break (successfully got a note) and then lose it
-        }
         if(!Robot.isReal()){
             return true;
         }
-        return shooter.state == Shooter.States.NOTHING // Waits until the note is fully in position
-                || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds)
-                || (this.bottomSensorTripTimeout != -1 && this.timeoutTimer.get() >= this.bottomSensorTripTimeout); // The beam breaks return the opposite of whether they're tripped
+
+        if(subsystemsManager.shooter.isBottomBeamBreakTripped()){
+           this.bottomSensorTripTimeout=-1; // This makes sure we don't time out if we catch the bottom beam break (successfully got a note) and then lose it
+        }
+
+        if(subsystemsManager.mechanismState == MechanismState.LOADED){
+            return true;
+        }
+        else{
+            return (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds)
+                    || (this.bottomSensorTripTimeout != -1 && this.timeoutTimer.get() >= this.bottomSensorTripTimeout);
+        }
     }
 
     /**
@@ -58,9 +57,5 @@ public class IntakeCommand extends Command {
     }
 
     @Override
-    public void shutdown() {
-      intake.halt();
-      shooter.stopFeeders();
-    }
-    
+    public void shutdown() {}
 }

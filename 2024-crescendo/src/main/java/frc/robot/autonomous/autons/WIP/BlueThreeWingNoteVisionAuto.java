@@ -24,32 +24,32 @@ public class BlueThreeWingNoteVisionAuto extends BaseAuto {
     @Override
     public void initialize() {
         queue = new CommandQueue(
-                new ShootCommand(shooter, elevator, 1.4), // shooting preloaded note
+                new ShootCommand(subsystemsManager, 1.4), // shooting preloaded note
                 // First wing note
                 new FollowerCommand(drive, noteOne),
                 new RotateCommand(drive, Rotation2d.fromDegrees(45)),
                 new JointCommand(
                         new AutoCollectCommand(targeting, drive ,
                                 shooter),
-                        new IntakeCommand(intake, shooter)),
+                        new IntakeCommand(subsystemsManager)),
                 new RotateCommand(drive, Rotation2d.fromDegrees(45)),
-                new ShootCommand(shooter, elevator, 2.83),
+                new ShootCommand(subsystemsManager, 2.83),
 
                 new RotateCommand(drive, new Rotation2d(-90)), // Turn towards the second note
                 new JointCommand(
                         new AutoCollectCommand(targeting, drive,
                                 shooter),
-                        new IntakeCommand(intake, shooter)),
+                        new IntakeCommand(subsystemsManager)),
                 new RotateCommand(drive, Rotation2d.fromDegrees(0)),
-                new ShootCommand(shooter, elevator, 2.83),
+                new ShootCommand(subsystemsManager, 2.83),
 
                 new RotateCommand(drive, new Rotation2d(-90)),
                 new JointCommand(
                         new AutoCollectCommand(targeting, drive,
                                 shooter),
-                        new IntakeCommand(intake,shooter)),
+                        new IntakeCommand(subsystemsManager)),
                 new RotateCommand(drive, Rotation2d.fromDegrees(-45)),
-                new ShootCommand(shooter, elevator, 2.83) // shooting third note
+                new ShootCommand(subsystemsManager, 2.83) // shooting third note
         );
     }
 

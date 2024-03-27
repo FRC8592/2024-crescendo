@@ -48,33 +48,33 @@ public class ThreeWingOneMidAuto extends BaseAuto{
     @Override
     public void initialize() {
        queue = new CommandQueue(
-        new ShootCommand(shooter, elevator, 1.4), //shooting preloaded note
+        new ShootCommand(subsystemsManager, 1.4), //shooting preloaded note
         new JointCommand(//going to first note and intaking at the same time
                 new FollowerCommand(drive, noteOne_1.addVision(targeting, -15)),
-                new IntakeCommand(intake, shooter).setBottomSensorTripTimeout(2).setTimeout(4)
+                new IntakeCommand(subsystemsManager).setBottomSensorTripTimeout(2).setTimeout(4)
         ),
         new DelayCommand(0.2),
-        new AutoShootCommand(drive, poseVision, elevator, shooter), //shooting first note at wing position
+        new AutoShootCommand(drive, poseVision, subsystemsManager), //shooting first note at wing position
         new FollowerCommand(drive, noteTwo_1),
         new JointCommand(//going to and intaking second note
                 new FollowerCommand(drive, noteTwo_2.addVision(targeting, -15)),
-                new IntakeCommand(intake, shooter).setBottomSensorTripTimeout(2).setTimeout(4)
+                new IntakeCommand(subsystemsManager).setBottomSensorTripTimeout(2).setTimeout(4)
         ),
         new DelayCommand(0.2),
-        new AutoShootCommand(drive, poseVision, elevator, shooter), //shooting second note at wing spot
+        new AutoShootCommand(drive, poseVision, subsystemsManager), //shooting second note at wing spot
         new FollowerCommand(drive, noteThree_1),
         new JointCommand(//going to and intaking thrid note
                  new FollowerCommand(drive, noteThree_2.addVision(targeting, -15)),
-                 new IntakeCommand(intake, shooter).setBottomSensorTripTimeout(2).setTimeout(4)
+                 new IntakeCommand(subsystemsManager).setBottomSensorTripTimeout(2).setTimeout(4)
         ),
         new DelayCommand(0.2),
-        new AutoShootCommand(drive, poseVision, elevator, shooter), //shooting third note 
+        new AutoShootCommand(drive, poseVision, subsystemsManager), //shooting third note 
         new JointCommand(
                     new FollowerCommand(drive, noteThree_2.addVision(targeting, -15)),
-                    new IntakeCommand(intake, shooter)
+                    new IntakeCommand(subsystemsManager)
                 ),
                 new FollowerCommand(drive, noteFour),
-                new AutoShootCommand(drive, poseVision, elevator, shooter)
+                new AutoShootCommand(drive, poseVision, subsystemsManager)
        );
     }
 

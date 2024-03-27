@@ -5,27 +5,26 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Elevator;
+import frc.robot.MainSubsystemsManager;
 import frc.robot.RangeTable;
+import frc.robot.Robot;
 import frc.robot.Shooter;
 import frc.robot.Constants.*;
+import frc.robot.MainSubsystemsManager.MechanismState;
 
 public class ShootCommand extends Command{
-    private Shooter shooter;
-    private Elevator elevator;
+    private MainSubsystemsManager subsystemsManager;
     private double expectedRange;
-    private double elevatorPivotAngle;
     private Timer timer = new Timer();
 
-    public ShootCommand(Shooter shooter, Elevator elevator, double expectedRange){
-        this.shooter = shooter;
-        this.elevator = elevator;
-        this.expectedRange = expectedRange;
-        this.elevatorPivotAngle = elevatorPivotAngle;
+    public ShootCommand(MainSubsystemsManager subsystemsManager, double expectedRange){
+        this.subsystemsManager = subsystemsManager;
     }
-    
+
     @Override
     public void initialize() {
         timer.reset();
+        subsystemsManager.setState(MechanismState.PRIMING);
         timeoutTimer.start();
     }
 
@@ -33,29 +32,15 @@ public class ShootCommand extends Command{
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "ShootCommand");
 
-        RangeTable.RangeEntry entry = RangeTable.get(expectedRange);
-        elevator.setPivotAngleCustom(entry.pivotAngle);
-        shooter.setShootVelocity(entry.leftFlywheelSpeed, entry.rightFlywheelSpeed);
-        SmartDashboard.putBoolean("Shooter is ready", shooter.readyToShoot());
-        if(shooter.readyToShoot() && elevator.isTargetAngle()){
-            timer.start();
-            if(timer.get()>0.1){
-                shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
-            }
-            else{
-                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
-            }
+        Robot.currentEntry = RangeTable.get(expectedRange);
+
+        if(subsystemsManager.mechanismState == MechanismState.PRIMED){
+            subsystemsManager.setState(MechanismState.SHOOTING);
         }
 
-        return timer.get() > 0.75 || (timeoutSeconds != -1 && timeoutTimer.get() >= timeoutSeconds);
+        return subsystemsManager.mechanismState == MechanismState.STOWING || (timeoutSeconds != -1 && timeoutTimer.get() >= timeoutSeconds);
     }
 
     @Override
-    public void shutdown() {
-      shooter.stopFlywheels();
-      shooter.stopFeeders();
-      elevator.stow();
-
-    }
-    
+    public void shutdown() {}
 }

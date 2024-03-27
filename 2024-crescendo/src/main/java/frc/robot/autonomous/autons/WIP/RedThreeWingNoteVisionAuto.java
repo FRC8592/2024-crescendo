@@ -44,28 +44,28 @@ public class RedThreeWingNoteVisionAuto extends BaseAuto {
     @Override
     public void initialize() {
         queue = new CommandQueue(
-                new ShootCommand(shooter, elevator, 1.4), // shooting preloaded note
+                new ShootCommand(subsystemsManager, 1.4), // shooting preloaded note
                 // First wing note
                 new FollowerCommand(drive, noteOne),
                 new JointCommand(
                         new AutoCollectCommand(targeting, drive, shooter),
-                        new IntakeCommand(intake, shooter)),
+                        new IntakeCommand(subsystemsManager)),
                 new FollowerCommand(drive, shootOne),
-                new ShootCommand(shooter, elevator, 2.83),
+                new ShootCommand(subsystemsManager, 2.83),
 
                 new FollowerCommand(drive, noteTwo), // Turn towards the second note
                 new JointCommand(
                         new AutoCollectCommand(targeting, drive, shooter),
-                        new IntakeCommand(intake, shooter)),
+                        new IntakeCommand(subsystemsManager)),
                 new FollowerCommand(drive, shootTwo),
-                new ShootCommand(shooter, elevator, 2.83),
+                new ShootCommand(subsystemsManager, 2.83),
 
                 new FollowerCommand(drive, noteThree),
                 new JointCommand(
                         new AutoCollectCommand(targeting, drive, shooter),
-                        new IntakeCommand(intake,shooter)),
+                        new IntakeCommand(subsystemsManager)),
                 new FollowerCommand(drive, shootThree),
-                new ShootCommand(shooter, elevator, 2.83) // shooting third note
+                new ShootCommand(subsystemsManager, 2.83) // shooting third note
         );
     }
 

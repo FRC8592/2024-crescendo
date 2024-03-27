@@ -31,15 +31,16 @@ public class AutoCollectCommand extends Command {
 
     @Override
     public boolean execute() {
-        Logger.recordOutput("CurrentCommand", "AutoCollectCommand");
-        Logger.recordOutput("hasNote", shooter.hasNote);
+        // Logger.recordOutput("CurrentCommand", "AutoCollectCommand");
+        // Logger.recordOutput("hasNote", shooter.hasNote);
 
-        this.targeting.updateVision();
-        this.drive.drive(targeting.driveToTarget(
-                new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD),
-                new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD),
-                NOTELOCK.AUTO_DRIVE_TO_TARGET_ANGLE));
-        return !this.targeting.isTargetValid() || shooter.hasNote;
+        // this.targeting.updateVision();
+        // this.drive.drive(targeting.driveToTarget(
+        //         new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD),
+        //         new PIDController(NOTELOCK.DRIVE_TO_DRIVE_kP, NOTELOCK.DRIVE_TO_DRIVE_kI, NOTELOCK.DRIVE_TO_DRIVE_kD),
+        //         NOTELOCK.AUTO_DRIVE_TO_TARGET_ANGLE));
+        // return !this.targeting.isTargetValid() || shooter.hasNote;
+        return true; //TODO: If we want to use this in the future, it needs to be updated to not depend on shooter.hasNote
     }
 
     @Override

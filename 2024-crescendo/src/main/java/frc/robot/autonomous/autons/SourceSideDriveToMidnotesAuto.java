@@ -44,7 +44,7 @@ public class SourceSideDriveToMidnotesAuto extends BaseAuto{
         }
         queue = new CommandQueue(
                 new GyroSetCommand(drive, 0),
-                new ShootCommand(shooter, elevator, 1.4),
+                new ShootCommand(subsystemsManager, 1.4),
                 new FollowerCommand(drive, midNote1),
                 new RotateCommand(drive, Rotation2d.fromDegrees(60+angle))
                 // new JointCommand(

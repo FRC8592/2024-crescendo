@@ -16,12 +16,12 @@ public class SourceSideTwoNoteWingNoteAuto extends BaseAuto {
     @Override
     public void initialize() {
         queue = new CommandQueue(
-                new ShootCommand(shooter, elevator, 1.4),
+                new ShootCommand(subsystemsManager, 1.4),
                 new JointCommand(
                         new FollowerCommand(drive, pathOne.addVision(targeting, -5)),
-                        new IntakeCommand(intake, shooter)),
+                        new IntakeCommand(subsystemsManager)),
                 new RotateCommand(drive, Rotation2d.fromDegrees(-45)),
-                new AutoShootCommand(drive, poseVision, elevator, shooter));
+                new AutoShootCommand(drive, poseVision, subsystemsManager));
     }
 
     @Override

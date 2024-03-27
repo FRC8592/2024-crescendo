@@ -19,7 +19,7 @@ public class SourceOneNoteAuto extends BaseAuto {
     @Override
     public void initialize() {
         queue = new CommandQueue(
-                new ShootCommand(shooter, elevator, 1.4),
+                new ShootCommand(subsystemsManager, 1.4),
                 new FollowerCommand(drive, pathOne)
        );
     }

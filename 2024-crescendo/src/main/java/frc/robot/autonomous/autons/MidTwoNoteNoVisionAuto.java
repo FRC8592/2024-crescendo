@@ -21,12 +21,12 @@ public class MidTwoNoteNoVisionAuto extends BaseAuto {
     @Override
     public void initialize() {
        queue = new CommandQueue(
-          new ShootCommand(shooter, elevator, 1.4),
+          new ShootCommand(subsystemsManager, 1.4),
           new JointCommand(
-            new IntakeCommand(intake, shooter),
+            new IntakeCommand(subsystemsManager),
             new FollowerCommand(drive, pathOne)
           ),
-          new ShootCommand(shooter, elevator, 2.12)
+          new ShootCommand(subsystemsManager, 2.12)
        );
     }
 

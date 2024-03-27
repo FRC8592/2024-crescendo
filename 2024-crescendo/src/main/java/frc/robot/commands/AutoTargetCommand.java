@@ -34,12 +34,12 @@ public class AutoTargetCommand extends Command {
     }
     @Override
     public boolean execute() {
-        Logger.recordOutput("CurrentCommand", "AutoTargetCommand");
-        double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
-        double vy = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
-        drive.drive(new ChassisSpeeds(vy, 0, omega));
-        //return false for now, since TODO there's no method to get position relative to a specified ID
-        return false;//(Math.abs(vision.processedDx)<APRILTAG_LIMELIGHT.LOCK_ERROR) && (Math.abs(vision.processedDy - APRILTAG_LIMELIGHT.SPEAKER_TY_TARGET) < APRILTAG_LIMELIGHT.CLOSE_ERROR); // && is target valid
+        // Logger.recordOutput("CurrentCommand", "AutoTargetCommand");
+        // double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
+        // double vy = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
+        // drive.drive(new ChassisSpeeds(vy, 0, omega));
+        
+        return true; //TODO: Delete this or update it with our newer code
     }
     @Override
     public void shutdown() {

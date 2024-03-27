@@ -31,7 +31,7 @@ public class MainSubsystemsManager {
         NOTHING
     }
 
-    private enum MechanismState {
+    public enum MechanismState {
         STOWED,
         STOWING,
         INTAKING,
@@ -49,13 +49,13 @@ public class MainSubsystemsManager {
         CLIMB
     }
 
-    private MechanismState mechanismState = MechanismState.LOADED;
+    public MechanismState mechanismState = MechanismState.LOADED;
 
     public MainStates mainState = MainStates.HOME;
     public SubStates subState = SubStates.NOTHING;
-    private Intake intake;
-    private Shooter shooter;
-    private Elevator elevator;
+    public Intake intake;
+    public Shooter shooter;
+    public Elevator elevator;
     private Timer timer = new Timer(); //Used for shooting timeouts
     private PIDController turnToSpeakerController; // Will be used later for auto-aiming at the speaker.
     private NeoPixelLED leds;
@@ -415,6 +415,11 @@ public class MainSubsystemsManager {
         }
     }
 
+
+
+
+    private Timer shootTimer = new Timer();
+
     public void runMechanismStateMachine(Controls userControls, RangeTable.RangeEntry userRange){
 
         if(userControls.stow.isRisingEdge()){
@@ -546,6 +551,8 @@ public class MainSubsystemsManager {
 
             case PRIMED:
                 // Notify Drivers
+                shootTimer.reset(); //Make sure the timer is running but always at zero until we shoot
+                shootTimer.start();
                 if(userControls.score.isRisingEdge()){
                     this.mechanismState = MechanismState.SHOOTING;
                 } else if(!shooter.readyToShoot() || !elevator.isAtTargetPosition()){
@@ -558,7 +565,10 @@ public class MainSubsystemsManager {
 
             case SHOOTING:
                 shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
-                if(!userControls.score.isFallingEdge()){
+                if(userControls.score.isFallingEdge()){
+                    this.mechanismState = MechanismState.STOWING;
+                }
+                if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
                     this.mechanismState = MechanismState.STOWING;
                 }
                 break;
@@ -620,5 +630,11 @@ public class MainSubsystemsManager {
 
         }
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"StateAfterUpdate", this.mechanismState.toString());
+    }
+
+    public void setState(MechanismState state){
+        if(DriverStation.isAutonomous()){ // To avoid any possible breakages, make sure this works exclusively in Auto (the only place it should be used)
+            this.mechanismState = state;
+        }
     }
 }

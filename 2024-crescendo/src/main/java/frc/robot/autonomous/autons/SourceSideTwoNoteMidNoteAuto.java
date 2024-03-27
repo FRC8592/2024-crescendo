@@ -28,13 +28,13 @@ public class SourceSideTwoNoteMidNoteAuto extends BaseAuto{
     @Override
     public void initialize(){
         queue = new CommandQueue(
-          new ShootCommand(shooter, elevator, 1.4),
+          new ShootCommand(subsystemsManager, 1.4),
           new JointCommand(
-            new IntakeCommand(intake, shooter),
+            new IntakeCommand(subsystemsManager),
             new FollowerCommand(drive, pathOne.addVision(targeting, -10))
           ),
           new FollowerCommand(drive, pathTwo.addVision(targeting, -10)),
-          new AutoShootCommand(drive, poseVision, elevator, shooter) 
+          new AutoShootCommand(drive, poseVision, subsystemsManager)
         );
     }
     

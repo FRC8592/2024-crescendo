@@ -70,7 +70,7 @@ public class Robot extends LoggedRobot {
     private SmoothingFilter smoothingFilter;
     private MainSubsystemsManager subsystemsManager;
 
-    public RangeEntry currentEntry;
+    public static RangeEntry currentEntry;
 
     private Controls controls;
     @Override
@@ -180,7 +180,7 @@ public class Robot extends LoggedRobot {
     public void autonomousInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
-        currentAuto.addModules(swerve, elevator, intake, shooter, noteLock, poseVision);
+        currentAuto.addModules(swerve, elevator, intake, shooter, noteLock, poseVision, subsystemsManager);
         currentAuto.initialize();
         swerve.resetEncoder();
         swerve.resetPose(currentAuto.getStartPose());
@@ -195,7 +195,7 @@ public class Robot extends LoggedRobot {
         leds.red();
         currentEntry = new RangeEntry(0, 0, 0);
         currentAuto.periodic();
-        subsystemsManager.runMechanismStateMachine(controls, currentEntry);
+        subsystemsManager.runMechanismStateMachine(controls, currentEntry); //`controls` is only updated in teleop, so MSM basically only responds to the state-setter used in the commands
     }
 
     @Override

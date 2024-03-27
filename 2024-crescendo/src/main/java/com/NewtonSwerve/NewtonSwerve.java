@@ -4,11 +4,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.PoseVision;
 import frc.robot.Constants.*;
 
 import com.NewtonSwerve.Gyro.Gyro;
@@ -39,6 +42,9 @@ public class NewtonSwerve {
     // Set up the kinematics module based on physical drivetrain characteristics
     private SwerveDriveKinematics m_kinematics;
 
+    // set up the pose estimator based on vision and odometry
+    private SwerveDrivePoseEstimator m_poseEstimator;
+
     public NewtonSwerve(ModuleConfig config, Gyro gyro, SwerveModule frontLeft, SwerveModule frontRight,
             SwerveModule backLeft, SwerveModule backRight) {
 
@@ -63,7 +69,7 @@ public class NewtonSwerve {
                 // Back left
                 new Translation2d(-DRIVETRAIN_WIDTH_METERS / 2.0, DRIVETRAIN_LENGTH_METERS / 2.0),
                 // Back right
-                new Translation2d(-DRIVETRAIN_WIDTH_METERS / 2.0, -DRIVETRAIN_LENGTH_METERS / 2.0));
+                new Translation2d(-DRIVETRAIN_WIDTH_METERS / 2.0, -DRIVETRAIN_LENGTH_METERS / 2.0)); 
 
         // setup modules
         this.m_frontLeftModule = new NewtonModule(frontLeft, WHEEL_CIRCUMFERENCE);
@@ -75,6 +81,12 @@ public class NewtonSwerve {
         this.odometry = new SwerveDriveOdometry(m_kinematics, new Rotation2d(),
                 new SwerveModulePosition[] { new SwerveModulePosition(), new SwerveModulePosition(),
                         new SwerveModulePosition(), new SwerveModulePosition() });
+        
+        // initialize pose estimator
+        m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, new Rotation2d(), 
+                new SwerveModulePosition[] { new SwerveModulePosition(), new SwerveModulePosition(),
+                        new SwerveModulePosition(), new SwerveModulePosition() }, 
+                new Pose2d());
     }
 
     // public NewtonSwerve(ModuleConfig config, Gyro gyro, NewtonModule frontLeft,
@@ -161,6 +173,25 @@ public class NewtonSwerve {
                 new SwerveModulePosition[] { new SwerveModulePosition(), new SwerveModulePosition(),
                         new SwerveModulePosition(), new SwerveModulePosition() },
                 pose);
+
+        m_poseEstimator.resetPosition(getGyroscopeRotation(), new SwerveModulePosition[] { new SwerveModulePosition(), 
+            new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition() }, pose);
+    }
+
+    // POSE ESTIMATOR METHODS
+    public void addVisionMeasurement(PoseVision m_poseVision) {
+        // check if valid. for now, just if it's visible and close enough
+        if (m_poseVision.getVisionActive() && 
+            m_poseVision.getTagInView() && 
+            m_poseVision.getCurrTagZ() < APRILTAG_VISION.FUSE_DISTANCE) {
+            Pose2d visionPose = m_poseVision.getPose2d();
+            double timestamp = Timer.getFPGATimestamp() - 0.1; // NT runs at 10 FPS, so subtract 0.1
+            m_poseEstimator.addVisionMeasurement(visionPose.transformBy(APRILTAG_VISION.CAMERA_TO_ROBOT), timestamp);
+        }
+    }
+
+    public Pose2d getCurrentPosVision() {
+        return m_poseEstimator.getEstimatedPosition();
     }
 
     public void drive(ChassisSpeeds chassisSpeeds) {
@@ -179,6 +210,10 @@ public class NewtonSwerve {
 
         this.odometry.update(this.getGyroscopeRotation(),
                 new SwerveModulePosition[] { m_frontLeftModule.getModulePosition(),
+                        m_frontRightModule.getModulePosition(), m_backLeftModule.getModulePosition(),
+                        m_backRightModule.getModulePosition() });
+
+        this.m_poseEstimator.update(getGyroscopeRotation(), new SwerveModulePosition[] { m_frontLeftModule.getModulePosition(),
                         m_frontRightModule.getModulePosition(), m_backLeftModule.getModulePosition(),
                         m_backRightModule.getModulePosition() });
     }

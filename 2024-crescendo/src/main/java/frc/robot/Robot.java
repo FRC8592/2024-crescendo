@@ -179,6 +179,9 @@ public class Robot extends LoggedRobot {
         //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();
 
+        // update odometry with pose
+        swerve.addVisionMeasurement(poseVision);
+
         // NOTE: FOR TESTING PURPOSES. 
         if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
                 SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());

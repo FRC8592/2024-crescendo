@@ -139,6 +139,8 @@ public class Robot extends LoggedRobot {
 
         currentEntry = new RangeEntry(0, 0, 0);
         subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator, leds);
+
+        Rumble.init();
     }
 
     @Override
@@ -174,6 +176,8 @@ public class Robot extends LoggedRobot {
         }
         Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
         Logger.recordOutput(APRILTAG_VISION.LOG_PATH+"X offset (m)", poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS));
+
+        Rumble.update(driverController, operatorController);
     }
 
     @Override

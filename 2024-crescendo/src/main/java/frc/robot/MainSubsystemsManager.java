@@ -118,6 +118,9 @@ public class MainSubsystemsManager {
                 shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
                 if(!shooter.isTopBeamBreakTripped()){ //if beam break NOT tripped, exclamation point
                     this.mechanismState = MechanismState.LOADED;
+
+                    //Rumble to signal that we have the note ready
+                    Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.3, 1));
                 }
                 break;
 
@@ -125,7 +128,6 @@ public class MainSubsystemsManager {
             // "Stow" state, but for when we have a note
 
             case LOADED:
-                //TODO: NOTIFY DRIVERS
                 if(userControls.outake.isRisingEdge()){
                     this.mechanismState = MechanismState.OUTTAKING;
                 }
@@ -171,9 +173,16 @@ public class MainSubsystemsManager {
             // position (usually a change in the targets during a range table shot)
 
             case PRIMED:
-                // Notify Drivers
                 shootTimer.reset(); //Make sure the timer is running but always at zero until we shoot
                 shootTimer.start();
+
+                //Constantly rumble both controllers to let both drivers know that we're ready to shoot
+                if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
+                    Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
+                }
+                if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
+                    Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
+                }
                 if(userControls.score.isRisingEdge()){
                     this.mechanismState = MechanismState.SHOOTING;
                 } else if(!shooter.readyToShoot() || !elevator.isAtTargetPosition()){

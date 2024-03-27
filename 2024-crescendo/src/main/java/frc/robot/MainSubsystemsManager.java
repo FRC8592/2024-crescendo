@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.*;
 
@@ -48,7 +49,7 @@ public class MainSubsystemsManager {
         CLIMB
     }
 
-    private MechanismState mechanismState = MechanismState.STOWED;
+    private MechanismState mechanismState = MechanismState.LOADED;
 
     public MainStates mainState = MainStates.HOME;
     public SubStates subState = SubStates.NOTHING;
@@ -414,14 +415,18 @@ public class MainSubsystemsManager {
         }
     }
 
-    public void runMechanismStateMachine(boolean userIntake, boolean userClimb, boolean userOuttaking,
-                                         boolean userPriming, boolean userAmpPriming, boolean userShoot, boolean userExtending,
-                                         boolean userRetracting, boolean userStow, RangeTable.RangeEntry userRange){
-        if(userStow){
+    public void runMechanismStateMachine(Controls userControls, RangeTable.RangeEntry userRange){
+
+        if(userControls.stow.isRisingEdge()){
             this.mechanismState = MechanismState.STOWING;
         }
 
+        Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"StateBeforeUpdate", this.mechanismState.toString());
+
         switch(this.mechanismState){
+
+            // Stop the spinning motors and put the elevator in the home position
+
             case STOWING:
                 elevator.setElevatorPosition(0, 0);
                 shooter.stopFlywheels();
@@ -431,33 +436,57 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.STOWED;
                 }
                 break;
+
+
+            // Does nothing; assumes STOWING has put everything in the robot in the home position
+
             case STOWED:
                 //TODO: NOTIFY DRIVERS
-                if(userIntake){
+                if(userControls.intake.isRisingEdge()){
                     this.mechanismState = MechanismState.INTAKING;
-                } else if(userClimb){
+                }
+                else if(userControls.climb.isRisingEdge()){
                     this.mechanismState = MechanismState.CLIMB_PRIME;
-                } else if (userOuttaking){
+                }
+                else if (userControls.outake.isRisingEdge()){
                     this.mechanismState = MechanismState.OUTTAKING;
-                } else if (!elevator.isAtTargetPosition()){
+                }
+                else if (!elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.STOWING;
                 }
                 break;
+
+
+            // Gets the note to the flywheels from the ground. TODO make sure we don't need the extra timer we had in the old shooter version of this
+
             case INTAKING:
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
-                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+                if(!shooter.isBottomBeamBreakTripped()){
+                    shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
+                }
+                else{
+                    shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 1); // The note will provide some resistance, so use the more powerful PID controller in slot 1
+                }
                 shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
                 if(shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.ADJUSTING_1;
                 } 
                 break;
+
+
+            // First adjustment phase after intaking that positions the note just above the top beam-break.
+
             case ADJUSTING_1:
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
-                shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+                shooter.setFeederVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
                 if(shooter.isTopBeamBreakTripped()){
                     this.mechanismState = MechanismState.ADJUSTING_2;
                 }
                 break;
+
+
+            // Second adjustment phase after intaking; positions the note in its final position just below the top beam-break
+
             case ADJUSTING_2:
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
                 shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
@@ -465,26 +494,43 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.LOADED;
                 }
                 break;
+
+
+            // "Stow" state, but for when we have a note
+
             case LOADED:
                 //TODO: NOTIFY DRIVERS
-                if(userOuttaking){
+                if(userControls.outake.isRisingEdge()){
                     this.mechanismState = MechanismState.OUTTAKING;
-                } else if(userClimb){
+                }
+                else if(userControls.climb.isRisingEdge()){
                     this.mechanismState = MechanismState.CLIMB_PRIME;
-                } else if(userPriming){
+                }
+                else if(userControls.shootFromPodium.isRisingEdge()
+                        || userControls.score.isRisingEdge() // For a subwoofer shot
+                        || userControls.jukeShot.isRisingEdge()
+                        || userControls.rangeTableShoot.isRisingEdge()){
                     this.mechanismState = MechanismState.PRIMING;
-                } else if(userAmpPriming){
+                }
+                else if(userControls.amp.isRisingEdge()){
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 }
                 break;
+
+
+            // Regurgitate the note
+
             case OUTTAKING:
                 intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
                 shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
-                if(!userOuttaking){
+                if(userControls.outake.isFallingEdge()){
                     this.mechanismState = MechanismState.STOWING;
                 }
                 break;
+
+
+            // Prepare for a shot by spinning up the flywheels and angling the pivot
 
             case PRIMING:
                 shooter.setTargetSpeed((int)userRange.leftFlywheelSpeed, (int)userRange.rightFlywheelSpeed);
@@ -493,20 +539,32 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.PRIMED;
                 }
                 break;
+
+
+            // Wait for a score press or for something to cause us to be out of tolerance on the flywheel speeds or elevator
+            // position (usually a change in the targets during a range table shot)
+
             case PRIMED:
                 // Notify Drivers
-                if(userShoot){
+                if(userControls.score.isRisingEdge()){
                     this.mechanismState = MechanismState.SHOOTING;
                 } else if(!shooter.readyToShoot() || !elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.PRIMING;
                 }
                 break;
+
+
+            // Under the assumption that our flywheels and pivot angle are set correctly, shoot into the speaker
+
             case SHOOTING:
                 shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
-                if(!userShoot){
+                if(!userControls.score.isFallingEdge()){
                     this.mechanismState = MechanismState.STOWING;
                 }
                 break;
+
+
+            // Get into the amp elevator position (max extension and mid-height pivot)
 
             case PRIMING_AMP:
                 shooter.stopFlywheels();
@@ -515,19 +573,30 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.AMP_PRIMED;
                 }
                 break;
+
+
+            // Static state that effectively waits for a score button press
+
             case AMP_PRIMED:
                 // Notify Drivers
-                if(userShoot){
+                if(userControls.score.isRisingEdge()){
                     this.mechanismState = MechanismState.AMP_SCORING;
                 }
                 break;
+
+
+            // Score in the amp (assumes that we're in the amp position)
+
             case AMP_SCORING:
                 shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED, SHOOTER.AMP_FLYWHEEL_SPEED);
                 shooter.setFeederPower(SHOOTER.AMP_FEEDER_SPEED);
-                if(!userShoot){
+                if(!userControls.score.isFallingEdge()){
                     this.mechanismState = MechanismState.AMP_PRIMED;
                 }
                 break;
+
+
+            //Lift the pivot and extend to the maximum position
 
             case CLIMB_PRIME:
                 shooter.stopFlywheels();
@@ -536,18 +605,20 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.CLIMB;
                 }
                 break;
-            
+
+
             //It allows the user to manually extend and retract the elevator
 
             case CLIMB:
-                if(userExtending){
+                if(userControls.manualExtend.isPressed()){
                     elevator.extend();
                 } 
-                else if(userRetracting){
+                else if(userControls.manualRetract.isPressed()){
                     elevator.retract();
                 }
                 break;
-            
+
         }
+        Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"StateAfterUpdate", this.mechanismState.toString());
     }
 }

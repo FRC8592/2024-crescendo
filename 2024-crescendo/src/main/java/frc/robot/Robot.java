@@ -29,14 +29,11 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.autons.*;
+import frc.robot.RangeTable.RangeEntry;
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 
-import javax.xml.stream.util.StreamReaderDelegate;
-
 import frc.robot.Constants.*;
-import frc.robot.MainSubsystemsManager.MainStates;
-import frc.robot.MainSubsystemsManager.SubStates;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -73,24 +70,9 @@ public class Robot extends LoggedRobot {
     private SmoothingFilter smoothingFilter;
     private MainSubsystemsManager subsystemsManager;
 
-    private BooleanManager slowMode = new BooleanManager(false);
-    private BooleanManager resetGyro = new BooleanManager(false);
-    private BooleanManager autoCollect = new BooleanManager(false);
-    private BooleanManager robotOriented = new BooleanManager(false);
+    public RangeEntry currentEntry;
 
-    // operator controls
-    private BooleanManager ledAmpSignal = new BooleanManager(false);
-    private BooleanManager shootFromPodium = new BooleanManager(false);
-    private BooleanManager rangeTableShoot = new BooleanManager(false);
-    private BooleanManager outake = new BooleanManager(false);
-    private BooleanManager intaking = new BooleanManager(false);
-    private BooleanManager stow = new BooleanManager(false);
-    private BooleanManager amp = new BooleanManager(false);
-    private BooleanManager climb = new BooleanManager(false);
-    private BooleanManager speakerAmp = new BooleanManager(false);
-    private BooleanManager manualRaiseClimber = new BooleanManager(false);
-    private BooleanManager manualLowerClimber = new BooleanManager(false);
-    private BooleanManager jukeShot = new BooleanManager(false);
+    private Controls controls;
     @Override
     public void robotInit() {
 
@@ -154,7 +136,8 @@ public class Robot extends LoggedRobot {
         turnPID = new PIDController(NOTELOCK.DRIVE_TO_TURN_kP, NOTELOCK.DRIVE_TO_TURN_kI, NOTELOCK.DRIVE_TO_TURN_kD);
 
         poseVision = new PoseVision(APRILTAG_VISION.kP, APRILTAG_VISION.kI, APRILTAG_VISION.kD, 0);
-        
+
+        currentEntry = new RangeEntry(0, 0, 0);
         subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator, leds);
     }
 
@@ -191,7 +174,6 @@ public class Robot extends LoggedRobot {
         }
         Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
         Logger.recordOutput(APRILTAG_VISION.LOG_PATH+"X offset (m)", poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS));
-        shooter.update(leds);
     }
 
     @Override
@@ -211,7 +193,9 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousPeriodic() {
         leds.red();
+        currentEntry = new RangeEntry(0, 0, 0);
         currentAuto.periodic();
+        subsystemsManager.runMechanismStateMachine(controls, currentEntry);
     }
 
     @Override
@@ -319,37 +303,17 @@ public class Robot extends LoggedRobot {
         double driveTranslateY = rawLeftY; //>= 0 ? (Math.pow(rawLeftY, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawLeftY, SWERVE.JOYSTICK_EXPONENT));
         double driveTranslateX = rawLeftX; //>= 0 ? (Math.pow(rawLeftX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawLeftX, SWERVE.JOYSTICK_EXPONENT));
         double driveRotate =     rawRightX >= 0 ? (Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT));
-        slowMode.update          (driverController.getRightBumper());
-        resetGyro.update         (driverController.getBackButton());
-        autoCollect.update       (driverController.getLeftBumper());
-        robotOriented.update     (driverController.getRightTriggerAxis() >0.1);
-
-        //operator controls
-        // shooter/feeder functions
-        shootFromPodium.update   (operatorController.getLeftBumper());
-        rangeTableShoot.update   (operatorController.getBButton());
-
-        outake.update            (operatorController.getRightBumper());
-        intaking.update          (operatorController.getLeftTriggerAxis()>0.1);
-
-        stow.update              (operatorController.getAButton());
-        amp.update               (operatorController.getXButton());
-        climb.update             (operatorController.getYButton());
-        speakerAmp.update        (operatorController.getRightTriggerAxis()>0.1);
-        manualRaiseClimber.update(operatorController.getPOV() == 0);
-        manualLowerClimber.update(operatorController.getPOV() == 180);
-        ledAmpSignal.update      (operatorController.getBackButton());
-        jukeShot.update          (operatorController.getStartButton());
+        controls.update(driverController, operatorController);
 
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
-        RangeTable.RangeEntry entry = new RangeTable.RangeEntry(0, 0, 0);
+        currentEntry = new RangeTable.RangeEntry(0, 0, 0);
 
-        if(resetGyro.getValue()){
+        if(controls.resetGyro.isPressed()){
             swerve.zeroGyroscope();
         }
 
-        if (slowMode.getValue()) { //Slow Mode slows down the robot for better precision & control
+        if (controls.slowMode.isPressed()) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
                     driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
                     driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
@@ -361,121 +325,39 @@ public class Robot extends LoggedRobot {
                     driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
                     driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
         }
-        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented.getValue()?new Rotation2d():swerve.getGyroscopeRotation());
+        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, controls.robotOriented.isPressed()?new Rotation2d():swerve.getGyroscopeRotation());
         noteLock.updateVision();
-
-        if (autoCollect.getValue()) { // Different from the others because it interacts with both the drivetrain and the main subsystems manager subsystems
-            if (!shooter.hasNote) {
-                currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
-                if (autoCollect.isRisingEdge()) {
-                    subsystemsManager.intake(true);
-                }
-            }
-        }
-        else if (autoCollect.isFallingEdge()) {
-            subsystemsManager.intake(false);
-        }
-        else if (intaking.isRisingEdge()) {
-            subsystemsManager.intake(true);
-        }
-        else if (intaking.isFallingEdge()) {
-            subsystemsManager.intake(false);
-        }
-        else if (amp.isRisingEdge()) {
-            subsystemsManager.amp(true);
-        }
-        else if (stow.isRisingEdge()) {
-            subsystemsManager.home();
-        }
-        //Maybe add something here to trigger `subsystemsManager.forceHome()`
-        else if (climb.isRisingEdge()) {
-            subsystemsManager.climb(true);
-        }
-        //TODO: Figure out what to do with prime
-        else if (manualRaiseClimber.isRisingEdge()) {
-            subsystemsManager.climbExtend(true);
-        }
-        else if (manualRaiseClimber.isFallingEdge()) {
-            subsystemsManager.climbExtend(false);
-        }
-        else if (manualLowerClimber.isRisingEdge()) {
-            subsystemsManager.climbRetract(true);
-        }
-        else if (manualLowerClimber.isFallingEdge()) {
-            subsystemsManager.climbRetract(false);
-        }
-        else if (outake.isRisingEdge()) {
-            subsystemsManager.outake(true);
-        }
-        else if (outake.isFallingEdge()) {
-            subsystemsManager.outake(false);
-        }
-        else if (shootFromPodium.isRisingEdge()) {
-            //This whole control is temporary. We account for the change in angle using code in the subsystemsManager.update() line
-            subsystemsManager.speaker(true);
-        }
-        else if (shootFromPodium.isFallingEdge()) {
-            subsystemsManager.speaker(false);
-        }
-        else if (speakerAmp.isRisingEdge()) {
-            if (subsystemsManager.mainState == MainStates.AMP) {
-                subsystemsManager.score();
-            }
-            else {
-                subsystemsManager.speaker(true);
-            }
-        }
-        else if (speakerAmp.isFallingEdge()) {
-            if (subsystemsManager.mainState == MainStates.SPEAKER) {
-                subsystemsManager.speaker(false);
-            }
-        }
-        else if (rangeTableShoot.isRisingEdge()){
-            subsystemsManager.speaker(true);
-        }
-        else if(rangeTableShoot.isFallingEdge()){
-            subsystemsManager.speaker(false);
-        }
-        else if(jukeShot.isRisingEdge()){
-            subsystemsManager.speaker(true);
-        }
-        else if(jukeShot.isFallingEdge()){
-            subsystemsManager.speaker(false);
-        }
-        else if (jukeShot.getValue()){ // Don't run on the first frame the control is pressed.
-            entry = new RangeTable.RangeEntry(4500, 3500, 32);
-            subsystemsManager.score();
-        }
-        else if (rangeTableShoot.getValue()){
-            double distance = poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
-            entry = RangeTable.get(distance==-1.0?0:distance);
-            subsystemsManager.score();
-        }
-        else if (speakerAmp.getValue()) {
-            entry = new RangeTable.RangeEntry(3500, (int)(3500*0.8), 0);
-            subsystemsManager.score();
-        }
-        else if (shootFromPodium.getValue()) {
-            subsystemsManager.score();
-            entry = RangeTable.get(2.83);
-        }
         if(driverController.getLeftTriggerAxis()>0.1){
             double omega = poseVision.visual_servo(0, 1.0, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
 
-        //LED management
-        if (ledAmpSignal.isRisingEdge()) {
-            leds.flashTimer.reset();
+        if(controls.score.isTriggered()){
+            if(!controls.jukeShot.isTriggered()
+                    && !controls.shootFromPodium.isTriggered()
+                    && !controls.rangeTableShoot.isTriggered()){
+                currentEntry = RangeTable.get(1.4);
+            }
+            else{
+                controls.score.resetTrigger();
+            }
         }
-        if (ledAmpSignal.getValue()) {
-            leds.amp();
+
+        if(controls.jukeShot.isTriggered()){
+            currentEntry = new RangeTable.RangeEntry(4500, 3500, 32); // This is manual because of the extension on the jukeshot
         }
-        if(ledAmpSignal.isFallingEdge()){
-            leds.off();
+        else if(controls.shootFromPodium.isTriggered()){
+            currentEntry = RangeTable.get(2.83);
         }
-        //poseVision.getTagInView()&&poseVision.getCurrTagID() == 4?poseVision.getCurrTagZ():
-        swerve.drive(subsystemsManager.update(entry.leftFlywheelSpeed, entry.rightFlywheelSpeed, entry.pivotAngle, jukeShot.getValue() ? ELEVATOR.EXTENSION_METERS_MAX : 0, currentSpeeds));
+        else if(controls.rangeTableShoot.isTriggered()){
+            double distance = poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
+            if(distance != -1.0){
+                currentEntry = RangeTable.get(distance);
+            }
+            //else the entry will stay at the default 0, 0, 0. MSM uses that to determine whether to continue with an RT shot
+        }
+        subsystemsManager.runMechanismStateMachine(controls, currentEntry);
+        swerve.drive(currentSpeeds);
     }
 
     @Override

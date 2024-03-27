@@ -238,6 +238,15 @@ public class Shooter {
     }
 
     /**
+     * Sets velocity of the feeder wheels
+     * @param feederVelocity feeder velocity in RPM
+     * @param slotID PID controller slot to pass to the motor
+    */
+    public void setFeederVelocity(double feederVelocity, int slotID) {
+        feederMotor.setVelocity(feederVelocity, slotID);
+    }
+
+    /**
      * stops feeder wheels from moving
      */
     public void stopFeeders() {

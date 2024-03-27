@@ -337,4 +337,8 @@ public final class Constants {
     public class MAIN_SUBSYSTEMS_MANAGER{
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/MainSubsystems/";
     }
+
+    public class CONTROLS{
+        public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Controls/";
+    }
 }

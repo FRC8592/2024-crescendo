@@ -9,6 +9,7 @@ public class BooleanManager {
     private boolean lastToggle = false;
     private boolean isToggleRisingEdge = false;
     private boolean isToggleFallingEdge = false;
+    private boolean isTriggered = false;
 
     public BooleanManager() {}
     
@@ -17,7 +18,7 @@ public class BooleanManager {
         lastFrame = b;
     }
 
-    public boolean getValue() {
+    public boolean isPressed() {
         return value;
     }
 
@@ -33,6 +34,10 @@ public class BooleanManager {
         isToggleRisingEdge = isToggle ? (lastToggle ? false : true) : false;
         isToggleFallingEdge = isToggle ? false : (lastToggle ? true : false);
         lastToggle = isToggle;
+
+        if(isRisingEdge){
+            isTriggered = true;
+        }
     }
 
     /**
@@ -76,5 +81,16 @@ public class BooleanManager {
     public void setToggle(boolean isToggle){
         this.isToggle = isToggle;
         this.lastToggle = isToggle;
+    }
+
+    /**
+     * @return whether the internal trigger is true. This is the case when there has been a rising edge anytime since the last `resetTrigger()`
+     */
+    public boolean isTriggered(){
+        return this.isTriggered;
+    }
+
+    public void resetTrigger(){
+        this.isTriggered = false;
     }
 }

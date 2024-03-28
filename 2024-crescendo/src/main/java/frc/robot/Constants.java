@@ -188,7 +188,7 @@ public final class Constants {
         public static final int AMP_FEEDER_SPEED = -3000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 1000;
+        public static final int INTAKE_FEEDER_SPEED = 2500;
 
         //No shooter speed because we use the range table
         // public static final int SHOOTING_FEEDER_SPEED = 2500;
@@ -198,7 +198,7 @@ public final class Constants {
         public static final double OUTAKE_FEEDER_SPEED = -2000;
 
 
-        public static final double SHOOT_SCORE_TIME = 0.75; //TODO: Tune this
+        public static final double SHOOT_SCORE_TIME = 2.0; //TODO: Tune this
         public static final double AMP_SCORE_TIME = 0.25; //TODO: Tune this
 
         public static final double FEEDER_AMP_TOLERANCE = 100;
@@ -321,8 +321,8 @@ public final class Constants {
 
     public class APRILTAG_VISION {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/MGVision/";
-        public static final double kP = 1.25;
-        public static final double kI = 1.75;
+        public static final double kP = 1.3;
+        public static final double kI = 0.75;
         public static final double kD = 0.005;
         public static final double iZone = 0.5;
 
@@ -331,7 +331,7 @@ public final class Constants {
         public static final ArrayList<Integer> AMP_AIM_TAGS = new ArrayList<>(Arrays.asList(5, 6));
         public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
 
-        public static final double X_ROT_LOCK_ERROR = 0.15;
+        public static final double X_ROT_LOCK_ERROR = 0.1;
     }
 
     public class MAIN_SUBSYSTEMS_MANAGER{

@@ -1,6 +1,9 @@
 package frc.robot;
 
+import org.ejml.equation.IntegerSequence.Range;
 import org.littletonrobotics.junction.Logger;
+
+import frc.robot.Constants.ELEVATOR;
 
 public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
@@ -83,11 +86,20 @@ public class RangeTable {
         public int leftFlywheelSpeed;
         public int rightFlywheelSpeed;
         public double pivotAngle;
+        public double elevatorHeight;
 
         public RangeEntry(int left, int right, double angle) {
             leftFlywheelSpeed = left;
             rightFlywheelSpeed = right;
             pivotAngle = angle;
+            elevatorHeight = 0;
+        }
+
+        public RangeEntry(int left, int right, double angle, double height) {
+            leftFlywheelSpeed = left;
+            rightFlywheelSpeed = right;
+            pivotAngle = angle;
+            elevatorHeight = height;
         }
 
         /**
@@ -107,5 +119,17 @@ public class RangeTable {
             Logger.recordOutput("CustomLogs/RangeTable/GeneratedFlywheelSpeed", generated.leftFlywheelSpeed);
             return generated;
         }
+    }
+
+    public static RangeEntry getKiddyPool() {
+        return new RangeEntry(4500, 3500, 32, ELEVATOR.EXTENSION_METERS_MAX);
+    }
+
+    public static RangeEntry getSubwoofer() {
+        return get(1.4);
+    }
+
+    public static RangeEntry getPodium() {
+        return get(2.83);
     }
 }

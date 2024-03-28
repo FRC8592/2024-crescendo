@@ -40,7 +40,7 @@ public class AutoShootCommand extends Command {
     public boolean execute() {
         double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0.5);
         double distance = vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
-        Robot.currentEntry = RangeTable.get(distance);
+        Robot.currentRange = RangeTable.get(distance);
         drive.drive(new ChassisSpeeds(0, 0, omega));
 
         if ((Math.abs(vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS))<APRILTAG_VISION.X_ROT_LOCK_ERROR

@@ -104,93 +104,15 @@ public class Shooter {
         state = States.NOTHING;
     }
 
-    public void update(NeoPixelLED readyToShootLED){
-        Logger.recordOutput(SHOOTER.LOG_PATH+"ShooterState", state.toString());
+    public void log() {
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftTargetSpeed", leftTargetSpeed);
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightTargetSpeed", rightTargetSpeed);
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightShooterSpeed", rightShooterMotor.getVelocity());
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftShooterSpeed", leftShooterMotor.getVelocity());
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/FeederSpeed", feederMotor.getVelocity());
         Logger.recordOutput(SHOOTER.LOG_PATH+"ReadyToShoot", readyToShoot());
-        Logger.recordOutput(SHOOTER.LOG_PATH+"ShootTimer", shootTimer.get());
-        Logger.recordOutput(SHOOTER.LOG_PATH+"KeepRammingTimer", keepRammingTimer.get());
         Logger.recordOutput(SHOOTER.LOG_PATH+"BottomBeamBreak", bottomBeamBreak.get());
         Logger.recordOutput(SHOOTER.LOG_PATH+"TopBeamBreak", topBeamBreak.get());
-        switch (state) {
-            default:
-                break;
-            case NOTHING:
-                feederMotor.motorControl.setIAccum(0);
-                break;
-            case INTAKING:
-                setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-                setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED);
-                if(!bottomBeamBreak.get()){ //Notice the exclamation point; the beam-break returns an inverted "is it tripped"
-                state = States.RAM_TO_SHOOTERS;
-            }
-                break;
-            case RAM_TO_SHOOTERS:
-                setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-                feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 1);
-                if(!topBeamBreak.get()){
-                    keepRammingTimer.reset();
-                    keepRammingTimer.start();
-                    state = States.KEEP_RAMMING;
-                }
-                break;
-            
-            case KEEP_RAMMING:
-                setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-                feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 1);
-                if (keepRammingTimer.get() > SHOOTER.KEEP_RAMMING_TIME){
-                    state = States.BACK_OFF_TO_SENSOR;
-                }
-                break;
-                
-            case BACK_OFF_TO_SENSOR:
-                setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
-                feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
-                if(!topBeamBreak.get()){
-                    state = States.BACK_OFF_FROM_SENSOR;
-                } 
-                break;
-                
-            case BACK_OFF_FROM_SENSOR:
-                
-                if(topBeamBreak.get()){
-                    feederMotor.setVelocity(0);
-                    setShootVelocity(0, 0);
-                    state = States.NOTHING;
-                    readyToShootLED.notePickup();
-                }
-                break;
-
-            case SHOOT_PREP:
-                setShootVelocity(leftTargetSpeed, rightTargetSpeed);
-                break;
-
-            case SHOOT:
-                setShootVelocity(leftTargetSpeed, rightTargetSpeed);
-                if(readyToShoot()){
-                    feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);
-                    shootTimer.start();
-                    if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
-                        stopFlywheels();
-                        stopFeeders();
-                        shootTimer.stop();
-                        shootTimer.reset();
-                        state = States.NOTHING;
-                    }
-                }
-                break;
-            case OUTAKE:
-                setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
-                setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
-                if(bottomBeamBreak.get()){ // "If the top beam break doesn't see anything"
-                    state = States.NOTHING;
-                }
-                break;
-        }
     }
 
     /**

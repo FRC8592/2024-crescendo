@@ -70,9 +70,13 @@ public class Robot extends LoggedRobot {
     private SmoothingFilter smoothingFilter;
     private MainSubsystemsManager subsystemsManager;
 
-    public static RangeEntry currentEntry;
+    public static RangeEntry currentRange;
 
     private Controls controls;
+
+    private double distance;
+    private boolean locked;
+
     @Override
     public void robotInit() {
 
@@ -137,7 +141,7 @@ public class Robot extends LoggedRobot {
 
         poseVision = new PoseVision(APRILTAG_VISION.kP, APRILTAG_VISION.kI, APRILTAG_VISION.kD, 0);
 
-        currentEntry = new RangeEntry(0, 0, 0);
+        currentRange = new RangeEntry(0, 0, 0);
         subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator, leds);
 
         Rumble.init();
@@ -163,6 +167,7 @@ public class Robot extends LoggedRobot {
 
         //SmartDashboard.putNumber("target angle", targetAngle);
         elevator.update();
+        shooter.log();
 
         // NOTE: FOR TESTING PURPOSES. 
         if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
@@ -178,6 +183,11 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput(APRILTAG_VISION.LOG_PATH+"X offset (m)", poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS));
 
         Rumble.update(driverController, operatorController);
+
+        // April Tag 
+        distance = poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
+        locked = poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS) < APRILTAG_VISION.X_ROT_LOCK_ERROR;
+
     }
 
     @Override
@@ -197,9 +207,9 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousPeriodic() {
         leds.red();
-        currentEntry = new RangeEntry(0, 0, 0);
+        currentRange = new RangeEntry(0, 0, 0);
         currentAuto.periodic();
-        subsystemsManager.runMechanismStateMachine(controls, currentEntry); //`controls` is only updated in teleop, so MSM basically only responds to the state-setter used in the commands
+        subsystemsManager.updateMechanismStateMachine(controls, distance, locked); //`controls` is only updated in teleop, so MSM basically only responds to the state-setter used in the commands
     }
 
     @Override
@@ -309,9 +319,12 @@ public class Robot extends LoggedRobot {
         double driveRotate =     rawRightX >= 0 ? (Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT));
         controls.update(driverController, operatorController);
 
+        
+        
+
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
-        currentEntry = new RangeTable.RangeEntry(0, 0, 0);
+        currentRange = new RangeTable.RangeEntry(0, 0, 0);
 
         if(controls.resetGyro.isPressed()){
             swerve.zeroGyroscope();
@@ -337,31 +350,28 @@ public class Robot extends LoggedRobot {
         }
 
         if(controls.score.isTriggered()){
-            if(!controls.jukeShot.isTriggered()
+            if(!controls.kiddyPoolShot.isTriggered()
                     && !controls.shootFromPodium.isTriggered()
                     && !controls.rangeTableShoot.isTriggered()){
-                currentEntry = RangeTable.get(1.4);
+                currentRange = RangeTable.get(1.4);
             }
             else{
                 controls.score.resetTrigger();
             }
         }
 
-        if(controls.jukeShot.isTriggered()){
-            currentEntry = new RangeTable.RangeEntry(4500, 3500, 32); // This is manual because of the extension on the jukeshot
+        if(controls.kiddyPoolShot.isRisingEdge()){
+            subsystemsManager.staticPrime(RangeTable.getKiddyPool());
         }
-        else if(controls.shootFromPodium.isTriggered()){
-            currentEntry = RangeTable.get(2.83);
+        else if(controls.shootFromPodium.isRisingEdge()){
+            subsystemsManager.staticPrime(RangeTable.getPodium());
         }
-        else if(controls.rangeTableShoot.isTriggered()){
-            double distance = poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
-            if(distance != -1.0){
-                currentEntry = RangeTable.get(distance);
-            }
-            //else the entry will stay at the default 0, 0, 0. MSM uses that to determine whether to continue with an RT shot
+        else if(controls.rangeTableShoot.isRisingEdge()){
+            subsystemsManager.setVisionPrime();
         }
-        subsystemsManager.runMechanismStateMachine(controls, currentEntry);
+    
         swerve.drive(currentSpeeds);
+        subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
     }
 
     @Override

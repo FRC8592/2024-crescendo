@@ -34,7 +34,7 @@ public class Intake {
 
     }
 
-    public void halt() {
+    public void stopIntake() {
         topMotor.setPercentOutput(0);
         // bottomMotor.setPercentOutput(0);
     }

@@ -22,7 +22,7 @@ public class Controls {
     public BooleanManager score;
     public BooleanManager manualExtend;
     public BooleanManager manualRetract;
-    public BooleanManager jukeShot;
+    public BooleanManager kiddyPoolShot;
 
     public Controls(){
         this.slowMode = new BooleanManager(false);
@@ -41,7 +41,7 @@ public class Controls {
         this.score = new BooleanManager(false);
         this.manualExtend = new BooleanManager(false);
         this.manualRetract = new BooleanManager(false);
-        this.jukeShot = new BooleanManager(false);
+        this.kiddyPoolShot = new BooleanManager(false);
     }
 
     public void update(XboxController driverController, XboxController operatorController){
@@ -61,7 +61,7 @@ public class Controls {
         this.manualExtend.update   (operatorController.getPOV() == 0);
         this.manualRetract.update  (operatorController.getPOV() == 180);
         this.ledAmpSignal.update   (operatorController.getBackButton());
-        this.jukeShot.update       (operatorController.getStartButton());
+        this.kiddyPoolShot.update       (operatorController.getStartButton());
 
         this.log(this.slowMode, "DriverController", "SlowMode");
         this.log(this.resetGyro, "DriverController", "ResetGyro");
@@ -79,7 +79,7 @@ public class Controls {
         this.log(this.score, "OperatorController", "Score");
         this.log(this.manualExtend, "OperatorController", "ManualExtend");
         this.log(this.manualRetract, "OperatorController", "ManualRetract");
-        this.log(this.jukeShot, "OperatorController", "JukeShot");
+        this.log(this.kiddyPoolShot, "OperatorController", "JukeShot");
     }
     private void log(BooleanManager logged, String controller, String name){
         Logger.recordOutput(CONTROLS.LOG_PATH+controller+"/"+name+"/IsPressed", logged.isPressed());

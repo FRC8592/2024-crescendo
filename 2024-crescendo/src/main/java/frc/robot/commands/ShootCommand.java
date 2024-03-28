@@ -32,7 +32,7 @@ public class ShootCommand extends Command{
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "ShootCommand");
 
-        Robot.currentEntry = RangeTable.get(expectedRange);
+        Robot.currentRange = RangeTable.get(expectedRange);
 
         if(subsystemsManager.mechanismState == MechanismState.PRIMED){
             subsystemsManager.setState(MechanismState.SHOOTING);

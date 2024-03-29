@@ -22,6 +22,7 @@ public class AutoShootCommand extends Command {
     private Elevator elevator;
     private Shooter shooter;
     private Timer timer;
+    private Timer aimTimeout;
     private boolean isShooting;
 
 
@@ -31,11 +32,13 @@ public class AutoShootCommand extends Command {
         this.elevator = elevator;
         this.shooter = shooter;
         this.timer = new Timer();
+        this.aimTimeout = new Timer();
         this.isShooting = false;
     }
     @Override
     public void initialize() {
         drive.drive(new ChassisSpeeds());
+        this.aimTimeout.start();
     }
     @Override
     public boolean execute() {
@@ -49,8 +52,17 @@ public class AutoShootCommand extends Command {
         shooter.setShootVelocity(entry.leftFlywheelSpeed, entry.leftFlywheelSpeed);
         // shooter.setShootVelocity(0, 0);
         drive.drive(new ChassisSpeeds(0, 0, omega));
-        if ((Math.abs(vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS))<APRILTAG_VISION.X_ROT_LOCK_ERROR && elevator.isTargetAngle()) || isShooting){
+        if ((Math.abs(vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS))<APRILTAG_VISION.X_ROT_LOCK_ERROR 
+            && elevator.isTargetAngle()) 
+            || isShooting
+            || aimTimeout.get() > 1.5){ // let it aim for 0.5 sec
             isShooting = true;
+
+            // update range table shot params
+            distance = vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
+            entry = RangeTable.get(distance);
+            shooter.setShootVelocity(entry.leftFlywheelSpeed, entry.leftFlywheelSpeed);
+
             SmartDashboard.putNumber("Ready To Shoot", distance);
             Logger.recordOutput("AutoShootCommand Shooting", true);
             this.timer.start();

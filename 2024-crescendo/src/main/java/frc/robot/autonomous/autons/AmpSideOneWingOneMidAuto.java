@@ -12,18 +12,25 @@ import frc.robot.commands.*;
 public class AmpSideOneWingOneMidAuto extends BaseAuto{ //NOTE THIS IS SOURCE SIDE
 
     private TrajectoryConfig slowConfig = new TrajectoryConfig(2, 3);
-    private SwerveTrajectory pathOne = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0),
+    private SwerveTrajectory pathOne = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(false),
     AutonomousPositions.SUBWOOFER_DOWN.getPose(),
-    AutonomousPositions.MID_NOTE_5.getPose()
+    AutonomousPositions.MID_NOTE_5.translate(0, -.2)
     ).addRotation(new Rotation2d(), 0.5);
-    private SwerveTrajectory pathTwo = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0),
-     AutonomousPositions.MID_NOTE_5.getPose(),
+    private SwerveTrajectory pathTwo = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
+     AutonomousPositions.MID_NOTE_5.translate(0, -.2),
+     AutonomousPositions.MID_NOTE_5.translate(-3, 0.5),
+     AutonomousPositions.WING_NOTE_2.translate(1, -2.25)
+    ).addRotation(Rotation2d.fromDegrees(-60));
+    private SwerveTrajectory pathThree = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(false),
+     AutonomousPositions.WING_NOTE_2.translate(0.5, -2.25),
+     AutonomousPositions.MID_NOTE_3.translate(-3, 0),
+     AutonomousPositions.MID_NOTE_3.translate(-1, -1.5)
+    ).addRotation(Rotation2d.fromDegrees(-15), 0.2);
+    private SwerveTrajectory pathFour = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
+     AutonomousPositions.MID_NOTE_3.translate(-1, -1),
+     AutonomousPositions.MID_NOTE_3.translate(-2, 0),
      AutonomousPositions.WING_NOTE_2.translate(0.5, -2.25)
-    ).addRotation(Rotation2d.fromDegrees(-45));
-    private SwerveTrajectory pathThree = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
-     AutonomousPositions.MID_NOTE_1.translate(2, 0),
-     AutonomousPositions.WING_NOTE_1.translate(2, 0) // stage position
-    ).addRotation(Rotation2d.fromDegrees(15));
+    ).addRotation(Rotation2d.fromDegrees(-60), 0.4);
 
     @Override
     public void initialize() {
@@ -35,14 +42,16 @@ public class AmpSideOneWingOneMidAuto extends BaseAuto{ //NOTE THIS IS SOURCE SI
                 ),
                 new FollowerCommand(drive, pathTwo),
                 new DelayCommand(0.1),
-                new AutoShootCommand(drive, poseVision, elevator, shooter)
-                // new JointCommand(
-                //     new FollowerCommand(drive, pathThree.addVision(targeting, -5)),
-                //     new IntakeCommand(intake, shooter)
-                // ),
-                // new FollowerCommand(drive, pathThree),
+                new AutoShootCommand(drive, poseVision, elevator, shooter),
                 // new DelayCommand(0.1),
-                // new AutoShootCommand(drive, poseVision, elevator, shooter)
+                new JointCommand(
+                    new FollowerCommand(drive, pathThree.addVision(targeting, -1)),
+                    new IntakeCommand(intake, shooter)
+                ),
+                new DelayCommand(0.1),
+                new FollowerCommand(drive, pathFour),
+                new DelayCommand(0.1),
+                new AutoShootCommand(drive, poseVision, elevator, shooter)
        );
     }
 

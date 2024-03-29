@@ -12,16 +12,17 @@ import frc.robot.Constants.SHOOTER;
 public class IntakeCommand extends Command {
     private Intake intake;
     private Shooter shooter;
-    private double bottomSensorTripTimeout = -1;
+    private double bottomSensorTripTimeout = 1;
+    private Timer timeoutTimer;
     public IntakeCommand(Intake intake, Shooter shooter){
         this.intake = intake;
         this.shooter = shooter;
+        this.timeoutTimer = new Timer();
     }
 
 
     @Override
     public void initialize() {
-        this.timeoutTimer.start();
         shooter.intake();
     }
 
@@ -36,15 +37,19 @@ public class IntakeCommand extends Command {
         else {
             intake.setIntakeVelocity(0);
         }
-        if(!shooter.bottomBeamBreak.get()){ // Notice the exclamation point
-            this.bottomSensorTripTimeout=-1; // This makes sure we don't time out if we catch the bottom beam break (successfully got a note) and then lose it
+        // if(!shooter.bottomBeamBreak.get()){ // Notice the exclamation point
+        //     this.bottomSensorTripTimeout=-1; // This makes sure we don't time out if we catch the bottom beam break (successfully got a note) and then lose it
+        // }
+        if (!shooter.bottomBeamBreak.get()) {
+            this.timeoutTimer.start();
         }
         if(!Robot.isReal()){
             return true;
         }
         return shooter.state == Shooter.States.NOTHING // Waits until the note is fully in position
                 || (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds)
-                || (this.bottomSensorTripTimeout != -1 && this.timeoutTimer.get() >= this.bottomSensorTripTimeout); // The beam breaks return the opposite of whether they're tripped
+                || (this.bottomSensorTripTimeout != -1 && this.timeoutTimer.get() >= this.bottomSensorTripTimeout
+                || this.timeoutTimer.get() > this.bottomSensorTripTimeout); // The beam breaks return the opposite of whether they're tripped
     }
 
     /**

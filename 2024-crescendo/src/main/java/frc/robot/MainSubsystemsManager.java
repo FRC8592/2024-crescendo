@@ -191,8 +191,8 @@ public class MainSubsystemsManager {
             // "Stow" state, but for when we have a note
 
             case LOADED:
-                this.staticPrime(RangeTable.get(1.4));
-                shooter.setShootVelocity(userRange.leftFlywheelSpeed, userRange.rightFlywheelSpeed);
+                RangeTable.RangeEntry subwoofer = RangeTable.getSubwoofer();
+                shooter.setShootVelocity(subwoofer.leftFlywheelSpeed, subwoofer.rightFlywheelSpeed);
                 leds.notePickup();
 
                 if(userControls.outake){

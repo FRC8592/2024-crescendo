@@ -350,6 +350,7 @@ public class MainSubsystemsManager {
                 break;
 
         }
+        Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"UseVision?", this.useVision);
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"StateAfterUpdate", this.mechanismState.toString());
     }
 

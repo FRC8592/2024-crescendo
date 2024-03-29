@@ -199,7 +199,7 @@ public final class Constants {
         public static final double OUTAKE_FEEDER_SPEED = -2000;
 
 
-        public static final double SHOOT_SCORE_TIME = 0.75; //TODO: Tune this
+        public static final double SHOOT_SCORE_TIME = 2.0; //TODO: Tune this
         public static final double AMP_SCORE_TIME = 0.25; //TODO: Tune this
 
         public static final double FEEDER_AMP_TOLERANCE = 100;
@@ -332,7 +332,7 @@ public final class Constants {
         public static final ArrayList<Integer> AMP_AIM_TAGS = new ArrayList<>(Arrays.asList(5, 6));
         public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
 
-        public static final double X_ROT_LOCK_ERROR = 0.15;
+        public static final double X_ROT_LOCK_ERROR = 0.1;
     }
 
     public class MAIN_SUBSYSTEMS_MANAGER{

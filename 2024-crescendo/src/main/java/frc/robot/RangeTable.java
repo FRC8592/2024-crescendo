@@ -30,6 +30,12 @@ public class RangeTable {
             new RangeEntry(5000, 3500, 31), //3.6
             new RangeEntry(5500, 3500, 32), //3.8
             new RangeEntry(5500, 3500, 33), //4.0
+            new RangeEntry(5500, 3500, 35), //4.2 
+            new RangeEntry(6000, 4000, 37.5), //4.4 
+            new RangeEntry(6000, 4000, 38), //4.6 
+            new RangeEntry(6000, 4500, 39), //4.8
+            new RangeEntry(6000, 4500, 40), //5.0 
+            new RangeEntry(6000, 4500, 39.7), //5.2
     };
     public static boolean valid;
 

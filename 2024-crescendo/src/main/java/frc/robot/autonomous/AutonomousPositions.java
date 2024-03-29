@@ -21,11 +21,11 @@ public enum AutonomousPositions {
     WING_NOTE_1(2.4, 6.5, new Rotation2d()),
     WING_NOTE_2(2.4, 5.5, new Rotation2d()),
     WING_NOTE_3(2.4, 4.125, new Rotation2d()),
-    MID_NOTE_1(7.5, 6.85, new Rotation2d()),
-    MID_NOTE_2(7.5, 6.125, new Rotation2d()),
-    MID_NOTE_3(7.5, 4.125, new Rotation2d()),
-    MID_NOTE_4(7.5, 2.6, new Rotation2d()),
-    MID_NOTE_5(7.5, 1.1, new Rotation2d()),;
+    MID_NOTE_1(7.25, 6.85, new Rotation2d()),
+    MID_NOTE_2(7.25, 6.125, new Rotation2d()),
+    MID_NOTE_3(7.25, 4.125, new Rotation2d()),
+    MID_NOTE_4(7.25, 2.6, new Rotation2d()),
+    MID_NOTE_5(7.25, 1.45, new Rotation2d()),;
 
     public static final double FIELD_LENGTH_X = 16.0;
     

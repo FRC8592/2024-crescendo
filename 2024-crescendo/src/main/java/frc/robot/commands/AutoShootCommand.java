@@ -34,28 +34,28 @@ public class AutoShootCommand extends Command {
     @Override
     public void initialize() {
         drive.drive(new ChassisSpeeds());
-        subsystemsManager.setState(MechanismState.PRIMING);
     }
     @Override
     public boolean execute() {
-        double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0.5);
-        double distance = vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
-        Robot.currentRange = RangeTable.get(distance);
-        drive.drive(new ChassisSpeeds(0, 0, omega));
+        // // subsystemsManager.setState(MechanismState.PRIMING);
+        // double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0.5);
+        // double distance = vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
+        // Robot.currentRange = RangeTable.get(distance);
+        // drive.drive(new ChassisSpeeds(0, 0, omega));
 
-        if ((Math.abs(vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS))<APRILTAG_VISION.X_ROT_LOCK_ERROR
-                && subsystemsManager.mechanismState == MechanismState.PRIMED)){
-            subsystemsManager.setState(MechanismState.SHOOTING);
-        }
-        else{
-            if(subsystemsManager.mechanismState == MechanismState.STOWING){
-                return true;
-            }
-        }
+        // if ((Math.abs(vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS))<APRILTAG_VISION.X_ROT_LOCK_ERROR
+        //         && subsystemsManager.mechanismState == MechanismState.PRIMED)){
+        //     subsystemsManager.setState(MechanismState.SHOOTING);
+        // }
+        // else{
+        //     if(subsystemsManager.mechanismState == MechanismState.STOWING){
+        //         return true;
+        //     }
+        // }
 
-        Logger.recordOutput("CurrentCommand", "AutoShootCommand");
-        Logger.recordOutput("AutoShootCommand Omega", omega);
-        Logger.recordOutput("Distance to Tag 4", distance);
+        // Logger.recordOutput("CurrentCommand", "AutoShootCommand");
+        // Logger.recordOutput("AutoShootCommand Omega", omega);
+        // Logger.recordOutput("Distance to Tag 4", distance);
 
         return false;
     }

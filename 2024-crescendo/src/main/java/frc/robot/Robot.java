@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.autons.*;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 
 import frc.robot.Constants.*;
+import frc.robot.MainSubsystemsManager.MechanismState;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -144,7 +146,9 @@ public class Robot extends LoggedRobot {
         currentRange = new RangeEntry(0, 0, 0);
         subsystemsManager = new MainSubsystemsManager(intake, shooter, elevator, leds);
 
-        Rumble.init();
+        this.controls = new Controls();
+
+        // Rumble.init();
     }
 
     @Override
@@ -182,7 +186,7 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
         Logger.recordOutput(APRILTAG_VISION.LOG_PATH+"X offset (m)", poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS));
 
-        Rumble.update(driverController, operatorController);
+        // Rumble.update(driverController, operatorController);
 
         // April Tag 
         distance = poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
@@ -209,7 +213,7 @@ public class Robot extends LoggedRobot {
         leds.red();
         currentRange = new RangeEntry(0, 0, 0);
         currentAuto.periodic();
-        subsystemsManager.updateMechanismStateMachine(controls, distance, locked); //`controls` is only updated in teleop, so MSM basically only responds to the state-setter used in the commands
+        // subsystemsManager.updateMechanismStateMachine(controls, distance, locked); //`controls` is only updated in teleop, so MSM basically only responds to the state-setter used in the commands
     }
 
     @Override
@@ -319,18 +323,15 @@ public class Robot extends LoggedRobot {
         double driveRotate =     rawRightX >= 0 ? (Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT));
         controls.update(driverController, operatorController);
 
-        
-        
-
         //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
         currentRange = new RangeTable.RangeEntry(0, 0, 0);
 
-        if(controls.resetGyro.isPressed()){
+        if(controls.resetGyro){
             swerve.zeroGyroscope();
         }
 
-        if (controls.slowMode.isPressed()) { //Slow Mode slows down the robot for better precision & control
+        if (controls.slowMode) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
                     driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
                     driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
@@ -342,31 +343,20 @@ public class Robot extends LoggedRobot {
                     driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
                     driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
         }
-        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, controls.robotOriented.isPressed()?new Rotation2d():swerve.getGyroscopeRotation());
+        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, controls.robotOriented?new Rotation2d():swerve.getGyroscopeRotation());
         noteLock.updateVision();
         if(driverController.getLeftTriggerAxis()>0.1){
             double omega = poseVision.visual_servo(0, 1.0, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
 
-        if(controls.score.isTriggered()){
-            if(!controls.kiddyPoolShot.isTriggered()
-                    && !controls.shootFromPodium.isTriggered()
-                    && !controls.rangeTableShoot.isTriggered()){
-                currentRange = RangeTable.get(1.4);
-            }
-            else{
-                controls.score.resetTrigger();
-            }
-        }
-
-        if(controls.kiddyPoolShot.isRisingEdge()){
+        if(controls.kiddyPoolShot){
             subsystemsManager.staticPrime(RangeTable.getKiddyPool());
         }
-        else if(controls.shootFromPodium.isRisingEdge()){
+        else if(controls.shootFromPodium){
             subsystemsManager.staticPrime(RangeTable.getPodium());
         }
-        else if(controls.rangeTableShoot.isRisingEdge()){
+        else if(controls.rangeTableShoot){
             subsystemsManager.setVisionPrime();
         }
     

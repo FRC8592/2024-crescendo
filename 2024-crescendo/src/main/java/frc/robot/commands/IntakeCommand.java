@@ -22,28 +22,29 @@ public class IntakeCommand extends Command {
     @Override
     public void initialize() {
         this.timeoutTimer.start();
-        subsystemsManager.setState(MechanismState.INTAKING);
+        // subsystemsManager.setState(MechanismState.INTAKING);
     }
 
     @Override
     public boolean execute() {
-        Logger.recordOutput("CurrentCommand", "IntakeCommand");
+        // Logger.recordOutput("CurrentCommand", "IntakeCommand");
 
-        if(!Robot.isReal()){
-            return true;
-        }
+        // if(!Robot.isReal()){
+        //     return true;
+        // }
 
-        if(subsystemsManager.shooter.isBottomBeamBreakTripped()){
-           this.bottomSensorTripTimeout=-1; // This makes sure we don't time out if we catch the bottom beam break (successfully got a note) and then lose it
-        }
+        // if(subsystemsManager.shooter.isBottomBeamBreakTripped()){
+        //    this.bottomSensorTripTimeout=-1; // This makes sure we don't time out if we catch the bottom beam break (successfully got a note) and then lose it
+        // }
 
-        if(subsystemsManager.mechanismState == MechanismState.LOADED){
-            return true;
-        }
-        else{
-            return (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds)
-                    || (this.bottomSensorTripTimeout != -1 && this.timeoutTimer.get() >= this.bottomSensorTripTimeout);
-        }
+        // if(subsystemsManager.mechanismState == MechanismState.LOADED){
+        //     return true;
+        // }
+        // else{
+        //     return (this.timeoutSeconds != -1 && this.timeoutTimer.get() >= this.timeoutSeconds)
+        //             || (this.bottomSensorTripTimeout != -1 && this.timeoutTimer.get() >= this.bottomSensorTripTimeout);
+        // }
+        return false;
     }
 
     /**

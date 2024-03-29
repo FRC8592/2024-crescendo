@@ -6,62 +6,62 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.*;
 
 public class Controls {
-    public BooleanManager slowMode;
-    public BooleanManager resetGyro;
-    public BooleanManager autoCollect;
-    public BooleanManager robotOriented;
+    public boolean slowMode;
+    public boolean resetGyro;
+    public boolean autoCollect;
+    public boolean robotOriented;
 
-    public BooleanManager ledAmpSignal;
-    public BooleanManager shootFromPodium;
-    public BooleanManager rangeTableShoot;
-    public BooleanManager outake;
-    public BooleanManager intake;
-    public BooleanManager stow;
-    public BooleanManager amp;
-    public BooleanManager climb;
-    public BooleanManager score;
-    public BooleanManager manualExtend;
-    public BooleanManager manualRetract;
-    public BooleanManager kiddyPoolShot;
+    public boolean ledAmpSignal;
+    public boolean shootFromPodium;
+    public boolean rangeTableShoot;
+    public boolean outake;
+    public boolean intake;
+    public boolean stow;
+    public boolean amp;
+    public boolean climb;
+    public boolean score;
+    public boolean manualExtend;
+    public boolean manualRetract;
+    public boolean kiddyPoolShot;
 
     public Controls(){
-        this.slowMode = new BooleanManager(false);
-        this.resetGyro = new BooleanManager(false);
-        this.autoCollect = new BooleanManager(false);
-        this.robotOriented = new BooleanManager(false);
+        this.slowMode = false;
+        this.resetGyro = false;
+        this.autoCollect = false;
+        this.robotOriented = false;
 
-        this.ledAmpSignal = new BooleanManager(false);
-        this.shootFromPodium = new BooleanManager(false);
-        this.rangeTableShoot = new BooleanManager(false);
-        this.outake = new BooleanManager(false);
-        this.intake = new BooleanManager(false);
-        this.stow = new BooleanManager(false);
-        this.amp = new BooleanManager(false);
-        this.climb = new BooleanManager(false);
-        this.score = new BooleanManager(false);
-        this.manualExtend = new BooleanManager(false);
-        this.manualRetract = new BooleanManager(false);
-        this.kiddyPoolShot = new BooleanManager(false);
+        this.ledAmpSignal = false;
+        this.shootFromPodium = false;
+        this.rangeTableShoot = false;
+        this.outake = false;
+        this.intake = false;
+        this.stow = false;
+        this.amp = false;
+        this.climb = false;
+        this.score = false;
+        this.manualExtend = false;
+        this.manualRetract = false;
+        this.kiddyPoolShot = false;
     }
 
     public void update(XboxController driverController, XboxController operatorController){
-        this.slowMode.update       (driverController.getRightBumper());
-        this.resetGyro.update      (driverController.getBackButton());
-        this.autoCollect.update    (driverController.getLeftBumper());
-        this.robotOriented.update  (driverController.getRightTriggerAxis() >0.1);
+        this.slowMode = driverController.getRightBumper();
+        this.resetGyro = driverController.getBackButton();
+        this.autoCollect = driverController.getLeftBumper();
+        this.robotOriented = driverController.getRightTriggerAxis() >0.1;
 
-        this.shootFromPodium.update(operatorController.getLeftBumper());
-        this.rangeTableShoot.update(operatorController.getBButton());
-        this.outake.update         (operatorController.getRightBumper());
-        this.intake.update         (operatorController.getLeftTriggerAxis()>0.1);
-        this.stow.update           (operatorController.getAButton());
-        this.amp.update            (operatorController.getXButton());
-        this.climb.update          (operatorController.getYButton());
-        this.score.update          (operatorController.getRightTriggerAxis()>0.1);
-        this.manualExtend.update   (operatorController.getPOV() == 0);
-        this.manualRetract.update  (operatorController.getPOV() == 180);
-        this.ledAmpSignal.update   (operatorController.getBackButton());
-        this.kiddyPoolShot.update       (operatorController.getStartButton());
+        this.shootFromPodium = operatorController.getLeftBumper();
+        this.rangeTableShoot = operatorController.getBButton();
+        this.outake = operatorController.getRightBumper();
+        this.intake = operatorController.getLeftTriggerAxis()>0.1;
+        this.stow = operatorController.getAButton();
+        this.amp = operatorController.getXButton();
+        this.climb = operatorController.getYButton();
+        this.score = operatorController.getRightTriggerAxis()>0.1;
+        this.manualExtend = operatorController.getPOV() == 0;
+        this.manualRetract = operatorController.getPOV() == 180;
+        this.ledAmpSignal = operatorController.getBackButton();
+        this.kiddyPoolShot = operatorController.getStartButton();
 
         this.log(this.slowMode, "DriverController", "SlowMode");
         this.log(this.resetGyro, "DriverController", "ResetGyro");
@@ -81,13 +81,7 @@ public class Controls {
         this.log(this.manualRetract, "OperatorController", "ManualRetract");
         this.log(this.kiddyPoolShot, "OperatorController", "JukeShot");
     }
-    private void log(BooleanManager logged, String controller, String name){
-        Logger.recordOutput(CONTROLS.LOG_PATH+controller+"/"+name+"/IsPressed", logged.isPressed());
-        Logger.recordOutput(CONTROLS.LOG_PATH+controller+"/"+name+"/IsRisingEdge", logged.isRisingEdge());
-        Logger.recordOutput(CONTROLS.LOG_PATH+controller+"/"+name+"/IsFallingEdge", logged.isFallingEdge());
-        Logger.recordOutput(CONTROLS.LOG_PATH+controller+"/"+name+"/IsToggled", logged.isToggle());
-        Logger.recordOutput(CONTROLS.LOG_PATH+controller+"/"+name+"/IsToggleRisingEdge", logged.isToggleRisingEdge());
-        Logger.recordOutput(CONTROLS.LOG_PATH+controller+"/"+name+"/isToggleFallingEdge", logged.isToggleFallingEdge());
-        Logger.recordOutput(CONTROLS.LOG_PATH+controller+"/"+name+"/IsTriggered", logged.isTriggered());
+    private void log(boolean logged, String controller, String name){
+        Logger.recordOutput(CONTROLS.LOG_PATH+controller+"/"+name, logged);
     }
 }

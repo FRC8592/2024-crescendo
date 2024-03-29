@@ -74,6 +74,7 @@ public class Shooter {
 
         feederMotor.setPIDF(SHOOTER.FEEDER_MOTOR_kP, SHOOTER.FEEDER_MOTOR_kI, SHOOTER.FEEDER_MOTOR_kD, SHOOTER.FEEDER_MOTOR_kF, 0);
         feederMotor.setPIDF(SHOOTER.FEEDER_MOTOR_SHOOT_kP, SHOOTER.FEEDER_MOTOR_SHOOT_kI, SHOOTER.FEEDER_MOTOR_SHOOT_kD, SHOOTER.FEEDER_MOTOR_SHOOT_kF, 1);
+        feederMotor.motorControl.setIZone(SHOOTER.FEEDER_MOTOR_SHOOT_IZONE, 1);
         feederMotor.setInverted();
 
         rightShooterMotor.setCurrentLimit(POWER.RIGHT_SHOOTER_MOTOR_CURRENT_LIMIT, POWER.RIGHT_SHOOTER_MOTOR_CURRENT_LIMIT);
@@ -222,32 +223,6 @@ public class Shooter {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Starts the intake state machine; run the feeders until we have a note, then back it off a little. All methods other than {@code intake()}, {@code hasNote()}, {@code isReady()}, and {@code intakeUpdate()} will cancel whatever the state machine is doing and prioritize that method's function.
-     */
-    public void intake(){
-        this.state = States.INTAKING;
-    }
-
-    public void setTargetSpeed(int left, int right){
-        leftTargetSpeed = left;
-        rightTargetSpeed = right;
-    }
-    public void intakeStop(){
-        state = States.NOTHING;
-    }
-    public void shoot(){
-        if(this.state != States.SHOOT){
-            feederMotor.motorControl.setIAccum(0);
-            shootTimer.stop();
-            shootTimer.reset();
-            state = States.SHOOT;
-        }
-    }
-    public void shootPrep(){
-        this.state = States.SHOOT_PREP;
     }
 
     public boolean isBottomBeamBreakTripped(){

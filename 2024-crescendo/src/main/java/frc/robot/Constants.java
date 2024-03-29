@@ -163,10 +163,11 @@ public final class Constants {
         public static final double FEEDER_MOTOR_kD = 0.0;
         public static final double FEEDER_MOTOR_kF = 0.00018;
 
-        public static final double FEEDER_MOTOR_SHOOT_kP = 0.0005;
-        public static final double FEEDER_MOTOR_SHOOT_kI = 0.000;//1;
-        public static final double FEEDER_MOTOR_SHOOT_kD = 0.0;
+        public static final double FEEDER_MOTOR_SHOOT_kP = 0.001;
+        public static final double FEEDER_MOTOR_SHOOT_kI = 0.000001;//1;
+        public static final double FEEDER_MOTOR_SHOOT_kD = 0.01;
         public static final double FEEDER_MOTOR_SHOOT_kF = 0.00018;
+        public static final double FEEDER_MOTOR_SHOOT_IZONE = 160;
 
         public static final double LEFT_SHOOTER_MOTOR_kP = 0.0003;
         public static final double LEFT_SHOOTER_MOTOR_kI = 0.0000012;
@@ -188,7 +189,7 @@ public final class Constants {
         public static final int AMP_FEEDER_SPEED = -3000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 1000;
+        public static final int INTAKE_FEEDER_SPEED = 2000;
 
         //No shooter speed because we use the range table
         // public static final int SHOOTING_FEEDER_SPEED = 2500;
@@ -322,7 +323,7 @@ public final class Constants {
     public class APRILTAG_VISION {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/MGVision/";
         public static final double kP = 1.25;
-        public static final double kI = 1.75;
+        public static final double kI = 2.25;
         public static final double kD = 0.005;
         public static final double iZone = 0.5;
 

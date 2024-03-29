@@ -61,8 +61,8 @@ public class MainSubsystemsManager {
     }
 
     public void updateMechanismStateMachine(Controls userControls, double cameraRange, boolean targetLocked){
-
-        if(userControls.stow.isRisingEdge()){
+        
+        if(userControls.stow){
             this.mechanismState = MechanismState.STOWING;
         }
 
@@ -97,13 +97,13 @@ public class MainSubsystemsManager {
 
             case STOWED:
                 //TODO: NOTIFY DRIVERS
-                if(userControls.intake.isPressed()){
+                if(userControls.intake){
                     this.mechanismState = MechanismState.INTAKING;
                 }
-                else if(userControls.climb.isPressed()){
+                else if(userControls.climb){
                     this.mechanismState = MechanismState.CLIMB_PRIME;
                 }
-                else if (userControls.outake.isPressed()){
+                else if (userControls.outake){
                     this.mechanismState = MechanismState.OUTTAKING;
                 }
                 else if (!elevator.isAtTargetPosition()){
@@ -117,8 +117,16 @@ public class MainSubsystemsManager {
             case INTAKING:
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
+                // shooter.setFeederPower(1);
                 shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-                
+
+                // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
+                //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
+                // }
+                // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
+                //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
+                // }
+
                 if(shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.INTAKING_2;
                 }
@@ -129,11 +137,19 @@ public class MainSubsystemsManager {
 
             case INTAKING_2:
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
-                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 1); // Set PID to when note is engaged
+                shooter.setFeederPower(1); // Set PID to when note is engaged
                 shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-                
+
+                // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
+                //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
+                // }
+                // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
+                //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
+                // }
+
                 if(!shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.ADJUSTING_1;
+                    intake.stopIntake();
                 }
 
                 break;
@@ -143,7 +159,7 @@ public class MainSubsystemsManager {
             case ADJUSTING_1:
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
                 shooter.setFeederVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
-                if(shooter.isTopBeamBreakTripped()){
+                if(shooter.isTopBeamBreakTripped() && shooter.feederMotor.getVelocity() < 0){
                     this.mechanismState = MechanismState.ADJUSTING_2;
                 }
                 break;
@@ -156,7 +172,10 @@ public class MainSubsystemsManager {
                 shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
                 if(!shooter.isTopBeamBreakTripped()){ //if beam break NOT tripped, exclamation point
                     this.mechanismState = MechanismState.LOADED;
-
+                    // shooter.stopFeeders();
+                    shooter.setFeederVelocity(0, 1);
+                    shooter.setShootVelocity(0, 0);
+                    // shooter.stopFlywheels();
                     //Rumble to signal that we have the note ready
                     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.3, 1));
                 }
@@ -166,16 +185,19 @@ public class MainSubsystemsManager {
             // "Stow" state, but for when we have a note
 
             case LOADED:
-                if(userControls.outake.isPressed()){
+                this.staticPrime(RangeTable.get(1.4));
+                shooter.setShootVelocity(userRange.leftFlywheelSpeed, userRange.rightFlywheelSpeed);
+
+                if(userControls.outake){
                     this.mechanismState = MechanismState.OUTTAKING;
                 }
-                else if(userControls.climb.isPressed()){
+                else if(userControls.climb){
                     this.mechanismState = MechanismState.CLIMB_PRIME;
                 }
                 else if(desireShot(userControls)){
                     this.mechanismState = MechanismState.PRIMING;
                 }
-                else if(userControls.amp.isPressed()){
+                else if(userControls.amp){
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 }
                 break;
@@ -188,7 +210,7 @@ public class MainSubsystemsManager {
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
                 shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
 
-                if(!userControls.outake.isPressed()){ // Is NOT pressed
+                if(!userControls.outake){ // Is NOT pressed
                     this.mechanismState = MechanismState.STOWING;
                 }
                 break;
@@ -197,10 +219,10 @@ public class MainSubsystemsManager {
             // Prepare for a shot by spinning up the flywheels and angling the pivot
 
             case PRIMING:
-                shooter.setTargetSpeed((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
+                shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
 
-                if (userControls.amp.isPressed()) {
+                if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 } else if(shooter.readyToShoot() && elevator.isAtTargetPosition() && aimed) {
                     this.mechanismState = MechanismState.PRIMED;
@@ -217,22 +239,22 @@ public class MainSubsystemsManager {
                 shootTimer.start();
 
                 // Redundant setting of speeds in case of manual overwriting by drivers
-                shooter.setTargetSpeed((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
+                shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
 
                 //Constantly rumble both controllers to let both drivers know that we're ready to shoot
-                if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
-                    Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
-                }
-                if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
-                    Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
-                }
+                // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
+                //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
+                // }
+                // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
+                //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
+                // }
 
-                if (userControls.amp.isPressed()) {
+                if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 } else if(!shooter.readyToShoot() || !elevator.isAtTargetPosition() || !aimed){
                     this.mechanismState = MechanismState.PRIMING;
-                } else if(userControls.score.isPressed()){
+                } else if(userControls.score){
                     this.mechanismState = MechanismState.SHOOTING;
                 }
 
@@ -269,11 +291,11 @@ public class MainSubsystemsManager {
             case AMP_PRIMED:
                 shooter.stopFlywheels();
                 shooter.stopFeeders();
-                if (desireShot(userControls)){
-                    this.mechanismState = MechanismState.PRIMING;
-                }
-                else if(userControls.score.isPressed()){
+                if(userControls.score){
                     this.mechanismState = MechanismState.AMP_SCORING;
+                }
+                else if (desireShot(userControls)){
+                    this.mechanismState = MechanismState.PRIMING;
                 }
                 break;
 
@@ -283,7 +305,7 @@ public class MainSubsystemsManager {
             case AMP_SCORING:
                 shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED, SHOOTER.AMP_FLYWHEEL_SPEED);
                 shooter.setFeederPower(SHOOTER.AMP_FEEDER_SPEED);
-                if(!userControls.score.isPressed()){
+                if(!userControls.score){
                     this.mechanismState = MechanismState.AMP_PRIMED;
                 }
                 break;
@@ -305,10 +327,10 @@ public class MainSubsystemsManager {
             //It allows the user to manually extend and retract the elevator
 
             case CLIMB:
-                if(userControls.manualExtend.isPressed()){
+                if(userControls.manualExtend){
                     elevator.extend();
                 } 
-                else if(userControls.manualRetract.isPressed()){
+                else if(userControls.manualRetract){
                     elevator.retract();
                 }
                 break;
@@ -317,16 +339,10 @@ public class MainSubsystemsManager {
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"StateAfterUpdate", this.mechanismState.toString());
     }
 
-    public void setState(MechanismState state){
-        if(DriverStation.isAutonomous()){ // To avoid any possible breakages, make sure this works exclusively in Auto (the only place it should be used)
-            this.mechanismState = state;
-        }
-    }
-
     public boolean desireShot(Controls userControls) {
-        return userControls.shootFromPodium.isPressed()
-                        || userControls.score.isPressed() // For a subwoofer shot
-                        || userControls.kiddyPoolShot.isPressed()
-                        || userControls.rangeTableShoot.isPressed();
+        return userControls.shootFromPodium
+                        || userControls.score // For a subwoofer shot
+                        || userControls.kiddyPoolShot
+                        || userControls.rangeTableShoot;
     }
 }

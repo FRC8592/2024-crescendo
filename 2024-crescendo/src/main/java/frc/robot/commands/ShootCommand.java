@@ -4,11 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Elevator;
-import frc.robot.MainSubsystemsManager;
-import frc.robot.RangeTable;
-import frc.robot.Robot;
-import frc.robot.Shooter;
+import frc.robot.*;
 import frc.robot.Constants.*;
 import frc.robot.MainSubsystemsManager.MechanismState;
 
@@ -16,6 +12,12 @@ public class ShootCommand extends Command{
     private MainSubsystemsManager subsystemsManager;
     private double expectedRange;
     private Timer timer = new Timer();
+    private Controls controls = new Controls();
+    private enum States{
+        WAIT,
+        RUN
+    }
+    private States state = States.WAIT;
 
     public ShootCommand(MainSubsystemsManager subsystemsManager, double expectedRange){
         this.subsystemsManager = subsystemsManager;
@@ -24,21 +26,28 @@ public class ShootCommand extends Command{
     @Override
     public void initialize() {
         timer.reset();
-        subsystemsManager.setState(MechanismState.PRIMING);
         timeoutTimer.start();
+        subsystemsManager.staticPrime(RangeTable.get(expectedRange));
     }
 
     @Override
     public boolean execute() {
-        Logger.recordOutput("CurrentCommand", "ShootCommand");
+        switch(state){
+            case WAIT:
+                controls.score = true;
+                subsystemsManager.updateMechanismStateMachine(controls, 0, true);
+                if(subsystemsManager.mechanismState == MechanismState.PRIMING){
+                    this.state = States.RUN;
+                }
+                return false;
+            case RUN:
+                Logger.recordOutput("CurrentCommand", "ShootCommand");
 
-        Robot.currentRange = RangeTable.get(expectedRange);
+                Robot.currentRange = RangeTable.get(expectedRange);
 
-        if(subsystemsManager.mechanismState == MechanismState.PRIMED){
-            subsystemsManager.setState(MechanismState.SHOOTING);
+                return subsystemsManager.mechanismState == MechanismState.STOWING || (timeoutSeconds != -1 && timeoutTimer.get() >= timeoutSeconds);
         }
-
-        return subsystemsManager.mechanismState == MechanismState.STOWING || (timeoutSeconds != -1 && timeoutTimer.get() >= timeoutSeconds);
+        return false;
     }
 
     @Override

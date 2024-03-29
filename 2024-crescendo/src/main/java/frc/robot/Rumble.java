@@ -53,7 +53,7 @@ public final class Rumble {
         if(!driverQueue.isEmpty()){ // Note the exclamation point
             RumbleBump currentBump = driverQueue.get(0);
             if(!driverTimer.hasElapsed(currentBump.duration)){ // Note the exclamation point again
-                driver.setRumble(RumbleType.kBothRumble, (int)(currentBump.strength*255));
+                // driver.setRumble(RumbleType.kBothRumble, (int)(currentBump.strength*255));
             }
             else{
                 driverQueue.remove(currentBump);
@@ -70,7 +70,7 @@ public final class Rumble {
         if(!operatorQueue.isEmpty()){
             RumbleBump currentBump = operatorQueue.get(0);
             if(!operatorTimer.hasElapsed(operatorQueue.get(0).duration)){
-                operator.setRumble(RumbleType.kBothRumble, (int)(currentBump.strength*255));
+                // operator.setRumble(RumbleType.kBothRumble, (int)(currentBump.strength*255));
             }
             else{
                 operatorQueue.remove(0);

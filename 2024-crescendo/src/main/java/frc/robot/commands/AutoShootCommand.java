@@ -42,10 +42,10 @@ public class AutoShootCommand extends Command {
         controls = new Controls();
         drive.drive(new ChassisSpeeds());
         controls.rangeTableShoot = true;
-        subsystemsManager.setVisionPrime();   //turn on auto vision
     }
     @Override
     public boolean execute() {
+        subsystemsManager.setVisionPrime();   //turn on auto vision
         double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0.5);
         drive.drive(new ChassisSpeeds(0, 0, omega));
         subsystemsManager.updateMechanismStateMachine(controls,

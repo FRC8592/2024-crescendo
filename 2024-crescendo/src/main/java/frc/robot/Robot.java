@@ -77,7 +77,7 @@ public class Robot extends LoggedRobot {
     private Controls controls;
 
     private double distance;
-    private boolean locked;
+    public boolean locked;
 
     @Override
     public void robotInit() {
@@ -198,6 +198,7 @@ public class Robot extends LoggedRobot {
     public void autonomousInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
         currentAuto = autoSelect.getSelectedAutonomous();
+        subsystemsManager.resetToLoaded();
         currentAuto.addModules(swerve, elevator, intake, shooter, noteLock, poseVision, subsystemsManager);
         currentAuto.initialize();
         swerve.resetEncoder();
@@ -348,6 +349,11 @@ public class Robot extends LoggedRobot {
         if(driverController.getLeftTriggerAxis()>0.1){
             double omega = poseVision.visual_servo(0, 1.0, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
+        }
+
+        if(controls.autoCollect){
+            currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
+            controls.intake = true;
         }
 
         if(controls.kiddyPoolShot){

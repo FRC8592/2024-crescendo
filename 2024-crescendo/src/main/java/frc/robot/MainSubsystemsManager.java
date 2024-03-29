@@ -109,6 +109,12 @@ public class MainSubsystemsManager {
                 else if (!elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.STOWING;
                 }
+                else if(desireShot(userControls)){
+                    this.mechanismState = MechanismState.PRIMING;
+                }
+                else if(userControls.amp){
+                    this.mechanismState = MechanismState.PRIMING_AMP;
+                }
                 break;
 
 
@@ -187,6 +193,7 @@ public class MainSubsystemsManager {
             case LOADED:
                 this.staticPrime(RangeTable.get(1.4));
                 shooter.setShootVelocity(userRange.leftFlywheelSpeed, userRange.rightFlywheelSpeed);
+                leds.notePickup();
 
                 if(userControls.outake){
                     this.mechanismState = MechanismState.OUTTAKING;
@@ -207,7 +214,7 @@ public class MainSubsystemsManager {
 
             case OUTTAKING:
                 intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
-                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
+                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED, 2);
                 shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
 
                 if(!userControls.outake){ // Is NOT pressed
@@ -267,6 +274,7 @@ public class MainSubsystemsManager {
                 shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
                 if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
                     this.mechanismState = MechanismState.STOWING;
+                    leds.off();
                 }
                 break;
 
@@ -282,6 +290,9 @@ public class MainSubsystemsManager {
                 } else if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.AMP_PRIMED;
                 }
+                else if(userControls.climb){
+                    this.mechanismState = MechanismState.CLIMB_PRIME;
+                }
 
                 break;
 
@@ -296,6 +307,9 @@ public class MainSubsystemsManager {
                 }
                 else if (desireShot(userControls)){
                     this.mechanismState = MechanismState.PRIMING;
+                }
+                else if(userControls.climb){
+                    this.mechanismState = MechanismState.CLIMB_PRIME;
                 }
                 break;
 
@@ -344,5 +358,11 @@ public class MainSubsystemsManager {
                         || userControls.score // For a subwoofer shot
                         || userControls.kiddyPoolShot
                         || userControls.rangeTableShoot;
+    }
+    public void resetToStowed(){
+        this.mechanismState = MechanismState.STOWED;
+    }
+    public void resetToLoaded(){
+        this.mechanismState = MechanismState.LOADED;
     }
 }

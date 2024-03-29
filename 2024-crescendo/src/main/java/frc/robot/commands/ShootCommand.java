@@ -25,29 +25,33 @@ public class ShootCommand extends Command{
 
     @Override
     public void initialize() {
+        controls = new Controls();
         timer.reset();
         timeoutTimer.start();
         subsystemsManager.staticPrime(RangeTable.get(expectedRange));
+        controls.score = true;
+        state = States.WAIT;
     }
 
     @Override
     public boolean execute() {
-        switch(state){
+        Logger.recordOutput("CurrentCommand", "ShootCommand");
+      /*   switch(state){
             case WAIT:
                 controls.score = true;
                 subsystemsManager.updateMechanismStateMachine(controls, 0, true);
-                if(subsystemsManager.mechanismState == MechanismState.PRIMING){
+                if(subsystemsManager.mechanismState == MechanismState.PRIMING || subsystemsManager.mechanismState == MechanismState.PRIMED){
                     this.state = States.RUN;
                 }
                 return false;
             case RUN:
-                Logger.recordOutput("CurrentCommand", "ShootCommand");
-
-                Robot.currentRange = RangeTable.get(expectedRange);
-
+                subsystemsManager.updateMechanismStateMachine(controls, 0, true);
                 return subsystemsManager.mechanismState == MechanismState.STOWING || (timeoutSeconds != -1 && timeoutTimer.get() >= timeoutSeconds);
         }
         return false;
+        */
+        subsystemsManager.updateMechanismStateMachine(controls, 0, true);
+        return subsystemsManager.mechanismState == MechanismState.STOWING;
     }
 
     @Override

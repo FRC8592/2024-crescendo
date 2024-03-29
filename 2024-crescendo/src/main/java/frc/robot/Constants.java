@@ -163,11 +163,17 @@ public final class Constants {
         public static final double FEEDER_MOTOR_kD = 0.0;
         public static final double FEEDER_MOTOR_kF = 0.00018;
 
-        public static final double FEEDER_MOTOR_SHOOT_kP = 0.001;
-        public static final double FEEDER_MOTOR_SHOOT_kI = 0.000001;//1;
-        public static final double FEEDER_MOTOR_SHOOT_kD = 0.01;
-        public static final double FEEDER_MOTOR_SHOOT_kF = 0.00018;
-        public static final double FEEDER_MOTOR_SHOOT_IZONE = 160;
+        public static final double FEEDER_MOTOR_LOADED_kP = 0.001;
+        public static final double FEEDER_MOTOR_LOADED_kI = 0.0000005;//1;
+        public static final double FEEDER_MOTOR_LOADED_kD = 0.01;
+        public static final double FEEDER_MOTOR_LOADED_kF = 0.00018;
+        public static final double FEEDER_MOTOR_LOADED_IZONE = 160;
+
+        public static final double FEEDER_MOTOR_OUTAKE_kP = 0.001;
+        public static final double FEEDER_MOTOR_OUTAKE_kI = 0.00001;//1;
+        public static final double FEEDER_MOTOR_OUTAKE_kD = 0.01;
+        public static final double FEEDER_MOTOR_OUTAKE_kF = 0.00018;
+        public static final double FEEDER_MOTOR_OUTAKE_IZONE = 160;
 
         public static final double LEFT_SHOOTER_MOTOR_kP = 0.0003;
         public static final double LEFT_SHOOTER_MOTOR_kI = 0.0000012;
@@ -193,13 +199,13 @@ public final class Constants {
 
         //No shooter speed because we use the range table
         // public static final int SHOOTING_FEEDER_SPEED = 2500;
-        public static final double SHOOTING_FEEDER_POWER = 0.5;
+        public static final double SHOOTING_FEEDER_POWER = 1d;
 
         public static final int OUTAKE_FLYWHEEL_SPEED = -500; //TODO: Figure out what this should be.
         public static final double OUTAKE_FEEDER_SPEED = -2000;
 
 
-        public static final double SHOOT_SCORE_TIME = 2.0; //TODO: Tune this
+        public static final double SHOOT_SCORE_TIME = 0.5; //TODO: Tune this
         public static final double AMP_SCORE_TIME = 0.25; //TODO: Tune this
 
         public static final double FEEDER_AMP_TOLERANCE = 100;

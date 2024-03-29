@@ -22,7 +22,12 @@ public class AutoShootCommand extends Command {
     private PoseVision vision;
     private MainSubsystemsManager subsystemsManager;
     private Timer timer;
-    private boolean isShooting;
+    private Controls controls;
+    private enum States{
+        WAIT,
+        RUN
+    }
+    private States state = States.WAIT;
 
 
     public AutoShootCommand(Swerve drive, PoseVision vision, MainSubsystemsManager subsystemsManager) {
@@ -30,32 +35,43 @@ public class AutoShootCommand extends Command {
         this.vision = vision;
         this.subsystemsManager = subsystemsManager;
         this.timer = new Timer();
+        this.controls = new Controls();
     }
     @Override
     public void initialize() {
+        controls = new Controls();
         drive.drive(new ChassisSpeeds());
+        controls.rangeTableShoot = true;
+        subsystemsManager.setVisionPrime();   //turn on auto vision
     }
     @Override
     public boolean execute() {
-        // // subsystemsManager.setState(MechanismState.PRIMING);
-        // double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0.5);
-        // double distance = vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS);
-        // Robot.currentRange = RangeTable.get(distance);
-        // drive.drive(new ChassisSpeeds(0, 0, omega));
+        double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0.5);
+        drive.drive(new ChassisSpeeds(0, 0, omega));
+        subsystemsManager.updateMechanismStateMachine(controls,
+                vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS),
+                vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)<APRILTAG_VISION.X_ROT_LOCK_ERROR); //TODO put this in PoseVision
+        // switch(this.state){
+        //     case WAIT:
+                // if(subsystemsManager.mechanismState == MechanismState.PRIMING || subsystemsManager.mechanismState == MechanismState.PRIMED){
+                //     this.state = States.RUN;
+                // }
+                // break;
+            // case RUN:
+            if (subsystemsManager.mechanismState == MechanismState.PRIMING){
+                controls.rangeTableShoot = false;
+            }
+                if (subsystemsManager.mechanismState == MechanismState.PRIMED){
+                    controls.score = true;
+                }
 
-        // if ((Math.abs(vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS))<APRILTAG_VISION.X_ROT_LOCK_ERROR
-        //         && subsystemsManager.mechanismState == MechanismState.PRIMED)){
-        //     subsystemsManager.setState(MechanismState.SHOOTING);
-        // }
-        // else{
-        //     if(subsystemsManager.mechanismState == MechanismState.STOWING){
-        //         return true;
-        //     }
-        // }
+                if(subsystemsManager.mechanismState == MechanismState.STOWING){
+                    return true;
+                }
 
-        // Logger.recordOutput("CurrentCommand", "AutoShootCommand");
-        // Logger.recordOutput("AutoShootCommand Omega", omega);
-        // Logger.recordOutput("Distance to Tag 4", distance);
+                Logger.recordOutput("CurrentCommand", "AutoShootCommand");
+                Logger.recordOutput("AutoShootCommand Omega", omega);
+        // }
 
         return false;
     }

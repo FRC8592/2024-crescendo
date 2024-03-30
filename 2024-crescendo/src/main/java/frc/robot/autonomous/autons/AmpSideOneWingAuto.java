@@ -9,21 +9,38 @@ import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
 import frc.robot.commands.*;
 
-public class AmpSideOneWingAuto extends BaseAuto {
-    private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
+public class AmpSideOneWingAuto extends BaseAuto { // this is amp side one wing one mid
+    private TrajectoryConfig slowConfig = new TrajectoryConfig(2, 3);
     private SwerveTrajectory pathOne = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0),
             AutonomousPositions.SUBWOOFER_UP.getPose(),
-            AutonomousPositions.WING_NOTE_1.getPose());
+            AutonomousPositions.WING_NOTE_1.getPose()
+    ).addRotation(Rotation2d.fromDegrees(0), 0.2);
+    private SwerveTrajectory pathTwo = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(false),
+            AutonomousPositions.WING_NOTE_1.getPose(),
+            AutonomousPositions.MID_NOTE_1.getPose()
+    );
+    private SwerveTrajectory pathThree = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
+            AutonomousPositions.MID_NOTE_1.getPose(),
+            AutonomousPositions.WING_NOTE_2.translate(1, 0.5)
+    ).addRotation(Rotation2d.fromDegrees(30), 0.2);
 
     @Override
     public void initialize() {
         queue = new CommandQueue(
                 new ShootCommand(shooter, elevator, 1.4),
+                // new AutoShootCommand(drive, poseVision, elevator, shooter),
                 new JointCommand(
-                        new FollowerCommand(drive, pathOne.addVision(targeting, -5)),
-                        new IntakeCommand(intake, shooter)),
-                new RotateCommand(drive, Rotation2d.fromDegrees(45)),
-                new AutoShootCommand(drive, poseVision, elevator, shooter));
+                        new FollowerCommand(drive, pathOne.addVision(targeting, 0)),
+                        new IntakeCommand(intake, shooter)
+                ),
+                new AutoShootCommand(drive, poseVision, elevator, shooter),
+                new JointCommand(
+                        new FollowerCommand(drive, pathTwo.addVision(targeting, 10)),
+                        new IntakeCommand(intake, shooter)
+                ),
+                new FollowerCommand(drive, pathThree),
+                new AutoShootCommand(drive, poseVision, elevator, shooter)
+        );
     }
 
     @Override

@@ -210,8 +210,8 @@ public final class Falcon500SteerControllerFactoryBuilder {
             // anymore.
             if (motor.getSelectedSensorVelocity()
                     * motorEncoderVelocityCoefficient < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
-                if (++resetIteration >= ENCODER_RESET_ITERATIONS) {
-                    resetIteration = 0;
+                if (++resetIteration == ENCODER_RESET_ITERATIONS) {
+                    // resetIteration = 0;
                     currentAngleRadians = resetAbsoluteAngle();
                 }
             } else {

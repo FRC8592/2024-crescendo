@@ -9,7 +9,7 @@ import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
 import frc.robot.commands.*;
 
-public class AmpSideOneWingOneMidAuto extends BaseAuto{ //TODO THIS IS SOURCE SIDE (RENAME TO SOURCE SIDE 2 MID NOTES)
+public class SourceSideTwoMidAuto extends BaseAuto{ //TODO THIS IS SOURCE SIDE (RENAME TO SOURCE SIDE 2 MID NOTES)
 
     private TrajectoryConfig slowConfig = new TrajectoryConfig(2, 3);
     private SwerveTrajectory pathOne = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(false),

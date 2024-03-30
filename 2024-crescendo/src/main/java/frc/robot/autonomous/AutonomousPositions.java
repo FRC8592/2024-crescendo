@@ -21,7 +21,7 @@ public enum AutonomousPositions {
     WING_NOTE_1(2.4, 6.5, new Rotation2d()),
     WING_NOTE_2(2.4, 5.5, new Rotation2d()),
     WING_NOTE_3(2.4, 4.125, new Rotation2d()),
-    MID_NOTE_1(7.25, 6.85, new Rotation2d()),
+    MID_NOTE_1(7.25, 6.4, new Rotation2d()),
     MID_NOTE_2(7.25, 6.125, new Rotation2d()),
     MID_NOTE_3(7.25, 4.125, new Rotation2d()),
     MID_NOTE_4(7.25, 2.6, new Rotation2d()),

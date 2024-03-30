@@ -371,7 +371,7 @@ public class Robot extends LoggedRobot {
         else if(controls.rangeTableShoot){
             subsystemsManager.setVisionPrime();
         }
-    
+
         swerve.drive(currentSpeeds);
         subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
     }

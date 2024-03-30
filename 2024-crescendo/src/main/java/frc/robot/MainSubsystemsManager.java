@@ -368,24 +368,26 @@ public class MainSubsystemsManager {
                 break;
 
             case PASS_THROUGH_1:
+                leds.PARTY();
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
-                    shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
-                    // shooter.setFeederPower(1);
-                    shooter.setShootVelocity(6000, 6000);
+                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
+                // shooter.setFeederPower(1);
+                shooter.setShootVelocity(6000, 6000);
 
-                    // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
-                    //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
-                    // }
-                    // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
-                    //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
-                    // }
+                // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
+                //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
+                // }
+                // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
+                //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
+                // }
 
-                    if(shooter.isBottomBeamBreakTripped()){
-                        this.mechanismState = MechanismState.PASS_THROUGH_2;
-                    }
+                if(shooter.isBottomBeamBreakTripped()){
+                    this.mechanismState = MechanismState.PASS_THROUGH_2;
+                }
 
-                    break;
+                break;
             case PASS_THROUGH_2:
+                leds.PARTY();
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederPower(1); // Set PID to when note is engaged
                 shooter.setShootVelocity(6000, 6000);

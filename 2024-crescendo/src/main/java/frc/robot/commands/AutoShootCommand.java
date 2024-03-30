@@ -68,7 +68,7 @@ public class AutoShootCommand extends Command {
             this.timer.start();
             if(this.timer.get() < SHOOTER.SHOOT_SCORE_TIME){
                 if(shooter.readyToShoot()){
-                    shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
+                    shooter.setFeederPower(0.3);
                 }
                 else{
                     shooter.stopFeeders();

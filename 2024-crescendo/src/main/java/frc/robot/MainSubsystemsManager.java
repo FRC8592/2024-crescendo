@@ -109,11 +109,12 @@ public class MainSubsystemsManager {
                 else if (!elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.STOWING;
                 }
-                else if(desireShot(userControls)){
-                    this.mechanismState = MechanismState.PRIMING;
-                }
                 else if(userControls.amp){
                     this.mechanismState = MechanismState.PRIMING_AMP;
+                }
+                else if(this.desireShot(userControls)){ // If the user wants some sort of speaker shot
+                    this.configureSpeakerPrime(userControls); // Either manually prime for one of our set shots or set our useVision flag to true
+                    this.mechanismState = MechanismState.PRIMING;
                 }
                 break;
 
@@ -201,11 +202,12 @@ public class MainSubsystemsManager {
                 else if(userControls.climb){
                     this.mechanismState = MechanismState.CLIMB_PRIME;
                 }
-                else if(desireShot(userControls)){
-                    this.mechanismState = MechanismState.PRIMING;
-                }
                 else if(userControls.amp){
                     this.mechanismState = MechanismState.PRIMING_AMP;
+                }
+                else if(this.desireShot(userControls)){ // If the user wants some sort of speaker shot
+                    this.configureSpeakerPrime(userControls); // Either manually prime for one of our set shots or set our useVision flag to true
+                    this.mechanismState = MechanismState.PRIMING;
                 }
                 break;
 
@@ -343,7 +345,7 @@ public class MainSubsystemsManager {
             case CLIMB:
                 if(userControls.manualExtend){
                     elevator.extend();
-                } 
+                }
                 else if(userControls.manualRetract){
                     elevator.retract();
                 }
@@ -359,6 +361,20 @@ public class MainSubsystemsManager {
                         || userControls.score // For a subwoofer shot
                         || userControls.kiddyPoolShot
                         || userControls.rangeTableShoot;
+    }
+    public void configureSpeakerPrime(Controls userControls){
+        if(userControls.kiddyPoolShot){
+            this.staticPrime(RangeTable.getKiddyPool());
+        }
+        else if(userControls.shootFromPodium){
+            this.staticPrime(RangeTable.getPodium());
+        }
+        else if(userControls.rangeTableShoot){
+            this.setVisionPrime();
+        }
+        else if(userControls.score){
+            this.staticPrime(RangeTable.getSubwoofer());
+        }
     }
     public void resetToStowed(){
         this.mechanismState = MechanismState.STOWED;

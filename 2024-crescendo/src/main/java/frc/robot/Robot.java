@@ -356,16 +356,6 @@ public class Robot extends LoggedRobot {
             controls.intake = true;
         }
 
-        if(controls.kiddyPoolShot){
-            subsystemsManager.staticPrime(RangeTable.getKiddyPool());
-        }
-        else if(controls.shootFromPodium){
-            subsystemsManager.staticPrime(RangeTable.getPodium());
-        }
-        else if(controls.rangeTableShoot){
-            subsystemsManager.setVisionPrime();
-        }
-    
         swerve.drive(currentSpeeds);
         subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
     }

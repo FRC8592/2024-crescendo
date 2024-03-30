@@ -123,8 +123,10 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
+
         pigeon = new NewtonPigeon2(new Pigeon2(CAN.PIGEON_CAN_ID));
         swerve = new Swerve(pigeon);
+
         power = new Power();
         leds = new NeoPixelLED();
         shooter = new Shooter();

@@ -9,27 +9,27 @@ public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
             // new RangeEntry(3000, 5), //Speaker
             // new RangeEntry(4500, 30.5) //Podium
-            new RangeEntry(3500, 3500, 0), //0m
-            new RangeEntry(3500, 3500, 0), //0.2m
-            new RangeEntry(3500, 3500, 0), //0.4
-            new RangeEntry(3500, 3500, 0), //0.6
-            new RangeEntry(3500, 3500, 0), //0.8
-            new RangeEntry(3500, 3500, 0), //1.0
-            new RangeEntry(3500, 3500, 0), //1.2
-            new RangeEntry(3500, 3500, 0), //1.4
-            new RangeEntry(3500, 3500, 6), //1.6
-            new RangeEntry(3500, 2700, 9), //1.8
-            new RangeEntry(3500, 2700, 13), //2.0
-            new RangeEntry(4000, 3000, 18), //2.2
-            new RangeEntry(4000, 3000, 20), //2.4
-            new RangeEntry(4250, 3250, 24), //2.6
-            new RangeEntry(4500, 3500, 27.5), //2.8
-            new RangeEntry(4500, 3500, 28), //3.0
-            new RangeEntry(4500, 3500, 28), //3.2
-            new RangeEntry(4500, 3500, 29), //3.4
-            new RangeEntry(5000, 3500, 31), //3.6
-            new RangeEntry(5500, 3500, 32), //3.8
-            new RangeEntry(5500, 3500, 33), //4.0
+            new RangeEntry(4000, 5500, 0), //0m
+            new RangeEntry(5500, 5500, 0), //0.2m
+            new RangeEntry(5500, 5500, 0), //0.4
+            new RangeEntry(5500, 5500, 0), //0.6
+            new RangeEntry(5500, 5500, 0), //0.8
+            new RangeEntry(5500, 5500, 0), //1.0
+            new RangeEntry(4000, 4000, 0), //1.2
+            new RangeEntry(4000, 4000, 0), //1.4
+            new RangeEntry(4000, 4000, 6), //1.6
+            new RangeEntry(5500, 4500, 9), //1.8
+            new RangeEntry(5500, 4000, 13), //2.0
+            new RangeEntry(5500, 3500, 18), //2.2
+            new RangeEntry(5500, 3500, 20), //2.4
+            new RangeEntry(5500, 3500, 25), //2.6
+            new RangeEntry(5500, 3500, 27.5), //2.8
+            new RangeEntry(5500, 3500, 28), //3.0
+            new RangeEntry(5500, 3500, 30), //3.2
+            new RangeEntry(5500, 3500, 31), //3.4
+            new RangeEntry(5500, 3500, 32), //3.6
+            new RangeEntry(5500, 3500, 33), //3.8
+            new RangeEntry(5500, 3500, 34), //4.0
             new RangeEntry(5500, 3500, 35), //4.2 
             new RangeEntry(6000, 4000, 37.5), //4.4 
             new RangeEntry(6000, 4000, 38), //4.6 

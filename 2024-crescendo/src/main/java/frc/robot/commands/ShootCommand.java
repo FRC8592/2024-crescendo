@@ -21,6 +21,7 @@ public class ShootCommand extends Command{
 
     public ShootCommand(MainSubsystemsManager subsystemsManager, double expectedRange){
         this.subsystemsManager = subsystemsManager;
+        this.expectedRange = expectedRange;
     }
 
     @Override

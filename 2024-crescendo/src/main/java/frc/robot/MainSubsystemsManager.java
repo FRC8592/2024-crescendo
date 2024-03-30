@@ -265,6 +265,7 @@ public class MainSubsystemsManager {
                 // Redundant setting of speeds in case of manual overwriting by drivers
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
+                
 
                 //Constantly rumble both controllers to let both drivers know that we're ready to shoot
                 // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){

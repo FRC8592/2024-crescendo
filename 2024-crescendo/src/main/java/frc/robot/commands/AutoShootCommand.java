@@ -79,5 +79,8 @@ public class AutoShootCommand extends Command {
 
     public void shutdown() {
         drive.drive(new ChassisSpeeds());
+        subsystemsManager.updateMechanismStateMachine(controls,
+            vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS),
+            vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)<APRILTAG_VISION.X_ROT_LOCK_ERROR); //TODO put this in PoseVision
     }
 }

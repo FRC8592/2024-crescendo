@@ -405,6 +405,9 @@ public class MainSubsystemsManager {
                 break;
 
         }
+        Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"UserRange/LeftSpeed", this.userRange.leftFlywheelSpeed);
+        Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"UserRange/RightSpeed", this.userRange.rightFlywheelSpeed);
+        Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"UserRange/PivotAngle", this.userRange.pivotAngle);
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"StateAfterUpdate", this.mechanismState.toString());
     }
 

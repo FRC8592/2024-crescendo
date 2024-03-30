@@ -125,8 +125,10 @@ public class Robot extends LoggedRobot {
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
         autoSelect = new AutonomousSelector();
+
         pigeon = new NewtonPigeon2(new Pigeon2(CAN.PIGEON_CAN_ID));
         swerve = new Swerve(pigeon);
+
         power = new Power();
         leds = new NeoPixelLED();
         shooter = new Shooter();
@@ -360,7 +362,11 @@ public class Robot extends LoggedRobot {
             subsystemsManager.staticPrime(RangeTable.getKiddyPool());
         }
         else if(controls.shootFromPodium){
-            subsystemsManager.staticPrime(RangeTable.getPodium());
+            double elevatorAngle = SmartDashboard.getNumber("Elevator Custom Angle", 0);
+            int leftShooterSpeed = (int)SmartDashboard.getNumber("Shooter Left Speed", 0);
+            int rightShooterSpeed = (int)SmartDashboard.getNumber("Shooter Right Speed", 0);
+            RangeTable.RangeEntry entry = new RangeEntry(leftShooterSpeed,rightShooterSpeed, elevatorAngle);
+            subsystemsManager.staticPrime(entry);
         }
         else if(controls.rangeTableShoot){
             subsystemsManager.setVisionPrime();

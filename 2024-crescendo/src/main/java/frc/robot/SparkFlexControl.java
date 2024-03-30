@@ -27,8 +27,10 @@ public class SparkFlexControl {
     public SparkFlexControl(int motorCanID, boolean coastMode){
         motor = new CANSparkFlex(motorCanID, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
+
         //Set update status to 10 Hz
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 100);
+        
         motorControl = motor.getPIDController();
         motorEncoder = motor.getEncoder();
         if (coastMode){

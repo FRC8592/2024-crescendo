@@ -82,6 +82,9 @@ public final class Falcon500DriveControllerFactoryBuilder {
             }
 
             TalonFX motor = new TalonFX(driveConfiguration);
+            // Set Status Frame Period to 50 Hz
+            motor.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, 20);
+
             CtreUtils.checkCtreError(motor.configAllSettings(motorConfiguration), "Failed to configure Falcon 500");
 
             if (hasVoltageCompensation()) {

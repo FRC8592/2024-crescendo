@@ -133,6 +133,9 @@ public final class Falcon500SteerControllerFactoryBuilder {
             }
 
             TalonFX motor = new TalonFX(steerConfiguration.getMotorPort());
+            // Set Status Frame Period to 50 Hz
+            motor.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, 20);
+
             checkCtreError(motor.configAllSettings(motorConfiguration, CAN_TIMEOUT_MS),
                     "Failed to configure Falcon 500 settings");
 

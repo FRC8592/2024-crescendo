@@ -10,6 +10,7 @@ public class Controls {
     public boolean resetGyro;
     public boolean autoCollect;
     public boolean robotOriented;
+    public boolean passThrough;
 
     public boolean ledAmpSignal;
     public boolean shootFromPodium;
@@ -29,6 +30,7 @@ public class Controls {
         this.resetGyro = false;
         this.autoCollect = false;
         this.robotOriented = false;
+        this.passThrough = false;
 
         this.ledAmpSignal = false;
         this.shootFromPodium = false;
@@ -49,10 +51,11 @@ public class Controls {
         this.resetGyro = driverController.getBackButton();
         this.autoCollect = driverController.getLeftBumper();
         this.robotOriented = driverController.getRightTriggerAxis() >0.1;
+        this.passThrough = driverController.getLeftTriggerAxis() >0.1;
 
-        this.shootFromPodium = operatorController.getLeftBumper();
+        this.shootFromPodium = operatorController.getRightBumper();
         this.rangeTableShoot = operatorController.getBButton();
-        this.outake = operatorController.getRightBumper();
+        this.outake = operatorController.getLeftBumper();
         this.intake = operatorController.getLeftTriggerAxis()>0.1;
         this.stow = operatorController.getAButton();
         this.amp = operatorController.getXButton();
@@ -67,6 +70,7 @@ public class Controls {
         this.log(this.resetGyro, "DriverController", "ResetGyro");
         this.log(this.autoCollect, "DriverController", "AutoCollect");
         this.log(this.robotOriented, "DriverController", "RobotOriented");
+        this.log(this.robotOriented, "DriverController", "PassThrough");
 
         this.log(this.ledAmpSignal, "OperatorController", "LEDAmpSignal");
         this.log(this.shootFromPodium, "OperatorController", "ShootFromPodium");

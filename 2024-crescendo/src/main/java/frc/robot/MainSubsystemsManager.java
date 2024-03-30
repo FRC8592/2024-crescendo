@@ -26,7 +26,9 @@ public class MainSubsystemsManager {
         AMP_PRIMED,
         AMP_SCORING,
         CLIMB_PRIME,
-        CLIMB
+        CLIMB,
+        PASS_THROUGH_1,
+        PASS_THROUGH_2
     }
 
     public MechanismState mechanismState = MechanismState.LOADED;
@@ -119,6 +121,12 @@ public class MainSubsystemsManager {
                 else if(userControls.amp){
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 }
+                else if(userControls.passThrough){
+                    this.mechanismState = MechanismState.PASS_THROUGH_1;
+                }
+                else {
+                    this.staticPrime(RangeTable.get(1.4));
+                }
                 break;
 
 
@@ -195,7 +203,6 @@ public class MainSubsystemsManager {
             // "Stow" state, but for when we have a note
 
             case LOADED:
-                this.staticPrime(RangeTable.get(1.4));
                 shooter.setShootVelocity(userRange.leftFlywheelSpeed, userRange.rightFlywheelSpeed);
                 leds.notePickup();
 
@@ -210,6 +217,12 @@ public class MainSubsystemsManager {
                 }
                 else if(userControls.amp){
                     this.mechanismState = MechanismState.PRIMING_AMP;
+                }
+                else if(userControls.passThrough){
+                    this.mechanismState = MechanismState.PASS_THROUGH_1;
+                }
+                else {
+                    this.staticPrime(RangeTable.get(1.4));
                 }
                 break;
 
@@ -351,6 +364,43 @@ public class MainSubsystemsManager {
                 else if(userControls.manualRetract){
                     elevator.retract();
                 }
+                break;
+
+            case PASS_THROUGH_1:
+                intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
+                    shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
+                    // shooter.setFeederPower(1);
+                    shooter.setShootVelocity(6000, 6000);
+
+                    // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
+                    //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
+                    // }
+                    // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
+                    //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
+                    // }
+
+                    if(shooter.isBottomBeamBreakTripped()){
+                        this.mechanismState = MechanismState.PASS_THROUGH_2;
+                    }
+
+                    break;
+            case PASS_THROUGH_2:
+                intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
+                shooter.setFeederPower(1); // Set PID to when note is engaged
+                shooter.setShootVelocity(6000, 6000);
+
+                // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
+                //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
+                // }
+                // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
+                //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
+                // }
+
+                if(!shooter.isBottomBeamBreakTripped()){
+                    this.mechanismState = MechanismState.STOWING;
+                    intake.stopIntake();
+                }
+
                 break;
 
         }

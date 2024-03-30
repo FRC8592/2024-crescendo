@@ -36,6 +36,8 @@ public class ShootCommand extends Command{
     @Override
     public boolean execute() {
         Logger.recordOutput("CurrentCommand", "ShootCommand");
+        controls.score = true;
+        subsystemsManager.staticPrime(RangeTable.get(expectedRange));
       /*   switch(state){
             case WAIT:
                 controls.score = true;

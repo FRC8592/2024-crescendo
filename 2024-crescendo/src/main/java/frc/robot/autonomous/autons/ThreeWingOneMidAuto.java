@@ -18,7 +18,7 @@ import frc.robot.commands.ShootCommand;
 public class ThreeWingOneMidAuto extends BaseAuto{
 
     //Setting speed and acceleration of each path as shown
-    private TrajectoryConfig config = new TrajectoryConfig(2, 1.5);
+    private TrajectoryConfig config = new TrajectoryConfig(1, 1.5);
     private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
    
     private SwerveTrajectory noteOne_1 = AutonomousPositions.generate(config.setStartVelocity(0).setEndVelocity(0), 

@@ -35,36 +35,37 @@ public class AutoShootCommand extends Command {
         this.vision = vision;
         this.subsystemsManager = subsystemsManager;
         this.timer = new Timer();
-        this.controls = new Controls();
     }
+
     @Override
     public void initialize() {
         controls = new Controls();
         drive.drive(new ChassisSpeeds());
+
+        /* Set up for an automatically ranged shot using vision */
         controls.rangeTableShoot = true;
+        controls.score = true;
         subsystemsManager.setVisionPrime();   //turn on auto vision
     }
     @Override
     public boolean execute() {
+
+        /* Set up for an automatically ranged shot using vision */
+        controls.rangeTableShoot = true;
+        controls.score = true;
+        subsystemsManager.setVisionPrime();   //turn on auto vision
+            
+        /* Rotate the robot to center the Apriltag fiducial in the camera view */
         double omega = vision.visual_servo(0, 3, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0.5);
         drive.drive(new ChassisSpeeds(0, 0, omega));
+
+        /* Update the subsystem manager with range */
         subsystemsManager.updateMechanismStateMachine(controls,
                 vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS),
                 vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)<APRILTAG_VISION.X_ROT_LOCK_ERROR); //TODO put this in PoseVision
-        // switch(this.state){
-        //     case WAIT:
-                // if(subsystemsManager.mechanismState == MechanismState.PRIMING || subsystemsManager.mechanismState == MechanismState.PRIMED){
-                //     this.state = States.RUN;
-                // }
-                // break;
-            // case RUN:
-            if (subsystemsManager.mechanismState == MechanismState.PRIMING){
-                controls.rangeTableShoot = false;
-            }
-                if (subsystemsManager.mechanismState == MechanismState.PRIMED){
-                    controls.score = true;
-                }
 
+
+                /* When the shot is complete, disable our shooter controls and inform the autonomous subsystem that this command is complete*/
                 if(subsystemsManager.mechanismState == MechanismState.STOWING){
                     return true;
                 }

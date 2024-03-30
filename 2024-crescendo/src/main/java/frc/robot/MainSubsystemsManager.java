@@ -46,16 +46,18 @@ public class MainSubsystemsManager {
         this.leds = leds;
     }
 
+    //
     // static range
-
+    //
     public void staticPrime(RangeEntry staticRange) {
         this.userRange = staticRange;
         this.useVision = false;
     }
 
 
+    //
     //dynamic (vision) range
-
+    //
     public void setVisionPrime() {
         this.useVision = true;
     }
@@ -66,10 +68,12 @@ public class MainSubsystemsManager {
             this.mechanismState = MechanismState.STOWING;
         }
 
+        // If we are using vision and if we can see the Apriltag, overwrite our last rangeTable value with a new value based on distance
         if (useVision && cameraRange != -1) {
             userRange = RangeTable.get(cameraRange);
         }
 
+        // TODO: This may shoot prematurely if we lose sight of the AprilTag while aiming
         if (cameraRange == -1) {
             aimed = true; //assume it's aimed
         } else {

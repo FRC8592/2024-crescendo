@@ -208,10 +208,14 @@ public final class Falcon500SteerControllerFactoryBuilder {
             // fully set up, and we don't
             // end up getting a good reading. If we reset periodically this won't matter
             // anymore.
+            //
+            // We think this logic is causing the robot to occasionally drag a wheel when a read from an absolute encoder fails.
+            // The function is temporarily modified to only run one time shortly after startup.
+            //
             if (motor.getSelectedSensorVelocity()
                     * motorEncoderVelocityCoefficient < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
-                if (++resetIteration >= ENCODER_RESET_ITERATIONS) {
-                    resetIteration = 0;
+                if (++resetIteration == ENCODER_RESET_ITERATIONS) {     // Only execute on the exact count of ENCODER_RESET_ITERATIONS
+                    //resetIteration = 0;                               // Commented out so that the interation count keeps increasing so this logic only executes one time
                     currentAngleRadians = resetAbsoluteAngle();
                 }
             } else {

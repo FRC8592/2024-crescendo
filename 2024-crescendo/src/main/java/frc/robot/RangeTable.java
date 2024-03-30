@@ -9,15 +9,15 @@ public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
             // new RangeEntry(3000, 5), //Speaker
             // new RangeEntry(4500, 30.5) //Podium
-            new RangeEntry(3500, 2700, 0), //0m
-            new RangeEntry(3500, 2700, 0), //0.2m
-            new RangeEntry(3500, 2700, 0), //0.4
-            new RangeEntry(3500, 2700, 0), //0.6
-            new RangeEntry(3500, 2700, 0), //0.8
-            new RangeEntry(3500, 2700, 0), //1.0
-            new RangeEntry(3500, 2700, 0), //1.2
-            new RangeEntry(3500, 2700, 0), //1.4
-            new RangeEntry(3500, 2700, 6), //1.6
+            new RangeEntry(3500, 3500, 0), //0m
+            new RangeEntry(3500, 3500, 0), //0.2m
+            new RangeEntry(3500, 3500, 0), //0.4
+            new RangeEntry(3500, 3500, 0), //0.6
+            new RangeEntry(3500, 3500, 0), //0.8
+            new RangeEntry(3500, 3500, 0), //1.0
+            new RangeEntry(3500, 3500, 0), //1.2
+            new RangeEntry(3500, 3500, 0), //1.4
+            new RangeEntry(3500, 3500, 6), //1.6
             new RangeEntry(3500, 2700, 9), //1.8
             new RangeEntry(3500, 2700, 13), //2.0
             new RangeEntry(4000, 3000, 18), //2.2
@@ -135,7 +135,8 @@ public class RangeTable {
         return get(1.4);
     }
 
-    public static RangeEntry getPodium() {
-        return get(2.83);
+    public static RangeEntry getPodium() { // TODO:  Return this to a normal podium shot.  It has a temporary power boost.
+        // return get(2.83);
+        return new RangeEntry(5250, 3250, 27.5, 0.0);
     }
 }

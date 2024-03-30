@@ -9,33 +9,33 @@ public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
             // new RangeEntry(3000, 5), //Speaker
             // new RangeEntry(4500, 30.5) //Podium
-            new RangeEntry(4000, 5500, 0), //0m
-            new RangeEntry(5500, 5500, 0), //0.2m
-            new RangeEntry(5500, 5500, 0), //0.4
-            new RangeEntry(5500, 5500, 0), //0.6
-            new RangeEntry(5500, 5500, 0), //0.8
-            new RangeEntry(5500, 5500, 0), //1.0
-            new RangeEntry(4000, 4000, 0), //1.2
-            new RangeEntry(4000, 4000, 0), //1.4
-            new RangeEntry(4000, 4000, 6), //1.6
-            new RangeEntry(5500, 4500, 9), //1.8
-            new RangeEntry(5500, 4000, 13), //2.0
-            new RangeEntry(5500, 3500, 18), //2.2
-            new RangeEntry(5500, 3500, 20), //2.4
-            new RangeEntry(5500, 3500, 25), //2.6
-            new RangeEntry(5500, 3500, 27.5), //2.8
-            new RangeEntry(5500, 3500, 28), //3.0
-            new RangeEntry(5500, 3500, 30), //3.2
-            new RangeEntry(5500, 3500, 31), //3.4
-            new RangeEntry(5500, 3500, 32), //3.6
-            new RangeEntry(5500, 3500, 33), //3.8
-            new RangeEntry(5500, 3500, 34), //4.0
-            new RangeEntry(5500, 3500, 35), //4.2 
-            new RangeEntry(6000, 4000, 37.5), //4.4 
-            new RangeEntry(6000, 4000, 38), //4.6 
-            new RangeEntry(6000, 4500, 39), //4.8
-            new RangeEntry(6000, 4500, 40), //5.0 
-            new RangeEntry(6000, 4500, 39.7), //5.2
+            new RangeEntry(3500, 3500, 0.0), //0.0m
+            new RangeEntry(3500, 3500, 0.0), //0.2m
+            new RangeEntry(3500, 3500, 0.0), //0.4
+            new RangeEntry(3500, 3500, 0.0), //0.6
+            new RangeEntry(3500, 3500, 0.0), //0.8
+            new RangeEntry(3500, 3500, 0.0), //1.0
+            new RangeEntry(3500, 3500, 0.000), //1.2
+            new RangeEntry(3500, 3500, 0.000), //1.4
+            new RangeEntry(4000, 3500, 11.00), //1.6
+            new RangeEntry(5000, 3500, 13.00), //1.8
+            new RangeEntry(5500, 3500, 18.00), //2.0
+            new RangeEntry(5500, 3500, 21.00), //2.2
+            new RangeEntry(5500, 3500, 25.00), //2.4
+            new RangeEntry(5500, 3500, 27.50), //2.6
+            new RangeEntry(5500, 3500, 29.00), //2.8
+            new RangeEntry(5500, 3500, 30.00), //3.0
+            new RangeEntry(5500, 3500, 30.75), //3.2
+            new RangeEntry(5500, 3500, 31.50), //3.4 xx
+            new RangeEntry(5500, 3500, 32.25), //3.6 xx
+            new RangeEntry(6000, 4000, 36.25), //3.8
+            new RangeEntry(6000, 4000, 36.50), //4.0
+            new RangeEntry(6000, 4000, 37.70), //4.2 *
+            new RangeEntry(6000, 4000, 37.50), //4.4
+            new RangeEntry(6000, 4000, 38.00), //4.6 
+            new RangeEntry(6000, 4500, 39.00), //4.8
+            new RangeEntry(6000, 4500, 40.00), //5.0 
+            new RangeEntry(6000, 4500, 39.70), //5.2
     };
     public static boolean valid;
 

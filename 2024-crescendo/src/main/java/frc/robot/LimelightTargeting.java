@@ -12,6 +12,8 @@ import frc.robot.Constants.*;
 
 import java.util.LinkedList;
 
+import javax.lang.model.util.ElementScanner14;
+
 import org.littletonrobotics.junction.Logger;
 
 public class LimelightTargeting {
@@ -130,7 +132,7 @@ public class LimelightTargeting {
             }
         }
         
-        if (totalvalid != 0) {
+        if (totalValid != 0) {
             processedDx = (totalDx / totalValid);
             processedDy = totalDy / totalValid;
         } else {
@@ -227,8 +229,7 @@ public class LimelightTargeting {
     public double turnRobot(double visionSearchSpeed, PIDController turnPID, String variable, double limit, double offset) {
         if (targetValid) {
             if (variable == "tx")
-                // turnSpeed = turnPID.calculate(tx.getDouble(0.0), offset); // Setpoint is always 0 degrees (dead center)
-                turnSpeed = turnPID.calculate(processedDx, offset); // Setpoint is always 0 degrees (dead center)
+                turnSpeed = turnPID.calculate(tx.getDouble(0.0), offset); // Setpoint is always 0 degrees (dead center)
             else if (variable == "ty")
                 turnSpeed = turnPID.calculate(ty.getDouble(0.0), offset); // Setpoint is always 0 degrees (dead center)
             turnSpeed = Math.max(turnSpeed, -limit);
@@ -247,11 +248,14 @@ public class LimelightTargeting {
     public ChassisSpeeds driveToTarget(PIDController turnPID, PIDController drivePID, double targetAngle) {
         double rotateSpeed = this.turnRobot(0, turnPID, "tx", SWERVE.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
         double driveToSpeed = -this.turnRobot(0, drivePID, "ty", 4.5, targetAngle);
+
+        if (processedDx > 4)
+            driveToSpeed = 0.0;
+
         SmartDashboard.putNumber("Drive-to velocity", driveToSpeed);
         Logger.recordOutput(NOTELOCK.LOG_PATH+"Drive-to Velocity", driveToSpeed);
         Logger.recordOutput(NOTELOCK.LOG_PATH+"RotateSpeed", rotateSpeed);
         return new ChassisSpeeds(driveToSpeed, 0, rotateSpeed);
-        
     }
 
     /**

@@ -23,7 +23,7 @@ public class ThreeWingNoteAuto extends BaseAuto{
    
     private SwerveTrajectory noteOne_1 = AutonomousPositions.generate(config.setStartVelocity(0).setEndVelocity(0), 
             AutonomousPositions.SUBWOOFER_MIDDLE.getPose(), 
-            AutonomousPositions.WING_NOTE_3.translate(-0.1, 0.5, Rotation2d.fromDegrees(-45))).addRotation(Rotation2d.fromDegrees(-45));//-45
+            AutonomousPositions.WING_NOTE_3.translate(-0.1, 0.6, Rotation2d.fromDegrees(-45))).addRotation(Rotation2d.fromDegrees(-45));//-45
 
 
     private SwerveTrajectory noteTwo_1 = AutonomousPositions.generate(config.setReversed(false).setStartVelocity(0).setEndVelocity(2), 

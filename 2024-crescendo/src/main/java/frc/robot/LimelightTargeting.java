@@ -54,7 +54,7 @@ public class LimelightTargeting {
     private static int STAT_SIZE = 10;
 
     // Avoid driving forward if the angle error exceeds this value
-    private static double MAX_ANGLE_ERROR_TO_DRIVE = 4.0;
+    private static double MAX_ANGLE_ERROR_TO_DRIVE = 1.0;
 
     private LinkedList<LimelightData> previousCoordinates;
 

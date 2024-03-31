@@ -1,9 +1,19 @@
 package frc.robot.commands;
 
-public class PrimeCommand extends Command {
+import frc.robot.Controls;
+import frc.robot.MainSubsystemsManager;
 
-    public PrimeCommand(){
+public class PrimeCommand extends Command {
+    private MainSubsystemsManager subsystemsManager;
+    private double expectedRange;
+    private Controls controls = new Controls();
+
+
+    public PrimeCommand(MainSubsystemsManager subsystemsManager, double expectedRange){
+        this.subsystemsManager = subsystemsManager;
+        this.expectedRange = expectedRange;
         
+
     }
     @Override
     public void initialize() {

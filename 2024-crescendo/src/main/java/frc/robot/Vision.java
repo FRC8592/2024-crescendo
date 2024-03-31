@@ -232,7 +232,8 @@ public class Vision {
     // Otherwise, if we have targetValid, turn towards the target using the PID controller to determine speed
     // Limit maximum speed
     if (targetValid) {
-      turnSpeed = turnPID.calculate(tx.getDouble(0.0), offset);  // Setpoint is always 0 degrees (dead center)
+      //turnSpeed = turnPID.calculate(tx.getDouble(0.0), offset);  // Setpoint is always 0 degrees (dead center)
+      turnSpeed = turnPID.calculate(processedDx, offset);  // Setpoint is always 0 degrees (dead center)
       turnSpeed = Math.max(turnSpeed, -limit);
       turnSpeed = Math.min(turnSpeed, limit);
     }

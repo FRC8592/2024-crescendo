@@ -54,7 +54,7 @@ public class LimelightTargeting {
     private static int STAT_SIZE = 10;
 
     // Avoid driving forward if the angle error exceeds this value
-    private static double MAX_ANGLE_ERROR_TO_DRIVE = 1.0;
+    private static double MAX_ANGLE_ERROR_TO_DRIVE = 2.0;
 
     private LinkedList<LimelightData> previousCoordinates;
 
@@ -252,7 +252,12 @@ public class LimelightTargeting {
         double rotateSpeed = this.turnRobot(0, turnPID, "tx", SWERVE.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
         double driveToSpeed = -this.turnRobot(0, drivePID, "ty", 4.5, targetAngle);
 
-        if (processedDx > MAX_ANGLE_ERROR_TO_DRIVE)
+        //
+        // Don't start driving forward until the target is near to the center of the image.
+        // This will prevent the turn PID from having to make big last-minute adjustments
+        // when we are close to the target, but have a large angle error.
+        // 
+        if (Math.abs(processedDx) > MAX_ANGLE_ERROR_TO_DRIVE)
             driveToSpeed = 0.0;
 
         SmartDashboard.putNumber("Drive-to velocity", driveToSpeed);

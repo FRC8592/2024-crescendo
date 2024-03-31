@@ -373,7 +373,7 @@ public class Robot extends LoggedRobot {
         }
 
         swerve.drive(currentSpeeds);
-        subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
+        subsystemsManager.updateMechanismStateMachine(controls, distance, poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS), locked);
     }
 
     @Override

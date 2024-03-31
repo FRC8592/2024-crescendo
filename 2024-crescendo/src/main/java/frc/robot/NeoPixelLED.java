@@ -69,9 +69,37 @@ public class NeoPixelLED {
         }
         ledStrip.setData(ledBuffer);
     }
-    // public void hone(){
-        
-    // }
+    public void blinkRed() {
+        if (((int) (flashTimer.get() * 4)) % 2 == 0) {
+            for (int i = 0; i < LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, 255, 255, 0);
+            }
+            ledStrip.setData(ledBuffer);
+        }
+        else {
+            for (int i = 0; i < LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, 0, 0, 0);
+            }
+            ledStrip.setData(ledBuffer);
+        }
+    }
+    public void hone(double offset){
+        off();
+        if(Math.abs(offset) < 0.7){
+            int idx=(int)(5-((offset-0.2)*10));
+            for (int i = 0; i < idx; i++) {
+                ledBuffer.setRGB(i, 255, 255, 0);
+                ledBuffer.setRGB(9-i, 255, 255, 0);
+            }
+            for (int i = idx; i < 5; i++) {
+                ledBuffer.setRGB(i, 255, 0, 0);
+                ledBuffer.setRGB(9-i, 255, 0, 0);
+            }
+        }
+        else{
+            blinkRed();
+        }
+    }
     private int[] HSVtoRGB(double h){
         double R1 = 0;
         double G1 = 0;

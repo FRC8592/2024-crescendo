@@ -53,7 +53,7 @@ public class ShootCommand extends Command{
         }
         return false;
         */
-        subsystemsManager.updateMechanismStateMachine(controls, 0, true);
+        subsystemsManager.updateMechanismStateMachine(controls, 0, 0, true);
         return subsystemsManager.mechanismState == MechanismState.STOWING;
     }
 

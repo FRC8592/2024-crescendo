@@ -64,7 +64,7 @@ public class MainSubsystemsManager {
         this.useVision = true;
     }
 
-    public void updateMechanismStateMachine(Controls userControls, double cameraRange, boolean targetLocked){
+    public void updateMechanismStateMachine(Controls userControls, double cameraRange, double cameraOffset, boolean targetLocked){
         
         if(userControls.stow){
             this.mechanismState = MechanismState.STOWING;
@@ -245,6 +245,7 @@ public class MainSubsystemsManager {
             case PRIMING:
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
+                leds.hone(cameraOffset);
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;

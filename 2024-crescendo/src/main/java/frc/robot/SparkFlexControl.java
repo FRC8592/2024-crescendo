@@ -28,8 +28,8 @@ public class SparkFlexControl {
         motor = new CANSparkFlex(motorCanID, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
 
-        //Set update status to 10 Hz
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 100);
+        //Set update status to 20 Hz
+        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 50);
         
         motorControl = motor.getPIDController();
         motorEncoder = motor.getEncoder();

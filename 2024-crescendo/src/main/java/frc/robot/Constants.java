@@ -329,7 +329,7 @@ public final class Constants {
     public class APRILTAG_VISION {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/MGVision/";
         public static final double kP = 1;
-        public static final double kI = 2.25;
+        public static final double kI = 3.5;
         public static final double kD = 0.005;
         public static final double iZone = 0.5;
 
@@ -338,7 +338,7 @@ public final class Constants {
         public static final ArrayList<Integer> AMP_AIM_TAGS = new ArrayList<>(Arrays.asList(5, 6));
         public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
 
-        public static final double X_ROT_LOCK_ERROR = 0.1;
+        public static final double X_ROT_LOCK_ERROR = 0.075;
     }
 
     public class MAIN_SUBSYSTEMS_MANAGER{

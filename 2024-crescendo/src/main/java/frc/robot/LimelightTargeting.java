@@ -129,9 +129,15 @@ public class LimelightTargeting {
                 totalValid = totalValid + 1;
             }
         }
+        
+        if (totalvalid != 0) {
+            processedDx = (totalDx / totalValid);
+            processedDy = totalDy / totalValid;
+        } else {
+            processedDx = -1;
+            processedDy = -1;
+        }
 
-        processedDx = (totalDx / totalValid);
-        processedDy = totalDy / totalValid;
         targetValid = (totalValid >= MIN_LOCKS);
 
         targetRange = distanceToTarget();
@@ -221,7 +227,8 @@ public class LimelightTargeting {
     public double turnRobot(double visionSearchSpeed, PIDController turnPID, String variable, double limit, double offset) {
         if (targetValid) {
             if (variable == "tx")
-                turnSpeed = turnPID.calculate(tx.getDouble(0.0), offset); // Setpoint is always 0 degrees (dead center)
+                // turnSpeed = turnPID.calculate(tx.getDouble(0.0), offset); // Setpoint is always 0 degrees (dead center)
+                turnSpeed = turnPID.calculate(processedDx, offset); // Setpoint is always 0 degrees (dead center)
             else if (variable == "ty")
                 turnSpeed = turnPID.calculate(ty.getDouble(0.0), offset); // Setpoint is always 0 degrees (dead center)
             turnSpeed = Math.max(turnSpeed, -limit);

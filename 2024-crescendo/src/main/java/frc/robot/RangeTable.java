@@ -9,27 +9,27 @@ public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
             // new RangeEntry(3000, 5), //Speaker
             // new RangeEntry(4500, 30.5) //Podium
-            new RangeEntry(3500, 3500, 0.0), //0.0m
-            new RangeEntry(3500, 3500, 0.0), //0.2m
-            new RangeEntry(3500, 3500, 0.0), //0.4
-            new RangeEntry(3500, 3500, 0.0), //0.6
-            new RangeEntry(3500, 3500, 0.0), //0.8
-            new RangeEntry(3500, 3500, 0.0), //1.0
-            new RangeEntry(3500, 3500, 0.000), //1.2
-            new RangeEntry(3500, 3500, 0.000), //1.4
-            new RangeEntry(4000, 3500, 11.00), //1.6
-            new RangeEntry(5000, 3500, 13.00), //1.8
-            new RangeEntry(5500, 3500, 18.00), //2.0
-            new RangeEntry(5500, 3500, 21.00), //2.2
-            new RangeEntry(5500, 3500, 25.00), //2.4
-            new RangeEntry(5500, 3500, 28.00), //2.6
-            new RangeEntry(5500, 3500, 29.00), //2.8
-            new RangeEntry(5500, 3500, 30.00), //3.0
-            new RangeEntry(5500, 3500, 30.75), //3.2
-            new RangeEntry(5500, 3500, 31.50), //3.4 xx
-            new RangeEntry(5500, 3500, 31), //3.6 xx
-            new RangeEntry(6000, 4000, 34.25), //3.8
-            new RangeEntry(6000, 4000, 35), //4.0
+            new RangeEntry(3500, 3500, 0.0),    // 0.0m
+            new RangeEntry(3500, 3500, 0.0),    // 0.2m
+            new RangeEntry(3500, 3500, 0.0),    // 0.4m
+            new RangeEntry(3500, 3500, 0.0),    // 0.6m
+            new RangeEntry(3500, 3500, 0.0),    // 0.8m
+            new RangeEntry(3500, 3500, 0.0),    // 1.0m
+            new RangeEntry(3500, 3500, 0.0),    // 1.2m
+            new RangeEntry(3500, 3500, 0.0),    // 1.4m
+            new RangeEntry(3750, 3500, 5.5),    // 1.6m 
+            new RangeEntry(4500, 3500, 12.5),   // 1.8m 
+            new RangeEntry(5000, 3500, 18.5),   // 2.0m 
+            new RangeEntry(5250, 3500, 21.5),   // 2.2m 
+            new RangeEntry(5500, 3500, 25.0),   // 2.4m 
+            new RangeEntry(5500, 3500, 28.0),   // 2.6m 
+            new RangeEntry(5500, 3500, 29.5),   // 2.8m 
+            new RangeEntry(5500, 3500, 30.0),   // 3.0m 
+            new RangeEntry(5500, 3500, 30.5),   // 3.2m 
+            new RangeEntry(5500, 3500, 31.25),  // 3.4m 
+            new RangeEntry(5750, 3750, 32.0),   // 3.6m 
+            new RangeEntry(6000, 4000, 34.625), // 3.8m 
+            new RangeEntry(6000, 4000, 35.25),   // 4.0m
             new RangeEntry(6000, 4000, 36), //4.2 *
             new RangeEntry(6000, 4000, 37.50), //4.4
             new RangeEntry(6000, 4000, 38.00), //4.6 
@@ -67,14 +67,20 @@ public class RangeTable {
         if (RANGE_TABLE.length > 0) {
             if (wholeMeters < RANGE_TABLE.length) {
                 if (wholeMeters < RANGE_TABLE.length - 1) {
-                    return RANGE_TABLE[wholeMeters].interpolate(RANGE_TABLE[wholeMeters + 1], decimal);
+                    RangeEntry entry = RANGE_TABLE[wholeMeters].interpolate(RANGE_TABLE[wholeMeters + 1], decimal);
+                    entry.pivotAngle += Constants.RANGE_TABLE.OFFSET_ANGLE;
+                    return entry;
                 } else {
                     valid = false;
-                    return RANGE_TABLE[RANGE_TABLE.length - 1];
+                    RangeEntry entry = RANGE_TABLE[RANGE_TABLE.length - 1];
+                    entry.pivotAngle += Constants.RANGE_TABLE.OFFSET_ANGLE;
+                    return entry;
                 }
             } else { // Too far for the range table
                 valid = false;
-                return RANGE_TABLE[RANGE_TABLE.length - 1];
+                RangeEntry entry = RANGE_TABLE[RANGE_TABLE.length - 1];
+                entry.pivotAngle += Constants.RANGE_TABLE.OFFSET_ANGLE;
+                    return entry;
             }
         } else {
             valid = false;

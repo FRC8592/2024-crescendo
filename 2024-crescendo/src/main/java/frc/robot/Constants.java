@@ -348,4 +348,8 @@ public final class Constants {
     public class CONTROLS{
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Controls/";
     }
+
+    public class RANGE_TABLE{
+        public static final double OFFSET_ANGLE = 0;
+    }
 }

@@ -33,11 +33,8 @@ public class AutoPrimeCommand extends Command {
                 vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS),
                 vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS) < APRILTAG_VISION.X_ROT_LOCK_ERROR);
 
-        if(subsystemsManager.mechanismState == MainSubsystemsManager.MechanismState.PRIMED){
-            return true;
-        }
 
-        return false;
+        return true;
     }
 
     @Override

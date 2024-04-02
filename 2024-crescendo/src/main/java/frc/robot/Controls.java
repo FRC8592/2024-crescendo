@@ -53,8 +53,8 @@ public class Controls {
         this.robotOriented = driverController.getRightTriggerAxis() >0.1;
         this.passThrough = driverController.getLeftTriggerAxis() >0.1;
 
-        this.shootFromPodium = operatorController.getRightBumper();
-        this.rangeTableShoot = operatorController.getBButton();
+        this.rangeTableShoot = operatorController.getRightBumper();
+        this.shootFromPodium = operatorController.getBButton();
         this.outake = operatorController.getLeftBumper();
         this.intake = operatorController.getLeftTriggerAxis()>0.1;
         this.stow = operatorController.getAButton();

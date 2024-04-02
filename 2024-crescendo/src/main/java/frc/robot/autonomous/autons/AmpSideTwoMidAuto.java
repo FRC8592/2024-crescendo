@@ -19,21 +19,21 @@ public class AmpSideTwoMidAuto extends BaseAuto{
     AutonomousPositions.WING_NOTE_1.translate(1,0.65),
     AutonomousPositions.WING_NOTE_1.translate(2, 0.2),
 
-     AutonomousPositions.MID_NOTE_1.translate(-0.5, -0.25)
+     AutonomousPositions.MID_NOTE_1.translate(-0.5, 0)
     );
     private SwerveTrajectory pathTwo = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
      AutonomousPositions.MID_NOTE_1.translate(-0.5, -0.25),
      AutonomousPositions.WING_NOTE_1.translate(3, 0),
-     AutonomousPositions.WING_NOTE_2.translate(1.5, 0) // stage position
+     AutonomousPositions.WING_NOTE_2.translate(1.75, 0) // stage position
     ).addRotation(Rotation2d.fromDegrees(15));
     
     private SwerveTrajectory pathThree = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
-     AutonomousPositions.WING_NOTE_2.translate(1.5, 0), // stage position
+     AutonomousPositions.WING_NOTE_2.translate(1.75, 0), // stage position
      AutonomousPositions.WING_NOTE_1.translate(3, 0), 
-     AutonomousPositions.MID_NOTE_2.translate(-0.5, -0.25)
+     AutonomousPositions.MID_NOTE_2.translate(-0.75, -1, Rotation2d.fromDegrees(45))
     ).addRotation(Rotation2d.fromDegrees(-30));
 
-    private SwerveTrajectory pathFour = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
+    private SwerveTrajectory pathFour = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(false),
     AutonomousPositions.MID_NOTE_2.translate(-1, 0),
     AutonomousPositions.WING_NOTE_1.translate(3, 0),
     AutonomousPositions.WING_NOTE_1.translate(2, 0) // stage position
@@ -45,14 +45,14 @@ public class AmpSideTwoMidAuto extends BaseAuto{
         queue = new CommandQueue(
                 new ShootCommand(subsystemsManager, 1.4),
                 new JointCommand(
-                    new FollowerCommand(drive, pathOne/*.addVision(targeting, -15)*/)
-                    // new IntakeCommand(subsystemsManager)
+                    new FollowerCommand(drive, pathOne.addVision(targeting, 0)),
+                    new IntakeCommand(subsystemsManager)
                 ), 
                 new FollowerCommand(drive, pathTwo),
                 new AutoShootCommand(drive, poseVision, subsystemsManager),
                 new JointCommand(
-                    new FollowerCommand(drive, pathThree/*.addVision(targeting, -15)*/)
-                    // new IntakeCommand(subsystemsManager)
+                    new FollowerCommand(drive, pathThree.addVision(targeting, 0)),
+                    new IntakeCommand(subsystemsManager)
                )
              //   new FollowerCommand(drive, pathFive)
                 // new AutoShootCommand(drive, poseVision, subsystemsManager)

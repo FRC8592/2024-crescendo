@@ -58,5 +58,8 @@ public class ShootCommand extends Command{
     }
 
     @Override
-    public void shutdown() {}
+    public void shutdown() {
+        controls.score = false;
+        subsystemsManager.updateMechanismStateMachine(controls, 0, true);
+    }
 }

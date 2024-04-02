@@ -69,17 +69,20 @@ public class RangeTable {
                 if (wholeMeters < RANGE_TABLE.length - 1) {
                     RangeEntry entry = RANGE_TABLE[wholeMeters].interpolate(RANGE_TABLE[wholeMeters + 1], decimal);
                     entry.pivotAngle += Constants.RANGE_TABLE.OFFSET_ANGLE;
+                    entry.pivotAngle = Math.max(entry.pivotAngle, 0);
                     return entry;
                 } else {
                     valid = false;
                     RangeEntry entry = RANGE_TABLE[RANGE_TABLE.length - 1];
                     entry.pivotAngle += Constants.RANGE_TABLE.OFFSET_ANGLE;
+                    entry.pivotAngle = Math.max(entry.pivotAngle, 0);
                     return entry;
                 }
             } else { // Too far for the range table
                 valid = false;
                 RangeEntry entry = RANGE_TABLE[RANGE_TABLE.length - 1];
                 entry.pivotAngle += Constants.RANGE_TABLE.OFFSET_ANGLE;
+                entry.pivotAngle = Math.max(entry.pivotAngle, 0);
                     return entry;
             }
         } else {

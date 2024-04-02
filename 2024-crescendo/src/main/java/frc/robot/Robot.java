@@ -362,10 +362,8 @@ public class Robot extends LoggedRobot {
             subsystemsManager.staticPrime(RangeTable.getKiddyPool());
         }
         else if(controls.shootFromPodium){
-            double elevatorAngle = SmartDashboard.getNumber("Elevator Custom Angle", 0);
-            int leftShooterSpeed = (int)SmartDashboard.getNumber("Shooter Left Speed", 0);
-            int rightShooterSpeed = (int)SmartDashboard.getNumber("Shooter Right Speed", 0);
-            RangeTable.RangeEntry entry = new RangeEntry(leftShooterSpeed,rightShooterSpeed, elevatorAngle);
+            
+            RangeTable.RangeEntry entry = RangeTable.getPodium();
             subsystemsManager.staticPrime(entry);
         }
         else if(controls.rangeTableShoot){

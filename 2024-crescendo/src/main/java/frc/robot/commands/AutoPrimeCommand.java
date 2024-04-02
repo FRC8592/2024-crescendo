@@ -4,18 +4,19 @@ import com.ctre.phoenix6.mechanisms.MechanismState;
 
 import frc.robot.Controls;
 import frc.robot.MainSubsystemsManager;
+import frc.robot.PoseVision;
 import frc.robot.RangeTable;
+import frc.robot.Constants.APRILTAG_VISION;
 
-public class PrimeCommand extends Command {
+public class AutoPrimeCommand extends Command {
     private MainSubsystemsManager subsystemsManager;
-    private double expectedRange;
     private Controls controls = new Controls();
+    private PoseVision vision;
 
 
-    public PrimeCommand(MainSubsystemsManager subsystemsManager, double expectedRange){
+    public AutoPrimeCommand(MainSubsystemsManager subsystemsManager, PoseVision vision){
         this.subsystemsManager = subsystemsManager;
-        this.expectedRange = expectedRange;
-        
+        this.vision = vision;
 
     }
     @Override
@@ -26,9 +27,11 @@ public class PrimeCommand extends Command {
 
     @Override
     public boolean execute() {
-        subsystemsManager.staticPrime(RangeTable.get(expectedRange));
-        controls.kiddyPoolShot = true; //any shoot command enters prime
-        subsystemsManager.updateMechanismStateMachine(controls, -1,true);
+        subsystemsManager.setVisionPrime();
+        controls.rangeTableShoot = true;
+        subsystemsManager.updateMechanismStateMachine(controls, 
+                vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS),
+                vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS) < APRILTAG_VISION.X_ROT_LOCK_ERROR);
 
         if(subsystemsManager.mechanismState == MainSubsystemsManager.MechanismState.PRIMED){
             return true;

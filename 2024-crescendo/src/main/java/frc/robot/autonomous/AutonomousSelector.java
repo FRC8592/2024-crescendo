@@ -17,14 +17,12 @@ public class AutonomousSelector {
         SourceOneNoteAuto.class,
         MiddleOneNoteAuto.class,
         TwoNoteAuto.class,
-        TwoNoteVisionAuto.class,
         ThreeWingNoteAuto.class,
         SourceTwoMidNoteAuto.class,
         AmpSideOneWingAuto.class,
         AmpSideOneWingOneMidAuto.class,
         SourceSideTwoNoteMidNoteAuto.class,
-        SourceSideTwoNoteWingNoteAuto.class,
-        SourceSideDriveToMidnotesAuto.class
+        CenterTwoWingOneMidAuto.class,
         };
 
     public AutonomousSelector() {

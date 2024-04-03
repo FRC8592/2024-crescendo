@@ -303,7 +303,7 @@ public class MainSubsystemsManager {
                 shooter.stopFlywheels(); // redundancy
                 elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP);
 
-                if(desireShot(userControls)) {
+                if(desireShot(userControls) && !userControls.score) { //TODO: Clean up this patch
                     this.mechanismState = MechanismState.PRIMING;
                 } else if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.AMP_PRIMED;
@@ -339,6 +339,7 @@ public class MainSubsystemsManager {
                 shooter.setFeederPower(SHOOTER.AMP_FEEDER_SPEED);
                 if(!userControls.score){
                     this.mechanismState = MechanismState.AMP_PRIMED;
+                    leds.off();
                 }
                 break;
 

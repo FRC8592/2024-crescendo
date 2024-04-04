@@ -67,6 +67,9 @@ public class AutoShootCommand extends Command {
 
                 /* When the shot is complete, disable our shooter controls and inform the autonomous subsystem that this command is complete*/
                 if(subsystemsManager.mechanismState == MechanismState.STOWING){
+                    // stop pretending like we want to score because it's done
+                    controls.score = false;
+                    controls.rangeTableShoot = false;
                     return true;
                 }
 
@@ -78,6 +81,7 @@ public class AutoShootCommand extends Command {
     }
 
     public void shutdown() {
+        controls = new Controls(); // reset all controls for the next command to be run
         drive.drive(new ChassisSpeeds());
         subsystemsManager.updateMechanismStateMachine(controls,
             vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS),

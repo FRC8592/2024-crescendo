@@ -346,15 +346,20 @@ public class Robot extends LoggedRobot {
                     driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
                     driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
         }
-        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, controls.robotOriented?new Rotation2d():swerve.getGyroscopeRotation());
+        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds,
+                controls.robotOriented ? new Rotation2d() : swerve.getGyroscopeRotation());
         noteLock.updateVision();
         if(driverController.getAButton()){
             double omega = poseVision.visual_servo(0, 1.0, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
 
-        if(controls.autoCollect){
+        if(controls.autoCollect){ 
             currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
+
+            //Override the autocollection forward-back with the joystick Y and lock left-right
+            currentSpeeds.vxMetersPerSecond = driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo();
+            currentSpeeds.vyMetersPerSecond = 0;
             controls.intake = true;
         }
 

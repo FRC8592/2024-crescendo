@@ -30,7 +30,7 @@ public class PrimeCommand extends Command {
         controls.kiddyPoolShot = true; //any shoot command enters prime
         subsystemsManager.updateMechanismStateMachine(controls, -1,true);
 
-        if(subsystemsManager.mechanismState == MainSubsystemsManager.MechanismState.PRIMED){
+        if(subsystemsManager.mechanismState == MainSubsystemsManager.MechanismState.SHOOT_PRIMED){
             return true;
         }
 

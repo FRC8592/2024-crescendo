@@ -19,13 +19,13 @@ public class MainSubsystemsManager {
         ADJUSTING_2,
         LOADED,
         OUTTAKING,
-        PRIMING,
-        PRIMED,
-        SHOOTING,
-        PRIMING_AMP,
+        SHOOT_PRIMING,
+        SHOOT_PRIMED,
+        SHOOT_SCORING,
+        AMP_PRIMING,
         AMP_PRIMED,
         AMP_SCORING,
-        CLIMB_PRIME,
+        CLIMB_PRIMING,
         CLIMB,
         PASS_THROUGH_1,
         PASS_THROUGH_2
@@ -96,6 +96,15 @@ public class MainSubsystemsManager {
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.STOWED;
                 }
+                else if(userControls.climb){
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
+                }
+                else if (userControls.amp) {
+                    this.mechanismState = MechanismState.AMP_PRIMING;
+                }
+                else if (desireShot(userControls)) {
+                    this.mechanismState = MechanismState.SHOOT_PRIMING;
+                }
                 break;
 
 
@@ -107,7 +116,7 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.INTAKING;
                 }
                 else if(userControls.climb){
-                    this.mechanismState = MechanismState.CLIMB_PRIME;
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
                 }
                 else if (userControls.outake){
                     this.mechanismState = MechanismState.OUTTAKING;
@@ -116,10 +125,10 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.STOWING;
                 }
                 else if(desireShot(userControls)){
-                    this.mechanismState = MechanismState.PRIMING;
+                    this.mechanismState = MechanismState.SHOOT_PRIMING;
                 }
                 else if(userControls.amp){
-                    this.mechanismState = MechanismState.PRIMING_AMP;
+                    this.mechanismState = MechanismState.AMP_PRIMING;
                 }
                 else if(userControls.passThrough){
                     this.mechanismState = MechanismState.PASS_THROUGH_1;
@@ -148,6 +157,9 @@ public class MainSubsystemsManager {
                 if(shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.INTAKING_2;
                 }
+                else if(userControls.climb){
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
+                }
 
                 break;
                 
@@ -169,6 +181,9 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.ADJUSTING_1;
                     intake.stopIntake();
                 }
+                else if(userControls.climb){
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
+                }
 
                 break;
 
@@ -179,6 +194,9 @@ public class MainSubsystemsManager {
                 shooter.setFeederVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
                 if(shooter.isTopBeamBreakTripped() && shooter.feederMotor.getVelocity() < 0){
                     this.mechanismState = MechanismState.ADJUSTING_2;
+                }
+                else if(userControls.climb){
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
                 }
                 break;
 
@@ -197,6 +215,9 @@ public class MainSubsystemsManager {
                     //Rumble to signal that we have the note ready
                     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.3, 1));
                 }
+                else if(userControls.climb){
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
+                }
                 break;
 
 
@@ -210,13 +231,13 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.OUTTAKING;
                 }
                 else if(userControls.climb){
-                    this.mechanismState = MechanismState.CLIMB_PRIME;
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
                 }
                 else if(desireShot(userControls)){
-                    this.mechanismState = MechanismState.PRIMING;
+                    this.mechanismState = MechanismState.SHOOT_PRIMING;
                 }
                 else if(userControls.amp){
-                    this.mechanismState = MechanismState.PRIMING_AMP;
+                    this.mechanismState = MechanismState.AMP_PRIMING;
                 }
                 else if(userControls.passThrough){
                     this.mechanismState = MechanismState.PASS_THROUGH_1;
@@ -242,14 +263,17 @@ public class MainSubsystemsManager {
 
             // Prepare for a shot by spinning up the flywheels and angling the pivot
 
-            case PRIMING:
+            case SHOOT_PRIMING:
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
 
                 if (userControls.amp) {
-                    this.mechanismState = MechanismState.PRIMING_AMP;
+                    this.mechanismState = MechanismState.AMP_PRIMING;
                 } else if(shooter.readyToShoot() && elevator.isAtTargetPosition() && aimed) {
-                    this.mechanismState = MechanismState.PRIMED;
+                    this.mechanismState = MechanismState.SHOOT_PRIMED;
+                }
+                else if(userControls.climb){
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
                 }
 
                 break;
@@ -258,7 +282,7 @@ public class MainSubsystemsManager {
             // Wait for a score press or for something to cause us to be out of tolerance on the flywheel speeds or elevator
             // position (usually a change in the targets during a range table shot)
 
-            case PRIMED:
+            case SHOOT_PRIMED:
                 shootTimer.reset(); //Make sure the timer is running but always at zero until we shoot
                 shootTimer.start();
 
@@ -276,11 +300,14 @@ public class MainSubsystemsManager {
                 // }
 
                 if (userControls.amp) {
-                    this.mechanismState = MechanismState.PRIMING_AMP;
+                    this.mechanismState = MechanismState.AMP_PRIMING;
                 } else if(!shooter.readyToShoot() || !elevator.isAtTargetPosition() || !aimed){
-                    this.mechanismState = MechanismState.PRIMING;
+                    this.mechanismState = MechanismState.SHOOT_PRIMING;
                 } else if(userControls.score){
-                    this.mechanismState = MechanismState.SHOOTING;
+                    this.mechanismState = MechanismState.SHOOT_SCORING;
+                }
+                else if(userControls.climb){
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
                 }
 
                 break;
@@ -288,7 +315,7 @@ public class MainSubsystemsManager {
 
             // Under the assumption that our flywheels and pivot angle are set correctly, shoot into the speaker
 
-            case SHOOTING:
+            case SHOOT_SCORING:
                 shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
                 if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
                     this.mechanismState = MechanismState.STOWING;
@@ -299,17 +326,17 @@ public class MainSubsystemsManager {
 
             // Get into the amp elevator position (max extension and mid-height pivot)
 
-            case PRIMING_AMP:
+            case AMP_PRIMING:
                 shooter.stopFlywheels(); // redundancy
                 elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP);
 
                 if(desireShot(userControls) && !userControls.score) { //TODO: Clean up this patch
-                    this.mechanismState = MechanismState.PRIMING;
+                    this.mechanismState = MechanismState.SHOOT_PRIMING;
                 } else if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.AMP_PRIMED;
                 }
                 else if(userControls.climb){
-                    this.mechanismState = MechanismState.CLIMB_PRIME;
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
                 }
 
                 break;
@@ -324,10 +351,10 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.AMP_SCORING;
                 }
                 else if (desireShot(userControls)){
-                    this.mechanismState = MechanismState.PRIMING;
+                    this.mechanismState = MechanismState.SHOOT_PRIMING;
                 }
                 else if(userControls.climb){
-                    this.mechanismState = MechanismState.CLIMB_PRIME;
+                    this.mechanismState = MechanismState.CLIMB_PRIMING;
                 }
                 break;
 
@@ -346,7 +373,7 @@ public class MainSubsystemsManager {
 
             //Lift the pivot and extend to the maximum position
 
-            case CLIMB_PRIME:
+            case CLIMB_PRIMING:
                 shooter.stopFlywheels();
                 shooter.stopFeeders();
                 intake.stopIntake();

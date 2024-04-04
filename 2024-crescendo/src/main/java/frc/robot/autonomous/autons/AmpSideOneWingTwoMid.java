@@ -40,23 +40,23 @@ public class AmpSideOneWingTwoMid extends BaseAuto{
     @Override
     public void initialize() {
         queue = new CommandQueue(
-                // new ShootCommand(subsystemsManager, 1.4),
+                new ShootCommand(subsystemsManager, 1.4),
                 new JointCommand(
-                    new FollowerCommand(drive, pathOne/*.addVision(targeting, -15)*/)
-                    // new IntakeCommand(subsystemsManager)
+                    new FollowerCommand(drive, pathOne.addVision(targeting, -15)),
+                    new IntakeCommand(subsystemsManager)
                 ),
-                // new AutoShootCommand(drive, poseVision, subsystemsManager),
+                new AutoShootCommand(drive, poseVision, subsystemsManager),
                 new JointCommand(
-                    new FollowerCommand(drive, pathTwo/* .addVision(targeting, -15)*/)
-                    // new IntakeCommand(subsystemsManager)
+                    new FollowerCommand(drive, pathTwo.addVision(targeting, -15)),
+                    new IntakeCommand(subsystemsManager)
                 ),
                 new FollowerCommand(drive, pathThree),
                 new JointCommand(
-                    new FollowerCommand(drive, pathFour/*.addVision(targeting, -15)*/)
-                    // new IntakeCommand(subsystemsManager)
+                    new FollowerCommand(drive, pathFour.addVision(targeting, -15)),
+                    new IntakeCommand(subsystemsManager)
                 ),
-                new FollowerCommand(drive, pathFive)
-                // new AutoShootCommand(drive, poseVision, subsystemsManager)
+                new FollowerCommand(drive, pathFive),
+                new AutoShootCommand(drive, poseVision, subsystemsManager)
        );
     }
 

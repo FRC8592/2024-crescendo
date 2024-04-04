@@ -71,7 +71,7 @@ public final class Constants {
         public static final int PIVOT_FOLLOW_MOTOR_CURRENT_LIMIT = 40;
 
         public static final int SWERVE_MAX_VOLTAGE = 12;
-        public static final int SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 80;
+        public static final int SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 70;
         public static final int SWERVE_AUTO_THROTTLE_CURRENT_LIMIT = 60;
         public static final int SWERVE_AZIMUTH_CURRENT_LIMIT = 40;
 

@@ -51,9 +51,8 @@ public class Controls {
         this.resetGyro = driverController.getBackButton();
         this.autoCollect = driverController.getLeftBumper();
         this.robotOriented = driverController.getRightTriggerAxis() >0.1;
-        this.passThrough = driverController.getLeftTriggerAxis() >0.1;
-
-        this.rangeTableShoot = operatorController.getRightBumper();
+        this.rangeTableShoot = driverController.getBButton();
+        
         this.shootFromPodium = operatorController.getBButton();
         this.outake = operatorController.getLeftBumper();
         this.intake = operatorController.getLeftTriggerAxis()>0.1;
@@ -65,6 +64,7 @@ public class Controls {
         this.manualRetract = operatorController.getPOV() == 180;
         this.ledAmpSignal = operatorController.getBackButton();
         this.kiddyPoolShot = operatorController.getStartButton();
+        this.passThrough = operatorController.getRightBumper();
 
         this.log(this.slowMode, "DriverController", "SlowMode");
         this.log(this.resetGyro, "DriverController", "ResetGyro");

@@ -37,7 +37,7 @@ public class IntakeCommand extends Command {
             return true;
         }
 
-        subsystemsManager.updateMechanismStateMachine(controls, 0, true);
+        subsystemsManager.updateMechanismStateMachine(controls, 0, 0, true);
         switch(state){
             case WAIT:
                 if(subsystemsManager.mechanismState == MechanismState.INTAKING){

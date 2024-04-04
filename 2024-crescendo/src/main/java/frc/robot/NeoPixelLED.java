@@ -8,34 +8,17 @@ public class NeoPixelLED {
     private AddressableLED ledStrip;
     private AddressableLEDBuffer ledBuffer;
     private int LED_LENGTH = 30;
-    private int ledCounter = 0;
-    private LEDMode mode;
     public Timer flashTimer;
+    private double counter = 0;
 
     public NeoPixelLED() {
         ledStrip = new AddressableLED(0);
         ledStrip.setLength(LED_LENGTH);
         ledBuffer = new AddressableLEDBuffer(LED_LENGTH);
         ledStrip.start();
-        mode = LEDMode.OFF;
         flashTimer = new Timer();
         flashTimer.start();
     }
-
-    public void update() {
-        switch (mode) {
-            case OFF:
-                off();
-                break;
-            case AMP:
-                amp();
-                break;
-            case NOTE_PICKUP:
-                notePickup();
-                break;
-        }
-    }
-
     public void amp() {
         if (((int) (flashTimer.get() * 4)) % 2 == 0) {
             for (int i = 0; i < LED_LENGTH; i++) {
@@ -56,11 +39,6 @@ public class NeoPixelLED {
             ledBuffer.setRGB(i, 0, 255,255);
         }
         ledStrip.setData(ledBuffer);
-        
-        ledCounter++;
-        if (ledCounter > 200) {
-            setMode(LEDMode.OFF);
-        }
     }
 
     public void off() {
@@ -83,15 +61,82 @@ public class NeoPixelLED {
         }
         ledStrip.setData(ledBuffer);
     }
-
-    static enum LEDMode {
-        OFF,
-        AMP,
-        NOTE_PICKUP
+    public void PARTY(){
+        counter+=10;
+        for(int i = 0; i < LED_LENGTH; i++) {
+            int[] RGB = HSVtoRGB((counter+(i*5))%360);
+            ledBuffer.setRGB(i, RGB[0], RGB[1], RGB[2]);
+        }
+        ledStrip.setData(ledBuffer);
     }
-
-    public void setMode(LEDMode mode) {
-        this.mode = mode;
-        ledCounter = 0;
+    public void blinkRed() {
+        if (((int) (flashTimer.get() * 4)) % 2 == 0) {
+            for (int i = 0; i < LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, 255, 255, 0);
+            }
+            ledStrip.setData(ledBuffer);
+        }
+        else {
+            for (int i = 0; i < LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, 0, 0, 0);
+            }
+            ledStrip.setData(ledBuffer);
+        }
+    }
+    public void hone(double offset){
+        off();
+        if(Math.abs(offset) < 0.7){
+            int idx=(int)(5-((offset-0.2)*10));
+            for (int i = 0; i < idx; i++) {
+                ledBuffer.setRGB(i, 255, 255, 0);
+                ledBuffer.setRGB(9-i, 255, 255, 0);
+            }
+            for (int i = idx; i < 5; i++) {
+                ledBuffer.setRGB(i, 255, 0, 0);
+                ledBuffer.setRGB(9-i, 255, 0, 0);
+            }
+        }
+        else{
+            blinkRed();
+        }
+    }
+    private int[] HSVtoRGB(double h){
+        double R1 = 0;
+        double G1 = 0;
+        double B1 = 0;
+        if(0 <= h && h < 60){
+            R1 = 255;
+            G1 = (h-0)*(255d/60d);
+            B1 = 0;
+        }
+        else if(60 <= h && h < 120){
+            R1 = (120-h)*(255d/60d);
+            G1 = 255;
+            B1 = 0;
+        }
+        else if(120 <= h && h < 180){
+            R1 = 0;
+            G1 = 255;
+            B1 = (h-120)*(255d/60d);
+        }
+        else if(180 <= h && h < 240){
+            R1 = 0;
+            G1 = (240-h)*(255d/60d);
+            B1 = 255;
+        }
+        else if(240 <= h && h < 300){
+            R1 = (h-240)*(255d/60d);
+            G1 = 0;
+            B1 = 255;
+        }
+        else if(300 <= h && h < 360){
+            R1 = 255;
+            G1 = 0;
+            B1 = (360-h)*(255d/60d);
+        }
+        R1=Math.max(Math.min(R1, 255), 0);
+        G1=Math.max(Math.min(G1, 255), 0);
+        B1=Math.max(Math.min(B1, 255), 0);
+        return new int[]{(int)R1, (int)G1, (int)B1};
     }
 }

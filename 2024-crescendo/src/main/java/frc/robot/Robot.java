@@ -374,9 +374,9 @@ public class Robot extends LoggedRobot {
         else if(controls.rangeTableShoot){
             subsystemsManager.setVisionPrime();
         }
-    
+
         swerve.drive(currentSpeeds);
-        subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
+        subsystemsManager.updateMechanismStateMachine(controls, distance, poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS), locked);
     }
 
     @Override

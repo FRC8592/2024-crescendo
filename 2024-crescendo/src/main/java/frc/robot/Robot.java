@@ -358,8 +358,8 @@ public class Robot extends LoggedRobot {
             currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
 
             //Override the autocollection forward-back with the joystick Y and lock left-right
-            currentSpeeds.vxMetersPerSecond = driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo();
-            currentSpeeds.vyMetersPerSecond = 0;
+            // currentSpeeds.vxMetersPerSecond = driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo();
+            // currentSpeeds.vyMetersPerSecond = 0;
             controls.intake = true;
         }
 

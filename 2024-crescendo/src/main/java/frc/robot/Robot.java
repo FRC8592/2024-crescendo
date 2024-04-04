@@ -79,6 +79,8 @@ public class Robot extends LoggedRobot {
     private double distance;
     public boolean locked;
 
+    private BooleanManager partyMode = new BooleanManager(false);
+
     @Override
     public void robotInit() {
 
@@ -374,7 +376,16 @@ public class Robot extends LoggedRobot {
         else if(controls.rangeTableShoot){
             subsystemsManager.setVisionPrime();
         }
-    
+        
+        partyMode.update(operatorController.getBackButton());
+        if(partyMode.isToggle()){
+            leds.PARTY();
+        }
+        if(controls.stow || controls.intake){
+            partyMode.setToggle(false); //When we stow or intake, manually stop partying
+        }
+
+
         swerve.drive(currentSpeeds);
         subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
     }

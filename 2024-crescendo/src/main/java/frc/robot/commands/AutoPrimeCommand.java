@@ -31,6 +31,7 @@ public class AutoPrimeCommand extends Command {
         controls.rangeTableShoot = true;
         subsystemsManager.updateMechanismStateMachine(controls, 
                 vision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS),
+                0,
                 vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS) < APRILTAG_VISION.X_ROT_LOCK_ERROR);
 
 

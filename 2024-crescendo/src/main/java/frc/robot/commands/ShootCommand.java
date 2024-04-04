@@ -60,6 +60,6 @@ public class ShootCommand extends Command{
     @Override
     public void shutdown() {
         controls.score = false;
-        subsystemsManager.updateMechanismStateMachine(controls, 0, true);
+        subsystemsManager.updateMechanismStateMachine(controls, 0, 0, true);
     }
 }

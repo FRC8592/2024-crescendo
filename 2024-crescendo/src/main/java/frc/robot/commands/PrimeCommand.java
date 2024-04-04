@@ -28,7 +28,7 @@ public class PrimeCommand extends Command {
     public boolean execute() {
         subsystemsManager.staticPrime(RangeTable.get(expectedRange));
         controls.kiddyPoolShot = true; //any shoot command enters prime
-        subsystemsManager.updateMechanismStateMachine(controls, -1,true);
+        subsystemsManager.updateMechanismStateMachine(controls, -1,0, true);
 
         if(subsystemsManager.mechanismState == MainSubsystemsManager.MechanismState.SHOOT_PRIMED){
             return true;

@@ -18,23 +18,23 @@ public class AmpSideTwoMidAuto extends BaseAuto{
     AutonomousPositions.WING_NOTE_1.translate(-1, 0.65),
     AutonomousPositions.WING_NOTE_1.translate(0, 0.65),
     AutonomousPositions.WING_NOTE_1.translate(1,0.65),
-    AutonomousPositions.WING_NOTE_1.translate(2, 0.2),
+    AutonomousPositions.WING_NOTE_1.translate(2, 0.65),
 
-     AutonomousPositions.MID_NOTE_1.translate(-0.5, 1)
+     AutonomousPositions.MID_NOTE_1.translate(-0.5, 0.2)
     );
     private SwerveTrajectory pathTwo = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
-     AutonomousPositions.MID_NOTE_1.translate(-0.5, 1),
+     AutonomousPositions.MID_NOTE_1.translate(-0.5, 0.2),
     //  AutonomousPositions.WING_NOTE_1.translate(3, 0),
      AutonomousPositions.WING_NOTE_2.translate(1.25, 1) // stage position
     ).addRotation(Rotation2d.fromDegrees(-15));
     
-    private SwerveTrajectory pathThree = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
-     AutonomousPositions.WING_NOTE_2.translate(1.25, 1), // stage position
-     AutonomousPositions.WING_NOTE_2.translate(3, 1.5), 
+    private SwerveTrajectory pathThree = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(false),
+     AutonomousPositions.WING_NOTE_2.translate(1.25, 1, Rotation2d.fromDegrees(0)), // stage position
+     AutonomousPositions.WING_NOTE_2.translate(3, 1),
      AutonomousPositions.MID_NOTE_2.translate(-1, 0)
     ).addRotation(Rotation2d.fromDegrees(15));
 
-    private SwerveTrajectory pathFour = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(false),
+    private SwerveTrajectory pathFour = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
     AutonomousPositions.MID_NOTE_2.translate(-1, 0),
     AutonomousPositions.WING_NOTE_1.translate(3, 0),
     AutonomousPositions.WING_NOTE_1.translate(2, 0) // stage position

@@ -2,10 +2,16 @@
   "HALProvider": {
     "Addressable LEDs": {
       "0": {
-        "columns": 30
+        "columns": 30,
+        "start": 2
       },
       "window": {
         "visible": true
+      }
+    },
+    "Other Devices": {
+      "window": {
+        "visible": false
       }
     }
   },
@@ -16,13 +22,14 @@
       "/SmartDashboard/Field": "Field2d"
     },
     "windows": {
-      "/Shuffleboard/Auton Configuration/Choose Autonomous": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Field": {
-        "image": "/Users/roshanjames/Downloads/2024-field.png",
+        "bottom": 544,
+        "builtin": "2024 Crescendo",
+        "height": 8.013679504394531,
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
         "window": {
           "visible": true
         }
@@ -30,6 +37,9 @@
     }
   },
   "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
     "visible": true
   },
   "NetworkTables View": {

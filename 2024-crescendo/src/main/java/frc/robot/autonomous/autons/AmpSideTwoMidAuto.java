@@ -1,5 +1,6 @@
 package frc.robot.autonomous.autons;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -19,45 +20,45 @@ public class AmpSideTwoMidAuto extends BaseAuto{
     AutonomousPositions.WING_NOTE_1.translate(1,0.65),
     AutonomousPositions.WING_NOTE_1.translate(2, 0.2),
 
-     AutonomousPositions.MID_NOTE_1.translate(-0.5, 0)
+     AutonomousPositions.MID_NOTE_1.translate(-0.5, 1)
     );
     private SwerveTrajectory pathTwo = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
-     AutonomousPositions.MID_NOTE_1.translate(-0.5, -0.25),
-     AutonomousPositions.WING_NOTE_1.translate(3, 0),
+     AutonomousPositions.MID_NOTE_1.translate(-0.5, 1),
+    //  AutonomousPositions.WING_NOTE_1.translate(3, 0),
      AutonomousPositions.WING_NOTE_2.translate(1.25, 1) // stage position
-    ).addRotation(Rotation2d.fromDegrees(15));
+    ).addRotation(Rotation2d.fromDegrees(-15));
     
     private SwerveTrajectory pathThree = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(true),
      AutonomousPositions.WING_NOTE_2.translate(1.25, 1), // stage position
-     AutonomousPositions.WING_NOTE_1.translate(3, 0), 
-     AutonomousPositions.MID_NOTE_2.translate(-1.25, -1, Rotation2d.fromDegrees(45))
-    ).addRotation(Rotation2d.fromDegrees(-30));
+     AutonomousPositions.WING_NOTE_2.translate(3, 1.5), 
+     AutonomousPositions.MID_NOTE_2.translate(-1, 0)
+    ).addRotation(Rotation2d.fromDegrees(15));
 
     private SwerveTrajectory pathFour = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0).setReversed(false),
     AutonomousPositions.MID_NOTE_2.translate(-1, 0),
     AutonomousPositions.WING_NOTE_1.translate(3, 0),
     AutonomousPositions.WING_NOTE_1.translate(2, 0) // stage position
-   ).addRotation(Rotation2d.fromDegrees(15));
+   ).addRotation(Rotation2d.fromDegrees(-15));
 
 
     @Override
     public void initialize() {
         queue = new CommandQueue(
-                new ShootCommand(subsystemsManager, 1.4),
+                // new ShootCommand(subsystemsManager, 1.4),
                 new JointCommand(
-                    new FollowerCommand(drive, pathOne.addVision(targeting, 0)),
-                    new IntakeCommand(subsystemsManager)
+                    new FollowerCommand(drive, pathOne/*.addVision(targeting, 0)*/)
+                    // new IntakeCommand(subsystemsManager)
                 ),
                 new JointCommand(
-                    new FollowerCommand(drive, pathTwo),
-                    new AutoPrimeCommand(subsystemsManager, poseVision)
+                    new FollowerCommand(drive, pathTwo)
+                    // new AutoPrimeCommand(subsystemsManager, poseVision)
                 ), 
-                new AutoShootCommand(drive, poseVision, subsystemsManager),
+                // new AutoShootCommand(drive, poseVision, subsystemsManager),
                 new JointCommand(
-                    new FollowerCommand(drive, pathThree.addVision(targeting, 0)),
-                    new IntakeCommand(subsystemsManager)
-               )
-             //   new FollowerCommand(drive, pathFive)
+                    new FollowerCommand(drive, pathThree/*.addVision(targeting, 0)*/)
+                    // new IntakeCommand(subsystemsManager)
+               ),
+               new FollowerCommand(drive, pathFour)
                 // new AutoShootCommand(drive, poseVision, subsystemsManager)
        );
     }

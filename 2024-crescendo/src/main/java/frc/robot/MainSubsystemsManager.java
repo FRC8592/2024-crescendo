@@ -76,7 +76,7 @@ public class MainSubsystemsManager {
         }
 
         // TODO: This may shoot prematurely if we lose sight of the AprilTag while aiming
-        if (cameraRange == -1) {
+        if (cameraRange == -1 || !useVision) {
             aimed = true; //assume it's aimed
         } else {
             aimed = targetLocked;

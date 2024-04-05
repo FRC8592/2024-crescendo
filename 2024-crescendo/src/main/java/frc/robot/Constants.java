@@ -351,6 +351,6 @@ public final class Constants {
     }
 
     public class RANGE_TABLE{
-        public static final double OFFSET_ANGLE = -0.5;
+        public static final double OFFSET_ANGLE = 0.0; // prev. -0.5
     }
 }

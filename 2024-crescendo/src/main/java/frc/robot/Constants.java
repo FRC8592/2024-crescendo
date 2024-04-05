@@ -311,7 +311,8 @@ public final class Constants {
         public static final double ROTATE_POWER_SLOW = 0.2; // Scaling for teleop driving. 1.0 is maximum
 
 
-        public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.5;
+        // public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.95; // 4.5 + 0.1(4.5) to go from 5700 --> 6300
+        public static final double MAX_VELOCITY_METERS_PER_SECOND = 5.25; // crazy test
         public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
                 Math.hypot(SWERVE.DRIVE_TRAIN_WIDTH / 2.0, DRIVE_TRAIN_LENGTH / 2.0);
 

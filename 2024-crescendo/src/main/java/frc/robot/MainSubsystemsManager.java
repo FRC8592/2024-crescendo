@@ -67,6 +67,7 @@ public class MainSubsystemsManager {
     public void updateMechanismStateMachine(Controls userControls, double cameraRange, boolean targetLocked){
 
         if(userControls.stow){
+            leds.off();
             this.mechanismState = MechanismState.STOWING;
         }
 
@@ -267,6 +268,13 @@ public class MainSubsystemsManager {
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
 
+                if(aimed){
+                    leds.green();
+                }
+                else{
+                    leds.red();
+                }
+
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.AMP_PRIMING;
                 } else if(shooter.readyToShoot() && elevator.isAtTargetPosition() && (aimed || isStaticShot(userRange))) { //For the last case, this means we don't care wether we're aimed if we're not range-table shooting
@@ -289,7 +297,13 @@ public class MainSubsystemsManager {
                 // Redundant setting of speeds in case of manual overwriting by drivers
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
-                
+
+                if(aimed){
+                    leds.green();
+                }
+                else{
+                    leds.red();
+                }
 
                 //Constantly rumble both controllers to let both drivers know that we're ready to shoot
                 // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){

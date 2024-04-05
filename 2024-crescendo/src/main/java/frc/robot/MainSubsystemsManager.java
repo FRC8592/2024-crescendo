@@ -65,7 +65,7 @@ public class MainSubsystemsManager {
     }
 
     public void updateMechanismStateMachine(Controls userControls, double cameraRange, boolean targetLocked){
-        
+
         if(userControls.stow){
             this.mechanismState = MechanismState.STOWING;
         }
@@ -269,7 +269,7 @@ public class MainSubsystemsManager {
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.AMP_PRIMING;
-                } else if(shooter.readyToShoot() && elevator.isAtTargetPosition() && aimed) {
+                } else if(shooter.readyToShoot() && elevator.isAtTargetPosition() && (aimed || isStaticShot(userRange))) { //For the last case, this means we don't care wether we're aimed if we're not range-table shooting
                     this.mechanismState = MechanismState.SHOOT_PRIMED;
                 }
                 else if(userControls.climb){
@@ -301,7 +301,7 @@ public class MainSubsystemsManager {
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.AMP_PRIMING;
-                } else if(!shooter.readyToShoot() || !elevator.isAtTargetPosition() || !aimed){
+                } else if(!shooter.readyToShoot() || !elevator.isAtTargetPosition() || !(aimed || isStaticShot(userRange))){
                     this.mechanismState = MechanismState.SHOOT_PRIMING;
                 } else if(userControls.score){
                     this.mechanismState = MechanismState.SHOOT_SCORING;
@@ -450,5 +450,10 @@ public class MainSubsystemsManager {
     }
     public void resetToLoaded(){
         this.mechanismState = MechanismState.LOADED;
+    }
+    public boolean isStaticShot(RangeEntry entry){
+        return entry.equals(RangeTable.getSubwoofer())
+                || entry.equals(RangeTable.getPodium())
+                || entry.equals(RangeTable.getKiddyPool());
     }
 }

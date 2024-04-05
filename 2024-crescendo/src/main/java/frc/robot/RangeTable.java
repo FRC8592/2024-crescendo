@@ -134,6 +134,20 @@ public class RangeTable {
             Logger.recordOutput("CustomLogs/RangeTable/GeneratedFlywheelSpeed", generated.leftFlywheelSpeed);
             return generated;
         }
+
+        public boolean equals(Object other){ //Must take in an Object to override the Java implementation
+            if(other instanceof RangeEntry //Make sure it's an instance of RangeEntry (or a subclass)
+                    //And then check all the variables
+                    && ((RangeEntry)other).leftFlywheelSpeed == leftFlywheelSpeed
+                    && ((RangeEntry)other).rightFlywheelSpeed == rightFlywheelSpeed
+                    && ((RangeEntry)other).pivotAngle == pivotAngle
+                    && ((RangeEntry)other).elevatorHeight == elevatorHeight){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
     }
 
     public static RangeEntry getKiddyPool() {

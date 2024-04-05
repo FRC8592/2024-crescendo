@@ -55,7 +55,7 @@ public class NeoPixelLED {
         ledStrip.setData(ledBuffer);
     }
     
-    public void disabled() {
+    public void green() {
         for(int i = 0; i < LED_LENGTH; i++) {
             ledBuffer.setRGB(i, 0, 255, 0);
         }

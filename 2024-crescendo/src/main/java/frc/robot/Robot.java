@@ -396,7 +396,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledPeriodic() {
-        leds.disabled();
+        leds.green();
     }
 
     @Override

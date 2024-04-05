@@ -76,12 +76,16 @@ public class MainSubsystemsManager {
             userRange = RangeTable.get(cameraRange);
         }
 
+        Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"RawAimed", aimed);
+        
         // TODO: This may shoot prematurely if we lose sight of the AprilTag while aiming
         if (cameraRange == -1) {
             aimed = true; //assume it's aimed
         } else {
             aimed = targetLocked;
         }
+
+        Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"ProcessedAimed", aimed);
 
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"StateBeforeUpdate", this.mechanismState.toString());
 

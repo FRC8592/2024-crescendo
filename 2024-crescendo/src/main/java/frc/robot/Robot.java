@@ -121,6 +121,7 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("Elevator Custom Angle", 0);
         SmartDashboard.putNumber("Shooter Left Speed", 0);
         SmartDashboard.putNumber("Shooter Right Speed", 0);
+        SmartDashboard.putNumber("Auto Delay", 0); // Set the delay for all ShuffleboardDelayCommands in Auto
 
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);

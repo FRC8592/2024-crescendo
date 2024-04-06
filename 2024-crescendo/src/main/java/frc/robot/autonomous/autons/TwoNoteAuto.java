@@ -20,6 +20,7 @@ public class TwoNoteAuto extends BaseAuto {
     @Override
     public void initialize() {
        queue = new CommandQueue(
+          new ShuffleboardDelayCommand(),
           new ShootCommand(subsystemsManager, 1.4).setTag("Score preloaded note..."),
           new JointCommand(
             new IntakeCommand(subsystemsManager),

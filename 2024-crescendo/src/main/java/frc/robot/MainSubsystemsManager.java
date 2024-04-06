@@ -233,6 +233,7 @@ public class MainSubsystemsManager {
                 intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED, 2);
                 shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
+                leds.off();
 
                 if(!userControls.outake){ // Is NOT pressed
                     this.mechanismState = MechanismState.STOWING;
@@ -290,9 +291,10 @@ public class MainSubsystemsManager {
 
             case SHOOTING:
                 shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
+                leds.off();
+
                 if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
                     this.mechanismState = MechanismState.STOWING;
-                    leds.off();
                 }
                 break;
 
@@ -390,6 +392,7 @@ public class MainSubsystemsManager {
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederPower(1); // Set PID to when note is engaged
                 shooter.setShootVelocity(6000, 6000);
+                leds.off();
 
                 // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
                 //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));

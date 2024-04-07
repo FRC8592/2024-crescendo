@@ -372,7 +372,9 @@ public class Robot extends LoggedRobot {
         }
     
         swerve.drive(currentSpeeds);
+        leds.off();
         subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
+        leds.update();
     }
 
     @Override

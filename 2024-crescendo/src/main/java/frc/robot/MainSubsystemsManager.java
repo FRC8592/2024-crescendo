@@ -93,6 +93,7 @@ public class MainSubsystemsManager {
                 shooter.stopFlywheels();
                 shooter.stopFeeders();
                 intake.stopIntake();
+                leds.solidPink();
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.STOWED;
                 }
@@ -102,7 +103,9 @@ public class MainSubsystemsManager {
             // Does nothing; assumes STOWING has put everything in the robot in the home position
 
             case STOWED:
-                //TODO: NOTIFY DRIVERS
+
+                leds.solidOff();
+
                 if(userControls.intake){
                     this.mechanismState = MechanismState.INTAKING;
                 }
@@ -247,6 +250,8 @@ public class MainSubsystemsManager {
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
 
+                leds.solidPink();
+
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 } else if(shooter.readyToShoot() && elevator.isAtTargetPosition() && aimed) {
@@ -266,15 +271,8 @@ public class MainSubsystemsManager {
                 // Redundant setting of speeds in case of manual overwriting by drivers
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
-                
 
-                //Constantly rumble both controllers to let both drivers know that we're ready to shoot
-                // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
-                //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
-                // }
-                // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
-                //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
-                // }
+                leds.solidGreen();
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
@@ -291,7 +289,8 @@ public class MainSubsystemsManager {
 
             case SHOOTING:
                 shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
-                leds.solidOff();
+
+                leds.solidPink();
 
                 if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
                     this.mechanismState = MechanismState.STOWING;
@@ -304,6 +303,8 @@ public class MainSubsystemsManager {
             case PRIMING_AMP:
                 shooter.stopFlywheels(); // redundancy
                 elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP);
+
+                leds.solidPink();
 
                 if(desireShot(userControls) && !userControls.score) { //TODO: Clean up this patch
                     this.mechanismState = MechanismState.PRIMING;
@@ -322,6 +323,9 @@ public class MainSubsystemsManager {
             case AMP_PRIMED:
                 shooter.stopFlywheels();
                 shooter.stopFeeders();
+
+                leds.solidGreen();
+
                 if(userControls.score){
                     this.mechanismState = MechanismState.AMP_SCORING;
                 }
@@ -339,6 +343,9 @@ public class MainSubsystemsManager {
             case AMP_SCORING:
                 shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED, SHOOTER.AMP_FLYWHEEL_SPEED);
                 shooter.setFeederPower(SHOOTER.AMP_FEEDER_SPEED);
+
+                leds.solidPink();
+
                 if(!userControls.score){
                     this.mechanismState = MechanismState.AMP_PRIMED;
                     leds.solidOff();
@@ -353,6 +360,9 @@ public class MainSubsystemsManager {
                 shooter.stopFeeders();
                 intake.stopIntake();
                 elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_CLIMB, ELEVATOR.EXTENSION_METERS_CLIMB);
+
+                leds.solidPink();
+
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.CLIMB;
                 }
@@ -368,6 +378,9 @@ public class MainSubsystemsManager {
                 else if(userControls.manualRetract){
                     elevator.retract();
                 }
+
+                leds.solidGreen();
+
                 break;
 
             case PASS_THROUGH_1:

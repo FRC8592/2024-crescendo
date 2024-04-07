@@ -8,7 +8,6 @@ public class NeoPixelLED {
     private AddressableLED ledStrip;
     private AddressableLEDBuffer ledBuffer;
     private int LED_LENGTH = 30;
-    private int ledCounter = 0;
     public Timer flashTimer;
 
     public NeoPixelLED() {
@@ -41,7 +40,12 @@ public class NeoPixelLED {
         for(int i = 0; i < LED_LENGTH; i++) {
             ledBuffer.setRGB(i, 0, 255,255);
         }
-        ledCounter++;
+    }
+
+    public void solidPink() {
+        for(int i = 0; i < LED_LENGTH; i++) {
+            ledBuffer.setRGB(i, 192, 0, 255);
+        }
     }
 
     public void solidOff() {

@@ -280,6 +280,7 @@ public final class Constants {
         public static final int PULSE_METHOD_SPEED = 5;
         public static final int PULSE_SIZE = 2;
         public static final int PULSE_GAP = 5;
+        public static final double INTAKING_TIMEOUT = 0.5; //Intake for this long before the LEDs start reporting a jam
     }
 
     public final class SWERVE {

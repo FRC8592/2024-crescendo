@@ -36,6 +36,7 @@ public class MainSubsystemsManager {
     public Shooter shooter;
     public Elevator elevator;
     private Timer shootTimer = new Timer();
+    private Timer intakeTimer = new Timer(); // When this times-out, the LEDs will start complaining that the intake is taking too long.
     private NeoPixelLED leds;
     private RangeEntry userRange = new RangeEntry(0, 0, 0);
     private boolean useVision = true;
@@ -136,23 +137,35 @@ public class MainSubsystemsManager {
             // Gets the note to the flywheels from the ground. TODO make sure we don't need the extra timer we had in the old shooter version of this
 
             case INTAKING:
+                intakeTimer.start(); //Keep the timer running but always zero until we see a note
+                intakeTimer.reset();
+
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
                 // shooter.setFeederPower(1);
                 shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+
+                leds.solidOrange();
 
                 if(shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.INTAKING_2;
                 }
 
                 break;
-                
+
             // Continues intaking while bottom beam break is hit until note fully passes it
 
             case INTAKING_2:
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederPower(1); // Set PID to when note is engaged
                 shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+
+                if(intakeTimer.hasElapsed(LEDS.INTAKING_TIMEOUT)){ // If there has been enough time that there's probably a jam
+                    leds.blinkRed();
+                }
+                else{
+                    leds.solidBlue(); //Blue just for the differentiation from the orange that comes before it
+                }
 
                 if(!shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.ADJUSTING_1;
@@ -166,6 +179,9 @@ public class MainSubsystemsManager {
             case ADJUSTING_1:
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
                 shooter.setFeederVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+
+                leds.solidPink();
+
                 if(shooter.isTopBeamBreakTripped() && shooter.feederMotor.getVelocity() < 0){
                     this.mechanismState = MechanismState.ADJUSTING_2;
                 }
@@ -177,6 +193,9 @@ public class MainSubsystemsManager {
             case ADJUSTING_2:
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
                 shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+
+                leds.solidPink();
+
                 if(!shooter.isTopBeamBreakTripped()){ //if beam break NOT tripped, exclamation point
                     this.mechanismState = MechanismState.LOADED;
                     // shooter.stopFeeders();
@@ -191,6 +210,7 @@ public class MainSubsystemsManager {
 
             case LOADED:
                 shooter.setShootVelocity(userRange.leftFlywheelSpeed, userRange.rightFlywheelSpeed);
+
                 leds.solidCyan();
 
                 if(userControls.outake){

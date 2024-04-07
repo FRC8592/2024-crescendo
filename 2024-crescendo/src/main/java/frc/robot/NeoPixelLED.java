@@ -36,6 +36,19 @@ public class NeoPixelLED {
         }
     }
 
+    public void blinkRed() {
+        if (((int) (flashTimer.get() * 4)) % 2 == 0) {
+            for (int i = 0; i < LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, 255, 0, 0);
+            }
+        }
+        else {
+            for (int i = 0; i < LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, 0, 0, 0);
+            }
+        }
+    }
+
     public void solidCyan() {
         for(int i = 0; i < LED_LENGTH; i++) {
             ledBuffer.setRGB(i, 0, 255,255);
@@ -62,6 +75,16 @@ public class NeoPixelLED {
     public void solidGreen() {
         for(int i = 0; i < LED_LENGTH; i++) {
             ledBuffer.setRGB(i, 0, 255, 0);
+        }
+    }
+    public void solidOrange(){
+        for(int i = 0; i < LED_LENGTH; i++) {
+            ledBuffer.setRGB(i, 255, 100, 0);
+        }
+    }
+    public void solidBlue(){
+        for(int i = 0; i < LED_LENGTH; i++) {
+            ledBuffer.setRGB(i, 0, 0, 255);
         }
     }
 }

@@ -275,11 +275,7 @@ public final class Constants {
 
 
     public final class LEDS { //TODO: Merge the LED code once we get the LEDs working physically
-        public static final int LED_LENGTH = 8;
-        public static final double MINIMUM_VOLTAGE = 9.0;
-        public static final int PULSE_METHOD_SPEED = 5;
-        public static final int PULSE_SIZE = 2;
-        public static final int PULSE_GAP = 5;
+        public static final int LED_LENGTH = 30;
         public static final double INTAKING_TIMEOUT = 0.5; //Intake for this long before the LEDs start reporting a jam
     }
 

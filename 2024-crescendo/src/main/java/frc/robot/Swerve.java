@@ -123,11 +123,16 @@ public class Swerve {
 
     public Pose2d getCurrentPos() {
         if(Robot.isReal()){
-            return swerve.getCurrentPos();
+            // return swerve.getCurrentPos();
+            return swerve.getCurrentPosVision(); // TODO: TEST!!!
         }
         else{
             return Robot.FIELD.getRobotPose();
         }
+    }
+
+    public void addVisionMeasurement(PoseVision vision) {
+        swerve.addVisionMeasurement(vision);
     }
 
     public Rotation2d getGyroscopeRotation() {

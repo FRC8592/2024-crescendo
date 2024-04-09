@@ -51,7 +51,6 @@ public class AmpSideOneWingTwoMid extends BaseAuto{
                     new IntakeCommand(subsystemsManager)
                 ),
                 new FollowerCommand(drive, pathThree),
-                new AutoShootCommand(drive, poseVision, subsystemsManager),
                 new JointCommand(
                     new FollowerCommand(drive, pathFour.addVision(targeting, -15)),
                     new IntakeCommand(subsystemsManager)

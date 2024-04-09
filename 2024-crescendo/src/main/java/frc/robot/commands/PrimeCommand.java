@@ -1,7 +1,10 @@
 package frc.robot.commands;
 
+import com.ctre.phoenix6.mechanisms.MechanismState;
+
 import frc.robot.Controls;
 import frc.robot.MainSubsystemsManager;
+import frc.robot.RangeTable;
 
 public class PrimeCommand extends Command {
     private MainSubsystemsManager subsystemsManager;
@@ -17,19 +20,26 @@ public class PrimeCommand extends Command {
     }
     @Override
     public void initialize() {
-        // TODO Auto-generated method stub
+        controls = new Controls();
         
     }
 
     @Override
     public boolean execute() {
-        // TODO Auto-generated method stub
+        subsystemsManager.staticPrime(RangeTable.get(expectedRange));
+        controls.kiddyPoolShot = true; //any shoot command enters prime
+        subsystemsManager.updateMechanismStateMachine(controls, -1,true);
+
+        if(subsystemsManager.mechanismState == MainSubsystemsManager.MechanismState.PRIMED){
+            return true;
+        }
+
         return false;
     }
 
     @Override
     public void shutdown() {
-        // TODO Auto-generated method stub
+    
         
     }
     

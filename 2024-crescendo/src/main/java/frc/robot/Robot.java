@@ -121,6 +121,7 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("Elevator Custom Angle", 0);
         SmartDashboard.putNumber("Shooter Left Speed", 0);
         SmartDashboard.putNumber("Shooter Right Speed", 0);
+        SmartDashboard.putNumber("Auto Delay", 0); // Set the delay for all ShuffleboardDelayCommands in Auto
 
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
@@ -362,10 +363,8 @@ public class Robot extends LoggedRobot {
             subsystemsManager.staticPrime(RangeTable.getKiddyPool());
         }
         else if(controls.shootFromPodium){
-            double elevatorAngle = SmartDashboard.getNumber("Elevator Custom Angle", 0);
-            int leftShooterSpeed = (int)SmartDashboard.getNumber("Shooter Left Speed", 0);
-            int rightShooterSpeed = (int)SmartDashboard.getNumber("Shooter Right Speed", 0);
-            RangeTable.RangeEntry entry = new RangeEntry(leftShooterSpeed,rightShooterSpeed, elevatorAngle);
+            
+            RangeTable.RangeEntry entry = RangeTable.getPodium();
             subsystemsManager.staticPrime(entry);
         }
         else if(controls.rangeTableShoot){

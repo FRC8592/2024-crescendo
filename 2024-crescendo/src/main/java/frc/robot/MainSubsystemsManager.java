@@ -36,6 +36,7 @@ public class MainSubsystemsManager {
     public Shooter shooter;
     public Elevator elevator;
     private Timer shootTimer = new Timer();
+    private Timer intakeTimer = new Timer(); // When this times-out, the LEDs will start complaining that the intake is taking too long.
     private NeoPixelLED leds;
     private RangeEntry userRange = new RangeEntry(0, 0, 0);
     private boolean useVision = true;
@@ -93,6 +94,7 @@ public class MainSubsystemsManager {
                 shooter.stopFlywheels();
                 shooter.stopFeeders();
                 intake.stopIntake();
+                leds.solidPink();
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.STOWED;
                 }
@@ -102,7 +104,9 @@ public class MainSubsystemsManager {
             // Does nothing; assumes STOWING has put everything in the robot in the home position
 
             case STOWED:
-                //TODO: NOTIFY DRIVERS
+
+                leds.solidOff();
+
                 if(userControls.intake){
                     this.mechanismState = MechanismState.INTAKING;
                 }
@@ -133,24 +137,22 @@ public class MainSubsystemsManager {
             // Gets the note to the flywheels from the ground. TODO make sure we don't need the extra timer we had in the old shooter version of this
 
             case INTAKING:
+                intakeTimer.start(); //Keep the timer running but always zero until we see a note
+                intakeTimer.reset();
+
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
                 // shooter.setFeederPower(1);
                 shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
 
-                // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
-                //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
-                // }
-                // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
-                //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
-                // }
+                leds.solidOrange();
 
                 if(shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.INTAKING_2;
                 }
 
                 break;
-                
+
             // Continues intaking while bottom beam break is hit until note fully passes it
 
             case INTAKING_2:
@@ -158,12 +160,12 @@ public class MainSubsystemsManager {
                 shooter.setFeederPower(1); // Set PID to when note is engaged
                 shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
 
-                // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
-                //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
-                // }
-                // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
-                //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
-                // }
+                if(intakeTimer.hasElapsed(LEDS.INTAKING_TIMEOUT)){ // If there has been enough time that there's probably a jam
+                    leds.blinkRed();
+                }
+                else{
+                    leds.solidBlue(); //Blue just for the differentiation from the orange that comes before it
+                }
 
                 if(!shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.ADJUSTING_1;
@@ -177,6 +179,9 @@ public class MainSubsystemsManager {
             case ADJUSTING_1:
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
                 shooter.setFeederVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+
+                leds.solidPink();
+
                 if(shooter.isTopBeamBreakTripped() && shooter.feederMotor.getVelocity() < 0){
                     this.mechanismState = MechanismState.ADJUSTING_2;
                 }
@@ -188,14 +193,15 @@ public class MainSubsystemsManager {
             case ADJUSTING_2:
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
                 shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+
+                leds.solidPink();
+
                 if(!shooter.isTopBeamBreakTripped()){ //if beam break NOT tripped, exclamation point
                     this.mechanismState = MechanismState.LOADED;
                     // shooter.stopFeeders();
                     shooter.setFeederVelocity(0, 1);
                     shooter.setShootVelocity(0, 0);
                     // shooter.stopFlywheels();
-                    //Rumble to signal that we have the note ready
-                    Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.3, 1));
                 }
                 break;
 
@@ -204,7 +210,8 @@ public class MainSubsystemsManager {
 
             case LOADED:
                 shooter.setShootVelocity(userRange.leftFlywheelSpeed, userRange.rightFlywheelSpeed);
-                leds.notePickup();
+
+                leds.solidCyan();
 
                 if(userControls.outake){
                     this.mechanismState = MechanismState.OUTTAKING;
@@ -233,7 +240,7 @@ public class MainSubsystemsManager {
                 intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED, 2);
                 shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
-                leds.off();
+                leds.solidOff();
 
                 if(!userControls.outake){ // Is NOT pressed
                     this.mechanismState = MechanismState.STOWING;
@@ -246,6 +253,8 @@ public class MainSubsystemsManager {
             case PRIMING:
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
+
+                leds.solidPink();
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
@@ -266,15 +275,8 @@ public class MainSubsystemsManager {
                 // Redundant setting of speeds in case of manual overwriting by drivers
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
-                
 
-                //Constantly rumble both controllers to let both drivers know that we're ready to shoot
-                // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
-                //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
-                // }
-                // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
-                //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
-                // }
+                leds.solidGreen();
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
@@ -291,7 +293,8 @@ public class MainSubsystemsManager {
 
             case SHOOTING:
                 shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
-                leds.off();
+
+                leds.solidPink();
 
                 if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
                     this.mechanismState = MechanismState.STOWING;
@@ -304,6 +307,8 @@ public class MainSubsystemsManager {
             case PRIMING_AMP:
                 shooter.stopFlywheels(); // redundancy
                 elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP);
+
+                leds.solidPink();
 
                 if(desireShot(userControls) && !userControls.score) { //TODO: Clean up this patch
                     this.mechanismState = MechanismState.PRIMING;
@@ -322,6 +327,9 @@ public class MainSubsystemsManager {
             case AMP_PRIMED:
                 shooter.stopFlywheels();
                 shooter.stopFeeders();
+
+                leds.solidGreen();
+
                 if(userControls.score){
                     this.mechanismState = MechanismState.AMP_SCORING;
                 }
@@ -339,9 +347,12 @@ public class MainSubsystemsManager {
             case AMP_SCORING:
                 shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED, SHOOTER.AMP_FLYWHEEL_SPEED);
                 shooter.setFeederPower(SHOOTER.AMP_FEEDER_SPEED);
+
+                leds.solidPink();
+
                 if(!userControls.score){
                     this.mechanismState = MechanismState.AMP_PRIMED;
-                    leds.off();
+                    leds.solidOff();
                 }
                 break;
 
@@ -353,6 +364,9 @@ public class MainSubsystemsManager {
                 shooter.stopFeeders();
                 intake.stopIntake();
                 elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_CLIMB, ELEVATOR.EXTENSION_METERS_CLIMB);
+
+                leds.solidPink();
+
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.CLIMB;
                 }
@@ -368,6 +382,9 @@ public class MainSubsystemsManager {
                 else if(userControls.manualRetract){
                     elevator.retract();
                 }
+
+                leds.solidGreen();
+
                 break;
 
             case PASS_THROUGH_1:
@@ -375,13 +392,6 @@ public class MainSubsystemsManager {
                     shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
                     // shooter.setFeederPower(1);
                     shooter.setShootVelocity(6000, 6000);
-
-                    // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
-                    //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
-                    // }
-                    // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
-                    //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
-                    // }
 
                     if(shooter.isBottomBeamBreakTripped()){
                         this.mechanismState = MechanismState.PASS_THROUGH_2;
@@ -392,14 +402,7 @@ public class MainSubsystemsManager {
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederPower(1); // Set PID to when note is engaged
                 shooter.setShootVelocity(6000, 6000);
-                leds.off();
-
-                // if(Rumble.isQueueEmpty(Rumble.Controller.OPERATOR)){
-                //     Rumble.enqueueRumbleBump(Rumble.Controller.OPERATOR, new Rumble().new RumbleBump(0.1, 0.25));
-                // }
-                // if(Rumble.isQueueEmpty(Rumble.Controller.DRIVER)){
-                //     Rumble.enqueueRumbleBump(Rumble.Controller.DRIVER, new Rumble().new RumbleBump(0.1, 0.25));
-                // }
+                leds.solidOff();
 
                 if(!shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.STOWING;

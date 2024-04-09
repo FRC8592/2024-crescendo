@@ -8,8 +8,6 @@ public class NeoPixelLED {
     private AddressableLED ledStrip;
     private AddressableLEDBuffer ledBuffer;
     private int LED_LENGTH = 30;
-    private int ledCounter = 0;
-    private LEDMode mode;
     public Timer flashTimer;
 
     public NeoPixelLED() {
@@ -17,81 +15,76 @@ public class NeoPixelLED {
         ledStrip.setLength(LED_LENGTH);
         ledBuffer = new AddressableLEDBuffer(LED_LENGTH);
         ledStrip.start();
-        mode = LEDMode.OFF;
         flashTimer = new Timer();
         flashTimer.start();
     }
 
     public void update() {
-        switch (mode) {
-            case OFF:
-                off();
-                break;
-            case AMP:
-                amp();
-                break;
-            case NOTE_PICKUP:
-                notePickup();
-                break;
-        }
+        ledStrip.setData(ledBuffer);
     }
 
-    public void amp() {
+    public void blinkYellow() {
         if (((int) (flashTimer.get() * 4)) % 2 == 0) {
             for (int i = 0; i < LED_LENGTH; i++) {
                 ledBuffer.setRGB(i, 255, 255, 0);
             }
-            ledStrip.setData(ledBuffer);
         }
         else {
             for (int i = 0; i < LED_LENGTH; i++) {
                 ledBuffer.setRGB(i, 0, 0, 0);
             }
-            ledStrip.setData(ledBuffer);
         }
     }
 
-    public void notePickup() {
+    public void blinkRed() {
+        if (((int) (flashTimer.get() * 4)) % 2 == 0) {
+            for (int i = 0; i < LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, 255, 0, 0);
+            }
+        }
+        else {
+            for (int i = 0; i < LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, 0, 0, 0);
+            }
+        }
+    }
+
+    public void solidCyan() {
         for(int i = 0; i < LED_LENGTH; i++) {
             ledBuffer.setRGB(i, 0, 255,255);
         }
-        ledStrip.setData(ledBuffer);
-        
-        ledCounter++;
-        if (ledCounter > 200) {
-            setMode(LEDMode.OFF);
+    }
+
+    public void solidPink() {
+        for(int i = 0; i < LED_LENGTH; i++) {
+            ledBuffer.setRGB(i, 192, 0, 255);
         }
     }
 
-    public void off() {
+    public void solidOff() {
         for(int i = 0; i < LED_LENGTH; i++) {
             ledBuffer.setRGB(i, 0, 0, 0);
         }
-        ledStrip.setData(ledBuffer);
     }
 
-    public void red() {
+    public void solidRed() {
         for(int i = 0; i < LED_LENGTH; i++) {
             ledBuffer.setRGB(i, 255,0,0);
         }
-        ledStrip.setData(ledBuffer);
     }
-    
-    public void disabled() {
+    public void solidGreen() {
         for(int i = 0; i < LED_LENGTH; i++) {
             ledBuffer.setRGB(i, 0, 255, 0);
         }
-        ledStrip.setData(ledBuffer);
     }
-
-    static enum LEDMode {
-        OFF,
-        AMP,
-        NOTE_PICKUP
+    public void solidOrange(){
+        for(int i = 0; i < LED_LENGTH; i++) {
+            ledBuffer.setRGB(i, 255, 100, 0);
+        }
     }
-
-    public void setMode(LEDMode mode) {
-        this.mode = mode;
-        ledCounter = 0;
+    public void solidBlue(){
+        for(int i = 0; i < LED_LENGTH; i++) {
+            ledBuffer.setRGB(i, 0, 0, 255);
+        }
     }
 }

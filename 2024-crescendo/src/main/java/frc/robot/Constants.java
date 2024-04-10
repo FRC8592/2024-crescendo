@@ -16,6 +16,7 @@ public final class Constants {
         public static final double TICKS_TO_ANGLE_DEGREES_SPARKFLEX = 360.0 / 4096.0;
 
         public static final double DEG_TO_RAD = 0.0174533;
+        public static final double RAD_TO_DEG = 57.2958;
         public static final double IN_TO_METERS = 0.0254;
         public static final double METERS_TO_FEET = 3.28084;
     }
@@ -292,6 +293,10 @@ public final class Constants {
         public static final double STEER_kP = 0.2;
         public static final double STEER_kI = 0.0;
         public static final double STEER_kD = 0.1;
+
+        public static final double SNAP_TO_kP = 0.2;
+        public static final double SNAP_TO_kI = 0.0;
+        public static final double SNAP_TO_kD = 0.0;
 
 
         public static final double DRIVE_TRAIN_WIDTH = 0.527; // meters

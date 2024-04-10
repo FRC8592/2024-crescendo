@@ -352,11 +352,24 @@ public class Robot extends LoggedRobot {
         if(driverController.getAButton()){
             double omega = poseVision.visual_servo(0, 1.0, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
+        } else if (controls.snapToDirection == 0){
+            double omega  = swerve.turnToAngle(0);
+            currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
+        } else if (controls.snapToDirection == 90){
+            double omega  = swerve.turnToAngle(90);
+            currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
+        } else if (controls.snapToDirection == 180){
+            double omega  = swerve.turnToAngle(180);
+            currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
+        } else if (controls.snapToDirection == 270){
+            double omega  = swerve.turnToAngle(270);
+            currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
 
         if(controls.autoCollect){
             currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
             controls.intake = true;
+
         }
 
         if(controls.kiddyPoolShot){

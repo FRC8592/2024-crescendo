@@ -15,6 +15,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.PoseVision;
 import frc.robot.Constants.*;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.NewtonSwerve.Gyro.Gyro;
 
 public class NewtonSwerve {
@@ -207,19 +209,44 @@ public class NewtonSwerve {
         double backLeftVelo = states[2].speedMetersPerSecond;
         double backRightVelo = states[3].speedMetersPerSecond;
 
+        Logger.recordOutput(SWERVE.LOG_PATH+"SwerveAssigned", states);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/ThrottleAssigned", states[0].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/AzimuthAssigned", states[0].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/ThrottleAssigned", states[1].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/AzimuthAssigned", states[1].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/ThrottleAssigned", states[2].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/AzimuthAssigned", states[2].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/ThrottleAssigned", states[3].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/AzimuthAssigned", states[3].angle);
+
         m_frontLeftModule.setModule(states[0].angle.getRadians(), metersPerSecondToTicks(frontLeftVelo));
         m_frontRightModule.setModule(states[1].angle.getRadians(), metersPerSecondToTicks(frontRightVelo));
         m_backLeftModule.setModule(states[2].angle.getRadians(), metersPerSecondToTicks(backLeftVelo));
         m_backRightModule.setModule(states[3].angle.getRadians(), metersPerSecondToTicks(backRightVelo));
 
-        this.odometry.update(this.getGyroscopeRotation(),
-                new SwerveModulePosition[] { m_frontLeftModule.getModulePosition(),
-                        m_frontRightModule.getModulePosition(), m_backLeftModule.getModulePosition(),
-                        m_backRightModule.getModulePosition() });
+        SwerveModulePosition[] readPositions = new SwerveModulePosition[] {m_frontLeftModule.getModulePosition(),
+            m_frontRightModule.getModulePosition(), m_backLeftModule.getModulePosition(),
+            m_backRightModule.getModulePosition()};
 
-        this.m_poseEstimator.update(getGyroscopeRotation(), new SwerveModulePosition[] { m_frontLeftModule.getModulePosition(),
-                        m_frontRightModule.getModulePosition(), m_backLeftModule.getModulePosition(),
-                        m_backRightModule.getModulePosition() });
+        SwerveModuleState[] readStates = new SwerveModuleState[]{
+            new SwerveModuleState(m_frontLeftModule.getThrottleVelocity(null), Rotation2d.fromDegrees(m_frontLeftModule.getSteerAngle())),
+            new SwerveModuleState(m_frontRightModule.getThrottleVelocity(null), Rotation2d.fromDegrees(m_frontRightModule.getSteerAngle())),
+            new SwerveModuleState(m_backLeftModule.getThrottleVelocity(null), Rotation2d.fromDegrees(m_backLeftModule.getSteerAngle())),
+            new SwerveModuleState(m_backRightModule.getThrottleVelocity(null), Rotation2d.fromDegrees(m_backRightModule.getSteerAngle()))
+        };
+
+        this.odometry.update(this.getGyroscopeRotation(), readPositions);
+        this.m_poseEstimator.update(getGyroscopeRotation(), readPositions);
+
+        Logger.recordOutput(SWERVE.LOG_PATH+"SwerveRead", readStates);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/ThrottleRead", readStates[0].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/AzimuthRead", readStates[0].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/ThrottleRead", readStates[1].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/AzimuthRead", readStates[1].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/ThrottleRead", readStates[2].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/AzimuthRead", readStates[2].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/ThrottleRead", readStates[3].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/AzimuthRead", readStates[3].angle);
     }
 
     // zero the absolute encoder for all modules

@@ -36,6 +36,10 @@ public class ShootCommand extends Command{
 
     @Override
     public boolean execute() {
+        if (!Robot.isReal()) {
+            return true;
+        }
+
         Logger.recordOutput("CurrentCommand", "ShootCommand");
         controls.score = true;
         subsystemsManager.staticPrime(RangeTable.get(expectedRange));

@@ -6,6 +6,7 @@ import frc.robot.Controls;
 import frc.robot.MainSubsystemsManager;
 import frc.robot.PoseVision;
 import frc.robot.RangeTable;
+import frc.robot.Robot;
 import frc.robot.Constants.APRILTAG_VISION;
 
 public class AutoPrimeCommand extends Command {
@@ -27,6 +28,10 @@ public class AutoPrimeCommand extends Command {
 
     @Override
     public boolean execute() {
+        if (!Robot.isReal()) {
+            return true;
+        }
+
         subsystemsManager.setVisionPrime();
         controls.rangeTableShoot = true;
         subsystemsManager.updateMechanismStateMachine(controls, 

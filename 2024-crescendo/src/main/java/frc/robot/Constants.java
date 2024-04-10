@@ -4,6 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import frc.robot.NeoPixelLED.NewtonColor;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+
 public final class Constants {
     public final class SHARED {
         public static final String LOG_FOLDER = "CustomLogs";
@@ -348,6 +355,10 @@ public final class Constants {
         public static final ArrayList<Integer> AMP_AIM_TAGS = new ArrayList<>(Arrays.asList(5, 6));
         public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
 
+        public static final double FUSE_DISTANCE = 3.5; // meters
+
+        // TODO: verify correctness
+        public static final Transform2d CAMERA_TO_ROBOT = new Transform2d(-0.2775, -0.0635, Rotation2d.fromDegrees(-90));
         public static final double X_ROT_LOCK_ERROR = 0.075;
     }
 

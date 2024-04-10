@@ -45,6 +45,10 @@ public class PoseVision {
         visual_servo_pid.setIZone(APRILTAG_VISION.iZone);
     }
 
+    public boolean getVisionActive() {
+        return SmartDashboard.getBoolean("jetson_active", false);
+    }
+
     /* -- CURRENT TAG -- */
     public double getCurrTagX() {
         tag_x = SmartDashboard.getNumber("jetson_apriltag_x", 0.0);

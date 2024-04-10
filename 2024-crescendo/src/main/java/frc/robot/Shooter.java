@@ -32,6 +32,7 @@ public class Shooter {
     // SparkPIDController rightShooterControl;
     public DigitalInput bottomBeamBreak; // Detects the note when incoming
     public DigitalInput topBeamBreak; // Detects the note outgoing
+    public DigitalInput middleBeamBreak;
 
     public SparkFlexControl feederMotor;
 
@@ -89,6 +90,7 @@ public class Shooter {
 
         bottomBeamBreak = new DigitalInput(SHOOTER.BOTTOM_BEAM_BREAK_DIO_PORT);
         topBeamBreak = new DigitalInput(SHOOTER.TOP_BEAM_BREAK_DIO_PORT);
+        middleBeamBreak = new DigitalInput(SHOOTER.MIDDLE_BEAM_BREAK_DIO_PORT);
 
         leftShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         rightShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);

@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import frc.robot.NeoPixelLED.NewtonColor;
 
 public final class Constants {
     public final class SHARED {
@@ -277,6 +278,17 @@ public final class Constants {
     public final class LEDS { //TODO: Merge the LED code once we get the LEDs working physically
         public static final int LED_LENGTH = 30;
         public static final double INTAKING_TIMEOUT = 0.5; //Intake for this long before the LEDs start reporting a jam
+        public static final NewtonColor RED = new NeoPixelLED().new NewtonColor(255, 0, 0);
+        public static final NewtonColor GREEN = new NeoPixelLED().new NewtonColor(0, 255, 0);
+        public static final NewtonColor BLUE = new NeoPixelLED().new NewtonColor(0, 0, 255);
+        public static final NewtonColor YELLOW = new NeoPixelLED().new NewtonColor(255, 255, 0);
+        public static final NewtonColor CYAN = new NeoPixelLED().new NewtonColor(0, 255, 255);
+        public static final NewtonColor MAGENTA = new NeoPixelLED().new NewtonColor(255, 0, 255);
+        public static final NewtonColor ORANGE = new NeoPixelLED().new NewtonColor(255, 92, 255);
+        public static final NewtonColor OFF = new NeoPixelLED().new NewtonColor(0, 0, 0);
+
+        public static final double NOT_AIMED_OFFSET = 1;
+        public static final double FULLY_AIMED_OFFSET = APRILTAG_VISION.X_ROT_LOCK_ERROR;
     }
 
     public final class SWERVE {

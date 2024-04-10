@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -181,12 +182,15 @@ public class NewtonSwerve {
     // POSE ESTIMATOR METHODS
     public void addVisionMeasurement(PoseVision m_poseVision) {
         // check if valid. for now, just if it's visible and close enough
+        double dist = m_poseVision.getCurrTagZ();
         if (m_poseVision.getVisionActive() && 
             m_poseVision.getTagInView() && 
-            m_poseVision.getCurrTagZ() < APRILTAG_VISION.FUSE_DISTANCE) {
+            dist < APRILTAG_VISION.FUSE_DISTANCE) {
             Pose2d visionPose = m_poseVision.getPose2d();
             double timestamp = Timer.getFPGATimestamp() - 0.1; // NT runs at 10 FPS, so subtract 0.1
-            m_poseEstimator.addVisionMeasurement(visionPose.transformBy(APRILTAG_VISION.CAMERA_TO_ROBOT), timestamp);
+            m_poseEstimator.addVisionMeasurement(visionPose.transformBy(APRILTAG_VISION.CAMERA_TO_ROBOT), 
+                                                 timestamp, 
+                                                 VecBuilder.fill(0.3 * dist, 0.3 * dist, 9999999)); // ignore theta
         }
     }
 

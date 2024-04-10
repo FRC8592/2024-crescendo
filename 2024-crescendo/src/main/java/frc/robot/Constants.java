@@ -348,8 +348,8 @@ public final class Constants {
 
         public static final double FUSE_DISTANCE = 3.5; // meters
 
-        // TODO: find Y offset for correct camera sensor!!!
-        public static final Transform2d CAMERA_TO_ROBOT = new Transform2d(-0.2775, 0, Rotation2d.fromDegrees(-90));
+        // TODO: verify correctness
+        public static final Transform2d CAMERA_TO_ROBOT = new Transform2d(-0.2775, -0.0635, Rotation2d.fromDegrees(-90));
         public static final double X_ROT_LOCK_ERROR = 0.075;
     }
 

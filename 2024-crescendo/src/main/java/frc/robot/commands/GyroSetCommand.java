@@ -13,6 +13,10 @@ public class GyroSetCommand extends Command {
 
     @Override
     public boolean execute() {
+        if (!Robot.isReal()) {
+            return true;
+        }
+
         this.swerve.setGyroscopeRotation(yaw);
         return true;
     }

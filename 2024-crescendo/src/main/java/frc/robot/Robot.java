@@ -164,6 +164,7 @@ public class Robot extends LoggedRobot {
 
         SmartDashboard.putBoolean("Top Beam Break", shooter.topBeamBreak.get());
         SmartDashboard.putBoolean("Bottom Beam Break", shooter.bottomBeamBreak.get());
+        SmartDashboard.putBoolean("Middle Beam Break", shooter.middleBeamBreak.get());
 
         Logger.recordOutput(INTAKE.LOG_PATH+"IntakeVelocityRPM", intake.getTopMotorVelocityRPM());
 

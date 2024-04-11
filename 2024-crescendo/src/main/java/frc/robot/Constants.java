@@ -166,6 +166,7 @@ public final class Constants {
 
         public static final int BOTTOM_BEAM_BREAK_DIO_PORT = 0;
         public static final int TOP_BEAM_BREAK_DIO_PORT = 1;
+        public static final int MIDDLE_BEAM_BREAK_DIO_PORT = 2;
 
         public static final double FEEDER_MOTOR_kP = 0.00001;
         public static final double FEEDER_MOTOR_kI = 0.0;

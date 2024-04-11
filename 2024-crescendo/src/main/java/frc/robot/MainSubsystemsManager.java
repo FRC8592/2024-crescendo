@@ -84,6 +84,10 @@ public class MainSubsystemsManager {
             aimed = targetLocked;
         }
 
+        if(shooter.isMiddleBeamBreakTripped()){
+            leds.solidColor(LEDS.CYAN);
+        }
+
         Logger.recordOutput(MAIN_SUBSYSTEMS_MANAGER.LOG_PATH+"StateBeforeUpdate", this.mechanismState.toString());
 
         switch(this.mechanismState){
@@ -207,8 +211,6 @@ public class MainSubsystemsManager {
             case LOADED:
                 shooter.setShootVelocity(userRange.leftFlywheelSpeed, userRange.rightFlywheelSpeed);
 
-                leds.solidColor(LEDS.CYAN);
-
                 if(userControls.outake){
                     this.mechanismState = MechanismState.OUTTAKING;
                 }
@@ -303,8 +305,6 @@ public class MainSubsystemsManager {
             case PRIMING_AMP:
                 shooter.stopFlywheels(); // redundancy
                 elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP);
-
-                leds.solidColor(LEDS.CYAN);
 
                 if(desireShot(userControls) && !userControls.score) { //TODO: Clean up this patch
                     this.mechanismState = MechanismState.PRIMING;

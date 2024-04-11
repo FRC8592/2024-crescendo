@@ -52,11 +52,11 @@ public class Controls {
     public void update(XboxController driverController, XboxController operatorController){
         this.slowMode = driverController.getRightBumper();
         this.resetGyro = driverController.getBackButton();
-        this.autoCollect = driverController.getLeftBumper();
-        this.robotOriented = driverController.getRightTriggerAxis() >0.1;
-        this.passThrough = driverController.getLeftTriggerAxis() >0.1;
-        this.snapToDirection = driverController.getPOV();
-
+        this.autoCollect = driverController.getAButton();
+        this.robotOriented = driverController.getLeftBumper();
+        this.score = driverController.getRightTriggerAxis()>0.1;
+        
+        this.passThrough = operatorController.getRightTriggerAxis() >0.1;
         this.rangeTableShoot = operatorController.getRightBumper();
         this.shootFromPodium = operatorController.getBButton();
         this.outake = operatorController.getLeftBumper();
@@ -64,7 +64,6 @@ public class Controls {
         this.stow = operatorController.getAButton();
         this.amp = operatorController.getXButton();
         this.climb = operatorController.getYButton();
-        this.score = operatorController.getRightTriggerAxis()>0.1;
         this.manualExtend = operatorController.getPOV() == 0;
         this.manualRetract = operatorController.getPOV() == 180;
         this.ledAmpSignal = operatorController.getBackButton();

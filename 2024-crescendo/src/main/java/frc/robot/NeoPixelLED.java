@@ -12,7 +12,7 @@ public class NeoPixelLED {
     private double offset;
     private boolean cameraWorking;
 
-    public class NewtonColor{
+    public static class NewtonColor{
         public final int red;
         public final int green;
         public final int blue;
@@ -37,7 +37,7 @@ public class NeoPixelLED {
 
     public void update(double offset, boolean cameraWorking) {
         ledStrip.setData(ledBuffer);
-        this.offset = offset;
+        this.offset = Math.abs(offset);
         this.cameraWorking = cameraWorking;
     }
 

@@ -176,6 +176,9 @@ public class Robot extends LoggedRobot {
         elevator.update();
         shooter.log();
 
+        // update odometry with pose
+        swerve.addVisionMeasurement(poseVision);
+
         // NOTE: FOR TESTING PURPOSES. 
         if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
                 SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
@@ -214,7 +217,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        leds.red();
+        leds.solidColor(LEDS.RED);
         currentRange = new RangeEntry(0, 0, 0);
         currentAuto.periodic();
         // subsystemsManager.updateMechanismStateMachine(controls, distance, locked); //`controls` is only updated in teleop, so MSM basically only responds to the state-setter used in the commands
@@ -226,7 +229,7 @@ public class Robot extends LoggedRobot {
         swerve.setSteerAnglesToAbsEncoder();
         //swerve.zeroGyoscope();
         swerve.setThrottleCurrentLimit(POWER.SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT);
-        leds.off();
+        leds.solidColor(LEDS.OFF);
 
         // shooter.feederMotor.setPIDF(SmartDashboard.getNumber("FeederKp", 0),
         // SmartDashboard.getNumber("FeederKp", 0),
@@ -364,16 +367,16 @@ public class Robot extends LoggedRobot {
             subsystemsManager.staticPrime(RangeTable.getKiddyPool());
         }
         else if(controls.shootFromPodium){
-            
             RangeTable.RangeEntry entry = RangeTable.getPodium();
             subsystemsManager.staticPrime(entry);
         }
         else if(controls.rangeTableShoot){
             subsystemsManager.setVisionPrime();
         }
-    
         swerve.drive(currentSpeeds);
+        leds.solidColor(LEDS.OFF);
         subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
+        leds.update(poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS));
     }
 
     @Override
@@ -382,7 +385,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledPeriodic() {
-        leds.disabled();
+        leds.solidColor(LEDS.GREEN);
     }
 
     @Override
@@ -461,7 +464,7 @@ public class Robot extends LoggedRobot {
 
         // driverController.setRumble(RumbleType.kBothRumble, driverController.getLeftTriggerAxis()*255);
 
-        leds.red();
+        leds.solidColor(LEDS.RED);
     } 
 
     @Override

@@ -4,12 +4,18 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.PoseVision;
 import frc.robot.Constants.*;
+
+import org.littletonrobotics.junction.Logger;
 
 import com.NewtonSwerve.Gyro.Gyro;
 
@@ -39,6 +45,9 @@ public class NewtonSwerve {
     // Set up the kinematics module based on physical drivetrain characteristics
     private SwerveDriveKinematics m_kinematics;
 
+    // set up the pose estimator based on vision and odometry
+    private SwerveDrivePoseEstimator m_poseEstimator;
+
     public NewtonSwerve(ModuleConfig config, Gyro gyro, SwerveModule frontLeft, SwerveModule frontRight,
             SwerveModule backLeft, SwerveModule backRight) {
 
@@ -63,7 +72,7 @@ public class NewtonSwerve {
                 // Back left
                 new Translation2d(-DRIVETRAIN_WIDTH_METERS / 2.0, DRIVETRAIN_LENGTH_METERS / 2.0),
                 // Back right
-                new Translation2d(-DRIVETRAIN_WIDTH_METERS / 2.0, -DRIVETRAIN_LENGTH_METERS / 2.0));
+                new Translation2d(-DRIVETRAIN_WIDTH_METERS / 2.0, -DRIVETRAIN_LENGTH_METERS / 2.0)); 
 
         // setup modules
         this.m_frontLeftModule = new NewtonModule(frontLeft, WHEEL_CIRCUMFERENCE);
@@ -75,6 +84,12 @@ public class NewtonSwerve {
         this.odometry = new SwerveDriveOdometry(m_kinematics, new Rotation2d(),
                 new SwerveModulePosition[] { new SwerveModulePosition(), new SwerveModulePosition(),
                         new SwerveModulePosition(), new SwerveModulePosition() });
+        
+        // initialize pose estimator
+        m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, new Rotation2d(), 
+                new SwerveModulePosition[] { new SwerveModulePosition(), new SwerveModulePosition(),
+                        new SwerveModulePosition(), new SwerveModulePosition() }, 
+                new Pose2d());
     }
 
     // public NewtonSwerve(ModuleConfig config, Gyro gyro, NewtonModule frontLeft,
@@ -161,6 +176,28 @@ public class NewtonSwerve {
                 new SwerveModulePosition[] { new SwerveModulePosition(), new SwerveModulePosition(),
                         new SwerveModulePosition(), new SwerveModulePosition() },
                 pose);
+
+        m_poseEstimator.resetPosition(getGyroscopeRotation(), new SwerveModulePosition[] { new SwerveModulePosition(), 
+            new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition() }, pose);
+    }
+
+    // POSE ESTIMATOR METHODS
+    public void addVisionMeasurement(PoseVision m_poseVision) {
+        // check if valid. for now, just if it's visible and close enough
+        double dist = m_poseVision.getCurrTagZ();
+        if (m_poseVision.getVisionActive() && 
+            m_poseVision.getTagInView() && 
+            dist < APRILTAG_VISION.FUSE_DISTANCE) {
+            Pose2d visionPose = m_poseVision.getPose2d();
+            double timestamp = Timer.getFPGATimestamp() - 0.1; // NT runs at 10 FPS, so subtract 0.1
+            m_poseEstimator.addVisionMeasurement(visionPose.transformBy(APRILTAG_VISION.CAMERA_TO_ROBOT), 
+                                                 timestamp, 
+                                                 VecBuilder.fill(0.3 * dist, 0.3 * dist, 9999999)); // ignore theta
+        }
+    }
+
+    public Pose2d getCurrentPosVision() {
+        return m_poseEstimator.getEstimatedPosition();
     }
 
     public void drive(ChassisSpeeds chassisSpeeds) {
@@ -172,15 +209,44 @@ public class NewtonSwerve {
         double backLeftVelo = states[2].speedMetersPerSecond;
         double backRightVelo = states[3].speedMetersPerSecond;
 
+        Logger.recordOutput(SWERVE.LOG_PATH+"SwerveAssigned", states);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/ThrottleAssigned", states[0].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/AzimuthAssigned", states[0].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/ThrottleAssigned", states[1].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/AzimuthAssigned", states[1].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/ThrottleAssigned", states[2].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/AzimuthAssigned", states[2].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/ThrottleAssigned", states[3].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/AzimuthAssigned", states[3].angle);
+
         m_frontLeftModule.setModule(states[0].angle.getRadians(), metersPerSecondToTicks(frontLeftVelo));
         m_frontRightModule.setModule(states[1].angle.getRadians(), metersPerSecondToTicks(frontRightVelo));
         m_backLeftModule.setModule(states[2].angle.getRadians(), metersPerSecondToTicks(backLeftVelo));
         m_backRightModule.setModule(states[3].angle.getRadians(), metersPerSecondToTicks(backRightVelo));
 
-        this.odometry.update(this.getGyroscopeRotation(),
-                new SwerveModulePosition[] { m_frontLeftModule.getModulePosition(),
-                        m_frontRightModule.getModulePosition(), m_backLeftModule.getModulePosition(),
-                        m_backRightModule.getModulePosition() });
+        SwerveModulePosition[] readPositions = new SwerveModulePosition[] {m_frontLeftModule.getModulePosition(),
+            m_frontRightModule.getModulePosition(), m_backLeftModule.getModulePosition(),
+            m_backRightModule.getModulePosition()};
+
+        SwerveModuleState[] readStates = new SwerveModuleState[]{
+            new SwerveModuleState(m_frontLeftModule.getThrottleVelocity(null), Rotation2d.fromDegrees(m_frontLeftModule.getSteerAngle())),
+            new SwerveModuleState(m_frontRightModule.getThrottleVelocity(null), Rotation2d.fromDegrees(m_frontRightModule.getSteerAngle())),
+            new SwerveModuleState(m_backLeftModule.getThrottleVelocity(null), Rotation2d.fromDegrees(m_backLeftModule.getSteerAngle())),
+            new SwerveModuleState(m_backRightModule.getThrottleVelocity(null), Rotation2d.fromDegrees(m_backRightModule.getSteerAngle()))
+        };
+
+        this.odometry.update(this.getGyroscopeRotation(), readPositions);
+        this.m_poseEstimator.update(getGyroscopeRotation(), readPositions);
+
+        Logger.recordOutput(SWERVE.LOG_PATH+"SwerveRead", readStates);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/ThrottleRead", readStates[0].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/AzimuthRead", readStates[0].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/ThrottleRead", readStates[1].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/AzimuthRead", readStates[1].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/ThrottleRead", readStates[2].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/AzimuthRead", readStates[2].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/ThrottleRead", readStates[3].speedMetersPerSecond);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/AzimuthRead", readStates[3].angle);
     }
 
     // zero the absolute encoder for all modules

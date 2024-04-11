@@ -3,95 +3,78 @@ package frc.robot;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.*;
 
 public class NeoPixelLED {
     private AddressableLED ledStrip;
     private AddressableLEDBuffer ledBuffer;
-    private int LED_LENGTH = 30;
-    private int ledCounter = 0;
-    private LEDMode mode;
     public Timer flashTimer;
+    private double offset;
+
+    public class NewtonColor{
+        public final int red;
+        public final int green;
+        public final int blue;
+        public NewtonColor(int r, int g, int b){
+            this.red = r;
+            this.green = g;
+            this.blue = b;
+        }
+        public int[] getColors(){
+            return new int[] {red, green, blue};
+        }
+    }
 
     public NeoPixelLED() {
         ledStrip = new AddressableLED(0);
-        ledStrip.setLength(LED_LENGTH);
-        ledBuffer = new AddressableLEDBuffer(LED_LENGTH);
+        ledStrip.setLength(LEDS.LED_LENGTH);
+        ledBuffer = new AddressableLEDBuffer(LEDS.LED_LENGTH);
         ledStrip.start();
-        mode = LEDMode.OFF;
         flashTimer = new Timer();
         flashTimer.start();
     }
 
-    public void update() {
-        switch (mode) {
-            case OFF:
-                off();
-                break;
-            case AMP:
-                amp();
-                break;
-            case NOTE_PICKUP:
-                notePickup();
-                break;
+    public void update(double offset) {
+        ledStrip.setData(ledBuffer);
+        this.offset = offset;
+    }
+
+    public void solidColor(NewtonColor color){
+        for(int i = 0; i < LEDS.LED_LENGTH; i++) {
+            ledBuffer.setRGB(i, color.red, color.green, color.blue);
         }
     }
 
-    public void amp() {
-        if (((int) (flashTimer.get() * 4)) % 2 == 0) {
-            for (int i = 0; i < LED_LENGTH; i++) {
-                ledBuffer.setRGB(i, 255, 255, 0);
+    public void blinkColor(NewtonColor blink, double hertz){
+        if (((int) (flashTimer.get() * hertz)) % 2 == 0) {
+            for (int i = 0; i < LEDS.LED_LENGTH; i++) {
+                ledBuffer.setRGB(i, blink.red, blink.green, blink.blue);
             }
-            ledStrip.setData(ledBuffer);
         }
         else {
-            for (int i = 0; i < LED_LENGTH; i++) {
+            for (int i = 0; i < LEDS.LED_LENGTH; i++) {
                 ledBuffer.setRGB(i, 0, 0, 0);
             }
-            ledStrip.setData(ledBuffer);
         }
     }
 
-    public void notePickup() {
-        for(int i = 0; i < LED_LENGTH; i++) {
-            ledBuffer.setRGB(i, 0, 255,255);
+    public void hone(){
+        if (offset >= LEDS.NOT_AIMED_OFFSET){
+            solidColor(LEDS.RED);
         }
-        ledStrip.setData(ledBuffer);
-        
-        ledCounter++;
-        if (ledCounter > 200) {
-            setMode(LEDMode.OFF);
+        else if (offset <= LEDS.NOT_AIMED_OFFSET && offset > LEDS.FULLY_AIMED_OFFSET){
+            solidColor(LEDS.RED);
+            double ledOffsetScale = 1 - ((offset - LEDS.FULLY_AIMED_OFFSET)
+                    /(LEDS.NOT_AIMED_OFFSET - LEDS.FULLY_AIMED_OFFSET)); //a value of 0-1 where 0 means equal to NOT_AIMED_OFFSET and 
+                                                                         //1 means FULLY_AIMED_OFFSET
+            double ledsToLight = ledOffsetScale * (LEDS.LED_LENGTH/2);
+            for (int i = 0; i < ledsToLight; i ++){
+                ledBuffer.setRGB(i, LEDS.GREEN.red, LEDS.GREEN.green, LEDS.GREEN.blue);
+                ledBuffer.setRGB(LEDS.LED_LENGTH - i - 1, LEDS.GREEN.red, LEDS.GREEN.green, LEDS.GREEN.blue);
+            }
         }
-    }
-
-    public void off() {
-        for(int i = 0; i < LED_LENGTH; i++) {
-            ledBuffer.setRGB(i, 0, 0, 0);
+        else{
+            solidColor(LEDS.GREEN);
         }
-        ledStrip.setData(ledBuffer);
-    }
-
-    public void red() {
-        for(int i = 0; i < LED_LENGTH; i++) {
-            ledBuffer.setRGB(i, 255,0,0);
-        }
-        ledStrip.setData(ledBuffer);
-    }
-    
-    public void disabled() {
-        for(int i = 0; i < LED_LENGTH; i++) {
-            ledBuffer.setRGB(i, 0, 255, 0);
-        }
-        ledStrip.setData(ledBuffer);
-    }
-
-    static enum LEDMode {
-        OFF,
-        AMP,
-        NOTE_PICKUP
-    }
-
-    public void setMode(LEDMode mode) {
-        this.mode = mode;
-        ledCounter = 0;
     }
 }

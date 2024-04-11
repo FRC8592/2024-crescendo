@@ -74,6 +74,10 @@ public class TargetCommand extends Command {
 
     @Override
     public boolean execute() {
+        if (!Robot.isReal()) {
+            return true;
+        }
+
         return followcmd.execute();
     }
 

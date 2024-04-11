@@ -49,6 +49,9 @@ public class AutoShootCommand extends Command {
     }
     @Override
     public boolean execute() {
+        if (!Robot.isReal()) {
+            return true;
+        }
 
         /* Set up for an automatically ranged shot using vision */
         controls.rangeTableShoot = true;

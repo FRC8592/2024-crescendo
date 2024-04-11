@@ -2,6 +2,14 @@ package frc.robot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import frc.robot.NeoPixelLED.NewtonColor;
+
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 public final class Constants {
     public final class SHARED {
@@ -276,11 +284,19 @@ public final class Constants {
 
 
     public final class LEDS { //TODO: Merge the LED code once we get the LEDs working physically
-        public static final int LED_LENGTH = 8;
-        public static final double MINIMUM_VOLTAGE = 9.0;
-        public static final int PULSE_METHOD_SPEED = 5;
-        public static final int PULSE_SIZE = 2;
-        public static final int PULSE_GAP = 5;
+        public static final int LED_LENGTH = 30;
+        public static final double INTAKING_TIMEOUT = 0.5; //Intake for this long before the LEDs start reporting a jam
+        public static final NewtonColor RED = new NeoPixelLED().new NewtonColor(255, 0, 0);
+        public static final NewtonColor GREEN = new NeoPixelLED().new NewtonColor(0, 255, 0);
+        public static final NewtonColor BLUE = new NeoPixelLED().new NewtonColor(0, 0, 255);
+        public static final NewtonColor YELLOW = new NeoPixelLED().new NewtonColor(255, 255, 0);
+        public static final NewtonColor CYAN = new NeoPixelLED().new NewtonColor(0, 255, 255);
+        public static final NewtonColor MAGENTA = new NeoPixelLED().new NewtonColor(255, 0, 255);
+        public static final NewtonColor ORANGE = new NeoPixelLED().new NewtonColor(255, 92, 255);
+        public static final NewtonColor OFF = new NeoPixelLED().new NewtonColor(0, 0, 0);
+
+        public static final double NOT_AIMED_OFFSET = 1;
+        public static final double FULLY_AIMED_OFFSET = APRILTAG_VISION.X_ROT_LOCK_ERROR;
     }
 
     public final class SWERVE {
@@ -344,6 +360,10 @@ public final class Constants {
         public static final ArrayList<Integer> AMP_AIM_TAGS = new ArrayList<>(Arrays.asList(5, 6));
         public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
 
+        public static final double FUSE_DISTANCE = 3.5; // meters
+
+        // TODO: verify correctness
+        public static final Transform2d CAMERA_TO_ROBOT = new Transform2d(-0.2775, -0.0635, Rotation2d.fromDegrees(-90));
         public static final double X_ROT_LOCK_ERROR = 0.075;
     }
 

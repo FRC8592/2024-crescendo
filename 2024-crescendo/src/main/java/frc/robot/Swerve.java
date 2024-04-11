@@ -14,6 +14,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Swerve {
@@ -168,7 +169,15 @@ public class Swerve {
         double currYaw = getGyroscopeRotation().getRadians();
         double setPoint = setAngle * CONVERSIONS.DEG_TO_RAD;
 
-        double out = snapToController.calculate(currYaw, setPoint);
+        double errorAngle = setPoint - currYaw;   
+       if(errorAngle > Math.PI){
+           errorAngle -= 2*Math.PI;
+       } else if(errorAngle <= -Math.PI){
+           errorAngle += 2*Math.PI;
+       } 
+
+        double out = snapToController.calculate(0, errorAngle);
+        
 
         return out;
     }

@@ -294,9 +294,9 @@ public final class Constants {
         public static final double STEER_kI = 0.0;
         public static final double STEER_kD = 0.1;
 
-        public static final double SNAP_TO_kP = 0.2;
+        public static final double SNAP_TO_kP = 3.2;
         public static final double SNAP_TO_kI = 0.0;
-        public static final double SNAP_TO_kD = 0.0;
+        public static final double SNAP_TO_kD = 0.1;
 
 
         public static final double DRIVE_TRAIN_WIDTH = 0.527; // meters
@@ -334,9 +334,9 @@ public final class Constants {
 
     public class APRILTAG_VISION {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/MGVision/";
-        public static final double kP = 1;
-        public static final double kI = 4;
-        public static final double kD = 0.005;
+        public static final double kP = 1.00;
+        public static final double kI = 4; // was 4
+        public static final double kD = 0.005; // was 0.005
         public static final double iZone = 0.5;
 
         // red, blue

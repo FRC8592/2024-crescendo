@@ -355,13 +355,13 @@ public class Robot extends LoggedRobot {
         } else if (controls.snapToDirection == 0){
             double omega  = swerve.turnToAngle(0);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
-        } else if (controls.snapToDirection == 90){
+        } else if (controls.snapToDirection == 270){
             double omega  = swerve.turnToAngle(90);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         } else if (controls.snapToDirection == 180){
             double omega  = swerve.turnToAngle(180);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
-        } else if (controls.snapToDirection == 270){
+        } else if (controls.snapToDirection == 90){
             double omega  = swerve.turnToAngle(270);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }

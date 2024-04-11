@@ -24,6 +24,7 @@ public class Controls {
     public boolean manualExtend;
     public boolean manualRetract;
     public boolean kiddyPoolShot;
+    public float snapToDirection;
 
     public Controls(){
         this.slowMode = false;
@@ -31,6 +32,7 @@ public class Controls {
         this.autoCollect = false;
         this.robotOriented = false;
         this.passThrough = false;
+        this.snapToDirection = 0;
 
         this.ledAmpSignal = false;
         this.shootFromPodium = false;
@@ -44,6 +46,7 @@ public class Controls {
         this.manualExtend = false;
         this.manualRetract = false;
         this.kiddyPoolShot = false;
+        this.snapToDirection = 0;
     }
 
     public void update(XboxController driverController, XboxController operatorController){
@@ -52,6 +55,7 @@ public class Controls {
         this.autoCollect = driverController.getLeftBumper();
         this.robotOriented = driverController.getRightTriggerAxis() >0.1;
         this.passThrough = driverController.getLeftTriggerAxis() >0.1;
+        this.snapToDirection = driverController.getPOV();
 
         this.rangeTableShoot = operatorController.getRightBumper();
         this.shootFromPodium = operatorController.getBButton();
@@ -71,6 +75,7 @@ public class Controls {
         this.log(this.autoCollect, "DriverController", "AutoCollect");
         this.log(this.robotOriented, "DriverController", "RobotOriented");
         this.log(this.robotOriented, "DriverController", "PassThrough");
+        Logger.recordOutput(CONTROLS.LOG_PATH+"DriverController"+"/"+"SnapToDirection", this.snapToDirection);
 
         this.log(this.ledAmpSignal, "OperatorController", "LEDAmpSignal");
         this.log(this.shootFromPodium, "OperatorController", "ShootFromPodium");

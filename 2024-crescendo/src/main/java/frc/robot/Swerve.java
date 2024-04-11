@@ -10,16 +10,18 @@ import com.NewtonSwerve.Mk4.Mk4SwerveModuleHelper;
 import com.NewtonSwerve.Mk4.Mk4iSwerveModuleHelper;
 import com.ctre.phoenix.sensors.Pigeon2;
 import frc.robot.Constants.*;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Swerve {
     private Mk4ModuleConfiguration swerveConfig;
     private NewtonSwerve swerve;
     private ChassisSpeeds lastSpeeds;
+    private PIDController snapToController;
 
     public Swerve(Gyro gyro) {
         lastSpeeds = new ChassisSpeeds();
@@ -38,6 +40,7 @@ public class Swerve {
         // // set PID constants
         config.setThrottlePID(SWERVE.THROTTLE_kP, SWERVE.THROTTLE_kI, SWERVE.THROTTLE_kD);
         config.setSteerPID(SWERVE.STEER_kP, SWERVE.STEER_kI, SWERVE.STEER_kD);
+        snapToController = new PIDController(SWERVE.SNAP_TO_kP, SWERVE.SNAP_TO_kI, SWERVE.SNAP_TO_kD);
 
         //TODO: Check the swerve module type and comment/uncomment the next 44 lines to account for it
         SwerveModule m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(config,
@@ -165,5 +168,22 @@ public class Swerve {
 
     public void setGyroscopeRotation(double yaw){
         swerve.gyro.setYaw(yaw);
+    }
+    public double turnToAngle (double setAngle) {
+
+        double currYaw = getGyroscopeRotation().getRadians();
+        double setPoint = setAngle * CONVERSIONS.DEG_TO_RAD;
+
+        double errorAngle = setPoint - currYaw;   
+       if(errorAngle > Math.PI){
+           errorAngle -= 2*Math.PI;
+       } else if(errorAngle <= -Math.PI){
+           errorAngle += 2*Math.PI;
+       } 
+
+        double out = snapToController.calculate(0, errorAngle);
+        
+
+        return out;
     }
 }

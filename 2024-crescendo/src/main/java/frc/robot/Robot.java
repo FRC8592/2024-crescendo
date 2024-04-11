@@ -350,7 +350,7 @@ public class Robot extends LoggedRobot {
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, controls.robotOriented?new Rotation2d():swerve.getGyroscopeRotation());
         noteLock.updateVision();
         if(driverController.getAButton()){
-            double omega = poseVision.visual_servo(0, 1.0, APRILTAG_VISION.SPEAKER_AIM_TAGS, 0);
+            double omega = poseVision.visual_servo(0, 10, APRILTAG_VISION.SPEAKER_AIM_TAGS, 1);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         } else if (controls.snapToDirection == 0){
             double omega  = swerve.turnToAngle(0);

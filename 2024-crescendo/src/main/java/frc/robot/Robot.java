@@ -376,7 +376,8 @@ public class Robot extends LoggedRobot {
         swerve.drive(currentSpeeds);
         leds.solidColor(LEDS.OFF);
         subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
-        leds.update(poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS));
+        leds.update(poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS), 
+                poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)!=-1);
     }
 
     @Override

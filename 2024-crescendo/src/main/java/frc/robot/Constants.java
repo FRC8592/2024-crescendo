@@ -290,7 +290,7 @@ public final class Constants {
         public static final NewtonColor GREEN = new NeoPixelLED().new NewtonColor(0, 255, 0);
         public static final NewtonColor BLUE = new NeoPixelLED().new NewtonColor(0, 0, 255);
         public static final NewtonColor YELLOW = new NeoPixelLED().new NewtonColor(255, 255, 0);
-        public static final NewtonColor CYAN = new NeoPixelLED().new NewtonColor(0, 255, 255);
+        public static final NewtonColor CYAN = new NeoPixelLED().new NewtonColor(0, 192, 255);
         public static final NewtonColor MAGENTA = new NeoPixelLED().new NewtonColor(255, 0, 255);
         public static final NewtonColor ORANGE = new NeoPixelLED().new NewtonColor(255, 92, 255);
         public static final NewtonColor OFF = new NeoPixelLED().new NewtonColor(0, 0, 0);

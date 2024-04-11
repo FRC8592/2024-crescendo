@@ -95,7 +95,7 @@ public class MainSubsystemsManager {
                 shooter.stopFlywheels();
                 shooter.stopFeeders();
                 intake.stopIntake();
-                leds.solidColor(LEDS.MAGENTA);
+                leds.solidColor(LEDS.OFF);
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.STOWED;
                 }
@@ -161,12 +161,7 @@ public class MainSubsystemsManager {
                 shooter.setFeederPower(1); // Set PID to when note is engaged
                 shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
 
-                if(intakeTimer.hasElapsed(LEDS.INTAKING_TIMEOUT)){ // If there has been enough time that there's probably a jam
-                    leds.blinkColor(LEDS.RED, 4);
-                }
-                else{
-                    leds.solidColor(LEDS.BLUE); //Blue just for the differentiation from the orange that comes before it
-                }
+                leds.blinkColor(LEDS.ORANGE, 3);
 
                 if(!shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.ADJUSTING_1;
@@ -181,7 +176,7 @@ public class MainSubsystemsManager {
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
                 shooter.setFeederVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
 
-                leds.solidColor(LEDS.MAGENTA);
+                leds.blinkColor(LEDS.CYAN, 3);
 
                 if(shooter.isTopBeamBreakTripped() && shooter.feederMotor.getVelocity() < 0){
                     this.mechanismState = MechanismState.ADJUSTING_2;
@@ -195,7 +190,7 @@ public class MainSubsystemsManager {
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
                 shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
 
-                leds.solidColor(LEDS.MAGENTA);
+                leds.blinkColor(LEDS.CYAN, 3);
 
                 if(!shooter.isTopBeamBreakTripped()){ //if beam break NOT tripped, exclamation point
                     this.mechanismState = MechanismState.LOADED;
@@ -255,12 +250,7 @@ public class MainSubsystemsManager {
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
 
-                if(useVision){
-                    leds.hone();
-                }
-                else{
-                    leds.solidColor(LEDS.MAGENTA);
-                }
+                leds.hone();
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
@@ -300,7 +290,7 @@ public class MainSubsystemsManager {
             case SHOOTING:
                 shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
 
-                leds.solidColor(LEDS.MAGENTA);
+                leds.solidColor(LEDS.OFF);
 
                 if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
                     this.mechanismState = MechanismState.STOWING;
@@ -314,7 +304,7 @@ public class MainSubsystemsManager {
                 shooter.stopFlywheels(); // redundancy
                 elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP);
 
-                leds.solidColor(LEDS.MAGENTA);
+                leds.solidColor(LEDS.CYAN);
 
                 if(desireShot(userControls) && !userControls.score) { //TODO: Clean up this patch
                     this.mechanismState = MechanismState.PRIMING;
@@ -334,7 +324,7 @@ public class MainSubsystemsManager {
                 shooter.stopFlywheels();
                 shooter.stopFeeders();
 
-                leds.solidColor(LEDS.GREEN);
+                leds.solidColor(LEDS.CYAN);
 
                 if(userControls.score){
                     this.mechanismState = MechanismState.AMP_SCORING;
@@ -354,7 +344,7 @@ public class MainSubsystemsManager {
                 shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED, SHOOTER.AMP_FLYWHEEL_SPEED);
                 shooter.setFeederPower(SHOOTER.AMP_FEEDER_SPEED);
 
-                leds.solidColor(LEDS.MAGENTA);
+                leds.solidColor(LEDS.OFF);
 
                 if(!userControls.score){
                     this.mechanismState = MechanismState.AMP_PRIMED;
@@ -371,7 +361,7 @@ public class MainSubsystemsManager {
                 intake.stopIntake();
                 elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_CLIMB, ELEVATOR.EXTENSION_METERS_CLIMB);
 
-                leds.solidColor(LEDS.MAGENTA);
+                leds.solidColor(LEDS.OFF);
 
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.CLIMB;
@@ -389,7 +379,7 @@ public class MainSubsystemsManager {
                     elevator.retract();
                 }
 
-                leds.solidColor(LEDS.GREEN);
+                leds.solidColor(LEDS.OFF);
 
                 break;
 
@@ -398,6 +388,8 @@ public class MainSubsystemsManager {
                     shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
                     // shooter.setFeederPower(1);
                     shooter.setShootVelocity(6000, 6000);
+
+                    leds.blinkColor(LEDS.ORANGE, 4);
 
                     if(shooter.isBottomBeamBreakTripped()){
                         this.mechanismState = MechanismState.PASS_THROUGH_2;
@@ -408,7 +400,8 @@ public class MainSubsystemsManager {
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederPower(1); // Set PID to when note is engaged
                 shooter.setShootVelocity(6000, 6000);
-                leds.solidColor(LEDS.OFF);
+
+                leds.blinkColor(LEDS.ORANGE, 4);
 
                 if(!shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.STOWING;

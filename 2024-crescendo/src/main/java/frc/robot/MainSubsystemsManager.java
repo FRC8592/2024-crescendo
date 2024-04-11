@@ -274,7 +274,7 @@ public class MainSubsystemsManager {
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
                 elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
 
-                leds.solidColor(LEDS.GREEN);
+                leds.hone();
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;

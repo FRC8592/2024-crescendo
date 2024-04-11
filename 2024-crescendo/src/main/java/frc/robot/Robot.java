@@ -354,7 +354,7 @@ public class Robot extends LoggedRobot {
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, controls.robotOriented?new Rotation2d():swerve.getGyroscopeRotation());
         noteLock.updateVision();
         if(driverController.getLeftTriggerAxis() > 0.1){
-            double omega = poseVision.visual_servo(0, 10, APRILTAG_VISION.SPEAKER_AIM_TAGS, 3);
+            double omega = poseVision.visual_servo(0, 10, APRILTAG_VISION.SPEAKER_AIM_TAGS, 1.5);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
 

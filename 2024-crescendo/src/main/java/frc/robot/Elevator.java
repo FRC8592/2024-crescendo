@@ -36,8 +36,8 @@ public class Elevator {
 
         extensionMotor.setMaxVelocity(5000, 0);
 
-        pivotMotor.setMaxAcceleration(5000, 0);
-        pivotFollowMotor.setMaxAcceleration(5000, 0);
+        pivotMotor.setMaxAcceleration(10000, 0);
+        pivotFollowMotor.setMaxAcceleration(10000, 0);
 
         extensionMotor.setMaxAcceleration(10000, 0);
         

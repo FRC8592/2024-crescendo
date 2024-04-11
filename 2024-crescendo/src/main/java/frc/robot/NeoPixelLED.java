@@ -10,8 +10,9 @@ public class NeoPixelLED {
     private AddressableLEDBuffer ledBuffer;
     public Timer flashTimer;
     private double offset;
+    private boolean cameraWorks;
 
-    public class NewtonColor{
+    public static class NewtonColor{
         public final int red;
         public final int green;
         public final int blue;
@@ -34,9 +35,10 @@ public class NeoPixelLED {
         flashTimer.start();
     }
 
-    public void update(double offset) {
+    public void update(double offset, boolean cameraWorks) {
         ledStrip.setData(ledBuffer);
         this.offset = offset;
+        this.cameraWorks = cameraWorks;
     }
 
     public void solidColor(NewtonColor color){
@@ -59,22 +61,27 @@ public class NeoPixelLED {
     }
 
     public void hone(){
-        if (offset >= LEDS.NOT_AIMED_OFFSET){
-            solidColor(LEDS.RED);
-        }
-        else if (offset <= LEDS.NOT_AIMED_OFFSET && offset > LEDS.FULLY_AIMED_OFFSET){
-            solidColor(LEDS.RED);
-            double ledOffsetScale = 1 - ((offset - LEDS.FULLY_AIMED_OFFSET)
-                    /(LEDS.NOT_AIMED_OFFSET - LEDS.FULLY_AIMED_OFFSET)); //a value of 0-1 where 0 means equal to NOT_AIMED_OFFSET and 
-                                                                         //1 means FULLY_AIMED_OFFSET
-            double ledsToLight = ledOffsetScale * (LEDS.LED_LENGTH/2);
-            for (int i = 0; i < ledsToLight; i ++){
-                ledBuffer.setRGB(i, LEDS.GREEN.red, LEDS.GREEN.green, LEDS.GREEN.blue);
-                ledBuffer.setRGB(LEDS.LED_LENGTH - i - 1, LEDS.GREEN.red, LEDS.GREEN.green, LEDS.GREEN.blue);
+        if(cameraWorks){
+            if (offset >= LEDS.NOT_AIMED_OFFSET){
+                solidColor(LEDS.RED);
+            }
+            else if (offset <= LEDS.NOT_AIMED_OFFSET && offset > LEDS.FULLY_AIMED_OFFSET){
+                solidColor(LEDS.RED);
+                double ledOffsetScale = 1 - ((offset - LEDS.FULLY_AIMED_OFFSET)
+                        /(LEDS.NOT_AIMED_OFFSET - LEDS.FULLY_AIMED_OFFSET)); //a value of 0-1 where 0 means equal to NOT_AIMED_OFFSET and 
+                                                                            //1 means FULLY_AIMED_OFFSET
+                double ledsToLight = ledOffsetScale * (LEDS.LED_LENGTH/2);
+                for (int i = 0; i < ledsToLight; i ++){
+                    ledBuffer.setRGB(i, LEDS.GREEN.red, LEDS.GREEN.green, LEDS.GREEN.blue);
+                    ledBuffer.setRGB(LEDS.LED_LENGTH - i - 1, LEDS.GREEN.red, LEDS.GREEN.green, LEDS.GREEN.blue);
+                }
+            }
+            else{
+                solidColor(LEDS.GREEN);
             }
         }
         else{
-            solidColor(LEDS.GREEN);
+            solidColor(LEDS.RED);
         }
     }
 }

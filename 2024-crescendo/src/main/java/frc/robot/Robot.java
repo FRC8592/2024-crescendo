@@ -394,6 +394,9 @@ public class Robot extends LoggedRobot {
         if(controls.ledAmpSignal){
             leds.blinkColor(LEDS.YELLOW, 4);
         }
+        else if(controls.partyMode){
+            leds.PARTY();
+        }
         leds.update(poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS), 
                 poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)!=-1);
     }

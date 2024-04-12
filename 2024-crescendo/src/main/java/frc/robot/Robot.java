@@ -393,10 +393,10 @@ public class Robot extends LoggedRobot {
         }
         if(controls.passAim){
             if(currentAlliance == Alliance.Red){
-                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(345);
+                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(330);
             }
             if(currentAlliance == Alliance.Blue){
-                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(15);
+                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(30);
             }
         }
         swerve.drive(currentSpeeds);

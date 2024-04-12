@@ -78,6 +78,8 @@ public class Robot extends LoggedRobot {
 
     private double distance;
     public boolean locked;
+    
+    private Alliance currentAlliance = Alliance.Red;
 
     @Override
     public void robotInit() {
@@ -231,6 +233,7 @@ public class Robot extends LoggedRobot {
         //swerve.zeroGyoscope();
         swerve.setThrottleCurrentLimit(POWER.SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT);
         leds.solidColor(LEDS.OFF);
+        currentAlliance = DriverStation.getAlliance().get();
 
         // shooter.feederMotor.setPIDF(SmartDashboard.getNumber("FeederKp", 0),
         // SmartDashboard.getNumber("FeederKp", 0),
@@ -387,6 +390,14 @@ public class Robot extends LoggedRobot {
             case 270:
                 currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(90);
                 break;
+        }
+        if(controls.passAim){
+            if(currentAlliance == Alliance.Red){
+                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(345);
+            }
+            if(currentAlliance == Alliance.Blue){
+                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(15);
+            }
         }
         swerve.drive(currentSpeeds);
         leds.solidColor(LEDS.OFF);

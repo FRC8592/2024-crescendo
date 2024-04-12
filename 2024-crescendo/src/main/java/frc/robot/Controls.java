@@ -12,6 +12,7 @@ public class Controls {
     public boolean robotOriented;
     public boolean passThrough;
     public boolean partyMode;
+    public boolean passAim;
 
     public boolean ledAmpSignal;
     public boolean shootFromPodium;
@@ -33,6 +34,7 @@ public class Controls {
         this.robotOriented = false;
         this.passThrough = false;
         this.partyMode = false;
+        this.passAim = false;
 
         this.ledAmpSignal = false;
         this.shootFromPodium = false;
@@ -55,6 +57,7 @@ public class Controls {
         this.robotOriented = driverController.getLeftBumper();
         this.score = driverController.getRightTriggerAxis()>0.1;
         this.partyMode = driverController.getStartButton();
+        this.passAim = driverController.getYButton();
 
         this.passThrough = operatorController.getRightTriggerAxis() >0.1;
         this.rangeTableShoot = operatorController.getRightBumper();
@@ -75,6 +78,7 @@ public class Controls {
         this.log(this.robotOriented, "DriverController", "RobotOriented");
         this.log(this.robotOriented, "DriverController", "PassThrough");
         this.log(this.partyMode, "DriverController", "PartyMode");
+        this.log(this.partyMode, "DriverController", "PassAim");
 
         this.log(this.ledAmpSignal, "OperatorController", "LEDAmpSignal");
         this.log(this.shootFromPodium, "OperatorController", "ShootFromPodium");

@@ -361,6 +361,7 @@ public final class Constants {
         public static final ArrayList<Integer> SPEAKER_AIM_TAGS = new ArrayList<>(Arrays.asList(4, 7));
         public static final ArrayList<Integer> AMP_AIM_TAGS = new ArrayList<>(Arrays.asList(5, 6));
         public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
+        public static final ArrayList<Integer> STAGE_AIM_TAGS = new ArrayList<>(Arrays.asList(11, 12, 13, 14, 15, 16));
 
         public static final double FUSE_DISTANCE = 3.5; // meters
 

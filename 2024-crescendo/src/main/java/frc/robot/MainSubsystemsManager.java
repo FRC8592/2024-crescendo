@@ -414,7 +414,8 @@ public class MainSubsystemsManager {
         return userControls.shootFromPodium
                         || userControls.score // For a subwoofer shot
                         || userControls.kiddyPoolShot
-                        || userControls.rangeTableShoot;
+                        || userControls.rangeTableShoot
+                        || userControls.trapPrime;
     }
     public void resetToStowed(){
         this.mechanismState = MechanismState.STOWED;

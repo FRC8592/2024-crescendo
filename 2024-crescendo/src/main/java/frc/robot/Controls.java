@@ -26,6 +26,9 @@ public class Controls {
     public boolean manualExtend;
     public boolean manualRetract;
     public boolean kiddyPoolShot;
+    public boolean trapPrime;
+    public boolean trapAim;
+    public float snapToDirection;
 
     public Controls(){
         this.slowMode = false;
@@ -48,6 +51,9 @@ public class Controls {
         this.manualExtend = false;
         this.manualRetract = false;
         this.kiddyPoolShot = false;
+        this.trapPrime = false;
+        this.trapAim = false;
+        this.snapToDirection = 0;
     }
 
     public void update(XboxController driverController, XboxController operatorController){
@@ -55,6 +61,7 @@ public class Controls {
         this.resetGyro = driverController.getBackButton();
         this.autoCollect = driverController.getAButton();
         this.robotOriented = driverController.getLeftBumper();
+        this.trapAim = driverController.getXButton();
         this.score = driverController.getRightTriggerAxis()>0.1;
         this.partyMode = driverController.getStartButton();
         this.passAim = driverController.getYButton();
@@ -70,7 +77,7 @@ public class Controls {
         this.manualExtend = operatorController.getPOV() == 0;
         this.manualRetract = operatorController.getPOV() == 180;
         this.ledAmpSignal = operatorController.getBackButton();
-        this.kiddyPoolShot = operatorController.getStartButton();
+        this.trapPrime = operatorController.getStartButton();
 
         this.log(this.slowMode, "DriverController", "SlowMode");
         this.log(this.resetGyro, "DriverController", "ResetGyro");
@@ -78,7 +85,7 @@ public class Controls {
         this.log(this.robotOriented, "DriverController", "RobotOriented");
         this.log(this.robotOriented, "DriverController", "PassThrough");
         this.log(this.partyMode, "DriverController", "PartyMode");
-        this.log(this.partyMode, "DriverController", "PassAim");
+        this.log(this.passAim, "DriverController", "PassAim");
 
         this.log(this.ledAmpSignal, "OperatorController", "LEDAmpSignal");
         this.log(this.shootFromPodium, "OperatorController", "ShootFromPodium");

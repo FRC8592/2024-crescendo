@@ -380,7 +380,7 @@ public class Robot extends LoggedRobot {
         else if(controls.rangeTableShoot){
             subsystemsManager.setVisionPrime();
         }
-        else if (controls.trapShot) {
+        else if (controls.trapPrime) {
             subsystemsManager.staticPrime(RangeTable.getTrap());
         }
 

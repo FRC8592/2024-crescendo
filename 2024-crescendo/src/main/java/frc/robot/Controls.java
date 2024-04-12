@@ -24,7 +24,7 @@ public class Controls {
     public boolean manualExtend;
     public boolean manualRetract;
     public boolean kiddyPoolShot;
-    public boolean trapShot;
+    public boolean trapPrime;
     public boolean trapAim;
     public float snapToDirection;
 
@@ -48,7 +48,7 @@ public class Controls {
         this.manualExtend = false;
         this.manualRetract = false;
         this.kiddyPoolShot = false;
-        this.trapShot = false;
+        this.trapPrime = false;
         this.trapAim = false;
         this.snapToDirection = 0;
     }
@@ -72,7 +72,7 @@ public class Controls {
         this.manualExtend = operatorController.getPOV() == 0;
         this.manualRetract = operatorController.getPOV() == 180;
         this.ledAmpSignal = operatorController.getBackButton();
-        this.trapShot = operatorController.getStartButton();
+        this.trapPrime = operatorController.getStartButton();
 
         this.log(this.slowMode, "DriverController", "SlowMode");
         this.log(this.resetGyro, "DriverController", "ResetGyro");

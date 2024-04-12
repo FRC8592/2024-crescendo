@@ -376,6 +376,9 @@ public class Robot extends LoggedRobot {
         else if(controls.rangeTableShoot){
             subsystemsManager.setVisionPrime();
         }
+        else if (controls.trapShot) {
+            subsystemsManager.staticPrime(RangeTable.getTrap());
+        }
 
         switch(driverController.getPOV()){
             case 0: case 180: // In either of these cases

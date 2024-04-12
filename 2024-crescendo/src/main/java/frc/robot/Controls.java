@@ -24,6 +24,7 @@ public class Controls {
     public boolean manualExtend;
     public boolean manualRetract;
     public boolean kiddyPoolShot;
+    public boolean trapShot;
     public float snapToDirection;
 
     public Controls(){
@@ -46,6 +47,7 @@ public class Controls {
         this.manualExtend = false;
         this.manualRetract = false;
         this.kiddyPoolShot = false;
+        this.trapShot = false;
         this.snapToDirection = 0;
     }
 
@@ -54,6 +56,7 @@ public class Controls {
         this.resetGyro = driverController.getBackButton();
         this.autoCollect = driverController.getAButton();
         this.robotOriented = driverController.getLeftBumper();
+        this.trapShot = driverController.getXButton();
         this.score = driverController.getRightTriggerAxis()>0.1;
         
         this.passThrough = operatorController.getRightTriggerAxis() >0.1;

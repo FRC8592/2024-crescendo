@@ -25,6 +25,7 @@ public class Controls {
     public boolean manualRetract;
     public boolean kiddyPoolShot;
     public boolean trapShot;
+    public boolean trapAim;
     public float snapToDirection;
 
     public Controls(){
@@ -48,6 +49,7 @@ public class Controls {
         this.manualRetract = false;
         this.kiddyPoolShot = false;
         this.trapShot = false;
+        this.trapAim = false;
         this.snapToDirection = 0;
     }
 
@@ -56,7 +58,7 @@ public class Controls {
         this.resetGyro = driverController.getBackButton();
         this.autoCollect = driverController.getAButton();
         this.robotOriented = driverController.getLeftBumper();
-        this.trapShot = driverController.getXButton();
+        this.trapAim = driverController.getXButton();
         this.score = driverController.getRightTriggerAxis()>0.1;
         
         this.passThrough = operatorController.getRightTriggerAxis() >0.1;
@@ -70,7 +72,7 @@ public class Controls {
         this.manualExtend = operatorController.getPOV() == 0;
         this.manualRetract = operatorController.getPOV() == 180;
         this.ledAmpSignal = operatorController.getBackButton();
-        this.kiddyPoolShot = operatorController.getStartButton();
+        this.trapShot = operatorController.getStartButton();
 
         this.log(this.slowMode, "DriverController", "SlowMode");
         this.log(this.resetGyro, "DriverController", "ResetGyro");

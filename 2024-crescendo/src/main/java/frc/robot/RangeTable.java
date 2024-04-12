@@ -36,6 +36,18 @@ public class RangeTable {
             new RangeEntry(6000, 4500, 39.00), //4.8
             new RangeEntry(6000, 4500, 40.00), //5.0 
             new RangeEntry(6000, 4500, 39.70), //5.2
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
+            new RangeEntry(6000, 4500, 39.70), //Untuned
     };
     public static boolean valid;
 
@@ -127,8 +139,8 @@ public class RangeTable {
             double leftSpeedUnit = rEntry.leftFlywheelSpeed - this.leftFlywheelSpeed;
             double rightSpeedUnit = rEntry.leftFlywheelSpeed - this.leftFlywheelSpeed;
             double angleUnit = rEntry.pivotAngle - this.pivotAngle;
-            RangeEntry generated = new RangeEntry((int) (this.leftFlywheelSpeed + (leftSpeedUnit * value)),
-                    (int) (this.rightFlywheelSpeed + (rightSpeedUnit * value)),
+            RangeEntry generated = new RangeEntry((int) (rEntry.leftFlywheelSpeed),
+                    (int) (rEntry.rightFlywheelSpeed),
                     (this.pivotAngle + (angleUnit * value)));
             Logger.recordOutput("CustomLogs/RangeTable/GeneratedPivotAngle", generated.pivotAngle);
             Logger.recordOutput("CustomLogs/RangeTable/GeneratedFlywheelSpeed", generated.leftFlywheelSpeed);

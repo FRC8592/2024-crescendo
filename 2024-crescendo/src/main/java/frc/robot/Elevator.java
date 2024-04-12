@@ -34,10 +34,10 @@ public class Elevator {
         pivotMotor.setMaxVelocity(6500, 0);
         pivotFollowMotor.setMaxVelocity(6500, 0);
 
-        extensionMotor.setMaxVelocity(5000, 0);
+        extensionMotor.setMaxVelocity(5000, 0); // TODO: Why is this so slow?????
 
-        pivotMotor.setMaxAcceleration(10000, 0);
-        pivotFollowMotor.setMaxAcceleration(10000, 0);
+        pivotMotor.setMaxAcceleration(7000, 0);
+        pivotFollowMotor.setMaxAcceleration(7000, 0);
 
         extensionMotor.setMaxAcceleration(10000, 0);
         

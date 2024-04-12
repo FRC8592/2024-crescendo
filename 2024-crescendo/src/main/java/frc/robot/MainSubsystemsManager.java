@@ -99,7 +99,6 @@ public class MainSubsystemsManager {
                 shooter.stopFlywheels();
                 shooter.stopFeeders();
                 intake.stopIntake();
-                leds.solidColor(LEDS.OFF);
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.STOWED;
                 }
@@ -110,7 +109,6 @@ public class MainSubsystemsManager {
 
             case STOWED:
 
-                leds.solidColor(LEDS.OFF);
 
                 if(userControls.intake){
                     this.mechanismState = MechanismState.INTAKING;
@@ -180,7 +178,7 @@ public class MainSubsystemsManager {
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
                 shooter.setFeederVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
 
-                leds.blinkColor(LEDS.CYAN, 3);
+                leds.blinkColor(LEDS.ORANGE, 3);
 
                 if(shooter.isTopBeamBreakTripped() && shooter.feederMotor.getVelocity() < 0){
                     this.mechanismState = MechanismState.ADJUSTING_2;
@@ -194,7 +192,7 @@ public class MainSubsystemsManager {
                 shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
                 shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
 
-                leds.blinkColor(LEDS.CYAN, 3);
+                leds.blinkColor(LEDS.ORANGE, 3);
 
                 if(!shooter.isTopBeamBreakTripped()){ //if beam break NOT tripped, exclamation point
                     this.mechanismState = MechanismState.LOADED;
@@ -238,7 +236,6 @@ public class MainSubsystemsManager {
                 intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
                 shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED, 2);
                 shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
-                leds.solidColor(LEDS.OFF);
 
                 if(!userControls.outake){ // Is NOT pressed
                     this.mechanismState = MechanismState.STOWING;
@@ -292,7 +289,6 @@ public class MainSubsystemsManager {
             case SHOOTING:
                 shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
 
-                leds.solidColor(LEDS.OFF);
 
                 if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
                     this.mechanismState = MechanismState.STOWING;
@@ -344,11 +340,10 @@ public class MainSubsystemsManager {
                 shooter.setShootVelocity(SHOOTER.AMP_FLYWHEEL_SPEED, SHOOTER.AMP_FLYWHEEL_SPEED);
                 shooter.setFeederPower(SHOOTER.AMP_FEEDER_SPEED);
 
-                leds.solidColor(LEDS.OFF);
 
                 if(!userControls.score){
                     this.mechanismState = MechanismState.AMP_PRIMED;
-                    leds.solidColor(LEDS.OFF);
+
                 }
                 break;
 
@@ -361,7 +356,6 @@ public class MainSubsystemsManager {
                 intake.stopIntake();
                 elevator.setElevatorPosition(ELEVATOR.PIVOT_ANGLE_CLIMB, ELEVATOR.EXTENSION_METERS_CLIMB);
 
-                leds.solidColor(LEDS.OFF);
 
                 if(elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.CLIMB;
@@ -379,7 +373,6 @@ public class MainSubsystemsManager {
                     elevator.retract();
                 }
 
-                leds.solidColor(LEDS.OFF);
 
                 break;
 

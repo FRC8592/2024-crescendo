@@ -68,13 +68,13 @@ public class AutoShootCommand extends Command {
                 vision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)<APRILTAG_VISION.X_ROT_LOCK_ERROR); //TODO put this in PoseVision
 
 
-                /* When the shot is complete, disable our shooter controls and inform the autonomous subsystem that this command is complete*/
-                if(subsystemsManager.mechanismState == MechanismState.STOWING){
-                    return true;
-                }
+        /* When the shot is complete, disable our shooter controls and inform the autonomous subsystem that this command is complete*/
+        if(subsystemsManager.mechanismState == MechanismState.STOWING){
+            return true;
+        }
 
-                Logger.recordOutput("CurrentCommand", "AutoShootCommand");
-                Logger.recordOutput("AutoShootCommand Omega", omega);
+        Logger.recordOutput("CurrentCommand", "AutoShootCommand");
+        Logger.recordOutput("AutoShootCommand Omega", omega);
         // }
 
         return false;

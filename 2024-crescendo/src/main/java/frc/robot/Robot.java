@@ -178,7 +178,7 @@ public class Robot extends LoggedRobot {
         shooter.log();
 
         // update odometry with pose
-        swerve.addVisionMeasurement(poseVision);
+        // swerve.addVisionMeasurement(poseVision);
 
         // NOTE: FOR TESTING PURPOSES. 
         if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
@@ -360,6 +360,8 @@ public class Robot extends LoggedRobot {
 
         if(controls.autoCollect){
             currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
+            currentSpeeds.vxMetersPerSecond = driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo();
+            currentSpeeds.vyMetersPerSecond = 0;
             controls.intake = true;
 
         }
@@ -374,9 +376,24 @@ public class Robot extends LoggedRobot {
         else if(controls.rangeTableShoot){
             subsystemsManager.setVisionPrime();
         }
+
+        switch(driverController.getPOV()){
+            case 0: case 180: // In either of these cases
+                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(driverController.getPOV());
+                break;
+            case 90:
+                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(270);
+                break;
+            case 270:
+                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(90);
+                break;
+        }
         swerve.drive(currentSpeeds);
         leds.solidColor(LEDS.OFF);
         subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
+        if(controls.ledAmpSignal){
+            leds.blinkColor(LEDS.YELLOW, 4);
+        }
         leds.update(poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS), 
                 poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)!=-1);
     }
@@ -387,7 +404,8 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledPeriodic() {
-        leds.solidColor(LEDS.GREEN);
+        leds.solidColor(LEDS.WHITE);
+        leds.update(0,false);
     }
 
     @Override

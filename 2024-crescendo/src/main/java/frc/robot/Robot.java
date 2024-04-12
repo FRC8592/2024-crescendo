@@ -360,10 +360,6 @@ public class Robot extends LoggedRobot {
             double omega = poseVision.visual_servo(0, 10, APRILTAG_VISION.SPEAKER_AIM_TAGS, 1.5);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
         }
-        else if (controls.trapAim) {
-            double omega = poseVision.visual_servo(0, 5, APRILTAG_VISION.STAGE_AIM_TAGS, 0);
-            currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
-        }
 
         if(controls.autoCollect){
             currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);

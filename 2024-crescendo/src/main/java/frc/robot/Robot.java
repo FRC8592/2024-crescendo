@@ -236,6 +236,8 @@ public class Robot extends LoggedRobot {
         swerve.setThrottleCurrentLimit(POWER.SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT);
         leds.solidColor(LEDS.OFF);
         currentAlliance = DriverStation.getAlliance().get();
+        swerve.setGyroscopeRotation(currentAuto.getStartPose().getRotation().getDegrees()
+                - swerve.getGyroscopeRotation().getDegrees());
 
         // shooter.feederMotor.setPIDF(SmartDashboard.getNumber("FeederKp", 0),
         // SmartDashboard.getNumber("FeederKp", 0),
@@ -331,8 +333,8 @@ public class Robot extends LoggedRobot {
         double rawLeftY = -driverController.getLeftY();
         double rawLeftX = -driverController.getLeftX();
         double rawRightX = -driverController.getRightX();
-        double driveTranslateY = rawLeftY; //>= 0 ? (Math.pow(rawLeftY, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawLeftY, SWERVE.JOYSTICK_EXPONENT));
-        double driveTranslateX = rawLeftX; //>= 0 ? (Math.pow(rawLeftX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawLeftX, SWERVE.JOYSTICK_EXPONENT));
+        double driveTranslateY = rawLeftY>= 0 ? (Math.pow(rawLeftY, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawLeftY, SWERVE.JOYSTICK_EXPONENT));
+        double driveTranslateX = rawLeftX>= 0 ? (Math.pow(rawLeftX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawLeftX, SWERVE.JOYSTICK_EXPONENT));
         double driveRotate =     rawRightX >= 0 ? (Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawRightX, SWERVE.JOYSTICK_EXPONENT));
         controls.update(driverController, operatorController);
 

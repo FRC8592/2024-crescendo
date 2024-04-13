@@ -20,7 +20,6 @@ public class SourceSideOneWingNoteAuto extends BaseAuto {
                 new JointCommand(
                         new FollowerCommand(drive, pathOne.addVision(targeting, -5)),
                         new IntakeCommand(subsystemsManager)),
-                new RotateCommand(drive, Rotation2d.fromDegrees(-45)),
                 new AutoShootCommand(drive, poseVision, subsystemsManager));
     }
 

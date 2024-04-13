@@ -68,7 +68,7 @@ public class Controls {
         this.shootFromPodium = operatorController.getBButton();
         this.outake = operatorController.getLeftBumper();
         this.intake = operatorController.getLeftTriggerAxis()>0.1;
-        this.stow = operatorController.getAButton();
+        this.stow = operatorController.getAButton() || driverController.getBButton();
         this.amp = operatorController.getXButton();
         this.climb = operatorController.getYButton();
         this.manualExtend = operatorController.getPOV() == 0;

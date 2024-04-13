@@ -236,8 +236,10 @@ public class Robot extends LoggedRobot {
         swerve.setThrottleCurrentLimit(POWER.SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT);
         leds.solidColor(LEDS.OFF);
         currentAlliance = DriverStation.getAlliance().get();
-        // swerve.setGyroscopeRotation(currentAuto.getStartPose().getRotation().getDegrees()
-        //         - swerve.getGyroscopeRotation().getDegrees());
+        if(currentAuto != null){
+            swerve.setGyroscopeRotation(currentAuto.getStartPose().getRotation().getDegrees()
+                    - swerve.getGyroscopeRotation().getDegrees());
+        }
 
         // shooter.feederMotor.setPIDF(SmartDashboard.getNumber("FeederKp", 0),
         // SmartDashboard.getNumber("FeederKp", 0),

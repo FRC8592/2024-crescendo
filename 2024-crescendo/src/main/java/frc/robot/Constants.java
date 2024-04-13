@@ -355,7 +355,7 @@ public final class Constants {
         public static final double kP = 0.9;
         public static final double kI = 6; // was 4
         public static final double kD = 0.085; // was 0.005
-        public static final double iZone = 0.2;
+        public static final double iZone = 0.25;
 
         // red, blue
         public static final ArrayList<Integer> SPEAKER_AIM_TAGS = new ArrayList<>(Arrays.asList(4, 7));

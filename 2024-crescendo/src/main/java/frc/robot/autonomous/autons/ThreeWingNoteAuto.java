@@ -19,15 +19,15 @@ public class ThreeWingNoteAuto extends BaseAuto{
    
     private SwerveTrajectory noteOne_1 = AutonomousPositions.generate(config.setStartVelocity(0).setEndVelocity(0), 
             AutonomousPositions.SUBWOOFER_MIDDLE.getPose(), 
-            AutonomousPositions.WING_NOTE_3.translate(0.0, 0.6, Rotation2d.fromDegrees(-45))).addRotation(Rotation2d.fromDegrees(-45));
+            AutonomousPositions.WING_NOTE_3.translate(0.2, 0.5, Rotation2d.fromDegrees(-45))).addRotation(Rotation2d.fromDegrees(-45));
         
     private SwerveTrajectory noteTwo_1 = AutonomousPositions.generate(config.setReversed(false).setStartVelocity(0).setEndVelocity(0), 
-            AutonomousPositions.WING_NOTE_3.translate(0, 0.6, Rotation2d.fromDegrees(180)),
-            AutonomousPositions.WING_NOTE_2.translate(-0.7, 0.1, Rotation2d.fromDegrees(-90)));
+            AutonomousPositions.WING_NOTE_3.translate(0.2, 0.5, Rotation2d.fromDegrees(180)),
+            AutonomousPositions.WING_NOTE_2.translate(-0.7, -0.1, Rotation2d.fromDegrees(-90)));
 
     private SwerveTrajectory noteTwo_2 = AutonomousPositions.generate(config.setReversed(false).setStartVelocity(0).setEndVelocity(0),
             AutonomousPositions.WING_NOTE_2.translate(-0.7, -0.1),
-            AutonomousPositions.WING_NOTE_2.translate(0.5, 0.0, Rotation2d.fromDegrees(0))).addRotation(Rotation2d.fromDegrees(0));
+            AutonomousPositions.WING_NOTE_2.translate(0.3, 0.0, Rotation2d.fromDegrees(0))).addRotation(Rotation2d.fromDegrees(0));
 
     private SwerveTrajectory noteThree_1 = AutonomousPositions.generate(config.setReversed(true).setStartVelocity(0).setEndVelocity(0), 
             AutonomousPositions.WING_NOTE_2.translate(0.3, 0.0,Rotation2d.fromDegrees(0)), // -0.3
@@ -35,7 +35,7 @@ public class ThreeWingNoteAuto extends BaseAuto{
 
     private SwerveTrajectory noteThree_2 = AutonomousPositions.generate(config.setReversed(true).setStartVelocity(0).setEndVelocity(0),
             AutonomousPositions.WING_NOTE_1.translate(-0.5, -0.3),
-            AutonomousPositions.WING_NOTE_1.translate(0.0, 0.6,Rotation2d.fromDegrees(0))).addRotation(Rotation2d.fromDegrees(15));
+            AutonomousPositions.WING_NOTE_1.translate(0.1, 0.3,Rotation2d.fromDegrees(0))).addRotation(Rotation2d.fromDegrees(15));
 
 
     @Override
@@ -47,13 +47,13 @@ public class ThreeWingNoteAuto extends BaseAuto{
         // Move straight towards the first wing note while intaking
         // This operation is highly reliable, so vision is disabled
         new JointCommand(
-                new FollowerCommand(drive, noteOne_1/*.addVision(targeting, -15)*/),
+                new FollowerCommand(drive, noteOne_1.addVision(targeting, -18)),
                 new IntakeCommand(subsystemsManager).setBottomSensorTripTimeout(2).setTimeout(4)
         ),
 
         // Drive away from the first wing note in an arc to the second note.  We'll shoot at the end of this movement
         new JointCommand(
-            new PrimeCommand(subsystemsManager, 1.6), // Spin up the shooter wheels in advance to reduce time-to-shoot
+            new PrimeCommand(subsystemsManager, 1.4), // Spin up the shooter wheels in advance to reduce time-to-shoot
             new FollowerCommand(drive, noteTwo_1)
         ),
 
@@ -62,7 +62,7 @@ public class ThreeWingNoteAuto extends BaseAuto{
 
         // Move directly back towards the second wing note while intaking
         new JointCommand(
-                new FollowerCommand(drive, noteTwo_2.addVision(targeting, -3)),
+                new FollowerCommand(drive, noteTwo_2.addVision(targeting, -10)),
                 new IntakeCommand(subsystemsManager).setBottomSensorTripTimeout(2).setTimeout(4)
         ),
 

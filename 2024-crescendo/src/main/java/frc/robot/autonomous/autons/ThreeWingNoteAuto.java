@@ -12,6 +12,7 @@ import frc.robot.commands.FollowerCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.JointCommand;
 import frc.robot.commands.ShootCommand;
+import frc.robot.commands.ShuffleboardDelayCommand;
 
 
 
@@ -50,10 +51,24 @@ public class ThreeWingNoteAuto extends BaseAuto{
     
 
 
+
     @Override
     public void initialize() {
        queue = new CommandQueue(
+
+        //
+        // Wait for the programmable timer to expire to deconflict with allied robot movements
+        //
+        new ShuffleboardDelayCommand(),
+
+        //
+        // Shoot the preloaded note
+        //
         new ShootCommand(subsystemsManager, 1.4), //shooting preloaded note
+
+        //
+        // Move to the first wing note while intaking
+        //
         new JointCommand(//going to first note and intaking at the same time
                 new FollowerCommand(drive, noteOne_1.addVision(targeting, -15)),
                 new IntakeCommand(subsystemsManager).setBottomSensorTripTimeout(2).setTimeout(4)

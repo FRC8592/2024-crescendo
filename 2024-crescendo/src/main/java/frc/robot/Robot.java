@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -123,7 +124,6 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("Elevator Custom Angle", 0);
         SmartDashboard.putNumber("Shooter Left Speed", 0);
         SmartDashboard.putNumber("Shooter Right Speed", 0);
-        SmartDashboard.putNumber("Auto Delay", 0); // Set the delay for all ShuffleboardDelayCommands in Auto
 
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
@@ -210,6 +210,7 @@ public class Robot extends LoggedRobot {
         subsystemsManager.resetToLoaded();
         currentAuto.addModules(swerve, elevator, intake, shooter, noteLock, poseVision, subsystemsManager);
         currentAuto.initialize();
+        currentAuto.addDelay(autoSelect.getDelay());
         swerve.resetEncoder();
         swerve.resetPose(currentAuto.getStartPose());
         swerve.setSteerAnglesToAbsEncoder();

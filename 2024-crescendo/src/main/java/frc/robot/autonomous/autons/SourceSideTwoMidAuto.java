@@ -35,7 +35,6 @@ public class SourceSideTwoMidAuto extends BaseAuto{ //TODO THIS IS SOURCE SIDE (
     @Override
     public void initialize() {
         queue = new CommandQueue(
-                new ShuffleboardDelayCommand(),
                 new ShootCommand(subsystemsManager, 1.4),
                 new JointCommand(
                     new FollowerCommand(drive, pathOne.addVision(targeting, -1)),

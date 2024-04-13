@@ -19,7 +19,6 @@ public class AmpSideOneNoteAuto extends BaseAuto {
     @Override
     public void initialize() {
         queue = new CommandQueue(
-                new ShuffleboardDelayCommand(),
                 new ShootCommand(subsystemsManager, 1.4),
                 new FollowerCommand(drive, pathOne)
        );

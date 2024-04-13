@@ -5,14 +5,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
-import frc.robot.commands.AutoShootCommand;
-import frc.robot.commands.CommandQueue;
-import frc.robot.commands.DelayCommand;
-import frc.robot.commands.FollowerCommand;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.JointCommand;
-import frc.robot.commands.ShootCommand;
-import frc.robot.commands.ShuffleboardDelayCommand;
+import frc.robot.commands.*;
 
 
 
@@ -50,7 +43,6 @@ private SwerveTrajectory noteThree_2 = AutonomousPositions.generate(config.setRe
     @Override
     public void initialize() {
        queue = new CommandQueue(
-        new ShuffleboardDelayCommand(),
         new ShootCommand(subsystemsManager, 1.4), //shooting preloaded note
         new JointCommand(//going to first note and intaking at the same time
                 new FollowerCommand(drive, noteOne_1.addVision(targeting, -15)),

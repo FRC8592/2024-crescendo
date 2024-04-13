@@ -5,16 +5,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
-import frc.robot.commands.AutoPrimeCommand;
-import frc.robot.commands.AutoShootCommand;
-import frc.robot.commands.CommandQueue;
-import frc.robot.commands.DelayCommand;
-import frc.robot.commands.FollowerCommand;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.JointCommand;
-import frc.robot.commands.PrimeCommand;
-import frc.robot.commands.ShootCommand;
-import frc.robot.commands.ShuffleboardDelayCommand;
+import frc.robot.commands.*;
 
 
 
@@ -50,9 +41,6 @@ public class ThreeWingNoteAuto extends BaseAuto{
     @Override
     public void initialize() {
        queue = new CommandQueue(
-        // Wait for the programmable timer to expire to deconflict with allied robot movements
-        new ShuffleboardDelayCommand(),
-
         // Shoot the preloaded note while at the base of the subwoofer
         new ShootCommand(subsystemsManager, 1.4), //shooting preloaded note
 

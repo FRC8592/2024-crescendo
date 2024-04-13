@@ -40,7 +40,6 @@ public class AmpSideOneWingTwoMid extends BaseAuto{
     @Override
     public void initialize() {
         queue = new CommandQueue(
-                new ShuffleboardDelayCommand(),
                 new ShootCommand(subsystemsManager, 1.4),
                 new JointCommand(
                     new FollowerCommand(drive, pathOne.addVision(targeting, -15)),

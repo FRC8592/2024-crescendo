@@ -25,6 +25,7 @@ public class AutonomousSelector {
         SourceSideTwoMidAuto.class,
         AmpSideOneWingTwoMid.class,
         AmpSideTwoMidAuto.class,
+        ThreeWingNoteTestingAuto.class
         };
 
     public AutonomousSelector() {

@@ -91,7 +91,6 @@ public class NeoPixelLED {
             int[] RGB = HSVtoRGB((counter+(i*5))%360);
             ledBuffer.setRGB(i, RGB[0], RGB[1], RGB[2]);
         }
-        ledStrip.setData(ledBuffer);
     }
     private int[] HSVtoRGB(double h){
         double R1 = 0;

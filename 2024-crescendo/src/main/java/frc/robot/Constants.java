@@ -353,7 +353,7 @@ public final class Constants {
     public class APRILTAG_VISION {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/MGVision/";
         public static final double kP = 0.9;
-        public static final double kI = 4; // was 4
+        public static final double kI = 6; // was 4
         public static final double kD = 0.085; // was 0.005
         public static final double iZone = 0.2;
 

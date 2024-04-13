@@ -220,9 +220,10 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        leds.solidColor(LEDS.RED);
         currentRange = new RangeEntry(0, 0, 0);
+        leds.solidColor(LEDS.OFF);
         currentAuto.periodic();
+        leds.update(0, false);
         // subsystemsManager.updateMechanismStateMachine(controls, distance, locked); //`controls` is only updated in teleop, so MSM basically only responds to the state-setter used in the commands
     }
 

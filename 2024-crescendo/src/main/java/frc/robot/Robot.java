@@ -211,6 +211,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         // shooter.setAlliance(DriverStation.getAlliance().get());
+        swerve.zeroGyroscope();
         currentAuto = autoSelect.getSelectedAutonomous();
         subsystemsManager.resetToLoaded();
         currentAuto.addModules(swerve, elevator, intake, shooter, noteLock, poseVision, subsystemsManager);
@@ -220,7 +221,6 @@ public class Robot extends LoggedRobot {
         swerve.resetPose(currentAuto.getStartPose());
         swerve.setSteerAnglesToAbsEncoder();
         swerve.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
-        swerve.zeroGyroscope();
         swerve.drive(new ChassisSpeeds());
     }
 

@@ -13,6 +13,7 @@ public class Controls {
     public boolean passThrough;
     public boolean partyMode;
     public boolean passAim;
+    public boolean forceShoot;
 
     public boolean ledAmpSignal;
     public boolean shootFromPodium;
@@ -37,6 +38,7 @@ public class Controls {
         this.passThrough = false;
         this.partyMode = false;
         this.passAim = false;
+        this.forceShoot = false;
 
         this.ledAmpSignal = false;
         this.shootFromPodium = false;
@@ -62,6 +64,7 @@ public class Controls {
         this.score = driverController.getRightTriggerAxis()>0.1;
         this.partyMode = driverController.getStartButton();
         this.passAim = driverController.getYButton();
+        this.forceShoot = driverController.getXButton();
 
         this.passThrough = operatorController.getRightTriggerAxis() >0.1;
         this.rangeTableShoot = operatorController.getRightBumper();
@@ -83,6 +86,7 @@ public class Controls {
         this.log(this.passThrough, "DriverController", "PassThrough");
         this.log(this.partyMode, "DriverController", "PartyMode");
         this.log(this.passAim, "DriverController", "PassAim");
+        this.log(this.forceShoot, "DriverController", "ForceShoot");
 
         this.log(this.ledAmpSignal, "OperatorController", "LEDAmpSignal");
         this.log(this.shootFromPodium, "OperatorController", "ShootFromPodium");

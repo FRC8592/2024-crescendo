@@ -28,6 +28,7 @@ public class MainSubsystemsManager {
         AMP_SCORING,
         CLIMB_PRIME,
         CLIMB,
+        PASS_THROUGH_PRIME,
         PASS_THROUGH_1,
         PASS_THROUGH_2
     }
@@ -129,7 +130,7 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 }
                 else if(userControls.passThrough){
-                    this.mechanismState = MechanismState.PASS_THROUGH_1;
+                    this.mechanismState = MechanismState.PASS_THROUGH_PRIME;
                 }
                 else {
                     this.staticPrime(RangeTable.get(1.4));
@@ -222,7 +223,7 @@ public class MainSubsystemsManager {
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 }
                 else if(userControls.passThrough){
-                    this.mechanismState = MechanismState.PASS_THROUGH_1;
+                    this.mechanismState = MechanismState.PASS_THROUGH_PRIME;
                 }
                 else {
                     this.staticPrime(RangeTable.get(1.4));
@@ -253,7 +254,7 @@ public class MainSubsystemsManager {
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
-                } else if(shooter.readyToShoot() && elevator.isAtTargetPosition() && aimed) {
+                } else if((shooter.readyToShoot() && elevator.isAtTargetPosition() && aimed) || userControls.forceShoot) {
                     this.mechanismState = MechanismState.PRIMED;
                 }
 
@@ -275,7 +276,7 @@ public class MainSubsystemsManager {
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
-                } else if(!shooter.readyToShoot() || !elevator.isAtTargetPosition() || !aimed){
+                } else if((!shooter.readyToShoot() || !elevator.isAtTargetPosition() || !aimed) && !userControls.forceShoot){
                     this.mechanismState = MechanismState.PRIMING;
                 } else if(userControls.score){
                     this.mechanismState = MechanismState.SHOOTING;
@@ -376,11 +377,21 @@ public class MainSubsystemsManager {
 
                 break;
 
+            case PASS_THROUGH_PRIME:
+                    shooter.setShootVelocity(5000, 5000);
+
+                    leds.solidColor(LEDS.ORANGE);
+
+                    if(shooter.readyToShoot()){
+                        this.mechanismState = MechanismState.PASS_THROUGH_2;
+                    }
+
+                    break;
+
             case PASS_THROUGH_1:
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                     shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
-                    // shooter.setFeederPower(1);
-                    shooter.setShootVelocity(6000, 6000);
+                    shooter.setShootVelocity(5000, 5000);
 
                     leds.blinkColor(LEDS.ORANGE, 4);
 
@@ -392,11 +403,14 @@ public class MainSubsystemsManager {
             case PASS_THROUGH_2:
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederPower(1); // Set PID to when note is engaged
-                shooter.setShootVelocity(6000, 6000);
+                shooter.setShootVelocity(5000, 5000);
 
                 leds.blinkColor(LEDS.ORANGE, 4);
 
-                if(!shooter.isBottomBeamBreakTripped()){
+                if(userControls.passThrough){
+                    this.mechanismState = MechanismState.PASS_THROUGH_1;
+                }
+                else if(!shooter.isBottomBeamBreakTripped()){
                     this.mechanismState = MechanismState.STOWING;
                     intake.stopIntake();
                 }

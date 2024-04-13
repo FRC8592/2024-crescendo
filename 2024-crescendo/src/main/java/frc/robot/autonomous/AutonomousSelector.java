@@ -13,19 +13,17 @@ public class AutonomousSelector {
 
     public Class<?>[] autos = {
         //putting all created autos in auto selector
-        AmpOneNoteAuto.class,
-        SourceOneNoteAuto.class,
-        MiddleOneNoteAuto.class,
-        TwoNoteAuto.class,
+        ThreeWingNoteAuto.class,
+        AmpSideOneNoteAuto.class,
+        SourceSideOneNoteAuto.class,
+        CenterOneNoteAuto.class,
         AmpSideOneWingNoteAuto.class,
         SourceSideOneWingNoteAuto.class,
-        ThreeWingNoteAuto.class,
-        // SourceTwoMidNoteAuto.class,
-        AmpSideOneWingOneMidAuto.class,
-        SourceSideTwoMidAuto.class,
-        AmpSideOneWingTwoMid.class,
+        CenterOneWingNoteAuto.class,
         AmpSideTwoMidAuto.class,
-        ThreeWingNoteTestingAuto.class
+        SourceSideTwoMidAuto.class,
+        AmpSideOneWingOneMidAuto.class,
+        AmpSideOneWingTwoMid.class,
         };
 
     public AutonomousSelector() {

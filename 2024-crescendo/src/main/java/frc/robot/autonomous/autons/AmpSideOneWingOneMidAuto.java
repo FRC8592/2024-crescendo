@@ -27,6 +27,7 @@ public class AmpSideOneWingOneMidAuto extends BaseAuto { // this is amp side one
     @Override
     public void initialize() {
         queue = new CommandQueue(
+                new ShuffleboardDelayCommand(),
                 new ShootCommand(subsystemsManager, 1.4),
                 // new AutoShootCommand(drive, poseVision, elevator, shooter),
                 new JointCommand(

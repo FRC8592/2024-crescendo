@@ -9,11 +9,11 @@ import frc.robot.autonomous.AutonomousPositions;
 import frc.robot.autonomous.SwerveTrajectory;
 import frc.robot.commands.*;
 
-public class MiddleOneNoteAuto extends BaseAuto {
+public class AmpSideOneNoteAuto extends BaseAuto {
     private TrajectoryConfig slowConfig = new TrajectoryConfig(1, 1);
     private SwerveTrajectory pathOne = AutonomousPositions.generate(slowConfig.setStartVelocity(0).setEndVelocity(0),
-    AutonomousPositions.SUBWOOFER_MIDDLE.getPose(),
-    AutonomousPositions.WING_NOTE_2.getPose()
+    AutonomousPositions.SUBWOOFER_UP.getPose(),
+    AutonomousPositions.WING_NOTE_1.getPose()
     );
 
     @Override

@@ -12,6 +12,7 @@ import frc.robot.commands.FollowerCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.JointCommand;
 import frc.robot.commands.ShootCommand;
+import frc.robot.commands.ShuffleboardDelayCommand;
 
 
 
@@ -24,11 +25,6 @@ public class ThreeWingOneMidAuto extends BaseAuto{
     private SwerveTrajectory noteOne_1 = AutonomousPositions.generate(config.setStartVelocity(0).setEndVelocity(0), 
     AutonomousPositions.SUBWOOFER_MIDDLE.getPose(), 
     AutonomousPositions.WING_NOTE_3.translate(0.0, 0.6, Rotation2d.fromDegrees(-45))).addRotation(Rotation2d.fromDegrees(-45));//-45
-
-// private SwerveTrajectory noteOne_shoot = AutonomousPositions.generate(config.setStartVelocity(0).setEndVelocity(0), 
-//         AutonomousPositions.WING_NOTE_3.translate(0.1, 0.5, Rotation2d.fromDegrees(-45)),
-//         AutonomousPositions.SUBWOOFER_MIDDLE.getPose()).addRotation(Rotation2d.fromDegrees(-45));
-
 
 private SwerveTrajectory noteTwo_1 = AutonomousPositions.generate(config.setReversed(false).setStartVelocity(0).setEndVelocity(config.getMaxVelocity()), 
     AutonomousPositions.WING_NOTE_3.translate(0, 0.6, Rotation2d.fromDegrees(180)),
@@ -54,6 +50,7 @@ private SwerveTrajectory noteThree_2 = AutonomousPositions.generate(config.setRe
     @Override
     public void initialize() {
        queue = new CommandQueue(
+        new ShuffleboardDelayCommand(),
         new ShootCommand(subsystemsManager, 1.4), //shooting preloaded note
         new JointCommand(//going to first note and intaking at the same time
                 new FollowerCommand(drive, noteOne_1.addVision(targeting, -15)),

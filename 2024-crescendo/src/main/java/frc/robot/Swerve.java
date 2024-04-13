@@ -116,6 +116,10 @@ public class Swerve {
         return swerve.getYaw();
     }
 
+    public double getYawRate() {
+        return swerve.gyro.getYawRate();
+    }
+
     public double getMaxTranslateVelo() {
         return swerve.getMaxTranslateVelocity();
     }

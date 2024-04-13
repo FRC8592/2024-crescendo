@@ -3,6 +3,7 @@ package com.NewtonSwerve.Gyro;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 public class NewtonPigeon2 implements Gyro {
+    private double lastYawSample = 0.0;
 
     private Pigeon2 pigeon;
 
@@ -28,6 +29,13 @@ public class NewtonPigeon2 implements Gyro {
     }
     public void setYaw(double yaw){
         this.pigeon.setYaw(yaw);
+    }
+
+    public double getYawRate() {
+        double currentYawSample = this.getYaw();
+        double yawRate = Math.abs(lastYawSample - currentYawSample) / 0.02;
+        lastYawSample = currentYawSample;
+        return yawRate;
     }
 
 

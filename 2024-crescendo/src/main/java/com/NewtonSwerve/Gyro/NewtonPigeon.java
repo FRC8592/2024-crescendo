@@ -7,6 +7,8 @@ public class NewtonPigeon implements Gyro {
      * For Pigeon 1 instead of Pigeon 2
      */
 
+    private double lastYawSample = 0.0;
+
     private PigeonIMU pigeon;
 
     public NewtonPigeon(PigeonIMU pigeon) {
@@ -32,6 +34,13 @@ public class NewtonPigeon implements Gyro {
 
     public void setYaw(double yaw){
         this.pigeon.setYaw(yaw);
+    }
+
+    public double getYawRate() {
+        double currentYawSample = this.getYaw();
+        double yawRate = Math.abs(lastYawSample - currentYawSample) / 0.02;
+        lastYawSample = currentYawSample;
+        return yawRate;
     }
 
 }

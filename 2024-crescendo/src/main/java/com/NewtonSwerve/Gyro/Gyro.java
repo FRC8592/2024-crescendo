@@ -11,6 +11,8 @@ public interface Gyro {
 
     public void zeroYaw();
 
+    public double getYawRate();
+
     // public boolean isRotating();
 
 }

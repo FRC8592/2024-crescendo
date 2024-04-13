@@ -4,6 +4,8 @@ import com.kauailabs.navx.frc.AHRS;
 
 public class NewtonNavX implements Gyro {
 
+    private double lastYawSample = 0.0;
+
     private AHRS navX;
 
     public NewtonNavX(AHRS navX) {
@@ -27,5 +29,12 @@ public class NewtonNavX implements Gyro {
     }
     public void setYaw(double yaw){
         System.err.println("Can't set yaw on a NavX");
+
+    }public double getYawRate() {
+        double currentYawSample = this.getYaw();
+        double yawRate = Math.abs(lastYawSample - currentYawSample) / 0.02;
+        lastYawSample = currentYawSample;
+        return yawRate;
     }
+
 }

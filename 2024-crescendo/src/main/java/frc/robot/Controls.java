@@ -80,7 +80,7 @@ public class Controls {
         this.log(this.resetGyro, "DriverController", "ResetGyro");
         this.log(this.autoCollect, "DriverController", "AutoCollect");
         this.log(this.robotOriented, "DriverController", "RobotOriented");
-        this.log(this.robotOriented, "DriverController", "PassThrough");
+        this.log(this.passThrough, "DriverController", "PassThrough");
         this.log(this.partyMode, "DriverController", "PartyMode");
         this.log(this.passAim, "DriverController", "PassAim");
 

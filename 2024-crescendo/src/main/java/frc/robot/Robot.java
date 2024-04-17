@@ -353,7 +353,7 @@ public class Robot extends LoggedRobot {
         // Lock the robot yaw if the rotation rate is low and the yaw joystick is released
         // Only unlock the robot yaw if the joystick provides a yaw command
         //
-        if ((Math.abs(swerve.getYawRate()) < 5) && (rawRightX < 0.05)) {
+        if ((Math.abs(swerve.getYawRate()) < 5) && (Math.abs(rawRightX) < 0.05)) {
             if (!yawLock) {
                 yawLast = swerve.getYaw();
             }
@@ -397,6 +397,8 @@ public class Robot extends LoggedRobot {
         if(driverController.getLeftTriggerAxis() > 0.1){
             double omega = poseVision.visual_servo(0, 10, APRILTAG_VISION.SPEAKER_AIM_TAGS, 1.5);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
+            yawLock = false;
+            yawLast = swerve.getYaw();
         }
 
         if(controls.autoCollect){
@@ -404,6 +406,8 @@ public class Robot extends LoggedRobot {
             currentSpeeds.vxMetersPerSecond = driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo();
             currentSpeeds.vyMetersPerSecond = 0;
             controls.intake = true;
+            yawLock = false;
+            yawLast = swerve.getYaw();
         }
 
         if(controls.kiddyPoolShot){
@@ -447,6 +451,9 @@ public class Robot extends LoggedRobot {
             if(currentAlliance == Alliance.Blue){
                 currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(30);
             }
+            
+            yawLock = false;
+            yawLast = swerve.getYaw();
         }
         swerve.drive(currentSpeeds);
         leds.solidColor(LEDS.OFF);

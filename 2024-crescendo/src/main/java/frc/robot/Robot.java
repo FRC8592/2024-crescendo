@@ -80,7 +80,7 @@ public class Robot extends LoggedRobot {
     
     // Keep track of the last commanded yaw and lock it in
     private Boolean yawLock = false;
-    private double yawLast = 0;
+    private double yawLockValue = 0;
 
     private double distance;
     public boolean locked;
@@ -248,7 +248,7 @@ public class Robot extends LoggedRobot {
 
         // Set the yaw lock to a benign value
         yawLock = false;
-        yawLast = swerve.getYaw();
+        yawLockValue = swerve.getYaw();
 
         // shooter.feederMotor.setPIDF(SmartDashboard.getNumber("FeederKp", 0),
         // SmartDashboard.getNumber("FeederKp", 0),
@@ -355,7 +355,7 @@ public class Robot extends LoggedRobot {
         //
         if ((Math.abs(swerve.getYawRate()) < 5) && (Math.abs(rawRightX) < 0.05)) {
             if (!yawLock) {
-                yawLast = swerve.getYaw();
+                yawLockValue = swerve.getYaw();
             }
             yawLock = true;
         }
@@ -365,7 +365,7 @@ public class Robot extends LoggedRobot {
         }
 
         Logger.recordOutput(SWERVE.LOG_PATH+"YawLock", yawLock);
-        Logger.recordOutput(SWERVE.LOG_PATH+"YawLast", yawLast);
+        Logger.recordOutput(SWERVE.LOG_PATH+"YawLast", yawLockValue);
         Logger.recordOutput(SWERVE.LOG_PATH+"YawRate", swerve.getYawRate());
         Logger.recordOutput(SWERVE.LOG_PATH+"rawRightX", rawRightX);
 
@@ -376,7 +376,7 @@ public class Robot extends LoggedRobot {
         if(controls.resetGyro){
             swerve.zeroGyroscope();
             yawLock = false;
-            yawLast = 0;
+            yawLockValue = 0;
         }
 
         if (controls.slowMode) { //Slow Mode slows down the robot for better precision & control
@@ -398,7 +398,7 @@ public class Robot extends LoggedRobot {
             double omega = poseVision.visual_servo(0, 10, APRILTAG_VISION.SPEAKER_AIM_TAGS, 1.5);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
             yawLock = false;
-            yawLast = swerve.getYaw();
+            yawLockValue = swerve.getYaw();
         }
 
         if(controls.autoCollect){
@@ -407,7 +407,7 @@ public class Robot extends LoggedRobot {
             currentSpeeds.vyMetersPerSecond = 0;
             controls.intake = true;
             yawLock = false;
-            yawLast = swerve.getYaw();
+            yawLockValue = swerve.getYaw();
         }
 
         if(controls.kiddyPoolShot){
@@ -424,37 +424,39 @@ public class Robot extends LoggedRobot {
             subsystemsManager.staticPrime(RangeTable.getTrap());
         }
 
+        if(controls.passAim){
+            if(currentAlliance == Alliance.Red){
+                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(330);
+                yawLockValue = 330;
+            }
+            if(currentAlliance == Alliance.Blue){
+                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(30);
+                yawLockValue = 30;
+            }
+            
+            yawLock = false;
+        }
+
         switch(driverController.getPOV()){
             case 0: case 180: // In either of these cases
                 currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(driverController.getPOV());
-                yawLast = driverController.getPOV();
+                yawLockValue = driverController.getPOV();
                 break;
             case 90:
                 currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(270);
-                yawLast = 270;
+                yawLockValue = 270;
                 break;
             case 270:
                 currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(90);
-                yawLast = 90;
+                yawLockValue = 90;
                 break;
             default:
                 // PID to keep yaw locked when yaw is not commanded by the joystick
                 if (yawLock) {
-                    currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(yawLast);
+                    currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(yawLockValue);
                 }
         }
 
-        if(controls.passAim){
-            if(currentAlliance == Alliance.Red){
-                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(330);
-            }
-            if(currentAlliance == Alliance.Blue){
-                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(30);
-            }
-            
-            yawLock = false;
-            yawLast = swerve.getYaw();
-        }
         swerve.drive(currentSpeeds);
         leds.solidColor(LEDS.OFF);
         subsystemsManager.updateMechanismStateMachine(controls, distance, locked);

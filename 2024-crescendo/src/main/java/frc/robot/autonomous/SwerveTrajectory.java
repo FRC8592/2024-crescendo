@@ -143,7 +143,7 @@ public class SwerveTrajectory {
         
         boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
         if (isRed){
-            SmartDashboard.putString("sample", "0");
+            // SmartDashboard.putString("sample", "0");
             rotation = Rotation2d.fromDegrees(90);
         }
 
@@ -204,13 +204,13 @@ public class SwerveTrajectory {
             vision.updateVision();
             if(vision.isTargetValid()){
                 Logger.recordOutput("SwerveTrajectory/Vision Valid", true);
-                SmartDashboard.putNumber("TY", vision.processedDy);
+                // SmartDashboard.putNumber("TY", vision.processedDy);
                 if (vision.processedDy <= this.visionAngleTolerance){
                     Logger.recordOutput("SwerveTrajectory/Y Position in Range", true);
                     double turnSpeed = visionRotatePID.calculate(vision.processedDx, 0);
                     double ySpeed = -visionTranslatePID.calculate(vision.processedDy, NOTELOCK.AUTO_DRIVE_TO_TARGET_ANGLE);
-                    SmartDashboard.putNumber("Turn Speed", turnSpeed);
-                    SmartDashboard.putNumber("y speed", ySpeed);
+                    // SmartDashboard.putNumber("Turn Speed", turnSpeed);
+                    // SmartDashboard.putNumber("y speed", ySpeed);
                     Logger.recordOutput("SwerveTrajectory/Turn⧸Strafe Speed", turnSpeed);
                     Logger.recordOutput("SwerveTrajectory/Forward-Back Translate Speed", ySpeed);
                     desired = new ChassisSpeeds(ySpeed, 0, turnSpeed);
@@ -218,13 +218,13 @@ public class SwerveTrajectory {
                 else{
                     Logger.recordOutput("SwerveTrajectory/Y Position in Range", false);
                 }
-                SmartDashboard.putNumber("Dy", vision.processedDy);
+                // SmartDashboard.putNumber("Dy", vision.processedDy);
             }
             else{
                 Logger.recordOutput("SwerveTrajectory/Vision Valid", false);
             }
         }
-        SmartDashboard.putNumber("Auto Target Rotation", rotation.getDegrees());
+        // SmartDashboard.putNumber("Auto Target Rotation", rotation.getDegrees());
         return desired;
     }
 

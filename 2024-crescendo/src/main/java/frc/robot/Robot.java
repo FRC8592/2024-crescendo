@@ -126,9 +126,9 @@ public class Robot extends LoggedRobot {
             // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
             SmartDashboard.putData(FIELD);
         }
-        SmartDashboard.putNumber("Elevator Custom Angle", 0);
-        SmartDashboard.putNumber("Shooter Left Speed", 0);
-        SmartDashboard.putNumber("Shooter Right Speed", 0);
+        // SmartDashboard.putNumber("Elevator Custom Angle", 0);
+        // SmartDashboard.putNumber("Shooter Left Speed", 0);
+        // SmartDashboard.putNumber("Shooter Right Speed", 0);
 
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
@@ -188,6 +188,7 @@ public class Robot extends LoggedRobot {
         // swerve.addVisionMeasurement(poseVision);
 
         // NOTE: FOR TESTING PURPOSES. 
+        /*
         if(poseVision.getTagInView() && poseVision.getCurrTagID() == 4) {
                 SmartDashboard.putNumber("Tag 4 Z", poseVision.getCurrTagZ());
         }
@@ -197,6 +198,7 @@ public class Robot extends LoggedRobot {
         else {
             SmartDashboard.putNumber("Tag 4 Z", -1.0);
         }
+        */
         Logger.recordOutput("Robot Pose from MGVision", poseVision.getPose2d());
         Logger.recordOutput(APRILTAG_VISION.LOG_PATH+"X offset (m)", poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS));
 

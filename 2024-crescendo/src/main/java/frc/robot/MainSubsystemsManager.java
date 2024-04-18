@@ -391,7 +391,7 @@ public class MainSubsystemsManager {
             case PASS_THROUGH_1:
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                     shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
-                    shooter.setShootVelocity(5000, 5000);
+                    shooter.setShootVelocity(4250, 4250);
 
                     leds.blinkColor(LEDS.ORANGE, 4);
 
@@ -403,7 +403,7 @@ public class MainSubsystemsManager {
             case PASS_THROUGH_2:
                 intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederPower(1); // Set PID to when note is engaged
-                shooter.setShootVelocity(5000, 5000);
+                shooter.setShootVelocity(4250, 4250);
 
                 leds.blinkColor(LEDS.ORANGE, 4);
 

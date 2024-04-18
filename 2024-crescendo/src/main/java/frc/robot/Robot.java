@@ -452,11 +452,11 @@ public class Robot extends LoggedRobot {
                 currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(90);
                 yawLockValue = 90;
                 break;
-            default:
+            // default:
                 // PID to keep yaw locked when yaw is not commanded by the joystick
-                if (yawLock) {
-                    currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(yawLockValue);
-                }
+                // if (yawLock) {
+                //     currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(yawLockValue);
+                // }
         }
 
         swerve.drive(currentSpeeds);

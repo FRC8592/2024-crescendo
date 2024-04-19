@@ -322,10 +322,10 @@ public final class Constants {
         public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI;
 
 
-        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(145.02+180); // 
-        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(339.785-180); // 
-        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(62.93+180);    // 
-        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(3.867+180); // 
+        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(320.977); // 145.02+180
+        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(159.17); // 339.785-180
+        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(246.709);    // 62.93+180
+        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(174.639); // 3.867+180
 
 
         public static final double TRANSLATE_POWER_FAST = 1.0; // Scaling for teleop driving. 1.0 is maximum

@@ -21,6 +21,10 @@ public class NewtonModule {
         return module.getDriveController().getDriveFalcon();
     }
 
+    public TalonFX getAzimuthMotor() {
+        return module.getSteerController().getSteerMotor();
+    }
+
     public double getThrottleEncoder() {
         return this.getThrottleMotor().getSelectedSensorPosition();
     }
@@ -58,6 +62,10 @@ public class NewtonModule {
 
     public double getThrottleVelocity(SwerveModule module) {
         return this.getThrottleMotor().getSelectedSensorVelocity();
+    }
+
+    public double getAzimuthVelocity(SwerveModule module) {
+        return this.getAzimuthMotor().getSelectedSensorVelocity();
     }
 
     public double getSteerAngle() {

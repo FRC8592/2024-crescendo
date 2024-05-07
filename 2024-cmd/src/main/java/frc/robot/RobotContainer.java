@@ -12,6 +12,8 @@ import frc.robot.subsystems.Swerve;
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -76,7 +78,13 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An example command will be run in autonomous
-        // return Autos.exampleAuto(m_exampleSubsystem); TODO write meaningful auto code
-        return null;
+        // return Autos.exampleAuto(m_exampleSubsystem);
+        // TODO finish autoInit and figure out the auto framework
+        return swerve.zeroGyroscopeCommand()
+                .andThen(swerve.resetEncoderCommand())
+                .andThen(swerve.resetPoseCommand(new Pose2d()))//TODO: Figure out a "get start pose" thing for auto and put it as the pose
+                .andThen(swerve.resetToAbsEncodersCommand())
+                .andThen(swerve.setThrottleCurrentLimitCommand(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT))
+                .andThen(swerve.chassisSpeedsDriveCommand(new ChassisSpeeds()));
     }
 }

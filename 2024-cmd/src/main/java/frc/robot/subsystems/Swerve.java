@@ -223,6 +223,16 @@ public class Swerve extends SubsystemBase {
         });
     }
 
+    public Command chassisSpeedsDriveCommand(ChassisSpeeds speeds){
+        return runOnce(() -> {swerve.drive(speeds);});
+    }
+
+    public Command zeroGyroscopeCommand() {
+        return runOnce(() -> {
+            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zero-ed");
+            swerve.zeroGyroscope();
+        });
+    }
 
     public void periodic() {
         Logger.recordOutput(SWERVE.LOG_PATH+"OdometryPosition", getCurrentPos());

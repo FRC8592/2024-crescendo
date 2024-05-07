@@ -11,7 +11,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 public final class Autos {
     /** Example static factory for an autonomous command. */
     public static Command exampleAuto(Swerve subsystem) {
-        return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
+        return null;//TODO: replace with something meaningful
+        //Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
     }
 
     private Autos() {

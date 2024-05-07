@@ -8,6 +8,10 @@ import frc.robot.Constants.*;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.Swerve;
+
+import com.NewtonSwerve.Gyro.NewtonPigeon2;
+import com.ctre.phoenix.sensors.Pigeon2;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -23,10 +27,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    private final Swerve m_exampleSubsystem = new Swerve();
+    private final Swerve swerve = new Swerve(new NewtonPigeon2(new Pigeon2(CAN.PIGEON_CAN_ID)));
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final CommandXboxController m_driverController = new CommandXboxController(
+    private final CommandXboxController driverController = new CommandXboxController(
             CONTROLLERS.DRIVER_PORT);
 
     /**
@@ -53,13 +57,16 @@ public class RobotContainer {
      */
     private void configureBindings() {
         // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-        new Trigger(m_exampleSubsystem::exampleCondition)
-                .onTrue(new ExampleCommand(m_exampleSubsystem));
+        // new Trigger(m_exampleSubsystem::exampleCondition)
+        //         .onTrue(new ExampleCommand(m_exampleSubsystem));
 
         // Schedule `exampleMethodCommand` when the Xbox controller's B button is
         // pressed,
         // cancelling on release.
-        m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+        // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+        swerve.setDefaultCommand(swerve.driveCommand(() -> driverController.getLeftX(),
+                                                            () -> driverController.getLeftY(),
+                                                            () -> driverController.getRightX()));
     }
 
     /**
@@ -69,6 +76,7 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An example command will be run in autonomous
-        return Autos.exampleAuto(m_exampleSubsystem);
+        // return Autos.exampleAuto(m_exampleSubsystem); TODO write meaningful auto code
+        return null;
     }
 }

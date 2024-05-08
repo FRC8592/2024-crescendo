@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+
 import com.NewtonSwerve.*;
 import com.NewtonSwerve.Mk4.*;
 import com.NewtonSwerve.Gyro.Gyro;
@@ -177,61 +179,57 @@ public class Swerve extends SubsystemBase {
                 }
                 currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented?new Rotation2d():swerve.getGyroscopeRotation());
                 swerve.drive(currentSpeeds);
-            });
-    }
-
-    public Command resetToAbsEncodersCommand() {
-        return runOnce(() -> {
-            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve steer angles reset.");
-            swerve.resetSteerAngles();
-        });
-    }
-
-    public Command setThrottleCurrentLimitCommand(double limit) {
-        return runOnce(() -> {
-            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle current limit set.");
-            swerve.setThrottleCurrentLimit(limit);
-        });
-    }
-
-    public Command resetPoseCommand(Pose2d pose) {
-        return runOnce(() -> {
-            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Current pose reset to X: "+
-                    pose.getX()+"; Y: "+pose.getY()+"; Rotation: "+pose.getRotation().getDegrees()+"°.");
-            swerve.resetPose(pose);
-        });
-    }
-
-    public Command resetEncoderCommand() {
-        return runOnce(() -> {
-            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle encoders reset.");
-            swerve.resetEncoder();
-        });
-    }
-
-    public Command slowModeCommand(boolean slowMode){
-        return runOnce(() -> {
-            Logger.recordOutput(SWERVE.LOG_PATH+"Console", slowMode?"Slow mode enabled":"Slow mode disabled");
-            this.isSlowMode = slowMode;
-        });
-    }
-
-    public Command robotOrientedCommand(boolean robotOriented){
-        return runOnce(() -> {
-            Logger.recordOutput(SWERVE.LOG_PATH+"Console", robotOriented?"Robot-oriented enabled":"Robot-oriented disabled");
-            this.robotOriented = robotOriented;
-        });
+        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
     public Command chassisSpeedsDriveCommand(ChassisSpeeds speeds){
         return runOnce(() -> {swerve.drive(speeds);});
     }
 
-    public Command zeroGyroscopeCommand() {
+    public void resetToAbsEncoders() {
+        swerve.resetSteerAngles();
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve steer angles reset.");
+    }
+
+    public void setThrottleCurrentLimit(double limit) {
+        swerve.setThrottleCurrentLimit(limit);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle current limit set.");
+    }
+
+    public void resetPose(Pose2d pose) {
+        swerve.resetPose(pose);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Current pose reset to X: "+
+                pose.getX()+"; Y: "+pose.getY()+"; Rotation: "+pose.getRotation().getDegrees()+"°.");
+    }
+
+    public void resetEncoder() {
+        swerve.resetEncoder();
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle encoders reset.");
+    }
+
+    public void slowMode(boolean slowMode){
+        this.isSlowMode = slowMode;
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", slowMode?"Slow mode enabled":"Slow mode disabled");
+    }
+
+    public void robotOriented(boolean robotOriented){
+        this.robotOriented = robotOriented;
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", robotOriented?"Robot-oriented enabled":"Robot-oriented disabled");
+    }
+
+    public void zeroGyroscope() {
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zeroed");
+        swerve.zeroGyroscope();
+    }
+
+    public Command autonomousInit(){
         return runOnce(() -> {
-            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zero-ed");
-            swerve.zeroGyroscope();
-        });
+            this.zeroGyroscope();
+            this.resetEncoder();
+            this.resetPose(new Pose2d());
+            this.resetToAbsEncoders();
+            this.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
+        }).andThen(this.chassisSpeedsDriveCommand(new ChassisSpeeds()));
     }
 
     public void periodic() {
@@ -275,10 +273,6 @@ public class Swerve extends SubsystemBase {
 
     public ChassisSpeeds getCurrentSpeeds() {
         return lastSpeeds;
-    }
-
-    public void zeroGyroscope() {
-        swerve.zeroGyroscope();
     }
 
     public void setGyroscopeRotation(double yaw){

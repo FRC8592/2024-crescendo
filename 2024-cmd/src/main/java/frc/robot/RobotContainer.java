@@ -80,11 +80,6 @@ public class RobotContainer {
         // An example command will be run in autonomous
         // return Autos.exampleAuto(m_exampleSubsystem);
         // TODO finish autoInit and figure out the auto framework
-        return swerve.zeroGyroscopeCommand()
-                .andThen(swerve.resetEncoderCommand())
-                .andThen(swerve.resetPoseCommand(new Pose2d()))//TODO: Figure out a "get start pose" thing for auto and put it as the pose
-                .andThen(swerve.resetToAbsEncodersCommand())
-                .andThen(swerve.setThrottleCurrentLimitCommand(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT))
-                .andThen(swerve.chassisSpeedsDriveCommand(new ChassisSpeeds()));
+        return swerve.autonomousInit();
     }
 }

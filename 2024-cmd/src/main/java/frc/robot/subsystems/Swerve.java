@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
@@ -186,40 +187,33 @@ public class Swerve extends SubsystemBase {
         return runOnce(() -> {swerve.drive(speeds);});
     }
 
-    public void resetToAbsEncoders() {
-        swerve.resetSteerAngles();
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve steer angles reset.");
+    // NOTE: We return Commands.runOnce() instead of this.runOnce() on the slowMode,
+    // robotOriented, and zeroGyroscope commands. This means the commands don't
+    // require this subsystem, which will avoid any problems from the scheduler
+    // being fussy about same-subsystem commands running at the same time.
+    //
+    // PLEASE NOTE that this is usually a horrible idea because of the risk of
+    // commands fighting each other. It should be fine in this case because these
+    // commands don't move the swerve, but this should generally be done with
+    // caution.
+    public Command slowModeCommand(boolean slowMode){
+        return Commands.runOnce(() -> {
+            this.isSlowMode = slowMode;
+            Logger.recordOutput(SWERVE.LOG_PATH+"Console", slowMode?"Slow mode enabled":"Slow mode disabled");
+        });
     }
 
-    public void setThrottleCurrentLimit(double limit) {
-        swerve.setThrottleCurrentLimit(limit);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle current limit set.");
+    public Command robotOrientedCommand(boolean robotOriented){
+        return Commands.runOnce(() -> {
+            this.robotOriented = robotOriented;
+            Logger.recordOutput(SWERVE.LOG_PATH+"Console", robotOriented?"Robot-oriented enabled":"Robot-oriented disabled");
+        });
     }
 
-    public void resetPose(Pose2d pose) {
-        swerve.resetPose(pose);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Current pose reset to X: "+
-                pose.getX()+"; Y: "+pose.getY()+"; Rotation: "+pose.getRotation().getDegrees()+"°.");
-    }
-
-    public void resetEncoder() {
-        swerve.resetEncoder();
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle encoders reset.");
-    }
-
-    public void slowMode(boolean slowMode){
-        this.isSlowMode = slowMode;
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", slowMode?"Slow mode enabled":"Slow mode disabled");
-    }
-
-    public void robotOriented(boolean robotOriented){
-        this.robotOriented = robotOriented;
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", robotOriented?"Robot-oriented enabled":"Robot-oriented disabled");
-    }
-
-    public void zeroGyroscope() {
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zeroed");
-        swerve.zeroGyroscope();
+    public Command zeroGyroscopeCommand() {
+        return Commands.runOnce(() -> {
+            this.zeroGyroscope(); //The log happens in this method
+        });
     }
 
     public Command autonomousInit(){
@@ -277,6 +271,32 @@ public class Swerve extends SubsystemBase {
 
     public void setGyroscopeRotation(double yaw){
         swerve.gyro.setYaw(yaw);
+    }
+
+    private void resetToAbsEncoders() {
+        swerve.resetSteerAngles();
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve steer angles reset.");
+    }
+
+    private void setThrottleCurrentLimit(double limit) {
+        swerve.setThrottleCurrentLimit(limit);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle current limit set.");
+    }
+
+    private void resetPose(Pose2d pose) {
+        swerve.resetPose(pose);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Current pose reset to X: "+
+                pose.getX()+"; Y: "+pose.getY()+"; Rotation: "+pose.getRotation().getDegrees()+"°.");
+    }
+
+    private void resetEncoder() {
+        swerve.resetEncoder();
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle encoders reset.");
+    }
+
+    private void zeroGyroscope(){
+        swerve.zeroGyroscope();
+        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zeroed");
     }
 
     private class SmoothingFilter {

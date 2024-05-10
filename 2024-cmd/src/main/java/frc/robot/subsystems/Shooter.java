@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.*;
 
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 import frc.robot.helpers.*;
@@ -75,15 +76,24 @@ public class Shooter extends SubsystemBase {
     private class ShooterPrimeCommand extends Command{
         private IntSupplier leftRPM;
         private IntSupplier rightRPM;
-        public ShooterPrimeCommand(int leftRPM, int rightRPM){
-            this.leftRPM = () -> {return leftRPM;};
-            this.rightRPM = () -> {return rightRPM;};
-            addRequirements(Shooter.this); //Refers to the instance of Shooter that parents this instance of ShooterPrimeCommand.
-        }
+        private boolean canEnd = true; //If one of the constructors with supplier inputs is called, this gets set to false and the command runs until interrupted
         public ShooterPrimeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
             this.leftRPM = leftRPM;
             this.rightRPM = rightRPM;
+            canEnd = false;
             addRequirements(Shooter.this); //Refers to the instance of Shooter that parents this instance of ShooterPrimeCommand.
+        }
+        public ShooterPrimeCommand(int leftRPM, int rightRPM){
+            this(() -> leftRPM, () -> rightRPM);
+            canEnd = true;
+        }
+        public ShooterPrimeCommand(Supplier<RangeTable.RangeEntry> entrySupplier){
+            this(() -> entrySupplier.get().leftFlywheelSpeed, () -> entrySupplier.get().rightFlywheelSpeed);
+            canEnd = false;
+        }
+        public ShooterPrimeCommand(RangeTable.RangeEntry entry){
+            this(() -> entry.leftFlywheelSpeed, () -> entry.rightFlywheelSpeed);
+            canEnd = true;
         }
         public void initialize(){}
         public void execute(){
@@ -100,7 +110,7 @@ public class Shooter extends SubsystemBase {
                 rightShooterMotor.setVelocity(rightTargetSpeed);
             }
         }
-        public boolean isFinished(){return readyToShoot();}
+        public boolean isFinished(){return readyToShoot() && canEnd;}
     }
     private class FireCommand extends Command{ // Named FireCommand instead of ShootCommand for clarity that this DOESN'T prime
         private Timer timer;
@@ -115,6 +125,15 @@ public class Shooter extends SubsystemBase {
     }
     public Command shooterPrimeCommand(int leftRPM, int rightRPM){
         return new ShooterPrimeCommand(leftRPM, rightRPM).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+    public Command shooterPrimeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
+        return new ShooterPrimeCommand(leftRPM, rightRPM).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+    public Command shooterPrimeCommand(Supplier<RangeTable.RangeEntry> entry){
+        return new ShooterPrimeCommand(entry).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+    public Command shooterPrimeCommand(RangeTable.RangeEntry entry){
+        return new ShooterPrimeCommand(entry).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
     public Command fireCommand(){
         return new FireCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
@@ -151,7 +170,7 @@ public class Shooter extends SubsystemBase {
      * 
      * @apiNote You must call this method before shooting
      */
-    private boolean readyToShoot() {
+    public boolean readyToShoot() {
         if (Math.abs(leftShooterMotor.getVelocity() - leftTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE
                 // && Math.abs(rightShooterMotor.getVelocity() - rightTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE
                 && leftTargetSpeed > 1000

@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.CANSparkBase.ControlType;
@@ -42,13 +45,31 @@ public class Elevator extends SubsystemBase {
     }
 
     private class SetElevatorPositionCommand extends Command{
-        public SetElevatorPositionCommand(double pivotDegrees, double extensionMeters){
-            targetExtension = extensionMeters;
-            targetPivot = pivotDegrees;
+        private DoubleSupplier pivotDegreesSupplier;
+        private DoubleSupplier extensionMetersSupplier;
+        private boolean canEnd = true;
+        public SetElevatorPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters){
+            pivotDegreesSupplier = pivotDegrees;
+            extensionMetersSupplier = extensionMeters;
             addRequirements(Elevator.this);
+            canEnd = false;
+        }
+        public SetElevatorPositionCommand(double pivotDegrees, double extensionMeters){
+            this(() -> pivotDegrees, () -> extensionMeters);
+            canEnd = true;
+        }
+        public SetElevatorPositionCommand(Supplier<RangeTable.RangeEntry> entrySupplier){
+            this(() -> entrySupplier.get().pivotAngle, () -> entrySupplier.get().elevatorHeight);
+            canEnd = false;
+        }
+        public SetElevatorPositionCommand(RangeTable.RangeEntry entry){
+            this(() -> entry.pivotAngle, () -> entry.elevatorHeight);
+            canEnd = true;
         }
         public void initialize(){}
         public void execute(){
+            targetExtension = extensionMetersSupplier.getAsDouble();
+            targetPivot = pivotDegreesSupplier.getAsDouble();
             double actualPivot = getPivotAngle();
             double actualExtension = getExtensionLength();
 
@@ -77,11 +98,20 @@ public class Elevator extends SubsystemBase {
                 pivotMotor.setPositionSmartMotion(pivotMotor.getPosition());
             }
         }
-        public boolean isFinished(){return isAtTargetPosition();}
+        public boolean isFinished(){return isAtTargetPosition() && canEnd;}
     }
 
     public Command setElevatorPositionCommand(double pivotDegrees, double extensionMeters) {
         return new SetElevatorPositionCommand(pivotDegrees, extensionMeters);
+    }
+    public Command setElevatorPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters) {
+        return new SetElevatorPositionCommand(pivotDegrees, extensionMeters);
+    }
+    public Command setElevatorPositionCommand(Supplier<RangeTable.RangeEntry> entrySupplier) {
+        return new SetElevatorPositionCommand(entrySupplier);
+    }
+    public Command setElevatorPositionCommand(RangeTable.RangeEntry entry) {
+        return new SetElevatorPositionCommand(entry);
     }
 
     public void periodic() {

@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.*;
 import frc.robot.commands.*;
+import frc.robot.helpers.PoseVision;
 import frc.robot.subsystems.*;
 
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
@@ -35,11 +36,19 @@ public class RobotContainer {
     private final Intake intake = new Intake();
     private final Elevator elevator = new Elevator();
 
+    //NOT a subsystem
+    private final PoseVision poseVision = new PoseVision(
+        APRILTAG_VISION.kP,
+        APRILTAG_VISION.kI,
+        APRILTAG_VISION.kD,
+        0
+    );
+
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController driverController = new CommandXboxController(
             CONTROLLERS.DRIVER_PORT);
     private final CommandXboxController operatorController = new CommandXboxController(
-                CONTROLLERS.OPERATOR_PORT);
+            CONTROLLERS.OPERATOR_PORT);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -49,34 +58,38 @@ public class RobotContainer {
         configureBindings();
     }
 
-    /**
-     * Use this method to define your trigger->command mappings. Triggers can be
-     * created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-     * an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-     * {@link
-     * CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
-     */
     private void configureBindings() {
-        // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-        // new Trigger(m_exampleSubsystem::exampleCondition)
-        //         .onTrue(new ExampleCommand(m_exampleSubsystem));
+        // Slow Mode is Driver Controller Right Bumper
+        // Reset Gyro is Driver Controller Back Button
+        // Auto Collect is Driver Controller A Button
+        // Robot Oriented is Driver Controller Left Bumper
+        // Score is Driver Controller Right Trigger
+        // Party Mode is Driver Controller Start Button
+        // Pass Aim is Driver Controller Y Button
+        // Force Shoot is Driver Controller X Button
 
-        // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-        // pressed,
-        // cancelling on release.
-        // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+        // Passthrough is Operator Controller Right Trigger
+        // Range Table Shoot is Operator Controller Right Bumper
+        // Shoot From Podium is Operator Controller B Button
+        // Outake is Operator Controller Left Bumper
+        // Intake is Operator Controller Left Trigger
+        // Stow is Operator Controller A Button or driverController B Button
+        // Amp is Operator Controller X Button
+        // climb is Operator Controller Y Button
+        // Manual Extend is Operator Controller DPAD Up
+        // Manual Retract is Operator Controller DPAD Down
+        // Led Amp Signal is Operator Controller Back Button
+        // Trap Prime is Operator Controller Start Button
         swerve.setDefaultCommand(swerve.driveCommand(() -> driverController.getLeftX(),
                                                             () -> driverController.getLeftY(),
                                                             () -> driverController.getRightX()));
 
         operatorController.a().onTrue(new OverrideEverythingCommand(new StowCommand(shooter, elevator, intake)));
+        operatorController.rightBumper().onTrue(
+                new PrimeCommand(() -> poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS),
+                shooter, elevator, intake)
+        );
+        driverController.rightTrigger(0.1).onTrue(shooter.fireCommand().onlyIf(() -> shooter.readyToShoot()));
     }
 
     /**

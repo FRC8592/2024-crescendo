@@ -32,97 +32,33 @@ public class Shooter extends SubsystemBase {
 
     public Shooter() {
         leftShooterMotor = new SparkFlexControl (CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
-
-        leftShooterMotor.setPIDF (SHOOTER.LEFT_SHOOTER_MOTOR_kP,  SHOOTER.LEFT_SHOOTER_MOTOR_kI,  SHOOTER.LEFT_SHOOTER_MOTOR_kD,  SHOOTER.LEFT_SHOOTER_MOTOR_kF,  0);
+        leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP,  SHOOTER.LEFT_SHOOTER_MOTOR_kI,  SHOOTER.LEFT_SHOOTER_MOTOR_kD,  SHOOTER.LEFT_SHOOTER_MOTOR_kF,  0);
         leftShooterMotor.motorControl.setIZone (SHOOTER.SHOOTER_MOTOR_IZONE);
-
         leftShooterMotor.setCurrentLimit (POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT,  POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT);
         leftShooterMotor.setInverted();
-
         leftShooterMotor.setPercentOutput(0);
 
-
         rightShooterMotor = new SparkFlexControl(CAN.BOTTOM_SHOOTER_MOTOR_CAN_ID, false);
-
         rightShooterMotor.setPIDF(SHOOTER.RIGHT_SHOOTER_MOTOR_kP, SHOOTER.RIGHT_SHOOTER_MOTOR_kI, SHOOTER.RIGHT_SHOOTER_MOTOR_kD, SHOOTER.RIGHT_SHOOTER_MOTOR_kF, 0);
-
         rightShooterMotor.setCurrentLimit(POWER.RIGHT_SHOOTER_MOTOR_CURRENT_LIMIT, POWER.RIGHT_SHOOTER_MOTOR_CURRENT_LIMIT);
         rightShooterMotor.setPercentOutput(0);
-
         rightShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
 
-
         feederMotor = new SparkFlexControl(CAN.FEEDER_MOTOR_CAN_ID, false);
-
         feederMotor.setPIDF(SHOOTER.FEEDER_MOTOR_LOADED_kP, SHOOTER.FEEDER_MOTOR_LOADED_kI, SHOOTER.FEEDER_MOTOR_LOADED_kD, SHOOTER.FEEDER_MOTOR_LOADED_kF, 1);
         feederMotor.setPIDF(SHOOTER.FEEDER_MOTOR_OUTAKE_kP, SHOOTER.FEEDER_MOTOR_OUTAKE_kI, SHOOTER.FEEDER_MOTOR_OUTAKE_kD, SHOOTER.FEEDER_MOTOR_OUTAKE_kF, 2);
         feederMotor.setPIDF(SHOOTER.FEEDER_MOTOR_kP,SHOOTER.FEEDER_MOTOR_kI,SHOOTER.FEEDER_MOTOR_kD,SHOOTER.FEEDER_MOTOR_kF,0);
         feederMotor.motorControl.setIZone(SHOOTER.FEEDER_MOTOR_LOADED_IZONE, 1);
         feederMotor.motorControl.setIZone(SHOOTER.FEEDER_MOTOR_OUTAKE_IZONE, 2);
-
         feederMotor.setCurrentLimit(POWER.FEEDER_MOTOR_CURRENT_LIMIT,POWER.FEEDER_MOTOR_CURRENT_LIMIT);
         feederMotor.setInverted();
-
         feederMotor.setPercentOutput(0);
-
 
         bottomBeamBreak = new DigitalInput(SHOOTER.BOTTOM_BEAM_BREAK_DIO_PORT);
         topBeamBreak = new DigitalInput   (SHOOTER.TOP_BEAM_BREAK_DIO_PORT);
         middleBeamBreak = new DigitalInput(SHOOTER.MIDDLE_BEAM_BREAK_DIO_PORT);
     }
 
-    // This command can't easily be made using the convenient methods from SubsystemBase,
-    // so we create a private class and return an instance of that (scroll down) instead.
-    private class ShooterPrimeCommand extends Command{
-        private IntSupplier leftRPM;
-        private IntSupplier rightRPM;
-        private boolean canEnd = true; //If one of the constructors with supplier inputs is called, this gets set to false and the command runs until interrupted
-        public ShooterPrimeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
-            this.leftRPM = leftRPM;
-            this.rightRPM = rightRPM;
-            canEnd = false;
-            addRequirements(Shooter.this); //Refers to the instance of Shooter that parents this instance of ShooterPrimeCommand.
-        }
-        public ShooterPrimeCommand(int leftRPM, int rightRPM){
-            this(() -> leftRPM, () -> rightRPM);
-            canEnd = true;
-        }
-        public ShooterPrimeCommand(Supplier<RangeTable.RangeEntry> entrySupplier){
-            this(() -> entrySupplier.get().leftFlywheelSpeed, () -> entrySupplier.get().rightFlywheelSpeed);
-            canEnd = false;
-        }
-        public ShooterPrimeCommand(RangeTable.RangeEntry entry){
-            this(() -> entry.leftFlywheelSpeed, () -> entry.rightFlywheelSpeed);
-            canEnd = true;
-        }
-        public void initialize(){}
-        public void execute(){
-            leftTargetSpeed = leftRPM.getAsInt();
-            rightTargetSpeed = rightRPM.getAsInt();
-            leftShooterMotor.setVelocity(leftTargetSpeed);
-            rightShooterMotor.setVelocity(rightTargetSpeed);
-        }
-        public void end(boolean interrupted){
-            if(interrupted){
-                leftTargetSpeed = 0;
-                rightTargetSpeed = 0;
-                leftShooterMotor.setVelocity(leftTargetSpeed);
-                rightShooterMotor.setVelocity(rightTargetSpeed);
-            }
-        }
-        public boolean isFinished(){return readyToShoot() && canEnd;}
-    }
-    private class FireCommand extends Command{ // Named FireCommand instead of ShootCommand for clarity that this DOESN'T prime
-        private Timer timer;
-        public FireCommand(){
-            this.timer = new Timer();
-            addRequirements(Shooter.this);
-        }
-        public void initialize(){this.timer.start();}
-        public void execute(){feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);}
-        public void end(boolean interrupted){}
-        public boolean isFinished(){return timer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME);}
-    }
     public Command shooterPrimeCommand(int leftRPM, int rightRPM){
         return new ShooterPrimeCommand(leftRPM, rightRPM).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
@@ -135,9 +71,11 @@ public class Shooter extends SubsystemBase {
     public Command shooterPrimeCommand(RangeTable.RangeEntry entry){
         return new ShooterPrimeCommand(entry).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
+
     public Command fireCommand(){
         return new FireCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
+
     public Command stopCommand(){
         return runOnce(() -> {
             leftShooterMotor.setVelocity(0);
@@ -190,5 +128,59 @@ public class Shooter extends SubsystemBase {
 
     private boolean isMiddleBeamBreakTripped(){
         return !middleBeamBreak.get(); //The beam break pulls low when triggered (notice exclamation point)
+    }
+
+
+
+    private class ShooterPrimeCommand extends Command{
+        private IntSupplier leftRPM;
+        private IntSupplier rightRPM;
+        private boolean canEnd = true; //If one of the constructors with supplier inputs is called, this gets set to false and the command runs until interrupted
+        public ShooterPrimeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
+            this.leftRPM = leftRPM;
+            this.rightRPM = rightRPM;
+            canEnd = false;
+            addRequirements(Shooter.this); //Refers to the instance of Shooter that parents this instance of ShooterPrimeCommand.
+        }
+        public ShooterPrimeCommand(int leftRPM, int rightRPM){
+            this(() -> leftRPM, () -> rightRPM);
+            canEnd = true;
+        }
+        public ShooterPrimeCommand(Supplier<RangeTable.RangeEntry> entrySupplier){
+            this(() -> entrySupplier.get().leftFlywheelSpeed, () -> entrySupplier.get().rightFlywheelSpeed);
+            canEnd = false;
+        }
+        public ShooterPrimeCommand(RangeTable.RangeEntry entry){
+            this(() -> entry.leftFlywheelSpeed, () -> entry.rightFlywheelSpeed);
+            canEnd = true;
+        }
+        public void initialize(){}
+        public void execute(){
+            leftTargetSpeed = leftRPM.getAsInt();
+            rightTargetSpeed = rightRPM.getAsInt();
+            leftShooterMotor.setVelocity(leftTargetSpeed);
+            rightShooterMotor.setVelocity(rightTargetSpeed);
+        }
+        public void end(boolean interrupted){
+            if(interrupted){
+                leftTargetSpeed = 0;
+                rightTargetSpeed = 0;
+                leftShooterMotor.setVelocity(leftTargetSpeed);
+                rightShooterMotor.setVelocity(rightTargetSpeed);
+            }
+        }
+        public boolean isFinished(){return readyToShoot() && canEnd;}
+    }
+
+    private class FireCommand extends Command{ // Named FireCommand instead of ShootCommand for clarity that this DOESN'T prime
+        private Timer timer;
+        public FireCommand(){
+            this.timer = new Timer();
+            addRequirements(Shooter.this);
+        }
+        public void initialize(){this.timer.start();}
+        public void execute(){feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);}
+        public void end(boolean interrupted){}
+        public boolean isFinished(){return timer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME);}
     }
 }

@@ -44,6 +44,53 @@ public class Elevator extends SubsystemBase {
         pivotFollowMotor.setMaxAcceleration(7000, 0);
     }
 
+    public Command setElevatorPositionCommand(double pivotDegrees, double extensionMeters) {
+        return new SetElevatorPositionCommand(pivotDegrees, extensionMeters);
+    }
+    public Command setElevatorPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters) {
+        return new SetElevatorPositionCommand(pivotDegrees, extensionMeters);
+    }
+    public Command setElevatorPositionCommand(Supplier<RangeTable.RangeEntry> entrySupplier) {
+        return new SetElevatorPositionCommand(entrySupplier);
+    }
+    public Command setElevatorPositionCommand(RangeTable.RangeEntry entry) {
+        return new SetElevatorPositionCommand(entry);
+    }
+
+    public void periodic() {
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Target", targetPivot);
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Read", getPivotAngle());
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Target", targetExtension);
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Read", getExtensionLength());
+    }
+
+    public void simulationPeriodic() {
+        // This method will be called once per scheduler run during simulation
+    }
+
+    private double getExtensionLength() {
+        return (extensionMotor.getPosition()*ELEVATOR.ELEVATOR_GEAR_RATIO);
+    }
+
+    private double getPivotAngle() {
+        double ticksConverted = (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES_SPARKFLEX)/ELEVATOR.PIVOT_GEAR_RATIO;
+        return ticksConverted;
+    }
+
+    private boolean isTargetAngle() {
+        return Math.abs(getPivotAngle() - targetPivot) < ELEVATOR.ANGLE_TOLERANCE;
+    }
+
+    private boolean isTargetLength() {
+        return Math.abs(getExtensionLength() - targetExtension) < ELEVATOR.LENGTH_TOLERANCE;
+    }
+
+    private boolean isAtTargetPosition(){
+        return isTargetAngle() && isTargetLength();
+    }
+
+
+
     private class SetElevatorPositionCommand extends Command{
         private DoubleSupplier pivotDegreesSupplier;
         private DoubleSupplier extensionMetersSupplier;
@@ -99,50 +146,5 @@ public class Elevator extends SubsystemBase {
             }
         }
         public boolean isFinished(){return isAtTargetPosition() && canEnd;}
-    }
-
-    public Command setElevatorPositionCommand(double pivotDegrees, double extensionMeters) {
-        return new SetElevatorPositionCommand(pivotDegrees, extensionMeters);
-    }
-    public Command setElevatorPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters) {
-        return new SetElevatorPositionCommand(pivotDegrees, extensionMeters);
-    }
-    public Command setElevatorPositionCommand(Supplier<RangeTable.RangeEntry> entrySupplier) {
-        return new SetElevatorPositionCommand(entrySupplier);
-    }
-    public Command setElevatorPositionCommand(RangeTable.RangeEntry entry) {
-        return new SetElevatorPositionCommand(entry);
-    }
-
-    public void periodic() {
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Target", targetPivot);
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Read", getPivotAngle());
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Target", targetExtension);
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Read", getExtensionLength());
-    }
-
-    public void simulationPeriodic() {
-        // This method will be called once per scheduler run during simulation
-    }
-
-    private double getExtensionLength() {
-        return (extensionMotor.getPosition()*ELEVATOR.ELEVATOR_GEAR_RATIO);
-    }
-
-    private double getPivotAngle() {
-        double ticksConverted = (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES_SPARKFLEX)/ELEVATOR.PIVOT_GEAR_RATIO;
-        return ticksConverted;
-    }
-
-    private boolean isTargetAngle() {
-        return Math.abs(getPivotAngle() - targetPivot) < ELEVATOR.ANGLE_TOLERANCE;
-    }
-
-    private boolean isTargetLength() {
-        return Math.abs(getExtensionLength() - targetExtension) < ELEVATOR.LENGTH_TOLERANCE;
-    }
-
-    private boolean isAtTargetPosition(){
-        return isTargetAngle() && isTargetLength();
     }
 }

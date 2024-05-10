@@ -21,11 +21,11 @@ public class Intake extends SubsystemBase {
     }
 
     public Command outakeCommand() {
-        return runEnd(() -> { 
+        return runEnd(() -> {
             // Run continuously until interrupted
             targetIntakeVelocity = INTAKE.OUTAKE_VELOCITY;
             intakeMotor.setVelocity(INTAKE.OUTAKE_VELOCITY);
-        }, () -> { 
+        }, () -> {
             // Run once when interrupted
             targetIntakeVelocity = 0;
             intakeMotor.setVelocity(0);

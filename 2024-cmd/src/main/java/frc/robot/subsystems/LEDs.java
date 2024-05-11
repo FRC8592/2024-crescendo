@@ -49,6 +49,7 @@ public class LEDs extends SubsystemBase{
             for(int i = 0; i < LEDS.LED_LENGTH; i++) {
                 int[] RGB = HSVtoRGB((counter[0]+(i*5))%360);
                 ledBuffer.setRGB(i, RGB[0], RGB[1], RGB[2]);
+                ledStrip.setData(ledBuffer);
             }
         });
     }
@@ -56,6 +57,7 @@ public class LEDs extends SubsystemBase{
     private void setSolidColor(Color color){
         for(int i = 0; i < LEDS.LED_LENGTH; i++){
             ledBuffer.setLED(i, color);
+            ledStrip.setData(ledBuffer);
         }
     }
 

@@ -6,7 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.*;
 import frc.robot.commands.*;
-import frc.robot.helpers.PoseVision;
+import frc.robot.helpers.*;
 import frc.robot.subsystems.*;
 
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
@@ -35,6 +35,7 @@ public class RobotContainer {
     private final Shooter shooter = new Shooter();
     private final Intake intake = new Intake();
     private final Elevator elevator = new Elevator();
+    private final LEDs leds = new LEDs();
 
     //NOT a subsystem
     private final PoseVision poseVision = new PoseVision(
@@ -54,8 +55,18 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        // Configure the trigger bindings
+        configureDefaults();
         configureBindings();
+    }
+
+    private void configureDefaults(){
+        swerve.setDefaultCommand(swerve.driveCommand(
+            () -> driverController.getLeftX(),
+            () -> driverController.getLeftY(),
+            () -> driverController.getRightX()
+        ));
+
+        leds.setDefaultCommand(leds.defaultCommand());
     }
 
     private void configureBindings() {
@@ -73,16 +84,13 @@ public class RobotContainer {
         // Shoot From Podium is Operator Controller B Button
         // Outake is Operator Controller Left Bumper
         // Intake is Operator Controller Left Trigger
-        // Stow is Operator Controller A Button or driverController B Button
+        // Stow is Operator Controller A Button or Driver Controller B Button
         // Amp is Operator Controller X Button
         // climb is Operator Controller Y Button
         // Manual Extend is Operator Controller DPAD Up
         // Manual Retract is Operator Controller DPAD Down
         // Led Amp Signal is Operator Controller Back Button
         // Trap Prime is Operator Controller Start Button
-        swerve.setDefaultCommand(swerve.driveCommand(() -> driverController.getLeftX(),
-                                                            () -> driverController.getLeftY(),
-                                                            () -> driverController.getRightX()));
 
         operatorController.a().onTrue(new OverrideEverythingCommand(new StowCommand(shooter, elevator, intake)));
         operatorController.rightBumper().onTrue(

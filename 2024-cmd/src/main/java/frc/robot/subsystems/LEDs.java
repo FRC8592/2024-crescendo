@@ -22,6 +22,12 @@ public class LEDs extends SubsystemBase{
         flashTimer.start();
     }
 
+    public Command defaultCommand(){
+        return run(() -> {
+            setSolidColor(new Color(0,0,0));
+        });
+    }
+
     public Command singleColorCommand(Color color){
         return runOnce(() -> {
             setSolidColor(color);
@@ -38,7 +44,7 @@ public class LEDs extends SubsystemBase{
             }
         });
     }
-
+    
     public Command partyCommand(){
         // The counter variable is required to be final for some reason, so
         // put the editable value in a final array
@@ -60,6 +66,7 @@ public class LEDs extends SubsystemBase{
             ledStrip.setData(ledBuffer);
         }
     }
+
 
     private int[] HSVtoRGB(double h){
         double R1 = 0;

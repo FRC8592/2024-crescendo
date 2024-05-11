@@ -13,6 +13,7 @@ import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -71,6 +72,14 @@ public class RobotContainer {
         setDefaultCommand(leds, leds.defaultCommand());
     }
 
+    private Command snapToCommand(Rotation2d angle){
+        return swerve.snapToCommand(
+            () -> driverController.getLeftX(),
+            () -> driverController.getLeftY(),
+            Rotation2d.fromDegrees((360-angle.getDegrees())%360)
+        );
+    }
+
     private void configureBindings() {
         // Translate on Driver Left Stick -------------- DONE
         // Rotate on Driver Right Stick ---------------- DONE
@@ -82,7 +91,7 @@ public class RobotContainer {
         // Party Mode on Driver Start ------------------ DONE
         // Pass Aim on Driver Y ------------------------ NOT DONE
         // Force Shoot on Driver X --------------------- NOT DONE
-        // Snap-to on Driver DPAD ---------------------- NOT DONE
+        // Snap-to on Driver DPAD ---------------------- DONE
 
         // Passthrough on Operator Right Trigger ------- NOT DONE
         // Range Table Shoot on Operator Right Bumper -- DONE
@@ -121,6 +130,22 @@ public class RobotContainer {
 
         driverController.b().onTrue(
             new OverrideEverythingCommand(new StowCommand(shooter, elevator, intake))
+        );
+
+        driverController.pov(0).whileTrue(
+            snapToCommand(Rotation2d.fromDegrees(0))
+        );
+
+        driverController.pov(90).whileTrue(
+            snapToCommand(Rotation2d.fromDegrees(90))
+        );
+
+        driverController.pov(180).whileTrue(
+            snapToCommand(Rotation2d.fromDegrees(180))
+        );
+
+        driverController.pov(270).whileTrue(
+            snapToCommand(Rotation2d.fromDegrees(270))
         );
 
 

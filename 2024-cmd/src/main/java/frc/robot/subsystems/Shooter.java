@@ -124,6 +124,13 @@ public class Shooter extends SubsystemBase {
         }).until(() -> !isTopBeamBreakTripped()));
     }
 
+    public Command outakeCommand(){
+        return run(() -> {
+            setShooterVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED);
+            feederMotor.setVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
+        });
+    }
+
 
 
     public void periodic() {

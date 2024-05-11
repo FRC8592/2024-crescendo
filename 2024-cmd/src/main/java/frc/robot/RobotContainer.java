@@ -87,7 +87,7 @@ public class RobotContainer {
         // Passthrough on Operator Right Trigger ------- NOT DONE
         // Range Table Shoot on Operator Right Bumper -- DONE
         // Shoot From Podium on Operator B ------------- DONE
-        // Outake on Operator Left Bumper -------------- NOT DONE
+        // Outake on Operator Left Bumper -------------- DONE
         // Intake on Operator Left Trigger ------------- DONE
         // Stow on Operator A or Driver B -------------- DONE
         // Amp on Operator X --------------------------- DONE
@@ -136,7 +136,9 @@ public class RobotContainer {
             new PrimeCommand(RangeTable.getPodium(), shooter, elevator, intake)
         );
 
-        //Outtake here
+        operatorController.leftBumper().onTrue(
+            new OutakeCommand(shooter, intake)
+        );
 
         operatorController.leftTrigger(0.1).onTrue(
             new IntakeCommand(shooter, elevator, intake)

@@ -70,34 +70,100 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        // Slow Mode is Driver Controller Right Bumper
-        // Reset Gyro is Driver Controller Back Button
-        // Auto Collect is Driver Controller A Button
-        // Robot Oriented is Driver Controller Left Bumper
-        // Score is Driver Controller Right Trigger
-        // Party Mode is Driver Controller Start Button
-        // Pass Aim is Driver Controller Y Button
-        // Force Shoot is Driver Controller X Button
+        // Translate on Driver Left Stick -------------- DONE
+        // Rotate on Driver Right Stick ---------------- DONE
+        // Slow Mode on Driver Right Bumper ------------ DONE
+        // Reset Gyro on Driver Back ------------------- DONE
+        // Auto Collect on Driver A -------------------- NOT DONE
+        // Robot Oriented on Driver Left Bumper -------- DONE
+        // Score on Driver Right Trigger --------------- DONE
+        // Party Mode on Driver Start ------------------ DONE
+        // Pass Aim on Driver Y ------------------------ NOT DONE
+        // Force Shoot on Driver X --------------------- NOT DONE
 
-        // Passthrough is Operator Controller Right Trigger
-        // Range Table Shoot is Operator Controller Right Bumper
-        // Shoot From Podium is Operator Controller B Button
-        // Outake is Operator Controller Left Bumper
-        // Intake is Operator Controller Left Trigger
-        // Stow is Operator Controller A Button or Driver Controller B Button
-        // Amp is Operator Controller X Button
-        // climb is Operator Controller Y Button
-        // Manual Extend is Operator Controller DPAD Up
-        // Manual Retract is Operator Controller DPAD Down
-        // Led Amp Signal is Operator Controller Back Button
-        // Trap Prime is Operator Controller Start Button
+        // Passthrough on Operator Right Trigger ------- NOT DONE
+        // Range Table Shoot on Operator Right Bumper -- DONE
+        // Shoot From Podium on Operator B ------------- DONE
+        // Outake on Operator Left Bumper -------------- NOT DONE
+        // Intake on Operator Left Trigger ------------- DONE
+        // Stow on Operator A or Driver B -------------- DONE
+        // Amp on Operator X --------------------------- DONE
+        // Climb on Operator Y ------------------------- DONE
+        // Manual Extend on Operator DPAD Up ----------- DONE
+        // Manual Retract on Operator DPAD Down -------- DONE
+        // Led Amp Signal on Operator Back ------------- DONE
+        // Trap Prime on Operator Start ---------------- NOT DONE
 
-        operatorController.a().onTrue(new OverrideEverythingCommand(new StowCommand(shooter, elevator, intake)));
+        driverController.rightBumper()
+                .onTrue(swerve.slowModeCommand(true))
+                .onFalse(swerve.slowModeCommand(false));
+
+        driverController.back().onTrue(swerve.zeroGyroscopeCommand());
+
+        //Autocollect here
+
+        driverController.leftBumper()
+                .onTrue(swerve.robotOrientedCommand(true))
+                .onFalse(swerve.robotOrientedCommand(false));
+
+        driverController.rightTrigger(0.1).onTrue(
+            new ScoreCommand(shooter, elevator, intake)
+        );
+
+        driverController.start().whileTrue(leds.partyCommand());
+
+        //Pass-aim here
+
+        //Force-shoot here
+
+        driverController.b().onTrue(
+            new OverrideEverythingCommand(new StowCommand(shooter, elevator, intake))
+        );
+
+
+
+        //Passthrough here
+
         operatorController.rightBumper().onTrue(
                 new PrimeCommand(() -> poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS),
                 shooter, elevator, intake)
         );
-        driverController.rightTrigger(0.1).onTrue(shooter.fireCommand().onlyIf(() -> shooter.readyToShoot()));
+
+        operatorController.b().onTrue(
+            new PrimeCommand(RangeTable.getPodium(), shooter, elevator, intake)
+        );
+
+        //Outtake here
+
+        operatorController.leftTrigger(0.1).onTrue(
+            new IntakeCommand(shooter, elevator, intake)
+        );
+
+        operatorController.a().onTrue(
+            new OverrideEverythingCommand(new StowCommand(shooter, elevator, intake))
+        );
+
+        operatorController.x().onTrue(
+            elevator.setStaticPositionCommand(
+                ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP
+            )
+        );
+
+        operatorController.y().onTrue(
+            new ClimbCommand(elevator, intake, shooter)
+        );
+
+        operatorController.pov(0).whileTrue(
+            elevator.incrementElevatorPositionCommand(0, ELEVATOR.MANUAL_EXTENSION_SPEED)
+        );
+
+        operatorController.pov(180).whileTrue(
+            elevator.incrementElevatorPositionCommand(0, -ELEVATOR.MANUAL_EXTENSION_SPEED)
+        );
+
+        operatorController.back().whileTrue(leds.blinkCommand(LEDS.YELLOW, 2));
+
+        //Trap prime here
     }
 
     /**

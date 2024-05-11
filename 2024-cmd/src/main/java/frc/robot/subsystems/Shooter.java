@@ -80,6 +80,13 @@ public class Shooter extends SubsystemBase {
         }).withTimeout(SHOOTER.SHOOT_SCORE_TIME);
     }
 
+    public Command ampScoreCommand(){
+        return run(() -> {
+            feederMotor.setVelocity(SHOOTER.AMP_FEEDER_SPEED);
+            setShooterVelocity(SHOOTER.AMP_FLYWHEEL_SPEED);
+        }).withTimeout(SHOOTER.AMP_SCORE_TIME);
+    }
+
     public Command stopCommand(){
         return runOnce(() -> {
             leftShooterMotor.setVelocity(0);
@@ -95,24 +102,24 @@ public class Shooter extends SubsystemBase {
     public Command intakeNoContactCommand(){
         return run(() -> {
             feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
-            setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+            setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
         }).until(() -> isBottomBeamBreakTripped());
     }
     public Command intakeWithContactCommand(){
         return run(() -> {
             feederMotor.setPercentOutput(SHOOTER.INTAKE_FEEDER_POWER); // Set PID to when note is disenganged
-            setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+            setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
         }).until(() -> !isBottomBeamBreakTripped());
     }
 
     public Command intakeAdjustNoteCommand(){
         return run(() -> {
-            setShooterVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
+            setShooterVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
             feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
         }).until(() -> isTopBeamBreakTripped() && feederMotor.getVelocity() < 0)
 
         .andThen(run(() -> {
-            setShooterVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
+            setShooterVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
             feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
         }).until(() -> !isTopBeamBreakTripped()));
     }
@@ -151,6 +158,9 @@ public class Shooter extends SubsystemBase {
         return false;
     }
 
+    private void setShooterVelocity(int both){
+        setShooterVelocity(both, both);
+    }
     private void setShooterVelocity(int left, int right){
         leftTargetSpeed = left;
         rightTargetSpeed = right;

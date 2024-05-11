@@ -81,7 +81,7 @@ public class Elevator extends SubsystemBase {
         });
     }
     public Command incrementElevatorPositionCommand(double pivotDegrees, double extensionMeters){
-        return runOnce(() -> {
+        return run(() -> {
             this.targetPivot += pivotDegrees;
             this.targetExtension += extensionMeters;
         });
@@ -96,6 +96,24 @@ public class Elevator extends SubsystemBase {
 
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
+    }
+
+    public boolean isAmp(){
+        return isAtTargetPosition()
+                && targetExtension == ELEVATOR.EXTENSION_METERS_AMP
+                && targetPivot == ELEVATOR.PIVOT_ANGLE_AMP;
+    }
+
+    public boolean isClimb(){
+        return isAtTargetPosition()
+                && targetExtension == ELEVATOR.EXTENSION_METERS_CLIMB
+                && targetPivot == ELEVATOR.PIVOT_ANGLE_CLIMB;
+    }
+
+    public boolean isStowed(){
+        return isAtTargetPosition()
+                && targetExtension == ELEVATOR.EXTENSION_METERS_STOWED
+                && targetPivot == ELEVATOR.PIVOT_ANGLE_STOWED;
     }
 
     private double getExtensionLength() {
@@ -141,41 +159,4 @@ public class Elevator extends SubsystemBase {
         pivotMotor.setPositionSmartMotion(pivotRotations);
         pivotFollowMotor.setPositionSmartMotion(pivotRotations);
     }
-
-
-
-    // private class SetElevatorPositionCommand extends Command{
-    //     private DoubleSupplier pivotDegreesSupplier;
-    //     private DoubleSupplier extensionMetersSupplier;
-    //     private boolean canEnd;
-    //     public SetElevatorPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters, boolean ends){
-    //         pivotDegreesSupplier = pivotDegrees;
-    //         extensionMetersSupplier = extensionMeters;
-    //         addRequirements(Elevator.this);
-    //         canEnd = ends;
-    //     }
-    //     public SetElevatorPositionCommand(double pivotDegrees, double extensionMeters, boolean ends){
-    //         this(() -> pivotDegrees, () -> extensionMeters, ends);
-    //     }
-    //     public SetElevatorPositionCommand(Supplier<RangeTable.RangeEntry> entrySupplier, boolean ends){
-    //         this(() -> entrySupplier.get().pivotAngle, () -> entrySupplier.get().elevatorHeight, ends);
-    //     }
-    //     public SetElevatorPositionCommand(RangeTable.RangeEntry entry, boolean ends){
-    //         this(() -> entry.pivotAngle, () -> entry.elevatorHeight, ends);
-    //     }
-    //     public void initialize(){}
-    //     public void execute(){
-    //         targetExtension = extensionMetersSupplier.getAsDouble();
-    //         targetPivot = pivotDegreesSupplier.getAsDouble();
-    //         runElevator();
-    //     }
-    //     public void end(boolean interrupted){
-    //         //If we interrupt, we no longer have the above logic protecting the elevator, so we freeze the elevator
-    //         if(interrupted){
-    //             extensionMotor.setPositionSmartMotion(extensionMotor.getPosition());
-    //             pivotMotor.setPositionSmartMotion(pivotMotor.getPosition());
-    //         }
-    //     }
-    //     public boolean isFinished(){return isAtTargetPosition() && canEnd;}
-    // }
 }

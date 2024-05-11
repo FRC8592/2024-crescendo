@@ -26,6 +26,7 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 import frc.robot.*;
+import frc.robot.helpers.*;
 
 public class Swerve extends SubsystemBase {
     private Mk4ModuleConfiguration swerveConfig;
@@ -135,52 +136,28 @@ public class Swerve extends SubsystemBase {
         // Inline construction of command goes here.
         // Subsystem::RunOnce implicitly requires `this` subsystem.
         return run(() -> {
-                double rawX = suppliedX.getAsDouble();
-                double rawY = suppliedY.getAsDouble();
-                double rawRot = suppliedRot.getAsDouble();
-
-                double driveTranslateY = rawY >= 0 ? (Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT));
-                double driveTranslateX = rawX >= 0 ? (Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT));
-                double driveRotate =   rawRot >= 0 ? (Math.pow(rawRot, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawRot, SWERVE.JOYSTICK_EXPONENT));
-
-                //
-                // Lock the robot yaw if the rotation rate is low and the yaw joystick is released
-                // Only unlock the robot yaw if the joystick provides a yaw command
-                //
-                if ((Math.abs(getYawRate()) < 5) && (Math.abs(rawRot) < 0.05)) {
-                    if (!yawLock) {
-                        yawLockValue = getYaw();
-                    }
-                    yawLock = true;
-                }
-
-                if (Math.abs(rawRot) > 0.05) {
-                    yawLock = false;
-                }
-
-                Logger.recordOutput(SWERVE.LOG_PATH+"YawLock", yawLock);
-                Logger.recordOutput(SWERVE.LOG_PATH+"YawLast", yawLockValue);
-                Logger.recordOutput(SWERVE.LOG_PATH+"YawRate", getYawRate());
-                Logger.recordOutput(SWERVE.LOG_PATH+"rawRot", rawRot);
-
-                //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
-                ChassisSpeeds currentSpeeds;
-
-                if (isSlowMode) { //Slow Mode slows down the robot for better precision & control
-                    currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                            driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelo(),
-                            driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelo(),
-                            driveRotate * SWERVE.ROTATE_POWER_SLOW * getMaxAngularVelo()));
-                }
-                else {
-                    currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                            driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelo(),
-                            driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelo(),
-                            driveRotate * SWERVE.ROTATE_POWER_FAST * getMaxAngularVelo()));
-                }
-                currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, robotOriented?new Rotation2d():swerve.getGyroscopeRotation());
-                swerve.drive(currentSpeeds);
+            swerve.drive(processJoystickInputs(
+                suppliedX.getAsDouble(),
+                suppliedY.getAsDouble(),
+                suppliedRot.getAsDouble()
+            ));
         }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+    }
+
+    public Command snapToCommand(
+        DoubleSupplier translationXSupplier,
+        DoubleSupplier translationYSupplier,
+        Rotation2d angle){
+        return run(() -> {
+            ChassisSpeeds processed = processJoystickInputs(
+                translationXSupplier.getAsDouble(),
+                translationYSupplier.getAsDouble(),
+                0
+            );
+
+            processed.omegaRadiansPerSecond = snapToAngle(angle);
+            swerve.drive(processed);
+        });
     }
 
     public Command chassisSpeedsDriveCommand(ChassisSpeeds speeds){
@@ -212,18 +189,21 @@ public class Swerve extends SubsystemBase {
 
     public Command zeroGyroscopeCommand() {
         return Commands.runOnce(() -> {
-            this.zeroGyroscope(); //The log happens in this method
+            swerve.zeroGyroscope();
+            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zeroed");
         });
     }
 
     public Command autonomousInit(){
         return runOnce(() -> {
-            this.zeroGyroscope();
             this.resetEncoder();
             this.resetPose(new Pose2d());
             this.resetToAbsEncoders();
             this.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
-        }).andThen(this.chassisSpeedsDriveCommand(new ChassisSpeeds()));
+        }).alongWith(
+            this.chassisSpeedsDriveCommand(new ChassisSpeeds())
+        )
+        .alongWith(this.zeroGyroscopeCommand());
     }
 
     public void periodic() {
@@ -294,77 +274,68 @@ public class Swerve extends SubsystemBase {
         Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle encoders reset.");
     }
 
-    private void zeroGyroscope(){
-        swerve.zeroGyroscope();
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zeroed");
+    private double snapToAngle (Rotation2d setpoint) {
+        double currYaw = getGyroscopeRotation().getRadians();
+        double errorAngle = setpoint.getRadians() - currYaw;
+
+        if(errorAngle > Math.PI){
+            errorAngle -= 2*Math.PI;
+        }
+        else if(errorAngle <= -Math.PI){
+            errorAngle += 2*Math.PI;
+        }
+
+        double out = snapToController.calculate(0, errorAngle);
+
+        return out;
     }
 
-    private class SmoothingFilter {
-        double[] velocityXValues;
-        double[] velocityYValues;
-        double[] velocityOmegaValues;
-        int sizeX;
-        int sizeY;
-        int sizeOmegas;
-        int index = 0;
+    private ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
+        double driveTranslateY = rawY >= 0 ? (Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT));
+        double driveTranslateX = rawX >= 0 ? (Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT));
+        double driveRotate =   rawRot >= 0 ? (Math.pow(rawRot, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawRot, SWERVE.JOYSTICK_EXPONENT));
 
-        /**
-         * Create smoothing object, will slowly and smoothly adjust speed values until target is hit
-         * @param sizeX Size for X velocity smoothing array, bigger will be smoothed slower
-         * @param sizeY Size for Y velocity smoothing array, bigger will be smoothed slower
-         * @param sizeOmegas Size for Omega velocity smoothing array, bigger will be smoothed slower
-         */
-        public SmoothingFilter(int sizeX, int sizeY, int sizeOmegas) {
-            this.sizeX = sizeX;
-            this.sizeY = sizeY;
-            this.sizeOmegas = sizeOmegas;
-            velocityXValues = new double[sizeX];
-            velocityYValues = new double[sizeY];
-            velocityOmegaValues = new double[sizeOmegas];
+        //
+        // Lock the robot yaw if the rotation rate is low and the yaw joystick is released
+        // Only unlock the robot yaw if the joystick provides a yaw command
+        //
+        // if ((Math.abs(getYawRate()) < 5) && (Math.abs(rawRot) < 0.05)) {
+        //     if (!yawLock) {
+        //         yawLockValue = getYaw();
+        //     }
+        //     yawLock = true;
+        // }
+
+        // if (Math.abs(rawRot) > 0.05) {
+        //     yawLock = false;
+        // }
+
+        // Logger.recordOutput(SWERVE.LOG_PATH+"YawLock", yawLock);
+        // Logger.recordOutput(SWERVE.LOG_PATH+"YawLast", yawLockValue);
+        // Logger.recordOutput(SWERVE.LOG_PATH+"YawRate", getYawRate());
+        // Logger.recordOutput(SWERVE.LOG_PATH+"rawRot", rawRot);
+
+        //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
+        ChassisSpeeds currentSpeeds;
+
+        if (isSlowMode) { //Slow Mode slows down the robot for better precision & control
+            currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
+                    driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelo(),
+                    driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelo(),
+                    driveRotate * SWERVE.ROTATE_POWER_SLOW * getMaxAngularVelo()));
+        }
+        else {
+            currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
+                    driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelo(),
+                    driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelo(),
+                    driveRotate * SWERVE.ROTATE_POWER_FAST * getMaxAngularVelo()));
         }
 
-        /**
-         * Take an array of zeros and fill each slot with a speed value until the value is hit
-         * @param desiredSpeed Speed to accelerate towards
-         */
-        public ChassisSpeeds smooth(ChassisSpeeds desiredSpeed) {
-            double smoothedX = 0;
-            double smoothedY = 0;
-            double smoothedOmegas = 0;
-            if(!desiredSpeed.equals(null)) {
-                smoothedX = smoothX(desiredSpeed.vxMetersPerSecond);
-                smoothedY = smoothY(desiredSpeed.vyMetersPerSecond);
-                smoothedOmegas = smoothOmega(desiredSpeed.omegaRadiansPerSecond);
-            }
-            index++;
-            return new ChassisSpeeds(smoothedX, smoothedY, smoothedOmegas);
-        }
+        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            currentSpeeds,
+            robotOriented ? new Rotation2d() : swerve.getGyroscopeRotation()
+        );
 
-        public double smoothX(double desiredSpeedX) {
-            double sum = 0;
-            velocityXValues[index % sizeX] = desiredSpeedX;
-            for(int i = 0; i < velocityXValues.length; i++) {
-                sum += velocityXValues[i];
-            }
-            return sum / sizeX;
-        }
-
-        public double smoothY(double desiredSpeedY) {
-            double sum = 0;
-            velocityYValues[index % sizeY] = desiredSpeedY;
-            for(int i = 0; i < velocityYValues.length; i++) {
-                sum += velocityYValues[i];
-            }
-            return sum / sizeY;
-        }
-
-        public double smoothOmega(double desiredSpeedOmega) {
-            double sum = 0;
-            velocityOmegaValues[index % sizeOmegas] = desiredSpeedOmega;
-            for(int i = 0; i < velocityOmegaValues.length; i++) {
-                sum += velocityOmegaValues[i];
-            }
-            return sum / sizeOmegas;
-        }
+        return currentSpeeds;
     }
 }

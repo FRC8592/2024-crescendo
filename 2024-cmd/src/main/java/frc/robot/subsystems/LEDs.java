@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Constants.*;
 
 public class LEDs extends SubsystemBase{
@@ -25,7 +26,7 @@ public class LEDs extends SubsystemBase{
     public Command defaultCommand(){
         return run(() -> {
             setSolidColor(new Color(0,0,0));
-        });
+        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
     public Command singleColorCommand(Color color){

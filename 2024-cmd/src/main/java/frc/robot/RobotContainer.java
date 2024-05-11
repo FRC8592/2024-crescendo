@@ -17,6 +17,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -60,13 +62,13 @@ public class RobotContainer {
     }
 
     private void configureDefaults(){
-        swerve.setDefaultCommand(swerve.driveCommand(
+        setDefaultCommand(swerve, swerve.driveCommand(
             () -> driverController.getLeftX(),
             () -> driverController.getLeftY(),
             () -> driverController.getRightX()
         ));
 
-        leds.setDefaultCommand(leds.defaultCommand());
+        setDefaultCommand(leds, leds.defaultCommand());
     }
 
     private void configureBindings() {
@@ -80,6 +82,7 @@ public class RobotContainer {
         // Party Mode on Driver Start ------------------ DONE
         // Pass Aim on Driver Y ------------------------ NOT DONE
         // Force Shoot on Driver X --------------------- NOT DONE
+        // Snap-to on Driver DPAD ---------------------- NOT DONE
 
         // Passthrough on Operator Right Trigger ------- NOT DONE
         // Range Table Shoot on Operator Right Bumper -- DONE
@@ -176,5 +179,15 @@ public class RobotContainer {
         // return Autos.exampleAuto(m_exampleSubsystem);
         // TODO finish autoInit and figure out the auto framework
         return swerve.autonomousInit();
+    }
+
+    private void setDefaultCommand(SubsystemBase subsystem, Command command){
+        if(command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf){
+            subsystem.setDefaultCommand(command);
+        }
+        else{
+            //If you want to force-allow setting a cancel-incoming default command, directly call `subsystem.setDefaultCommand()` instead
+            throw new UnsupportedOperationException("Can't set a default command that cancels incoming!");
+        }
     }
 }

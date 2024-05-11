@@ -7,7 +7,7 @@ public class StowCommand extends ProxyCommand {
     public StowCommand(Shooter shooter, Elevator elevator, Intake intake){
         super(shooter.stopCommand()
                 .alongWith(intake.stopCommand())
-                .alongWith(elevator.setElevatorPositionCommand(0, 0))
+                .alongWith(elevator.setStaticPositionCommand(0, 0))
         );
     }
 }

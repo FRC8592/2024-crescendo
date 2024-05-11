@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -217,6 +218,7 @@ public final class Constants {
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
         public static final int INTAKE_FEEDER_SPEED = 2000;
+        public static final double INTAKE_FEEDER_POWER = 1d;
 
         //No shooter speed because we use the range table
         // public static final int SHOOTING_FEEDER_SPEED = 2500;
@@ -236,6 +238,7 @@ public final class Constants {
         public static final int ALIGN_FLYWHEEL_SPEED = -150;
 
         public static final double KEEP_RAMMING_TIME = 0.1;
+
     }
 
 
@@ -300,15 +303,15 @@ public final class Constants {
         public static final double INTAKING_TIMEOUT = 0.5; //Intake for this long before the LEDs start reporting a jam
 
         //TODO: Once the LED code is back in, uncomment and use this
-        // public static final NewtonColor RED = new NewtonColor(255, 0, 0);
-        // public static final NewtonColor GREEN = new NewtonColor(0, 255, 0);
-        // public static final NewtonColor BLUE = new NewtonColor(0, 0, 255);
-        // public static final NewtonColor YELLOW = new NewtonColor(255, 255, 0);
-        // public static final NewtonColor CYAN = new NewtonColor(0, 192, 255);
-        // public static final NewtonColor MAGENTA = new NewtonColor(255, 0, 255);
-        // public static final NewtonColor ORANGE = new NewtonColor(255, 64, 0);
-        // public static final NewtonColor OFF = new NewtonColor(0, 0, 0);
-        // public static final NewtonColor WHITE = new NewtonColor(255, 255, 255);
+        public static final Color RED = new Color(255, 0, 0);
+        public static final Color GREEN = new Color(0, 255, 0);
+        public static final Color BLUE = new Color(0, 0, 255);
+        public static final Color YELLOW = new Color(255, 255, 0);
+        public static final Color CYAN = new Color(0, 192, 255);
+        public static final Color MAGENTA = new Color(255, 0, 255);
+        public static final Color ORANGE = new Color(255, 64, 0);
+        public static final Color OFF = new Color(0, 0, 0);
+        public static final Color WHITE = new Color(255, 255, 255);
 
         public static final double NOT_AIMED_OFFSET = 2;
         public static final double FULLY_AIMED_OFFSET = APRILTAG_VISION.X_ROT_LOCK_ERROR;

@@ -59,6 +59,8 @@ public class Shooter extends SubsystemBase {
         middleBeamBreak = new DigitalInput(SHOOTER.MIDDLE_BEAM_BREAK_DIO_PORT);
     }
 
+
+
     public Command shooterPrimeCommand(int leftRPM, int rightRPM){
         return new ShooterPrimeCommand(leftRPM, rightRPM).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
@@ -73,7 +75,9 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command fireCommand(){
-        return new FireCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        return run(() -> {
+            feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);
+        }).withTimeout(SHOOTER.SHOOT_SCORE_TIME);
     }
 
     public Command stopCommand(){
@@ -85,6 +89,35 @@ public class Shooter extends SubsystemBase {
             feederMotor.setVelocity(0);
         });
     }
+
+
+
+    public Command intakeNoContactCommand(){
+        return run(() -> {
+            feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
+            setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+        }).until(() -> isBottomBeamBreakTripped());
+    }
+    public Command intakeWithContactCommand(){
+        return run(() -> {
+            feederMotor.setPercentOutput(SHOOTER.INTAKE_FEEDER_POWER); // Set PID to when note is disenganged
+            setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+        }).until(() -> !isBottomBeamBreakTripped());
+    }
+
+    public Command intakeAdjustNoteCommand(){
+        return run(() -> {
+            setShooterVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
+            feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+        }).until(() -> isTopBeamBreakTripped() && feederMotor.getVelocity() < 0)
+
+        .andThen(run(() -> {
+            setShooterVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
+            feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+        }).until(() -> !isTopBeamBreakTripped()));
+    }
+
+
 
     public void periodic() {
         Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftTargetSpeed", leftTargetSpeed);
@@ -116,6 +149,13 @@ public class Shooter extends SubsystemBase {
             return true;
         }
         return false;
+    }
+
+    private void setShooterVelocity(int left, int right){
+        leftTargetSpeed = left;
+        rightTargetSpeed = right;
+        leftShooterMotor.setVelocity(leftTargetSpeed);
+        rightShooterMotor.setVelocity(rightTargetSpeed);
     }
 
     private boolean isBottomBeamBreakTripped(){
@@ -155,32 +195,12 @@ public class Shooter extends SubsystemBase {
             canEnd = true;
         }
         public void initialize(){}
-        public void execute(){
-            leftTargetSpeed = leftRPM.getAsInt();
-            rightTargetSpeed = rightRPM.getAsInt();
-            leftShooterMotor.setVelocity(leftTargetSpeed);
-            rightShooterMotor.setVelocity(rightTargetSpeed);
-        }
+        public void execute(){setShooterVelocity(leftRPM.getAsInt(), rightRPM.getAsInt());}
         public void end(boolean interrupted){
             if(interrupted){
-                leftTargetSpeed = 0;
-                rightTargetSpeed = 0;
-                leftShooterMotor.setVelocity(leftTargetSpeed);
-                rightShooterMotor.setVelocity(rightTargetSpeed);
+                setShooterVelocity(0, 0);
             }
         }
         public boolean isFinished(){return readyToShoot() && canEnd;}
-    }
-
-    private class FireCommand extends Command{ // Named FireCommand instead of ShootCommand for clarity that this DOESN'T prime
-        private Timer timer;
-        public FireCommand(){
-            this.timer = new Timer();
-            addRequirements(Shooter.this);
-        }
-        public void initialize(){this.timer.start();}
-        public void execute(){feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);}
-        public void end(boolean interrupted){}
-        public boolean isFinished(){return timer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME);}
     }
 }

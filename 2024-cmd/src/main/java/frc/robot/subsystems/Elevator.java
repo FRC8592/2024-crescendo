@@ -18,7 +18,7 @@ import frc.robot.Constants.*;
 
 public class Elevator extends SubsystemBase {
     private SparkFlexControl extensionMotor;
-    public SparkFlexControl pivotMotor;
+    private SparkFlexControl pivotMotor;
     private SparkFlexControl pivotFollowMotor;
 
     private double targetExtension;
@@ -44,17 +44,47 @@ public class Elevator extends SubsystemBase {
         pivotFollowMotor.setMaxAcceleration(7000, 0);
     }
 
-    public Command setElevatorPositionCommand(double pivotDegrees, double extensionMeters) {
-        return new SetElevatorPositionCommand(pivotDegrees, extensionMeters);
+    // public Command setElevatorPositionCommand(double pivotDegrees, double extensionMeters, boolean ends) {
+    //     return new SetElevatorPositionCommand(pivotDegrees, extensionMeters, ends);
+    // }
+    // public Command setElevatorPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters, boolean ends) {
+    //     return new SetElevatorPositionCommand(pivotDegrees, extensionMeters, ends);
+    // }
+    // public Command setElevatorPositionCommand(Supplier<RangeTable.RangeEntry> entrySupplier, boolean ends) {
+    //     return new SetElevatorPositionCommand(entrySupplier, ends);
+    // }
+    // public Command setElevatorPositionCommand(RangeTable.RangeEntry entry, boolean ends) {
+    //     return new SetElevatorPositionCommand(entry, ends);
+    // }
+
+    public Command setStaticPositionCommand(double pivotDegrees, double extensionMeters){
+        return run(() -> {
+            targetPivot = pivotDegrees;
+            targetExtension = extensionMeters;
+            runElevator();
+        }).until(() -> isAtTargetPosition());
     }
-    public Command setElevatorPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters) {
-        return new SetElevatorPositionCommand(pivotDegrees, extensionMeters);
+
+    public Command setUpdatingPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters){
+        return run(() -> {
+            targetPivot = pivotDegrees.getAsDouble();
+            targetExtension = extensionMeters.getAsDouble();
+            runElevator();
+        });
     }
-    public Command setElevatorPositionCommand(Supplier<RangeTable.RangeEntry> entrySupplier) {
-        return new SetElevatorPositionCommand(entrySupplier);
+
+    public Command setMalleablePositionCommand(double pivotDegrees, double extensionMeters){
+        targetPivot = pivotDegrees;
+        targetExtension = extensionMeters;
+        return run(() -> {
+            runElevator();
+        });
     }
-    public Command setElevatorPositionCommand(RangeTable.RangeEntry entry) {
-        return new SetElevatorPositionCommand(entry);
+    public Command incrementElevatorPositionCommand(double pivotDegrees, double extensionMeters){
+        return runOnce(() -> {
+            this.targetPivot += pivotDegrees;
+            this.targetExtension += extensionMeters;
+        });
     }
 
     public void periodic() {
@@ -89,62 +119,63 @@ public class Elevator extends SubsystemBase {
         return isTargetAngle() && isTargetLength();
     }
 
+    private void runElevator(){
+        double actualPivot = getPivotAngle();
+        double actualExtension = getExtensionLength();
 
+        targetPivot = Math.max(Math.min(targetPivot, ELEVATOR.PIVOT_ANGLE_MAX), ELEVATOR.PIVOT_ANGLE_MIN);
 
-    private class SetElevatorPositionCommand extends Command{
-        private DoubleSupplier pivotDegreesSupplier;
-        private DoubleSupplier extensionMetersSupplier;
-        private boolean canEnd = true;
-        public SetElevatorPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters){
-            pivotDegreesSupplier = pivotDegrees;
-            extensionMetersSupplier = extensionMeters;
-            addRequirements(Elevator.this);
-            canEnd = false;
+        targetExtension = Math.max(Math.min(targetExtension, ELEVATOR.EXTENSION_METERS_MAX), ELEVATOR.EXTENSION_METERS_MIN);
+
+        if (actualPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD - ELEVATOR.RETRACT_THRESHOLD_TOLERANCE){
+            targetExtension = actualExtension;
         }
-        public SetElevatorPositionCommand(double pivotDegrees, double extensionMeters){
-            this(() -> pivotDegrees, () -> extensionMeters);
-            canEnd = true;
-        }
-        public SetElevatorPositionCommand(Supplier<RangeTable.RangeEntry> entrySupplier){
-            this(() -> entrySupplier.get().pivotAngle, () -> entrySupplier.get().elevatorHeight);
-            canEnd = false;
-        }
-        public SetElevatorPositionCommand(RangeTable.RangeEntry entry){
-            this(() -> entry.pivotAngle, () -> entry.elevatorHeight);
-            canEnd = true;
-        }
-        public void initialize(){}
-        public void execute(){
-            targetExtension = extensionMetersSupplier.getAsDouble();
-            targetPivot = pivotDegreesSupplier.getAsDouble();
-            double actualPivot = getPivotAngle();
-            double actualExtension = getExtensionLength();
 
-            targetPivot = Math.max(Math.min(targetPivot, ELEVATOR.PIVOT_ANGLE_MAX), ELEVATOR.PIVOT_ANGLE_MIN);
-
-            targetExtension = Math.max(Math.min(targetExtension, ELEVATOR.EXTENSION_METERS_MAX), ELEVATOR.EXTENSION_METERS_MIN);
-
-            if (actualPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD - ELEVATOR.RETRACT_THRESHOLD_TOLERANCE){
-                targetExtension = actualExtension;
-            }
-
-            if (actualExtension > ELEVATOR.EXTENSION_FULLY_RETRACTED && targetPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD) {
-                targetPivot = ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD;
-            }
-
-            double extensionRotations = targetExtension / ELEVATOR.ELEVATOR_GEAR_RATIO;
-            extensionMotor.setPositionSmartMotion(extensionRotations);
-            double pivotRotations = (ELEVATOR.PIVOT_GEAR_RATIO * targetPivot) / 360;
-            pivotMotor.setPositionSmartMotion(pivotRotations);
-            pivotFollowMotor.setPositionSmartMotion(pivotRotations);
+        if (actualExtension > ELEVATOR.EXTENSION_FULLY_RETRACTED && targetPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD) {
+            targetPivot = ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD;
         }
-        public void end(boolean interrupted){
-            //If we interrupt, we no longer have the above logic protecting the elevator, so we freeze the elevator
-            if(interrupted){
-                extensionMotor.setPositionSmartMotion(extensionMotor.getPosition());
-                pivotMotor.setPositionSmartMotion(pivotMotor.getPosition());
-            }
-        }
-        public boolean isFinished(){return isAtTargetPosition() && canEnd;}
+
+        double extensionRotations = targetExtension / ELEVATOR.ELEVATOR_GEAR_RATIO;
+        extensionMotor.setPositionSmartMotion(extensionRotations);
+        double pivotRotations = (ELEVATOR.PIVOT_GEAR_RATIO * targetPivot) / 360;
+        pivotMotor.setPositionSmartMotion(pivotRotations);
+        pivotFollowMotor.setPositionSmartMotion(pivotRotations);
     }
+
+
+
+    // private class SetElevatorPositionCommand extends Command{
+    //     private DoubleSupplier pivotDegreesSupplier;
+    //     private DoubleSupplier extensionMetersSupplier;
+    //     private boolean canEnd;
+    //     public SetElevatorPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters, boolean ends){
+    //         pivotDegreesSupplier = pivotDegrees;
+    //         extensionMetersSupplier = extensionMeters;
+    //         addRequirements(Elevator.this);
+    //         canEnd = ends;
+    //     }
+    //     public SetElevatorPositionCommand(double pivotDegrees, double extensionMeters, boolean ends){
+    //         this(() -> pivotDegrees, () -> extensionMeters, ends);
+    //     }
+    //     public SetElevatorPositionCommand(Supplier<RangeTable.RangeEntry> entrySupplier, boolean ends){
+    //         this(() -> entrySupplier.get().pivotAngle, () -> entrySupplier.get().elevatorHeight, ends);
+    //     }
+    //     public SetElevatorPositionCommand(RangeTable.RangeEntry entry, boolean ends){
+    //         this(() -> entry.pivotAngle, () -> entry.elevatorHeight, ends);
+    //     }
+    //     public void initialize(){}
+    //     public void execute(){
+    //         targetExtension = extensionMetersSupplier.getAsDouble();
+    //         targetPivot = pivotDegreesSupplier.getAsDouble();
+    //         runElevator();
+    //     }
+    //     public void end(boolean interrupted){
+    //         //If we interrupt, we no longer have the above logic protecting the elevator, so we freeze the elevator
+    //         if(interrupted){
+    //             extensionMotor.setPositionSmartMotion(extensionMotor.getPosition());
+    //             pivotMotor.setPositionSmartMotion(pivotMotor.getPosition());
+    //         }
+    //     }
+    //     public boolean isFinished(){return isAtTargetPosition() && canEnd;}
+    // }
 }

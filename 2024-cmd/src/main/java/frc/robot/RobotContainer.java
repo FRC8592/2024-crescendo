@@ -104,7 +104,7 @@ public class RobotContainer {
         // Manual Extend on Operator DPAD Up ----------- DONE
         // Manual Retract on Operator DPAD Down -------- DONE
         // Led Amp Signal on Operator Back ------------- DONE
-        // Trap Prime on Operator Start ---------------- NOT DONE
+        // Trap Prime on Operator Start ---------------- DONE
 
         driverController.rightBumper()
                 .onTrue(swerve.slowModeCommand(true))
@@ -193,7 +193,9 @@ public class RobotContainer {
 
         operatorController.back().whileTrue(leds.blinkCommand(LEDS.YELLOW, 2));
 
-        //Trap prime here
+        operatorController.start().onTrue(
+            new PrimeCommand(RangeTable.getTrap(), shooter, elevator, intake)
+        );
     }
 
     /**

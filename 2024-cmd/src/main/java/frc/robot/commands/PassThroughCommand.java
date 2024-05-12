@@ -8,9 +8,11 @@ public class PassThroughCommand extends ProxyCommand {
     public PassThroughCommand(Shooter shooter, Elevator elevator, Intake intake, LEDs leds){
         super(
             new StowCommand(shooter, elevator, intake)
-            .andThen(intake.intakeCommand())
-            .andThen(shooter.passThroughCommand())
-            .alongWith(leds.blinkCommand(LEDS.ORANGE, 4))
+            .andThen(
+                intake.intakeCommand()
+                .alongWith(shooter.passThroughCommand())
+                .alongWith(leds.blinkCommand(LEDS.ORANGE, 4))
+            )
         );
     }
 }

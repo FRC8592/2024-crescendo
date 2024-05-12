@@ -241,11 +241,7 @@ public class Shooter extends SubsystemBase {
         public void execute(){
             setShooterVelocity(leftRPM.getAsInt(), rightRPM.getAsInt());
         }
-        public void end(boolean interrupted){
-            if(interrupted){
-                setShooterVelocity(0, 0);
-            }
-        }
+        public void end(boolean interrupted){}
         public boolean isFinished(){
             return readyToShoot() && canEnd;
         }

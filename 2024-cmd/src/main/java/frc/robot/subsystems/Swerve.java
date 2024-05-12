@@ -31,15 +31,12 @@ public class Swerve extends SubsystemBase {
 
     private boolean isSlowMode;
     private boolean robotOriented;
-    private ChassisSpeeds lastSpeeds;
     private boolean yawLock;
     private double yawLockValue;
 
     private SmoothingFilter smoothingFilter;
 
     public Swerve(Gyro gyro) {
-        lastSpeeds = new ChassisSpeeds();
-
         smoothingFilter = new SmoothingFilter(
             SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
             SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
@@ -269,11 +266,6 @@ public class Swerve extends SubsystemBase {
 
     public Rotation2d getGyroscopeRotation() {
         return swerve.getGyroscopeRotation();
-    }
-
-
-    public ChassisSpeeds getCurrentSpeeds() {
-        return lastSpeeds;
     }
 
     public void setGyroscopeRotation(double yaw){

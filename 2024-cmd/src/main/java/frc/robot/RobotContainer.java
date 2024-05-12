@@ -15,6 +15,8 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -89,7 +91,7 @@ public class RobotContainer {
         // Robot Oriented on Driver Left Bumper -------- DONE
         // Score on Driver Right Trigger --------------- DONE
         // Party Mode on Driver Start ------------------ DONE
-        // Pass Aim on Driver Y ------------------------ NOT DONE
+        // Pass Aim on Driver Y ------------------------ DONE
         // Force Shoot on Driver X --------------------- NOT DONE
         // Snap-to on Driver DPAD ---------------------- DONE
 
@@ -124,7 +126,11 @@ public class RobotContainer {
 
         driverController.start().whileTrue(leds.partyCommand());
 
-        //Pass-aim here
+        driverController.y().whileTrue(
+            snapToCommand(Rotation2d.fromDegrees(
+                DriverStation.getAlliance().get() == Alliance.Red ? 330 : 30
+            ))
+        );
 
         //Force-shoot here
 

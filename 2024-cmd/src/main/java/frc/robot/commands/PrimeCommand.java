@@ -13,7 +13,6 @@ public class PrimeCommand extends ProxyCommand {
             shooter.shooterPrimeCommand(entry)
             .alongWith(elevator.setStaticPositionCommand(entry.pivotAngle, entry.elevatorHeight))
         );
-        this.withInterruptBehavior(InterruptionBehavior.kCancelSelf);
         addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime
     }
     public PrimeCommand(double distance, Shooter shooter, Elevator elevator, Intake intake){

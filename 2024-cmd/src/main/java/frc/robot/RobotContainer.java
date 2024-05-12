@@ -121,7 +121,11 @@ public class RobotContainer {
                 .onFalse(swerve.robotOrientedCommand(false));
 
         driverController.rightTrigger(0.1).onTrue(
-            new ScoreCommand(shooter, elevator, intake)
+            driverController.getHID().getXButton() ? //If X button (force-shoot) pressed,
+            //Override any elevator positioning that might have been happening and shoot
+            new OverrideEverythingCommand(new ScoreCommand(shooter, elevator, intake)) :
+            //Otherwise, reject if we're not reasonably prepared
+            new ScoreCommand(shooter, elevator, intake).onlyIf(() -> shooter.readyToShoot())
         );
 
         driverController.start().whileTrue(leds.partyCommand());

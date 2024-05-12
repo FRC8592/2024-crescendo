@@ -77,14 +77,16 @@ public class Shooter extends SubsystemBase {
     public Command fireCommand(){
         return run(() -> {
             feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);
-        }).withTimeout(SHOOTER.SHOOT_SCORE_TIME);
+        }).withTimeout(SHOOTER.SHOOT_SCORE_TIME)
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command ampScoreCommand(){
         return run(() -> {
             feederMotor.setVelocity(SHOOTER.AMP_FEEDER_SPEED);
-            setShooterVelocity(SHOOTER.AMP_FLYWHEEL_SPEED);
-        }).withTimeout(SHOOTER.AMP_SCORE_TIME);
+            setFlywheelVelocity(SHOOTER.AMP_FLYWHEEL_SPEED);
+        }).withTimeout(SHOOTER.AMP_SCORE_TIME)
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command stopCommand(){
@@ -102,33 +104,51 @@ public class Shooter extends SubsystemBase {
     public Command intakeNoContactCommand(){
         return run(() -> {
             feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
-            setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
-        }).until(() -> isBottomBeamBreakTripped());
+            setFlywheelVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
+        }).until(() -> isBottomBeamBreakTripped())
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
     public Command intakeWithContactCommand(){
         return run(() -> {
             feederMotor.setPercentOutput(SHOOTER.INTAKE_FEEDER_POWER); // Set PID to when note is disenganged
-            setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
-        }).until(() -> !isBottomBeamBreakTripped());
+            setFlywheelVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
+        }).until(() -> !isBottomBeamBreakTripped())
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command intakeAdjustNoteCommand(){
         return run(() -> {
-            setShooterVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
+            setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
             feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
         }).until(() -> isTopBeamBreakTripped() && feederMotor.getVelocity() < 0)
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
 
         .andThen(run(() -> {
-            setShooterVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
+            setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
             feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
-        }).until(() -> !isTopBeamBreakTripped()));
+        }).until(() -> !isTopBeamBreakTripped()))
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command outakeCommand(){
         return run(() -> {
-            setShooterVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED);
+            setFlywheelVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED);
             feederMotor.setVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
-        });
+        })
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+
+    public Command passThroughCommand(){
+        return run(() -> {
+            if(isBottomBeamBreakTripped()){
+                feederMotor.setVelocity(1);
+            }
+            else{
+                feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
+            }
+            setFlywheelVelocity(5000);
+        })
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
 
@@ -165,7 +185,7 @@ public class Shooter extends SubsystemBase {
         return false;
     }
 
-    private void setShooterVelocity(int both){
+    private void setFlywheelVelocity(int both){
         setShooterVelocity(both, both);
     }
     private void setShooterVelocity(int left, int right){
@@ -183,7 +203,7 @@ public class Shooter extends SubsystemBase {
         return !topBeamBreak.get(); //The beam break pulls low when triggered (notice exclamation point)
     }
 
-    private boolean isMiddleBeamBreakTripped(){
+    public boolean isMiddleBeamBreakTripped(){
         return !middleBeamBreak.get(); //The beam break pulls low when triggered (notice exclamation point)
     }
 
@@ -198,6 +218,7 @@ public class Shooter extends SubsystemBase {
             this.rightRPM = rightRPM;
             canEnd = false;
             addRequirements(Shooter.this); //Refers to the instance of Shooter that parents this instance of ShooterPrimeCommand.
+            this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
         }
         public ShooterPrimeCommand(int leftRPM, int rightRPM){
             this(() -> leftRPM, () -> rightRPM);

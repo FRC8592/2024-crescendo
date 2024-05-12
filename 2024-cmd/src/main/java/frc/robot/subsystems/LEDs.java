@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
@@ -23,9 +26,9 @@ public class LEDs extends SubsystemBase{
         flashTimer.start();
     }
 
-    public Command defaultCommand(){
+    public Command defaultCommand(BooleanSupplier isLoaded){
         return run(() -> {
-            setSolidColor(new Color(0,0,0));
+            setSolidColor(isLoaded.getAsBoolean() ? LEDS.CYAN : LEDS.OFF);
         }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
@@ -41,11 +44,11 @@ public class LEDs extends SubsystemBase{
                 setSolidColor(color);
             }
             else {
-                setSolidColor(new Color(0,0,0));
+                setSolidColor(LEDS.OFF);
             }
-        });
+        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
-    
+
     public Command partyCommand(){
         // The counter variable is required to be final for some reason, so
         // put the editable value in a final array
@@ -58,7 +61,29 @@ public class LEDs extends SubsystemBase{
                 ledBuffer.setRGB(i, RGB[0], RGB[1], RGB[2]);
             }
             ledStrip.setData(ledBuffer);
-        });
+        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+    }
+
+    public Command honeCommand(DoubleSupplier offset){
+        return run(() -> {
+            if (offset.getAsDouble() >= LEDS.NOT_AIMED_OFFSET){
+                setSolidColor(LEDS.RED);
+            }
+            else if (offset.getAsDouble() <= LEDS.NOT_AIMED_OFFSET && offset.getAsDouble() > LEDS.FULLY_AIMED_OFFSET){
+                setSolidColor(LEDS.RED);
+                double ledOffsetScale = 1 - ((offset.getAsDouble() - LEDS.FULLY_AIMED_OFFSET)
+                        /(LEDS.NOT_AIMED_OFFSET - LEDS.FULLY_AIMED_OFFSET)); //a value of 0-1 where 0 means equal to NOT_AIMED_OFFSET and
+                                                                            //1 means FULLY_AIMED_OFFSET
+                double ledsToLight = ledOffsetScale * (LEDS.LED_LENGTH/2);
+                for (int i = 0; i < ledsToLight; i ++){
+                    ledBuffer.setLED(i, LEDS.GREEN);
+                    ledBuffer.setLED(LEDS.LED_LENGTH - i - 1, LEDS.GREEN);
+                }
+            }
+            else{
+                setSolidColor(LEDS.GREEN);
+            }
+        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
     private void setSolidColor(Color color){

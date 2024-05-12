@@ -16,5 +16,6 @@ public class ClimbCommand extends ProxyCommand {
                 )
             )
         );
+        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

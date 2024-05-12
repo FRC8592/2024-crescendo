@@ -157,10 +157,27 @@ public class Swerve extends SubsystemBase {
 
             processed.omegaRadiansPerSecond = snapToAngle(angle);
             swerve.drive(processed);
+        }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+
+    public Command noExpoRotationCommand(
+        DoubleSupplier translationXSupplier,
+        DoubleSupplier translationYSupplier,
+        DoubleSupplier rotationSpeedSupplier){
+
+        return run(() -> {
+            ChassisSpeeds processed = processJoystickInputs(
+                translationXSupplier.getAsDouble(),
+                translationYSupplier.getAsDouble(),
+                0
+            );
+
+            processed.omegaRadiansPerSecond = rotationSpeedSupplier.getAsDouble();
+            swerve.drive(processed);
         });
     }
 
-    public Command chassisSpeedsDriveCommand(ChassisSpeeds speeds){
+    private Command chassisSpeedsDriveCommand(ChassisSpeeds speeds){
         return runOnce(() -> {swerve.drive(speeds);});
     }
 

@@ -9,5 +9,6 @@ public class StowCommand extends ProxyCommand {
                 .alongWith(intake.stopCommand())
                 .alongWith(elevator.setStaticPositionCommand(0, 0))
         );
+        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

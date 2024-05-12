@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
@@ -62,7 +63,8 @@ public class Elevator extends SubsystemBase {
             targetPivot = pivotDegrees;
             targetExtension = extensionMeters;
             runElevator();
-        }).until(() -> isAtTargetPosition());
+        }).until(() -> isAtTargetPosition())
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command setUpdatingPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters){
@@ -70,7 +72,8 @@ public class Elevator extends SubsystemBase {
             targetPivot = pivotDegrees.getAsDouble();
             targetExtension = extensionMeters.getAsDouble();
             runElevator();
-        });
+        })
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command setMalleablePositionCommand(double pivotDegrees, double extensionMeters){
@@ -78,7 +81,8 @@ public class Elevator extends SubsystemBase {
         targetExtension = extensionMeters;
         return run(() -> {
             runElevator();
-        });
+        })
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
     public Command incrementElevatorPositionCommand(double pivotDegrees, double extensionMeters){
         return run(() -> {
@@ -133,7 +137,7 @@ public class Elevator extends SubsystemBase {
         return Math.abs(getExtensionLength() - targetExtension) < ELEVATOR.LENGTH_TOLERANCE;
     }
 
-    private boolean isAtTargetPosition(){
+    public boolean isAtTargetPosition(){
         return isTargetAngle() && isTargetLength();
     }
 

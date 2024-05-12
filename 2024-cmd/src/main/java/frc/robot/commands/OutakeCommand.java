@@ -10,5 +10,6 @@ public class OutakeCommand extends ProxyCommand {
             shooter.outakeCommand()
             .alongWith(intake.outakeCommand())
         );
+        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

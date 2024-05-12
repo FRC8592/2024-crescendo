@@ -30,7 +30,7 @@ public class SparkFlexControl {
 
         //Set update status to 20 Hz
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 50);
-        
+
         motorControl = motor.getPIDController();
         motorEncoder = motor.getEncoder();
         if (coastMode){
@@ -42,15 +42,15 @@ public class SparkFlexControl {
     }
 
     public void setVelocity(double RPM){
-        motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity); 
+        motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity);
     }
 
     public void setVelocity(double RPM, int slotID){
-        motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity, slotID); 
+        motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity, slotID);
     }
 
     public void setPosition(double rotations){
-        motorControl.setReference(rotations, com.revrobotics.CANSparkBase.ControlType.kPosition); 
+        motorControl.setReference(rotations, com.revrobotics.CANSparkBase.ControlType.kPosition);
     }
 
     public void setPercentOutput(double power){
@@ -78,7 +78,7 @@ public class SparkFlexControl {
     public double getVelocity(){
         return motorEncoder.getVelocity();
     }
-    
+
     public double getPosition(){
         return motorEncoder.getPosition();
     }
@@ -91,7 +91,6 @@ public class SparkFlexControl {
         return motorEncoder.getPosition()*4096;
     }
 
-
     public void setFollower(SparkFlexControl motorToFollow){
         motor.follow(motorToFollow.motor);
     }
@@ -102,18 +101,20 @@ public class SparkFlexControl {
 
     public void setPositionSmartMotion(double rotations){
         motorControl.setReference(rotations, ControlType.kSmartMotion, 0);
-        SmartDashboard.putNumber("smart motion", rotations);
     }
 
     public void setMaxVelocity(double maxVelocity, int slotID){
         motorControl.setSmartMotionMaxVelocity(maxVelocity, slotID);
     }
+
     public void setMaxAcceleration(double maxAccel, int slotID){
         motorControl.setSmartMotionMaxAccel(maxAccel, slotID);
     }
+
     public void follow(SparkFlexControl sfc, boolean inverted) {
         this.motor.follow(sfc.motor, inverted);
     }
+
     public void setCurrentLimit(int stallLimit, int fullRPMLimit){
         this.motor.setSmartCurrentLimit(stallLimit, fullRPMLimit);
     }

@@ -7,9 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.*;
 
 import java.util.function.IntSupplier;
@@ -27,8 +25,8 @@ public class Shooter extends SubsystemBase {
     private DigitalInput topBeamBreak;
     private DigitalInput middleBeamBreak;
 
-    int leftTargetSpeed = 0;
-    int rightTargetSpeed = 0;
+    private int leftTargetSpeed = 0;
+    private int rightTargetSpeed = 0;
 
     public Shooter() {
         leftShooterMotor = new SparkFlexControl (CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
@@ -62,16 +60,20 @@ public class Shooter extends SubsystemBase {
 
 
     public Command shooterPrimeCommand(int leftRPM, int rightRPM){
-        return new ShooterPrimeCommand(leftRPM, rightRPM).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        return new ShooterPrimeCommand(leftRPM, rightRPM)
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
     public Command shooterPrimeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
-        return new ShooterPrimeCommand(leftRPM, rightRPM).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        return new ShooterPrimeCommand(leftRPM, rightRPM)
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
     public Command shooterPrimeCommand(Supplier<RangeTable.RangeEntry> entry){
-        return new ShooterPrimeCommand(entry).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        return new ShooterPrimeCommand(entry)
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
     public Command shooterPrimeCommand(RangeTable.RangeEntry entry){
-        return new ShooterPrimeCommand(entry).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        return new ShooterPrimeCommand(entry)
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command fireCommand(){
@@ -121,7 +123,6 @@ public class Shooter extends SubsystemBase {
             setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
             feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
         }).until(() -> isTopBeamBreakTripped() && feederMotor.getVelocity() < 0)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
 
         .andThen(run(() -> {
             setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
@@ -188,6 +189,7 @@ public class Shooter extends SubsystemBase {
     private void setFlywheelVelocity(int both){
         setShooterVelocity(both, both);
     }
+
     private void setShooterVelocity(int left, int right){
         leftTargetSpeed = left;
         rightTargetSpeed = right;
@@ -225,7 +227,10 @@ public class Shooter extends SubsystemBase {
             canEnd = true;
         }
         public ShooterPrimeCommand(Supplier<RangeTable.RangeEntry> entrySupplier){
-            this(() -> entrySupplier.get().leftFlywheelSpeed, () -> entrySupplier.get().rightFlywheelSpeed);
+            this(
+                () -> entrySupplier.get().leftFlywheelSpeed,
+                () -> entrySupplier.get().rightFlywheelSpeed
+            );
             canEnd = false;
         }
         public ShooterPrimeCommand(RangeTable.RangeEntry entry){
@@ -233,12 +238,16 @@ public class Shooter extends SubsystemBase {
             canEnd = true;
         }
         public void initialize(){}
-        public void execute(){setShooterVelocity(leftRPM.getAsInt(), rightRPM.getAsInt());}
+        public void execute(){
+            setShooterVelocity(leftRPM.getAsInt(), rightRPM.getAsInt());
+        }
         public void end(boolean interrupted){
             if(interrupted){
                 setShooterVelocity(0, 0);
             }
         }
-        public boolean isFinished(){return readyToShoot() && canEnd;}
+        public boolean isFinished(){
+            return readyToShoot() && canEnd;
+        }
     }
 }

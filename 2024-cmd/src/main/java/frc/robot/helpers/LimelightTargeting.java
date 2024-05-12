@@ -132,7 +132,7 @@ public class LimelightTargeting {
                 totalValid = totalValid + 1;
             }
         }
-        
+
         if (totalValid != 0) {
             processedDx = (totalDx / totalValid);
             processedDy = totalDy / totalValid;

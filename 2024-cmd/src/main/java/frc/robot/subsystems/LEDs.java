@@ -93,6 +93,8 @@ public class LEDs extends SubsystemBase{
         ledStrip.setData(ledBuffer);
     }
 
+    public void periodic(){}
+    public void simulationPeriodic(){}
 
     private int[] HSVtoRGB(double h){
         double R1 = 0;
@@ -134,6 +136,4 @@ public class LEDs extends SubsystemBase{
         return new int[]{(int)R1, (int)G1, (int)B1};
     }
 
-    public void periodic(){}
-    public void simulationPeriodic(){}
 }

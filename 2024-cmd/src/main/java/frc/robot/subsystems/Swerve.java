@@ -12,15 +12,11 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import com.NewtonSwerve.*;
 import com.NewtonSwerve.Mk4.*;
 import com.NewtonSwerve.Gyro.Gyro;
-import com.ctre.phoenix.sensors.Pigeon2;
 import frc.robot.Constants.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.Current;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.function.DoubleSupplier;
 
@@ -43,9 +39,12 @@ public class Swerve extends SubsystemBase {
 
     public Swerve(Gyro gyro) {
         lastSpeeds = new ChassisSpeeds();
-        smoothingFilter = new SmoothingFilter(SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
-                SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
-                SWERVE.ROTATION_SMOOTHING_AMOUNT);
+
+        smoothingFilter = new SmoothingFilter(
+            SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
+            SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
+            SWERVE.ROTATION_SMOOTHING_AMOUNT
+        );
 
         Mk4ModuleConfiguration config = new Mk4ModuleConfiguration();
 
@@ -65,32 +64,36 @@ public class Swerve extends SubsystemBase {
 
         //TODO: Check the swerve module type and comment/uncomment the next 44 lines to account for it
         SwerveModule m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(config,
-                Mk4iSwerveModuleHelper.GearRatio.L2,
-                CAN.SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID,
-                CAN.SWERVE_BLACK_FRONT_LEFT_STEER_CAN_ID,
-                CAN.SWERVE_BLACK_FRONT_LEFT_ENCODER_CAN_ID,
-                SWERVE.BLACK_FRONT_LEFT_STEER_OFFSET);
+            Mk4iSwerveModuleHelper.GearRatio.L2,
+            CAN.SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID,
+            CAN.SWERVE_BLACK_FRONT_LEFT_STEER_CAN_ID,
+            CAN.SWERVE_BLACK_FRONT_LEFT_ENCODER_CAN_ID,
+            SWERVE.BLACK_FRONT_LEFT_STEER_OFFSET
+        );
 
         SwerveModule m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(config,
-                Mk4iSwerveModuleHelper.GearRatio.L2,
-                CAN.SWERVE_ORANGE_FRONT_RIGHT_DRIVE_CAN_ID, 
-                CAN.SWERVE_ORANGE_FRONT_RIGHT_STEER_CAN_ID,
-                CAN.SWERVE_ORANGE_FRONT_RIGHT_ENCODER_CAN_ID, 
-                SWERVE.ORANGE_FRONT_RIGHT_STEER_OFFSET);
+            Mk4iSwerveModuleHelper.GearRatio.L2,
+            CAN.SWERVE_ORANGE_FRONT_RIGHT_DRIVE_CAN_ID,
+            CAN.SWERVE_ORANGE_FRONT_RIGHT_STEER_CAN_ID,
+            CAN.SWERVE_ORANGE_FRONT_RIGHT_ENCODER_CAN_ID,
+            SWERVE.ORANGE_FRONT_RIGHT_STEER_OFFSET
+        );
 
         SwerveModule m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(config,
-                Mk4iSwerveModuleHelper.GearRatio.L2,
-                CAN.SWERVE_TEAL_BACK_LEFT_DRIVE_CAN_ID, 
-                CAN.SWERVE_TEAL_BACK_LEFT_STEER_CAN_ID,
-                CAN.SWERVE_TEAL_BACK_LEFT_ENCODER_CAN_ID, 
-                SWERVE.TEAL_BACK_LEFT_STEER_OFFSET);
+            Mk4iSwerveModuleHelper.GearRatio.L2,
+            CAN.SWERVE_TEAL_BACK_LEFT_DRIVE_CAN_ID,
+            CAN.SWERVE_TEAL_BACK_LEFT_STEER_CAN_ID,
+            CAN.SWERVE_TEAL_BACK_LEFT_ENCODER_CAN_ID,
+            SWERVE.TEAL_BACK_LEFT_STEER_OFFSET
+        );
 
         SwerveModule m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(config,
-                Mk4iSwerveModuleHelper.GearRatio.L2,
-                CAN.SWERVE_WHITE_BACK_RIGHT_DRIVE_CAN_ID, 
-                CAN.SWERVE_WHITE_BACK_RIGHT_STEER_CAN_ID,
-                CAN.SWERVE_WHITE_BACK_RIGHT_ENCODER_CAN_ID, 
-                SWERVE.WHITE_BACK_RIGHT_STEER_OFFSET);
+            Mk4iSwerveModuleHelper.GearRatio.L2,
+            CAN.SWERVE_WHITE_BACK_RIGHT_DRIVE_CAN_ID,
+            CAN.SWERVE_WHITE_BACK_RIGHT_STEER_CAN_ID,
+            CAN.SWERVE_WHITE_BACK_RIGHT_ENCODER_CAN_ID,
+            SWERVE.WHITE_BACK_RIGHT_STEER_OFFSET
+        );
 
         // SwerveModule m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,
         //         Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.BLACK_FRONT_LEFT_DRIVE_CAN,
@@ -123,8 +126,14 @@ public class Swerve extends SubsystemBase {
 
         this.swerveConfig = config;
 
-        this.swerve = new NewtonSwerve(config, gyro, m_frontLeftModule, m_frontRightModule, m_backLeftModule,
-                m_backRightModule);
+        this.swerve = new NewtonSwerve(
+            config,
+            gyro,
+            m_frontLeftModule,
+            m_frontRightModule,
+            m_backLeftModule,
+            m_backRightModule
+        );
 
     }
     /**
@@ -219,8 +228,9 @@ public class Swerve extends SubsystemBase {
             this.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
         }).alongWith(
             this.chassisSpeedsDriveCommand(new ChassisSpeeds())
-        )
-        .alongWith(this.zeroGyroscopeCommand());
+        ).alongWith(
+            this.zeroGyroscopeCommand()
+        );
     }
 
     public void periodic() {
@@ -282,8 +292,17 @@ public class Swerve extends SubsystemBase {
 
     private void resetPose(Pose2d pose) {
         swerve.resetPose(pose);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Current pose reset to X: "+
-                pose.getX()+"; Y: "+pose.getY()+"; Rotation: "+pose.getRotation().getDegrees()+"°.");
+        Logger.recordOutput(
+            SWERVE.LOG_PATH+"Console", (
+                "Current pose reset to X: "+
+                pose.getX()+
+                "; Y: "+
+                pose.getY()+
+                "; Rotation: "+
+                pose.getRotation().getDegrees()+
+                "°."
+            )
+        );
     }
 
     private void resetEncoder() {
@@ -308,9 +327,23 @@ public class Swerve extends SubsystemBase {
     }
 
     private ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
-        double driveTranslateY = rawY >= 0 ? (Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT));
-        double driveTranslateX = rawX >= 0 ? (Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT));
-        double driveRotate =   rawRot >= 0 ? (Math.pow(rawRot, SWERVE.JOYSTICK_EXPONENT)) : -(Math.pow(rawRot, SWERVE.JOYSTICK_EXPONENT));
+        double driveTranslateY = (
+            rawY >= 0
+            ? (Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT))
+            : -(Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT))
+        );
+
+        double driveTranslateX = (
+            rawX >= 0 
+            ? (Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT))
+            : -(Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT))
+        );
+
+        double driveRotate = (
+            rawRot >= 0
+            ? (Math.pow(rawRot, SWERVE.JOYSTICK_EXPONENT))
+            : -(Math.pow(rawRot, SWERVE.JOYSTICK_EXPONENT))
+        );
 
         //
         // Lock the robot yaw if the rotation rate is low and the yaw joystick is released
@@ -337,20 +370,26 @@ public class Swerve extends SubsystemBase {
 
         if (isSlowMode) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                    driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelo(),
-                    driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelo(),
-                    driveRotate * SWERVE.ROTATE_POWER_SLOW * getMaxAngularVelo()));
+                driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelo(),
+                driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelo(),
+                driveRotate * SWERVE.ROTATE_POWER_SLOW * getMaxAngularVelo()
+            ));
         }
         else {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                    driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelo(),
-                    driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelo(),
-                    driveRotate * SWERVE.ROTATE_POWER_FAST * getMaxAngularVelo()));
+                driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelo(),
+                driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelo(),
+                driveRotate * SWERVE.ROTATE_POWER_FAST * getMaxAngularVelo()
+            ));
         }
 
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             currentSpeeds,
-            robotOriented ? new Rotation2d() : swerve.getGyroscopeRotation()
+            (
+                robotOriented 
+                ? new Rotation2d() 
+                : swerve.getGyroscopeRotation()
+            )
         );
 
         return currentSpeeds;

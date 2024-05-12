@@ -103,21 +103,27 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean isAmp(){
-        return isAtTargetPosition()
-                && targetExtension == ELEVATOR.EXTENSION_METERS_AMP
-                && targetPivot == ELEVATOR.PIVOT_ANGLE_AMP;
+        return (
+            isAtTargetPosition()
+            && targetExtension == ELEVATOR.EXTENSION_METERS_AMP
+            && targetPivot == ELEVATOR.PIVOT_ANGLE_AMP
+        );
     }
 
     public boolean isClimb(){
-        return isAtTargetPosition()
-                && targetExtension == ELEVATOR.EXTENSION_METERS_CLIMB
-                && targetPivot == ELEVATOR.PIVOT_ANGLE_CLIMB;
+        return (
+            isAtTargetPosition()
+            && targetExtension == ELEVATOR.EXTENSION_METERS_CLIMB
+            && targetPivot == ELEVATOR.PIVOT_ANGLE_CLIMB
+        );
     }
 
     public boolean isStowed(){
-        return isAtTargetPosition()
-                && targetExtension == ELEVATOR.EXTENSION_METERS_STOWED
-                && targetPivot == ELEVATOR.PIVOT_ANGLE_STOWED;
+        return (
+            isAtTargetPosition()
+            && targetExtension == ELEVATOR.EXTENSION_METERS_STOWED
+            && targetPivot == ELEVATOR.PIVOT_ANGLE_STOWED
+        );
     }
 
     private double getExtensionLength() {
@@ -125,7 +131,10 @@ public class Elevator extends SubsystemBase {
     }
 
     private double getPivotAngle() {
-        double ticksConverted = (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES_SPARKFLEX)/ELEVATOR.PIVOT_GEAR_RATIO;
+        double ticksConverted = (
+                (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES_SPARKFLEX)
+                /ELEVATOR.PIVOT_GEAR_RATIO
+        );
         return ticksConverted;
     }
 
@@ -145,9 +154,21 @@ public class Elevator extends SubsystemBase {
         double actualPivot = getPivotAngle();
         double actualExtension = getExtensionLength();
 
-        targetPivot = Math.max(Math.min(targetPivot, ELEVATOR.PIVOT_ANGLE_MAX), ELEVATOR.PIVOT_ANGLE_MIN);
+        targetPivot = Math.max(
+            Math.min(
+                targetPivot,
+                ELEVATOR.PIVOT_ANGLE_MAX
+            ),
+            ELEVATOR.PIVOT_ANGLE_MIN
+        );
 
-        targetExtension = Math.max(Math.min(targetExtension, ELEVATOR.EXTENSION_METERS_MAX), ELEVATOR.EXTENSION_METERS_MIN);
+        targetExtension = Math.max(
+            Math.min(
+                targetExtension,
+                ELEVATOR.EXTENSION_METERS_MAX
+            ),
+            ELEVATOR.EXTENSION_METERS_MIN
+        );
 
         if (actualPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD - ELEVATOR.RETRACT_THRESHOLD_TOLERANCE){
             targetExtension = actualExtension;
@@ -159,6 +180,7 @@ public class Elevator extends SubsystemBase {
 
         double extensionRotations = targetExtension / ELEVATOR.ELEVATOR_GEAR_RATIO;
         extensionMotor.setPositionSmartMotion(extensionRotations);
+
         double pivotRotations = (ELEVATOR.PIVOT_GEAR_RATIO * targetPivot) / 360;
         pivotMotor.setPositionSmartMotion(pivotRotations);
         pivotFollowMotor.setPositionSmartMotion(pivotRotations);

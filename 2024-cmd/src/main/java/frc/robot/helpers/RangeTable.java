@@ -1,6 +1,5 @@
 package frc.robot.helpers;
 
-import org.ejml.equation.IntegerSequence.Range;
 import org.littletonrobotics.junction.Logger;
 
 import frc.robot.Constants;
@@ -80,23 +79,32 @@ public class RangeTable {
         if (RANGE_TABLE.length > 0) {
             if (wholeMeters < RANGE_TABLE.length) {
                 if (wholeMeters < RANGE_TABLE.length - 1) {
-                    RangeEntry entry = RANGE_TABLE[wholeMeters].interpolate(RANGE_TABLE[wholeMeters + 1], decimal);
+                    RangeEntry entry = RANGE_TABLE[wholeMeters]
+                        .interpolate(RANGE_TABLE[wholeMeters + 1], decimal);
+
                     entry.pivotAngle += Constants.RANGE_TABLE.OFFSET_ANGLE;
                     entry.pivotAngle = Math.max(entry.pivotAngle, 0);
+
                     return entry;
                 } else {
                     valid = false;
+
                     RangeEntry entry = RANGE_TABLE[RANGE_TABLE.length - 1];
+
                     entry.pivotAngle += Constants.RANGE_TABLE.OFFSET_ANGLE;
                     entry.pivotAngle = Math.max(entry.pivotAngle, 0);
+
                     return entry;
                 }
             } else { // Too far for the range table
                 valid = false;
+
                 RangeEntry entry = RANGE_TABLE[RANGE_TABLE.length - 1];
+
                 entry.pivotAngle += Constants.RANGE_TABLE.OFFSET_ANGLE;
                 entry.pivotAngle = Math.max(entry.pivotAngle, 0);
-                    return entry;
+
+                return entry;
             }
         } else {
             valid = false;
@@ -140,11 +148,22 @@ public class RangeTable {
             double leftSpeedUnit = rEntry.leftFlywheelSpeed - this.leftFlywheelSpeed;
             double rightSpeedUnit = rEntry.leftFlywheelSpeed - this.leftFlywheelSpeed;
             double angleUnit = rEntry.pivotAngle - this.pivotAngle;
-            RangeEntry generated = new RangeEntry((int) (rEntry.leftFlywheelSpeed),
-                    (int) (rEntry.rightFlywheelSpeed),
-                    (this.pivotAngle + (angleUnit * value)));
-            Logger.recordOutput("CustomLogs/RangeTable/GeneratedPivotAngle", generated.pivotAngle);
-            Logger.recordOutput("CustomLogs/RangeTable/GeneratedFlywheelSpeed", generated.leftFlywheelSpeed);
+    
+            RangeEntry generated = new RangeEntry(
+                (int) (rEntry.leftFlywheelSpeed),
+                (int) (rEntry.rightFlywheelSpeed),
+                (this.pivotAngle + (angleUnit * value))
+            );
+
+            Logger.recordOutput(
+                "CustomLogs/RangeTable/GeneratedPivotAngle",
+                generated.pivotAngle
+            );
+            Logger.recordOutput(
+                "CustomLogs/RangeTable/GeneratedFlywheelSpeed",
+                generated.leftFlywheelSpeed
+            );
+
             return generated;
         }
     }

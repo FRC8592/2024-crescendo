@@ -13,18 +13,13 @@ import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -124,11 +119,15 @@ public class RobotContainer {
         // Led Amp Signal on Operator Back ------------- DONE
         // Trap Prime on Operator Start ---------------- DONE
 
-        driverController.rightBumper()
-                .onTrue(swerve.slowModeCommand(true))
-                .onFalse(swerve.slowModeCommand(false));
+        driverController.rightBumper().onTrue(
+            swerve.slowModeCommand(true)
+        ).onFalse(
+            swerve.slowModeCommand(false)
+        );
 
-        driverController.back().onTrue(swerve.zeroGyroscopeCommand());
+        driverController.back().onTrue(
+            swerve.zeroGyroscopeCommand()
+        );
 
         driverController.a().whileTrue(swerve.noExpoRotationCommand(
             () -> driverController.getLeftX(),
@@ -136,9 +135,11 @@ public class RobotContainer {
             () -> noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE).omegaRadiansPerSecond
         ));
 
-        driverController.leftBumper()
-                .onTrue(swerve.robotOrientedCommand(true))
-                .onFalse(swerve.robotOrientedCommand(false));
+        driverController.leftBumper().onTrue(
+            swerve.robotOrientedCommand(true)
+        ).onFalse(
+            swerve.robotOrientedCommand(false)
+        );
 
         driverController.rightTrigger(0.1).onTrue(
             elevator.isAmp()
@@ -160,7 +161,9 @@ public class RobotContainer {
             )
         );
 
-        driverController.start().whileTrue(leds.partyCommand());
+        driverController.start().whileTrue(
+            leds.partyCommand()
+        );
 
         driverController.y().whileTrue(
             snapToCommand(Rotation2d.fromDegrees(

@@ -10,7 +10,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class PoseVision {
     private double tag_x;
@@ -326,7 +325,7 @@ public class PoseVision {
         if (getTagInView() && getCurrTagID() == id) {
             // it's tag 1
             return getCurrTagZ();
-        }    
+        }
         else if (getTag2InView() && getCurrTag2ID() == id) {
             // it's tag 2
             return getCurrTag2Z();
@@ -364,7 +363,7 @@ public class PoseVision {
         if (getTagInView() && ids.contains(getCurrTagID())) {
             // it's tag 1
             return getCurrTagX();
-        }    
+        }
         else if (getTag2InView() && ids.contains(getCurrTag2ID())) {
             // it's tag 2
             return getCurrTag2X();
@@ -372,14 +371,5 @@ public class PoseVision {
         else {
             return -1.0; // tag not in view
         }
-    }
-    /**
-     * sets the alliance to blue or red!!
-     * Manav plz fix this
-     * @param alliance
-     */
-    public void setAlliance(Alliance alliance) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setAlliance'");
     }
 }

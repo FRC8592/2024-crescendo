@@ -145,7 +145,8 @@ public class Swerve extends SubsystemBase {
             swerve.drive(processJoystickInputs(
                 suppliedX.getAsDouble(),
                 suppliedY.getAsDouble(),
-                suppliedRot.getAsDouble()
+                suppliedRot.getAsDouble(),
+                true
             ));
         }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
@@ -158,7 +159,8 @@ public class Swerve extends SubsystemBase {
             ChassisSpeeds processed = processJoystickInputs(
                 translationXSupplier.getAsDouble(),
                 translationYSupplier.getAsDouble(),
-                0
+                0,
+                true
             );
 
             processed.omegaRadiansPerSecond = snapToAngle(angle);
@@ -175,7 +177,8 @@ public class Swerve extends SubsystemBase {
             ChassisSpeeds processed = processJoystickInputs(
                 translationXSupplier.getAsDouble(),
                 translationYSupplier.getAsDouble(),
-                0
+                0,
+                false
             );
 
             processed.omegaRadiansPerSecond = rotationSpeedSupplier.getAsDouble();
@@ -318,7 +321,7 @@ public class Swerve extends SubsystemBase {
         return out;
     }
 
-    private ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
+    private ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot, boolean fieldOrientedAllowed){
         double driveTranslateY = (
             rawY >= 0
             ? (Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT))
@@ -376,10 +379,9 @@ public class Swerve extends SubsystemBase {
         }
 
         currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            currentSpeeds,
-            (
-                robotOriented 
-                ? new Rotation2d() 
+            currentSpeeds, (
+                robotOriented || !fieldOrientedAllowed
+                ? new Rotation2d()
                 : swerve.getGyroscopeRotation()
             )
         );

@@ -25,8 +25,7 @@ public class PrimeCommand extends ProxyCommand {
             .alongWith(elevator.setUpdatingPositionCommand(() -> entry.get().pivotAngle, () -> entry.get().elevatorHeight))
             .alongWith(leds.honeCommand(offsetSupplier))
         );
-        this.withInterruptBehavior(InterruptionBehavior.kCancelSelf);
         addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime
-        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        this.withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 }

@@ -36,6 +36,9 @@ public class Swerve extends SubsystemBase {
 
     private SmoothingFilter smoothingFilter;
 
+    /**
+     * @param gyro a com.NewtonSwerve.Gyro.Gryo object instantiated with the hardware gyroscope
+     */
     public Swerve(Gyro gyro) {
         smoothingFilter = new SmoothingFilter(
             SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
@@ -43,9 +46,10 @@ public class Swerve extends SubsystemBase {
             SWERVE.ROTATION_SMOOTHING_AMOUNT
         );
 
+        // Stores physical information about the swerve and info about user config
         Mk4ModuleConfiguration config = new Mk4ModuleConfiguration();
 
-        // drivetrain dimensions
+        // Drivetrain dimensions
         config.setDriveTrainWidthMeters(SWERVE.DRIVE_TRAIN_WIDTH);
         config.setDriveTrainLengthMeters(SWERVE.DRIVE_TRAIN_LENGTH);
         config.setWheelCircumference(SWERVE.WHEEL_CIRCUMFERENCE);
@@ -54,9 +58,11 @@ public class Swerve extends SubsystemBase {
         config.setNominalVoltage(POWER.SWERVE_MAX_VOLTAGE);
         config.setMaxVelocityMetersPerSecond(SWERVE.MAX_VELOCITY_METERS_PER_SECOND);
 
-        // // set PID constants
+        // Set PID constants
         config.setThrottlePID(SWERVE.THROTTLE_kP, SWERVE.THROTTLE_kI, SWERVE.THROTTLE_kD);
         config.setSteerPID(SWERVE.STEER_kP, SWERVE.STEER_kI, SWERVE.STEER_kD);
+
+        // For the snap-to-angle functionality
         snapToController = new PIDController(SWERVE.SNAP_TO_kP, SWERVE.SNAP_TO_kI, SWERVE.SNAP_TO_kD);
 
         //TODO: Check the swerve module type and comment/uncomment the next 44 lines to account for it
@@ -133,14 +139,21 @@ public class Swerve extends SubsystemBase {
         );
 
     }
+
     /**
-     * Example command factory method.
+     * Command to drive the swerve based on the inputted lambdas until interrupted. Processes the inputs to
+     * optimize for human comfort and control, so joystick inputs will almost always be the only thing
+     * that should be passed in.
      *
-     * @return a command
+     * @param suppliedX {@code DoubleSupplier}: a lambda for X translation input (will be optimized for human control)
+     * @param suppliedY {@code DoubleSupplier}: a lambda for Y translation input (will be optimized for human control)
+     * @param suppliedRot {@code DoubleSupplier}: a lambda for rotation input (will be optimized for human control)
+     *
+     * @return the command
+     *
+     * @apiNote This command never ends on its own; it must be interrupted to end
      */
     public Command driveCommand(DoubleSupplier suppliedX, DoubleSupplier suppliedY, DoubleSupplier suppliedRot) {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
         return run(() -> {
             swerve.drive(processJoystickInputs(
                 suppliedX.getAsDouble(),
@@ -151,6 +164,21 @@ public class Swerve extends SubsystemBase {
         }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
+    /**
+     * Command to snap to the specified angle while driving with human input. The translation inputs
+     * are processed for human comfort and control, so these should almost always be joystick inputs.
+     *
+     * @param translationXSupplier {@code DoubleSupplier}: a lambda for X translation input (will be
+     * optimized for human control)
+     * @param translationYSupplier {@code DoubleSupplier}: a lambda for Y translation input (will be
+     * optimized for human control)
+     *
+     * @param angle {@code Rotation2d}: the angle to snap to (doesn't have any corrections applied)
+     *
+     * @return the command
+     *
+     * @apiNote This command never ends on its own; it must be interrupted to end
+     */
     public Command snapToCommand(
         DoubleSupplier translationXSupplier,
         DoubleSupplier translationYSupplier,
@@ -168,6 +196,19 @@ public class Swerve extends SubsystemBase {
         }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Same as {@link Swerve#driveCommand(DoubleSupplier, DoubleSupplier, DoubleSupplier)}, but doesn't
+     * process the rotation for human input. Translation should come from joysticks while rotation usually
+     * should be from a PID controller or other computer control.
+     *
+     * @param translationXSupplier {@code DoubleSupplier}: a lambda for X translation input (will be optimized for human control)
+     * @param translationYSupplier {@code DoubleSupplier}: a lambda for Y translation input (will be optimized for human control)
+     * @param rotationSpeedSupplier {@code DoubleSupplier}: a lambda for rotation input (will NOT be optimized for human control)
+     *
+     * @return the command
+     *
+     * @apiNote This command never ends on its own; it must be interrupted to end
+     */
     public Command noExpoRotationCommand(
         DoubleSupplier translationXSupplier,
         DoubleSupplier translationYSupplier,
@@ -183,9 +224,19 @@ public class Swerve extends SubsystemBase {
 
             processed.omegaRadiansPerSecond = rotationSpeedSupplier.getAsDouble();
             swerve.drive(processed);
-        });
+        }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Command to send the {@code ChassisSpeeds} object to the swerve. Mostly intended to be
+     * used to stop the drivetrain
+     *
+     * @param speeds {@code ChassisSpeeds}: speeds to apply to the swerve
+     *
+     * @return the command
+     *
+     * @apiNote This command runs for one frame and ends immediately
+     */
     private Command chassisSpeedsDriveCommand(ChassisSpeeds speeds){
         return runOnce(() -> {swerve.drive(speeds);});
     }
@@ -199,6 +250,17 @@ public class Swerve extends SubsystemBase {
     // commands fighting each other. It should be fine in this case because these
     // commands don't move the swerve, but this should generally be done with
     // caution.
+
+    /**
+     * Command to enable or disable slow mode for all inputs that are processed for
+     * human comfort
+     *
+     * @param slowMode {@code boolean}: whether to enable (true) or disable (false) slow mode
+     *
+     * @return the command
+     *
+     * @apiNote This command runs for one frame and ends immediately
+     */
     public Command slowModeCommand(boolean slowMode){
         return Commands.runOnce(() -> {
             this.isSlowMode = slowMode;
@@ -206,6 +268,16 @@ public class Swerve extends SubsystemBase {
         });
     }
 
+    /**
+     * Command to enable or disable robot-oriented control for all inputs that are processed for
+     * human comfort
+     *
+     * @param robotOriented {@code boolean}: whether to enable (true) or disable (false) robot-oriented control
+     *
+     * @return the command
+     *
+     * @apiNote This command runs for one frame and ends immediately
+     */
     public Command robotOrientedCommand(boolean robotOriented){
         return Commands.runOnce(() -> {
             this.robotOriented = robotOriented;
@@ -213,6 +285,13 @@ public class Swerve extends SubsystemBase {
         });
     }
 
+    /**
+     * Command to reset the gyroscope yaw heading to zero
+     *
+     * @return the command
+     *
+     * @apiNote This command runs for one frame and ends immediately
+     */
     public Command zeroGyroscopeCommand() {
         return Commands.runOnce(() -> {
             swerve.zeroGyroscope();
@@ -220,6 +299,14 @@ public class Swerve extends SubsystemBase {
         });
     }
 
+    /**
+     * Command to run all the necessary setup for autonomous. Please don't run this
+     * any other time.
+     *
+     * @return the command
+     *
+     * @apiNote This command runs for one frame and ends immediately
+     */
     public Command autonomousInit(){
         return runOnce(() -> {
             this.resetEncoder();

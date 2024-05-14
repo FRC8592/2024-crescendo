@@ -26,18 +26,48 @@ public class LEDs extends SubsystemBase{
         flashTimer.start();
     }
 
-    public Command defaultCommand(BooleanSupplier isLoaded){
+    /**
+     * Command that turns the light strip cyan or off depending on whether there is a
+     * note loaded as determined by the passed-in lambda.
+     *
+     * @param isLoaded {@code BooleanSupplier}: lambda that returns whether there
+     * is a note in the robot.
+     *
+     * @return the command
+     *
+     * @apiNote This command doesn't end on its own; it must be interrupted to end
+     */
+    public Command indicateLoadedCommand(BooleanSupplier isLoaded){
         return run(() -> {
             setSolidColor(isLoaded.getAsBoolean() ? LEDS.CYAN : LEDS.OFF);
         }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
+    /**
+     * Command to turn the whole light-strip a certain color
+     *
+     * @param color {@code Color}: the color the strip should become
+     *
+     * @return the command
+     *
+     * @apiNote This command runs instantly and ends on the same frame
+     */
     public Command singleColorCommand(Color color){
         return runOnce(() -> {
             setSolidColor(color);
         });
     }
 
+    /**
+     * Command to blink the lights at a certain color with the specified speed
+     *
+     * @param color {@code Color}: the color the lights should be
+     * @param hertz {@code int}: the frequency in hertz that the lights should blink
+     *
+     * @return the command
+     *
+     * @apiNote This command doesn't end on its own; it must be interrupted to end
+     */
     public Command blinkCommand(Color color, int hertz){
         return run(() -> {
             if (((int) (flashTimer.get() * hertz * 2)) % 2 == 0) {
@@ -49,6 +79,13 @@ public class LEDs extends SubsystemBase{
         }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
+    /**
+     * Command to run party mode (rainbow flashing)
+     *
+     * @return the command
+     *
+     * @apiNote This command doesn't end on its own; it must be interrupted to end
+     */
     public Command partyCommand(){
         // The counter variable is required to be final for some reason, so
         // put the editable value in a final array
@@ -64,6 +101,16 @@ public class LEDs extends SubsystemBase{
         }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
+    /**
+     * Command to run the honing lights (show drivers how far off they are)
+     *
+     * @param offset {@code DoubleSupplier}: lambda that returns how far
+     * off-center the target is. Usually a call to PoseVision.offsetFromAprilTag()
+     *
+     * @return the command
+     *
+     * @apiNote This command doesn't end on its own; it must be interrupted to end
+     */
     public Command honeCommand(DoubleSupplier offset){
         return run(() -> {
             if (offset.getAsDouble() >= LEDS.NOT_AIMED_OFFSET){

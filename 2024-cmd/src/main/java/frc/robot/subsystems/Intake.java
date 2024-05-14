@@ -21,6 +21,13 @@ public class Intake extends SubsystemBase {
         intakeMotor.setCurrentLimit(POWER.INTAKE_MOTOR_CURRENT_LIMIT, POWER.INTAKE_MOTOR_CURRENT_LIMIT);
     }
 
+    /**
+     * Command to run the intake motor at the outake velocity constant
+     *
+     * @return the command
+     *
+     * @apiNote This command doesn't end on its own; it must be interrupted to end
+     */
     public Command outakeCommand() {
         return runEnd(() -> {
             // Run continuously until interrupted
@@ -33,6 +40,13 @@ public class Intake extends SubsystemBase {
         }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Command to run the intake motor at the intake velocity constant
+     *
+     * @return the command
+     *
+     * @apiNote This command doesn't end on its own; it must be interrupted to end
+     */
     public Command intakeCommand(){
         return runEnd(() -> {
             targetIntakeVelocity = INTAKE.INTAKE_VELOCITY;
@@ -43,6 +57,13 @@ public class Intake extends SubsystemBase {
         }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Command to stop the intake
+     *
+     * @return the command
+     *
+     * @apiNote This command runs instantly and ends on the same frame
+     */
     public Command stopCommand(){
         return runOnce(() -> {
             targetIntakeVelocity = 0;

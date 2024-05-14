@@ -4,6 +4,14 @@ import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.subsystems.*;
 
 public class StowCommand extends ProxyCommand {
+    /**
+     * Command to stow the robot. Does not automatically override other commands; use
+     * {@link OverrideEverythingCommand} for that
+     *
+     * @param shooter
+     * @param elevator
+     * @param intake
+     */
     public StowCommand(Shooter shooter, Elevator elevator, Intake intake){
         super(
             shooter.stopCommand()

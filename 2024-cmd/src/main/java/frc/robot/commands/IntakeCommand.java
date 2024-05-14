@@ -5,6 +5,14 @@ import frc.robot.subsystems.*;
 import frc.robot.Constants.*;
 
 public class IntakeCommand extends ProxyCommand {
+    /**
+     * Command to run the full intake routine
+     *
+     * @param shooter
+     * @param elevator
+     * @param intake
+     * @param leds
+     */
     public IntakeCommand(Shooter shooter, Elevator elevator, Intake intake, LEDs leds){
         super(
             new StowCommand(shooter, elevator, intake)

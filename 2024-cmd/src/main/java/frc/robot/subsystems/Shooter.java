@@ -58,24 +58,85 @@ public class Shooter extends SubsystemBase {
     }
 
 
-
+    /**
+     * Command to spin up the flywheels to the specified RPMs
+     *
+     * @param leftRPM {@code int}: the target RPM of the left flywheel
+     * (should be faster than the right if there is spin).
+     * @param rightRPM {@code int}: the target RPM of the right flywheel
+     *
+     * @return the command
+     *
+     * @apiNote This command runs until {@link Shooter#readyToShoot()}
+     * returns {@code true}.
+     */
     public Command shooterPrimeCommand(int leftRPM, int rightRPM){
         return new ShooterPrimeCommand(leftRPM, rightRPM)
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
+
+    /**
+     * Command to spin up the flywheels to the specified RPMs
+     *
+     * @param leftRPM {@code IntSupplier}: a lambda that returns the target
+     * RPM of the left flywheel (should be faster than the right if
+     * there is spin).
+     * @param rightRPM {@code IntSupplier}: a lambda that returns the target
+     * RPM of the right flywheel.
+     *
+     * @return the command
+     *
+     * @apiNote This command doesn't end on its own; it must be interrupted
+     * to end
+     */
     public Command shooterPrimeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
         return new ShooterPrimeCommand(leftRPM, rightRPM)
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
-    public Command shooterPrimeCommand(Supplier<RangeTable.RangeEntry> entry){
-        return new ShooterPrimeCommand(entry)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
-    }
+
+    /**
+     * Command to spin up the flywheels to the RPMs stored in
+     * the specified {@code RangeEntry}
+     *
+     * @param entry {@code RangeEntry}: the {@code RangeEntry} object containing 
+     * the target flywheel speeds
+     *
+     * @return the command
+     *
+     * @apiNote This command runs until {@link Shooter#readyToShoot()}
+     * returns {@code true}.
+     */
     public Command shooterPrimeCommand(RangeTable.RangeEntry entry){
         return new ShooterPrimeCommand(entry)
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Command to spin up the flywheels to the RPMs in the supplied
+     * {@code RangeEntry}
+     *
+     * @param entry {@code Supplier<RangeEntry>}: a lambda that returns a
+     * {@code RangeEntry} object containing the target flywheel speeds.
+     *
+     * @return the command
+     *
+     * @apiNote This command doesn't end on its own; it must be interrupted
+     * to end
+     */
+    public Command shooterPrimeCommand(Supplier<RangeTable.RangeEntry> entry){
+        return new ShooterPrimeCommand(entry)
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+
+    /**
+     * Command to run the note in the shooter (if there is one) into the flywheels.
+     * There should be code elsewhere that blocks this from running if the flywheels
+     * aren't spinning.
+     *
+     * @return the command
+     *
+     * @apiNote This command ends after {@link SHOOTER#SHOOT_SCORE_TIME} seconds
+     */
     public Command fireCommand(){
         return run(() -> {
             feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);
@@ -83,6 +144,15 @@ public class Shooter extends SubsystemBase {
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Command to run the flywheels and feeders backwards to score in the amp. There
+     * should be code elsewhere preventing this from running if the elevator isn't in
+     * the amp position.
+     *
+     * @return the command
+     *
+     * @apiNote This command ends after {@link SHOOTER#AMP_SCORE_TIME} seconds
+     */
     public Command ampScoreCommand(){
         return run(() -> {
             feederMotor.setVelocity(SHOOTER.AMP_FEEDER_SPEED);
@@ -91,6 +161,14 @@ public class Shooter extends SubsystemBase {
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Command to stop the flywheels and feeder
+     *
+     * @return the command
+     *
+     * @apiNote This command runs instantly and
+     * ends on the same frame
+     */
     public Command stopCommand(){
         return runOnce(() -> {
             leftShooterMotor.setVelocity(0);
@@ -102,22 +180,46 @@ public class Shooter extends SubsystemBase {
     }
 
 
-
+    /**
+     * Command to run the no-note-yet part of the intake routine. This
+     * should be run with the rest of the intake routine.
+     *
+     * @return the command
+     *
+     * @apiNote This command runs until {@link Shooter#isBottomBeamBreakTripped()}
+     * returns {@code true}
+     */
     public Command intakeNoContactCommand(){
         return run(() -> {
-            feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
+            feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
             setFlywheelVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
         }).until(() -> isBottomBeamBreakTripped())
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
+
+    /**
+     * Command to run the part of the intake routine that gets the note
+     * from the of the feeder to the flywheels.
+     *
+     * @return the command
+     *
+     * @apiNote This command runs until {@link Shooter#isBottomBeamBreakTripped()}
+     * returns {@code false}
+     */
     public Command intakeWithContactCommand(){
         return run(() -> {
-            feederMotor.setPercentOutput(SHOOTER.INTAKE_FEEDER_POWER); // Set PID to when note is disenganged
+            feederMotor.setPercentOutput(SHOOTER.INTAKE_FEEDER_POWER);
             setFlywheelVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
         }).until(() -> !isBottomBeamBreakTripped())
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Command to adjust the note's position to get it in a good spot
+     * for shooting.
+     *
+     * @return the command
+     */
     public Command intakeAdjustNoteCommand(){
         return run(() -> {
             setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
@@ -131,6 +233,15 @@ public class Shooter extends SubsystemBase {
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Command that runs the feeder and flywheels backwards. Usually
+     * needs to be run with {@link Intake#outakeCommand()} as well.
+     *
+     * @return the command
+     *
+     * @apiNote This command doesn't end on its own; it must be
+     * interrupted to end
+     */
     public Command outakeCommand(){
         return run(() -> {
             setFlywheelVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED);
@@ -139,6 +250,15 @@ public class Shooter extends SubsystemBase {
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Command to run the passthrough routine. Usually needs to be
+     * paired with the {@link Intake#intakeCommand()}.
+     *
+     * @return the command
+     *
+     * @apiNote This command doesn't end on its own; it must be
+     * interrupted to end
+     */
     public Command passThroughCommand(){
         return run(() -> {
             if(isBottomBeamBreakTripped()){
@@ -165,7 +285,6 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Middle", middleBeamBreak.get());
         Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Top", topBeamBreak.get());
     }
-
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
     }
@@ -215,6 +334,15 @@ public class Shooter extends SubsystemBase {
         private IntSupplier leftRPM;
         private IntSupplier rightRPM;
         private boolean canEnd = true; //If one of the constructors with supplier inputs is called, this gets set to false and the command runs until interrupted
+
+        /**
+         * Command to constantly drive the flywheels towards the setpoints specified by the {@code IntSupplier} arguments
+         *
+         * @param leftRPM {@code IntSupplier}: lambda that returns the left flywheel setpoint
+         * @param rightRPM {@code IntSupplier}: lambda that returns the right flywheel setpoint
+         *
+         * @apiNote This command does not end on its own; it must be interrupted to end
+         */
         public ShooterPrimeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
             this.leftRPM = leftRPM;
             this.rightRPM = rightRPM;
@@ -222,10 +350,28 @@ public class Shooter extends SubsystemBase {
             addRequirements(Shooter.this); //Refers to the instance of Shooter that parents this instance of ShooterPrimeCommand.
             this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
         }
+
+        /**
+         * Command to spin up the flywheels to the setpoints in the {@code int} arguments
+         *
+         * @param leftRPM {@code int}: the left flywheel setpoint
+         * @param rightRPM {@code int}: the right flywheel setpoint
+         *
+         * @apiNote This command ends when {@link Shooter#readyToShoot()} returns {@code true}
+         */
         public ShooterPrimeCommand(int leftRPM, int rightRPM){
             this(() -> leftRPM, () -> rightRPM);
             canEnd = true;
         }
+
+        /**
+         * Command to constantly drive the flywheels towards the setpoints specified by {@code Supplier<RangeEntry>} argument
+         *
+         * @param entrySupplier {@code Supplier<RangeEntry>} lambda that returns a {@code RangeEntry} containing the target
+         * left and right flywheel speeds.
+         *
+         * @apiNote This command does not end on its own; it must be interrupted to end
+         */
         public ShooterPrimeCommand(Supplier<RangeTable.RangeEntry> entrySupplier){
             this(
                 () -> entrySupplier.get().leftFlywheelSpeed,
@@ -233,6 +379,14 @@ public class Shooter extends SubsystemBase {
             );
             canEnd = false;
         }
+
+        /**
+         * Command to spin up the flywheels to the setpoints in the {@code RangeEntry} argument
+         *
+         * @param entry {@code RangeEntry}: contains the target left and right flywheel speeds.
+         *
+         * @apiNote This command ends when {@link Shooter#readyToShoot()} returns {@code true}
+         */
         public ShooterPrimeCommand(RangeTable.RangeEntry entry){
             this(() -> entry.leftFlywheelSpeed, () -> entry.rightFlywheelSpeed);
             canEnd = true;

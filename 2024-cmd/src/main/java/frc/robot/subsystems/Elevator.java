@@ -12,6 +12,7 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.helpers.*;
@@ -45,19 +46,16 @@ public class Elevator extends SubsystemBase {
         pivotFollowMotor.setMaxAcceleration(7000, 0);
     }
 
-    // public Command setElevatorPositionCommand(double pivotDegrees, double extensionMeters, boolean ends) {
-    //     return new SetElevatorPositionCommand(pivotDegrees, extensionMeters, ends);
-    // }
-    // public Command setElevatorPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters, boolean ends) {
-    //     return new SetElevatorPositionCommand(pivotDegrees, extensionMeters, ends);
-    // }
-    // public Command setElevatorPositionCommand(Supplier<RangeTable.RangeEntry> entrySupplier, boolean ends) {
-    //     return new SetElevatorPositionCommand(entrySupplier, ends);
-    // }
-    // public Command setElevatorPositionCommand(RangeTable.RangeEntry entry, boolean ends) {
-    //     return new SetElevatorPositionCommand(entry, ends);
-    // }
-
+    /**
+     * Command to put the elevator at the given setpoint. Ends when the elevator is at the target.
+     *
+     * @param pivotDegrees {@code double}: the pivot target in degrees
+     * @param extensionMeters {@code double}: the extension target in meters
+     *
+     * @return the command
+     *
+     * @apiNote This command runs until {@link Elevator#isAtTargetPosition()} returns {@code true}
+     */
     public Command setStaticPositionCommand(double pivotDegrees, double extensionMeters){
         return run(() -> {
             targetPivot = pivotDegrees;
@@ -67,6 +65,18 @@ public class Elevator extends SubsystemBase {
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * Command to contantly drive the elevator towards a setpoint that can change as desired.
+     * This command never ends on its own.
+     *
+     * @param pivotDegrees {@code DoubleSupplier}: a lambda that returns where the pivot should be
+     * @param extensionMeters {@code DoubleSupplier}: a lambda that returns how far the extension
+     * should go
+     *
+     * @return the command
+     *
+     * @apiNote This command never ends on its own; it must be interrupted to end
+     */
     public Command setUpdatingPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters){
         return run(() -> {
             targetPivot = pivotDegrees.getAsDouble();
@@ -76,6 +86,18 @@ public class Elevator extends SubsystemBase {
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
+    /**
+     * The same as {@link Elevator#setStaticPositionCommand(double, double)}, but allows the setpoint
+     * to be edited  on the fly and won't end on its own. This is meant to be used together with 
+     * {@link Elevator#incrementElevatorPositionCommand(double, double)}.
+     *
+     * @param pivotDegrees {@code double}: the pivot setpoint to start with
+     * @param extensionMeters {@code double}: the extension setpoint to start with
+     *
+     * @return the command
+     *
+     * @apiNote This command never ends on its own; it must be interrupted to end
+     */
     public Command setMalleablePositionCommand(double pivotDegrees, double extensionMeters){
         targetPivot = pivotDegrees;
         targetExtension = extensionMeters;
@@ -84,8 +106,20 @@ public class Elevator extends SubsystemBase {
         })
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
+
+    /**
+     * If a {@link Elevator#setMalleablePositionCommand(double, double)} command is running, change
+     * the pivot and extension setpoints for the elevator to target. Otherwise, does nothing functional.
+     *
+     * @param pivotDegrees {@code double}: the amount to change the pivot target by
+     * @param extensionMeters {@code double}: the amount to change the extension setpoint by
+     *
+     * @return the command
+     *
+     * @apiNote This command never ends on its own; it must be interrupted to end
+     */
     public Command incrementElevatorPositionCommand(double pivotDegrees, double extensionMeters){
-        return run(() -> {
+        return Commands.run(() -> {
             this.targetPivot += pivotDegrees;
             this.targetExtension += extensionMeters;
         });

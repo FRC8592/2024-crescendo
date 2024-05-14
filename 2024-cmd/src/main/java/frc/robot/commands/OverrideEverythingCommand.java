@@ -11,6 +11,13 @@ import edu.wpi.first.wpilibj2.command.ProxyCommand;
 
 public class OverrideEverythingCommand extends Command {
     Command command;
+
+    /**
+     * Proxy command that cancels all scheduled commands before
+     * scheduling the passed-in command.
+     *
+     * @param command the command to run
+     */
     public OverrideEverythingCommand(Command command) {
         this.command = command;
     }

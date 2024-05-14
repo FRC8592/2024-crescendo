@@ -21,24 +21,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-/**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
 public class RobotContainer {
-    // The robot's subsystems and commands are defined here...
+    // The robot's subsystems
     private final Swerve swerve = new Swerve(new NewtonPigeon2(new Pigeon2(CAN.PIGEON_CAN_ID)));
     private final Shooter shooter = new Shooter();
     private final Intake intake = new Intake();
     private final Elevator elevator = new Elevator();
     private final LEDs leds = new LEDs();
 
-    //NOT subsystems
+    //Any helpers that need to be instantiated go here:
     private final PoseVision poseVision = new PoseVision(
         APRILTAG_VISION.kP,
         APRILTAG_VISION.kI,
@@ -59,7 +50,7 @@ public class RobotContainer {
         NOTELOCK.DRIVE_TO_TURN_kD
     );
 
-    // Replace with CommandPS4Controller or CommandJoystick if needed
+    // Controllers
     private final CommandXboxController driverController = new CommandXboxController(
         CONTROLLERS.DRIVER_PORT
     );
@@ -67,24 +58,39 @@ public class RobotContainer {
         CONTROLLERS.OPERATOR_PORT
     );
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
+    //Run config functions here
     public RobotContainer() {
         configureDefaults();
         configureBindings();
     }
 
+    //Please use this.setDefaultCommand() instead of SubsystemBase.setDefaultCommand() here.
+    //The method from this class includes a check for interruption behavior.
+
+    /**
+     * Configure default commands for the subsystems
+     */
     private void configureDefaults(){
+        // Set the swerve's default command to drive with joysticks
         setDefaultCommand(swerve, swerve.driveCommand(
             () -> driverController.getLeftX(),
             () -> driverController.getLeftY(),
             () -> driverController.getRightX()
         ));
 
-        setDefaultCommand(leds, leds.defaultCommand(() -> shooter.isMiddleBeamBreakTripped()));
+        // Set the LED strip's default command to showing whether or not the robot is loaded
+        setDefaultCommand(leds, leds.indicateLoadedCommand(() -> shooter.isMiddleBeamBreakTripped()));
     }
 
+
+    //Any commands that are reused a lot but can't go in a separate class go here
+
+    /**
+     * Snap the swerve to the set angle. Does NOT need to be left-right corrected
+     *
+     * @param angle Rotation2d containing the angle setpoint
+     * @return the swerve.snapToCommand
+     */
     private Command snapToCommand(Rotation2d angle){
         return swerve.snapToCommand(
             () -> driverController.getLeftX(),
@@ -93,6 +99,9 @@ public class RobotContainer {
         );
     }
 
+    /**
+     * Configure all button bindings here
+     */
     private void configureBindings() {
         // Translate on Driver Left Stick -------------- DONE
         // Rotate on Driver Right Stick ---------------- DONE
@@ -119,41 +128,56 @@ public class RobotContainer {
         // Led Amp Signal on Operator Back ------------- DONE
         // Trap Prime on Operator Start ---------------- DONE
 
-        driverController.rightBumper().onTrue(
-            swerve.slowModeCommand(true)
+        // Slow Mode (hold)
+        driverController.rightBumper()
+        .onTrue(
+            swerve.slowModeCommand(true) // Enable slow mode
         ).onFalse(
-            swerve.slowModeCommand(false)
+            swerve.slowModeCommand(false) // Disable slow mode
         );
 
+        // Reset Gyroscope (press)
         driverController.back().onTrue(
             swerve.zeroGyroscopeCommand()
         );
 
+        //Autocollect (hold)
         driverController.a().whileTrue(swerve.noExpoRotationCommand(
-            () -> driverController.getLeftX(),
-            () -> 0,
-            () -> noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE).omegaRadiansPerSecond
+            () -> driverController.getLeftX(), // Drive forward and back freely
+            () -> 0, // No side-to-side
+
+            // Rotation speed of the autocollect function (turn towards the note)
+            () -> noteLock.driveToTarget(
+                turnPID,
+                drivePID,
+                NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE
+            ).omegaRadiansPerSecond
         ));
 
+        // Robot-oriented (hold)
         driverController.leftBumper().onTrue(
-            swerve.robotOrientedCommand(true)
+            swerve.robotOrientedCommand(true) // Enable robot-oriented driving
         ).onFalse(
-            swerve.robotOrientedCommand(false)
+            swerve.robotOrientedCommand(false) // Disable robot-oriented driving
         );
 
-        driverController.rightTrigger(0.1).onTrue(
+        // Amp-score or shoot (press) + force-shoot (hold)
+        driverController.rightTrigger(0.1).onTrue( // <-- The 0.1 is the threshold
             elevator.isAmp()
-            ?(
+            ?( // This runs if the elevator is in the amp position
                 new AmpScoreCommand(shooter, elevator, intake, leds)
             )
-            :(
+            :( // This block runs if the elevator is NOT in the amp position
+
                 driverController.getHID().getXButton()
                 ?( //If X button (force-shoot) pressed,
+
                     //Override any elevator positioning that might have been happening and shoot
                     new OverrideEverythingCommand(new ShootCommand(shooter, elevator, intake, leds))
                 )
-                :(
-                    //Otherwise, reject if we're not reasonably prepared
+                :( // If the force-shoot button is NOT pressed,
+
+                    // Refuse to shoot if we're not reasonably prepared
                     new ShootCommand(shooter, elevator, intake, leds).onlyIf(() ->
                         shooter.readyToShoot() && elevator.isAtTargetPosition()
                     )
@@ -161,89 +185,109 @@ public class RobotContainer {
             )
         );
 
+        // Party Mode (hold)
         driverController.start().whileTrue(
             leds.partyCommand()
         );
 
+        // Pass-aim (hold)
         driverController.y().whileTrue(
             snapToCommand(Rotation2d.fromDegrees(
                 DriverStation.getAlliance().get() == Alliance.Red ? 330 : 30
             ))
         );
 
+        // Stow (press)
         driverController.b().onTrue(
+            // This clears all scheduled commands and stows, meaning the robot
+            // will stow without reference to what it was previously doing.
             new OverrideEverythingCommand(new StowCommand(shooter, elevator, intake))
         );
 
+        // Snap-to (hold)
         driverController.pov(0).whileTrue(
             snapToCommand(Rotation2d.fromDegrees(0))
         );
-
         driverController.pov(90).whileTrue(
             snapToCommand(Rotation2d.fromDegrees(90))
         );
-
         driverController.pov(180).whileTrue(
             snapToCommand(Rotation2d.fromDegrees(180))
         );
-
         driverController.pov(270).whileTrue(
             snapToCommand(Rotation2d.fromDegrees(270))
         );
 
 
 
+        //Passthrough (hold)
         operatorController.rightTrigger(0.1).whileTrue(
             new PassThroughCommand(shooter, elevator, intake, leds)
         );
 
+        //Vision Prime (press)
         operatorController.rightBumper().onTrue(
             new PrimeCommand(
+                // Lambda that returns the table entry corresponding to distance to the tag
                 () -> RangeTable.get(poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)),
                 shooter, elevator, intake, leds,
+                // For the honing lights
                 () -> poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
             )
         );
 
+        //Podium Prime (press)
         operatorController.b().onTrue(
             new PrimeCommand(
                 RangeTable.getPodium(), shooter, elevator, intake, leds,
+                // For the honing lights
                 () -> poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
             )
         );
 
-        operatorController.leftBumper().onTrue(
+        // Outake (hold)
+        operatorController.leftBumper().whileTrue(
             new OutakeCommand(shooter, intake)
         );
 
+        // Intake (press)
         operatorController.leftTrigger(0.1).onTrue(
             new IntakeCommand(shooter, elevator, intake, leds)
         );
 
+        // Stow (press)
         operatorController.a().onTrue(
             new OverrideEverythingCommand(new StowCommand(shooter, elevator, intake))
         );
 
+        // Amp prime (press)
         operatorController.x().onTrue(
             elevator.setStaticPositionCommand(
                 ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP
             )
         );
 
+        // Climb position (press)
         operatorController.y().onTrue(
             new ClimbCommand(elevator, intake, shooter)
         );
 
+        // Extend (hold)
         operatorController.pov(0).whileTrue(
             elevator.incrementElevatorPositionCommand(0, ELEVATOR.MANUAL_EXTENSION_SPEED)
         );
 
+        // Retract (hold)
         operatorController.pov(180).whileTrue(
             elevator.incrementElevatorPositionCommand(0, -ELEVATOR.MANUAL_EXTENSION_SPEED)
         );
 
-        operatorController.back().whileTrue(leds.blinkCommand(LEDS.YELLOW, 2));
+        // Note Request (hold)
+        operatorController.back().whileTrue(
+            leds.blinkCommand(LEDS.YELLOW, 2)
+        );
 
+        // Trap Prime (press)
         operatorController.start().onTrue(
             new PrimeCommand(RangeTable.getTrap(), shooter, elevator, intake, leds, () -> 0)
         );
@@ -261,6 +305,15 @@ public class RobotContainer {
         return swerve.autonomousInit();
     }
 
+    /**
+     * Set the default command of a subsystem (what to run if no other command requiring it is running).
+     * <p> NOTE: all subsystems also have a setDefaultCommand method; this version includes a check for
+     * default commands that cancel incoming commands that require the subsystem. Unless you're sure
+     * of what you're doing, you should use this one.
+     *
+     * @param subsystem the subsystem to apply the default command to
+     * @param command to command to set as default
+     */
     private void setDefaultCommand(SubsystemBase subsystem, Command command){
         if(command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf){
             subsystem.setDefaultCommand(command);

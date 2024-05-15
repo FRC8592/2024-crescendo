@@ -11,7 +11,7 @@ public class PrimeCommand extends ProxyCommand {
 
     /**
      * Command to do a static prime (see the other constructor for this class for vision-prime). Command
-     * ends when both the shooter and elevator are fully ready to shoot.
+     * never ends on its own; the shoot command logic must cancel this command.
      *
      * @param entry {@code RangeEntry}: the {@code RangeEntry} to prime to
      * @param shooter
@@ -32,16 +32,15 @@ public class PrimeCommand extends ProxyCommand {
         super(
             shooter.shooterPrimeCommand(entry)
             .alongWith(elevator.setStaticPositionCommand(entry.pivotAngle, entry.elevatorHeight))
-            .deadlineWith(leds.honeCommand(offsetSupplier))
+            .alongWith(leds.honeCommand(offsetSupplier))
         );
         addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime
-        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        this.withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
     /**
      * Command to do a vision prime (see the other constructor for this class for static prime). Command
-     * never ends on its own (the task of checking whether the robot falls on code outside this command).
-     * This command cancels itself if a command requiring one of the subsystems is scheduled.
+     * never ends on its own; the shoot command logic must cancel this command.
      *
      * @param entry {@code Supplier<RangeEntry>}: lambda that returns the latest update of the {@code RangeEntry}
      * to prime to

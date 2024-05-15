@@ -333,7 +333,6 @@ public class Shooter extends SubsystemBase {
     private class ShooterPrimeCommand extends Command{
         private IntSupplier leftRPM;
         private IntSupplier rightRPM;
-        private boolean canEnd = true; //If one of the constructors with supplier inputs is called, this gets set to false and the command runs until interrupted
 
         /**
          * Command to constantly drive the flywheels towards the setpoints specified by the {@code IntSupplier} arguments
@@ -346,7 +345,6 @@ public class Shooter extends SubsystemBase {
         public ShooterPrimeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
             this.leftRPM = leftRPM;
             this.rightRPM = rightRPM;
-            canEnd = false;
             addRequirements(Shooter.this); //Refers to the instance of Shooter that parents this instance of ShooterPrimeCommand.
             this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
         }
@@ -357,11 +355,10 @@ public class Shooter extends SubsystemBase {
          * @param leftRPM {@code int}: the left flywheel setpoint
          * @param rightRPM {@code int}: the right flywheel setpoint
          *
-         * @apiNote This command ends when {@link Shooter#readyToShoot()} returns {@code true}
+         * @apiNote This command does not end on its own; it must be interrupted to end
          */
         public ShooterPrimeCommand(int leftRPM, int rightRPM){
             this(() -> leftRPM, () -> rightRPM);
-            canEnd = true;
         }
 
         /**
@@ -377,7 +374,6 @@ public class Shooter extends SubsystemBase {
                 () -> entrySupplier.get().leftFlywheelSpeed,
                 () -> entrySupplier.get().rightFlywheelSpeed
             );
-            canEnd = false;
         }
 
         /**
@@ -385,11 +381,10 @@ public class Shooter extends SubsystemBase {
          *
          * @param entry {@code RangeEntry}: contains the target left and right flywheel speeds.
          *
-         * @apiNote This command ends when {@link Shooter#readyToShoot()} returns {@code true}
+         * @apiNote This command does not end on its own; it must be interrupted to end
          */
         public ShooterPrimeCommand(RangeTable.RangeEntry entry){
             this(() -> entry.leftFlywheelSpeed, () -> entry.rightFlywheelSpeed);
-            canEnd = true;
         }
         public void initialize(){}
         public void execute(){
@@ -397,7 +392,7 @@ public class Shooter extends SubsystemBase {
         }
         public void end(boolean interrupted){}
         public boolean isFinished(){
-            return readyToShoot() && canEnd;
+            return false;
         }
     }
 }

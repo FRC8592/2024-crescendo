@@ -110,15 +110,8 @@ public class MainSubsystemsManager {
 
             case STOWED:
 
-
-                if(userControls.intake){
-                    this.mechanismState = MechanismState.INTAKING;
-                }
-                else if(userControls.climb){
+                if(userControls.climb){
                     this.mechanismState = MechanismState.CLIMB_PRIME;
-                }
-                else if (userControls.outake){
-                    this.mechanismState = MechanismState.OUTTAKING;
                 }
                 else if (!elevator.isAtTargetPosition()){
                     this.mechanismState = MechanismState.STOWING;
@@ -129,118 +122,20 @@ public class MainSubsystemsManager {
                 else if(userControls.amp){
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 }
-                else if(userControls.passThrough){
-                    this.mechanismState = MechanismState.PASS_THROUGH_PRIME;
-                }
-                else {
-                    this.staticPrime(RangeTable.get(1.4));
-                }
                 break;
 
 
             // Gets the note to the flywheels from the ground. TODO make sure we don't need the extra timer we had in the old shooter version of this
 
             case INTAKING:
-                intakeTimer.start(); //Keep the timer running but always zero until we see a note
-                intakeTimer.reset();
-
-                intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
-                // shooter.setFeederPower(1);
-                shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
+                shooter.setShootVelocity(0,0);
 
-                leds.solidColor(LEDS.ORANGE);
-
-                if(shooter.isBottomBeamBreakTripped()){
-                    this.mechanismState = MechanismState.INTAKING_2;
+                if(shooter.isTopBeamBreakTripped()){
+                    shooter.setFeederPower(0);
+                    this.mechanismState = MechanismState.AMP_PRIMED;
                 }
 
-                break;
-
-            // Continues intaking while bottom beam break is hit until note fully passes it
-
-            case INTAKING_2:
-                intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
-                shooter.setFeederPower(1); // Set PID to when note is engaged
-                shooter.setShootVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED, SHOOTER.INTAKE_FLYWHEEL_SPEED);
-
-                leds.blinkColor(LEDS.ORANGE, 3);
-
-                if(!shooter.isBottomBeamBreakTripped()){
-                    this.mechanismState = MechanismState.ADJUSTING_1;
-                    intake.stopIntake();
-                }
-
-                break;
-
-            // First adjustment phase after intaking that positions the note just above the top beam-break.
-
-            case ADJUSTING_1:
-                shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
-                shooter.setFeederVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
-
-                leds.blinkColor(LEDS.ORANGE, 3);
-
-                if(shooter.isTopBeamBreakTripped() && shooter.feederMotor.getVelocity() < 0){
-                    this.mechanismState = MechanismState.ADJUSTING_2;
-                }
-                break;
-
-
-            // Second adjustment phase after intaking; positions the note in its final position just below the top beam-break
-
-            case ADJUSTING_2:
-                shooter.setShootVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED, SHOOTER.ALIGN_FLYWHEEL_SPEED);
-                shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
-
-                leds.blinkColor(LEDS.ORANGE, 3);
-
-                if(!shooter.isTopBeamBreakTripped()){ //if beam break NOT tripped, exclamation point
-                    this.mechanismState = MechanismState.LOADED;
-                    // shooter.stopFeeders();
-                    shooter.setFeederVelocity(0, 1);
-                    shooter.setShootVelocity(0, 0);
-                    // shooter.stopFlywheels();
-                }
-                break;
-
-
-            // "Stow" state, but for when we have a note
-
-            case LOADED:
-                shooter.setShootVelocity(userRange.leftFlywheelSpeed, userRange.rightFlywheelSpeed);
-
-                if(userControls.outake){
-                    this.mechanismState = MechanismState.OUTTAKING;
-                }
-                else if(userControls.climb){
-                    this.mechanismState = MechanismState.CLIMB_PRIME;
-                }
-                else if(desireShot(userControls)){
-                    this.mechanismState = MechanismState.PRIMING;
-                }
-                else if(userControls.amp){
-                    this.mechanismState = MechanismState.PRIMING_AMP;
-                }
-                else if(userControls.passThrough){
-                    this.mechanismState = MechanismState.PASS_THROUGH_PRIME;
-                }
-                else {
-                    this.staticPrime(RangeTable.get(1.4));
-                }
-                break;
-
-
-            // Regurgitate the note
-
-            case OUTTAKING:
-                intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
-                shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED, 2);
-                shooter.setShootVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED, SHOOTER.OUTAKE_FLYWHEEL_SPEED);
-
-                if(!userControls.outake){ // Is NOT pressed
-                    this.mechanismState = MechanismState.STOWING;
-                }
                 break;
 
 
@@ -248,14 +143,25 @@ public class MainSubsystemsManager {
 
             case PRIMING:
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
-                elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
-
-                leds.hone();
+                // elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
-                } else if((shooter.readyToShoot() && elevator.isAtTargetPosition() && aimed) || userControls.forceShoot) {
+                }
+                else if(shooter.readyToShoot() && elevator.isAtTargetPosition()) {
                     this.mechanismState = MechanismState.PRIMED;
+                }
+                else if(userControls.manualExtend){
+                    elevator.extend();
+                } 
+                else if(userControls.manualRetract){
+                    elevator.retract();
+                }
+                if(userControls.manualPivotIncrease){
+                    elevator.pivotIncrease();
+                } 
+                else if(userControls.manualPivotDecrease){
+                    elevator.pivotDecrease();
                 }
 
                 break;
@@ -270,16 +176,24 @@ public class MainSubsystemsManager {
 
                 // Redundant setting of speeds in case of manual overwriting by drivers
                 shooter.setShootVelocity((int) userRange.leftFlywheelSpeed, (int) userRange.rightFlywheelSpeed);
-                elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
-
-                leds.hone();
+                // elevator.setElevatorPosition(userRange.pivotAngle, userRange.elevatorHeight);
 
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
-                } else if((!shooter.readyToShoot() || !elevator.isAtTargetPosition() || !aimed) && !userControls.forceShoot){
-                    this.mechanismState = MechanismState.PRIMING;
                 } else if(userControls.score){
                     this.mechanismState = MechanismState.SHOOTING;
+                }
+                else if(userControls.manualExtend){
+                    elevator.extend();
+                } 
+                else if(userControls.manualRetract){
+                    elevator.retract();
+                }
+                if(userControls.manualPivotIncrease){
+                    elevator.pivotIncrease();
+                } 
+                else if(userControls.manualPivotDecrease){
+                    elevator.pivotDecrease();
                 }
 
                 break;
@@ -292,7 +206,7 @@ public class MainSubsystemsManager {
 
 
                 if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
-                    this.mechanismState = MechanismState.STOWING;
+                    this.mechanismState = MechanismState.PRIMING_AMP;
                 }
                 break;
 
@@ -331,6 +245,9 @@ public class MainSubsystemsManager {
                 }
                 else if(userControls.climb){
                     this.mechanismState = MechanismState.CLIMB_PRIME;
+                }
+                else if(userControls.intake){
+                    this.mechanismState = MechanismState.INTAKING;
                 }
                 break;
 
@@ -373,47 +290,13 @@ public class MainSubsystemsManager {
                 else if(userControls.manualRetract){
                     elevator.retract();
                 }
-
-
-                break;
-
-            case PASS_THROUGH_PRIME:
-                    shooter.setShootVelocity(5000, 5000);
-
-                    leds.solidColor(LEDS.ORANGE);
-
-                    if(shooter.readyToShoot()){
-                        this.mechanismState = MechanismState.PASS_THROUGH_2;
-                    }
-
-                    break;
-
-            case PASS_THROUGH_1:
-                intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
-                    shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
-                    shooter.setShootVelocity(5000, 5000);
-
-                    leds.blinkColor(LEDS.ORANGE, 4);
-
-                    if(shooter.isBottomBeamBreakTripped()){
-                        this.mechanismState = MechanismState.PASS_THROUGH_2;
-                    }
-
-                    break;
-            case PASS_THROUGH_2:
-                intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
-                shooter.setFeederPower(1); // Set PID to when note is engaged
-                shooter.setShootVelocity(5000, 5000);
-
-                leds.blinkColor(LEDS.ORANGE, 4);
-
-                if(userControls.passThrough){
-                    this.mechanismState = MechanismState.PASS_THROUGH_1;
+                if(userControls.manualPivotIncrease){
+                    elevator.pivotIncrease();
+                } 
+                else if(userControls.manualPivotDecrease){
+                    elevator.pivotDecrease();
                 }
-                else if(!shooter.isBottomBeamBreakTripped()){
-                    this.mechanismState = MechanismState.STOWING;
-                    intake.stopIntake();
-                }
+
 
                 break;
 
@@ -425,11 +308,7 @@ public class MainSubsystemsManager {
     }
 
     public boolean desireShot(Controls userControls) {
-        return userControls.shootFromPodium
-                        || userControls.score // For a subwoofer shot
-                        || userControls.kiddyPoolShot
-                        || userControls.rangeTableShoot
-                        || userControls.trapPrime;
+        return userControls.score || userControls.rangeTableShoot;
     }
     public void resetToStowed(){
         this.mechanismState = MechanismState.STOWED;

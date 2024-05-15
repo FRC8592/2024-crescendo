@@ -44,7 +44,7 @@ public class Intake {
      * @param speed the power to send to the motors
      */
     public void spinPercentOutput(double speed) {
-        topMotor.setPercentOutput(speed);
+        // topMotor.setPercentOutput(speed);
         // bottomMotor.setPercentOutput(speed);
     }
 
@@ -76,10 +76,10 @@ public class Intake {
      * @param top Velocity for top motor (RPM)
      */
     public void setIntakeVelocity(/*double bottom, */double top) {
-        topMotor.setVelocity(top);
-        // bottomMotor.setVelocity(bottom);
+        // topMotor.setVelocity(top);
+        // // bottomMotor.setVelocity(bottom);
 
-        getTopMotorVelocityRPM();
+        // getTopMotorVelocityRPM();
         // getBottomMotorVelocityRPM();
     }
 }

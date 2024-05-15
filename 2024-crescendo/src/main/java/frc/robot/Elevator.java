@@ -177,6 +177,16 @@ public class Elevator {
         desiredExtension -= ELEVATOR.MANUAL_EXTENSION_SPEED;
         desiredExtension = Math.max(desiredExtension, 0);
     }
+    
+    public void pivotIncrease() {
+        desiredPivot += ELEVATOR.MANUAL_EXTENSION_SPEED;
+        desiredPivot = Math.min(desiredPivot, ELEVATOR.EXTENSION_METERS_MAX);
+    }
+
+    public void pivotDecrease() {
+        desiredPivot -= ELEVATOR.MANUAL_EXTENSION_SPEED;
+        desiredPivot = Math.max(desiredPivot, 0);
+    }
 
     public void setElevatorPosition(double angle, double length){
         setExtensionLengthCustom(length);

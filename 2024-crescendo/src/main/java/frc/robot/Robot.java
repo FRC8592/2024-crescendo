@@ -30,8 +30,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import frc.robot.autonomous.*;
-import frc.robot.autonomous.autons.*;
 import frc.robot.RangeTable.RangeEntry;
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
@@ -50,10 +48,6 @@ public class Robot extends LoggedRobot {
     //Controllers
     private XboxController driverController;
     private XboxController operatorController;
-
-    //Autonomous objects
-    private BaseAuto currentAuto;
-    private AutonomousSelector autoSelect;
 
     //Subsystem and hardware objects
     private NewtonPigeon2 pigeon;
@@ -132,7 +126,6 @@ public class Robot extends LoggedRobot {
 
         driverController = new XboxController(CONTROLLERS.DRIVER_PORT);
         operatorController = new XboxController(CONTROLLERS.OPERATOR_PORT);
-        autoSelect = new AutonomousSelector();
 
         pigeon = new NewtonPigeon2(new Pigeon2(CAN.PIGEON_CAN_ID));
         swerve = new Swerve(pigeon);
@@ -210,26 +203,14 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
-        // shooter.setAlliance(DriverStation.getAlliance().get());
-        swerve.zeroGyroscope();
-        currentAuto = autoSelect.getSelectedAutonomous();
-        subsystemsManager.resetToLoaded();
-        currentAuto.addModules(swerve, elevator, intake, shooter, noteLock, poseVision, subsystemsManager);
-        currentAuto.initialize();
-        currentAuto.addDelay(autoSelect.getDelay());
-        swerve.resetEncoder();
-        swerve.resetPose(currentAuto.getStartPose());
-        swerve.setSteerAnglesToAbsEncoder();
-        swerve.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
-        swerve.drive(new ChassisSpeeds());
     }
 
     @Override
     public void autonomousPeriodic() {
-        currentRange = new RangeEntry(0, 0, 0);
-        leds.solidColor(LEDS.OFF);
-        currentAuto.periodic();
-        leds.update(0, false);
+        // currentRange = new RangeEntry(0, 0, 0);
+        // leds.solidColor(LEDS.OFF);
+        // currentAuto.periodic();
+        // leds.update(0, false);
         // subsystemsManager.updateMechanismStateMachine(controls, distance, locked); //`controls` is only updated in teleop, so MSM basically only responds to the state-setter used in the commands
     }
 
@@ -241,10 +222,6 @@ public class Robot extends LoggedRobot {
         swerve.setThrottleCurrentLimit(POWER.SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT);
         leds.solidColor(LEDS.OFF);
         currentAlliance = DriverStation.getAlliance().get();
-        if(currentAuto != null){
-            swerve.setGyroscopeRotation(currentAuto.getStartPose().getRotation().getDegrees()
-                    - swerve.getGyroscopeRotation().getDegrees());
-        }
 
         // Set the yaw lock to a benign value
         yawLock = false;
@@ -379,64 +356,23 @@ public class Robot extends LoggedRobot {
             yawLockValue = 0;
         }
 
-        if (controls.slowMode) { //Slow Mode slows down the robot for better precision & control
-            currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                    driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                    driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * swerve.getMaxTranslateVelo(),
-                    driveRotate * SWERVE.ROTATE_POWER_SLOW * swerve.getMaxAngularVelo()));
-        }
-        else {
-            currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                    driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                    driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
-                    driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
-        }
-        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, controls.robotOriented?new Rotation2d():swerve.getGyroscopeRotation());
+        currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
+                driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo(),
+                driveRotate * SWERVE.ROTATE_POWER_FAST * swerve.getMaxAngularVelo()));
+        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currentSpeeds, swerve.getGyroscopeRotation());
         noteLock.updateVision();
 
-        if(driverController.getLeftTriggerAxis() > 0.1){
+        if(controls.autoAim){
             double omega = poseVision.visual_servo(0, 10, APRILTAG_VISION.SPEAKER_AIM_TAGS, 1.5);
             currentSpeeds = new ChassisSpeeds(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, omega);
             yawLock = false;
             yawLockValue = swerve.getYaw();
         }
 
-        if(controls.autoCollect){
-            currentSpeeds = noteLock.driveToTarget(turnPID, drivePID, NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE);
-            currentSpeeds.vxMetersPerSecond = driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * swerve.getMaxTranslateVelo();
-            currentSpeeds.vyMetersPerSecond = 0;
-            controls.intake = true;
-            yawLock = false;
-            yawLockValue = swerve.getYaw();
-        }
-
-        if(controls.kiddyPoolShot){
-            subsystemsManager.staticPrime(RangeTable.getKiddyPool());
-        }
-        else if(controls.shootFromPodium){
-            RangeTable.RangeEntry entry = RangeTable.getPodium();
-            subsystemsManager.staticPrime(entry);
-        }
         else if(controls.rangeTableShoot){
             subsystemsManager.setVisionPrime();
         }
-        else if (controls.trapPrime) {
-            subsystemsManager.staticPrime(RangeTable.getTrap());
-        }
-
-        if(controls.passAim){
-            if(currentAlliance == Alliance.Red){
-                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(330);
-                yawLockValue = 330;
-            }
-            if(currentAlliance == Alliance.Blue){
-                currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(30);
-                yawLockValue = 30;
-            }
-            
-            yawLock = false;
-        }
-
         switch(driverController.getPOV()){
             case 0: case 180: // In either of these cases
                 currentSpeeds.omegaRadiansPerSecond = swerve.turnToAngle(driverController.getPOV());
@@ -460,6 +396,7 @@ public class Robot extends LoggedRobot {
         swerve.drive(currentSpeeds);
         leds.solidColor(LEDS.OFF);
         subsystemsManager.updateMechanismStateMachine(controls, distance, locked);
+        leds.blinkColor(LEDS.RED, 8);
         if(controls.ledAmpSignal){
             leds.blinkColor(LEDS.YELLOW, 4);
         }
@@ -476,8 +413,13 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledPeriodic() {
-        leds.solidColor(LEDS.WHITE);
-        leds.update(0,false);
+        if(DriverStation.isEStopped()){
+            leds.solidColor(LEDS.GREEN);
+        }
+        else{
+            leds.blinkColor(LEDS.ORANGE, 4);
+        }
+        leds.update(0, true);
     }
 
     @Override

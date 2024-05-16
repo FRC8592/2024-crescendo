@@ -18,7 +18,6 @@ public class MainSubsystemsManager {
         INTAKING_2,
         ADJUSTING_1,
         ADJUSTING_2,
-        LOADED,
         OUTTAKING,
         PRIMING,
         PRIMED,
@@ -33,7 +32,7 @@ public class MainSubsystemsManager {
         PASS_THROUGH_2
     }
 
-    public MechanismState mechanismState = MechanismState.LOADED;
+    public MechanismState mechanismState = MechanismState.STOWED;
     public Intake intake;
     public Shooter shooter;
     public Elevator elevator;
@@ -312,8 +311,5 @@ public class MainSubsystemsManager {
     }
     public void resetToStowed(){
         this.mechanismState = MechanismState.STOWED;
-    }
-    public void resetToLoaded(){
-        this.mechanismState = MechanismState.LOADED;
     }
 }

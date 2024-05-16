@@ -218,12 +218,12 @@ public class Shooter {
      * @apiNote You must call this method before shooting
      */
     public boolean readyToShoot() {
-        SmartDashboard.putNumber("topShooterRPM", leftShooterMotor.getVelocity());
-        SmartDashboard.putNumber("bottomShooterRPM", rightShooterMotor.getVelocity());
+        // SmartDashboard.putNumber("topShooterRPM", leftShooterMotor.getVelocity());
+        // SmartDashboard.putNumber("bottomShooterRPM", rightShooterMotor.getVelocity());
         if (Math.abs(leftShooterMotor.getVelocity() - leftTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE
                 // && Math.abs(rightShooterMotor.getVelocity() - rightTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE
-                && leftTargetSpeed > 1000
-                && rightTargetSpeed > 1000) {
+                && leftTargetSpeed > 500
+                && rightTargetSpeed > 500) {
             return true;
         }
         return false;

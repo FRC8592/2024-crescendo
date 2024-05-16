@@ -228,25 +228,25 @@ public class NewtonSwerve {
             m_frontRightModule.getModulePosition(), m_backLeftModule.getModulePosition(),
             m_backRightModule.getModulePosition()};
 
-        SwerveModuleState[] readStates = new SwerveModuleState[]{
-            new SwerveModuleState(ticks100MSToRPM(m_frontLeftModule.getThrottleVelocity(null)), Rotation2d.fromDegrees(m_frontLeftModule.getSteerAngle())),
-            new SwerveModuleState(ticks100MSToRPM(m_frontRightModule.getThrottleVelocity(null)), Rotation2d.fromDegrees(m_frontRightModule.getSteerAngle())),
-            new SwerveModuleState(ticks100MSToRPM(m_backLeftModule.getThrottleVelocity(null)), Rotation2d.fromDegrees(m_backLeftModule.getSteerAngle())),
-            new SwerveModuleState(ticks100MSToRPM(m_backRightModule.getThrottleVelocity(null)), Rotation2d.fromDegrees(m_backRightModule.getSteerAngle()))
+        double[] readStates = new double[]{
+            ticks100MSToRPM(m_frontLeftModule.getThrottleVelocity(null)), ticks100MSToRPM(m_frontLeftModule.getAzimuthVelocity(null)),
+            ticks100MSToRPM(m_frontRightModule.getThrottleVelocity(null)), ticks100MSToRPM(m_frontRightModule.getAzimuthVelocity(null)),
+            ticks100MSToRPM(m_backLeftModule.getThrottleVelocity(null)), ticks100MSToRPM(m_backLeftModule.getAzimuthVelocity(null)),
+            ticks100MSToRPM(m_backRightModule.getThrottleVelocity(null)), ticks100MSToRPM(m_backRightModule.getAzimuthVelocity(null))
         };
 
         this.odometry.update(this.getGyroscopeRotation(), readPositions);
         this.m_poseEstimator.update(getGyroscopeRotation(), readPositions);
 
         Logger.recordOutput(SWERVE.LOG_PATH+"SwerveRead", readStates);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/ThrottleReadRPM", readStates[0].speedMetersPerSecond);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/AzimuthReadRPM", readStates[0].angle);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/ThrottleReadRPM", readStates[1].speedMetersPerSecond);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/AzimuthReadRPM", readStates[1].angle);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/ThrottleReadRPM", readStates[2].speedMetersPerSecond);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/AzimuthReadRPM", readStates[2].angle);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/ThrottleReadRPM", readStates[3].speedMetersPerSecond);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/AzimuthReadRPM", readStates[3].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/ThrottleReadRPM", readStates[0]);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/AzimuthReadRPM", readStates[1]);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/ThrottleReadRPM", readStates[2]);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/AzimuthReadRPM", readStates[3]);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/ThrottleReadRPM", readStates[4]);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/AzimuthReadRPM", readStates[5]);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/ThrottleReadRPM", readStates[6]);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/AzimuthReadRPM", readStates[7]);
     }
 
     // zero the absolute encoder for all modules

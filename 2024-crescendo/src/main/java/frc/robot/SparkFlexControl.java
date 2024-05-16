@@ -102,7 +102,7 @@ public class SparkFlexControl {
 
     public void setPositionSmartMotion(double rotations){
         motorControl.setReference(rotations, ControlType.kSmartMotion, 0);
-        SmartDashboard.putNumber("smart motion", rotations);
+        // SmartDashboard.putNumber("smart motion", rotations);
     }
 
     public void setMaxVelocity(double maxVelocity, int slotID){

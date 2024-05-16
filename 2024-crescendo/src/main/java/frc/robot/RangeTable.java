@@ -153,16 +153,16 @@ public class RangeTable {
     }
 
     public static RangeEntry getSubwoofer() {
-        return get(1.4);
+        return new RangeEntry(4000, 4000, 0, 0.0);
     }
 
     public static RangeEntry getPodium() { // TODO:  Return this to a normal podium shot.  It has a temporary power boost.
         // return get(2.83);
-        return new RangeEntry(2000, 1000, 27.5, 0.0);
+        return new RangeEntry(3000, 1500, 27.5, 0.0);
     }
 
     public static RangeEntry getTrap() { // TODO:  Return this to a normal podium shot.  It has a temporary power boost.
         // return get(2.83);
-        return new RangeEntry(2000, 2000, 5, 0.0);
+        return new RangeEntry(4000, 4000, 5, 0.0);
     }
 }

@@ -73,7 +73,7 @@ public final class Constants {
 
         public static final int LEFT_SHOOTER_MOTOR_CURRENT_LIMIT = 60;
         public static final int RIGHT_SHOOTER_MOTOR_CURRENT_LIMIT = 60;
-        public static final int FEEDER_MOTOR_CURRENT_LIMIT = 5;
+        public static final int FEEDER_MOTOR_CURRENT_LIMIT = 30;
 
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 60;
         public static final int PIVOT_MOTOR_CURRENT_LIMIT = 40;
@@ -205,11 +205,11 @@ public final class Constants {
         public static final int AMP_FEEDER_SPEED = -3000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 500;
+        public static final int INTAKE_FEEDER_SPEED = 1000;
 
         //No shooter speed because we use the range table
         // public static final int SHOOTING_FEEDER_SPEED = 2500;
-        public static final double SHOOTING_FEEDER_POWER = 0.3;
+        public static final double SHOOTING_FEEDER_POWER = 1;
 
         public static final int OUTAKE_FLYWHEEL_SPEED = -500; //TODO: Figure out what this should be.
         public static final double OUTAKE_FEEDER_SPEED = -2000;
@@ -262,13 +262,14 @@ public final class Constants {
         public static final int PIVOT_ANGLE_STOWED = 0;
 
         public static final double EXTENSION_METERS_AMP = 0.27;
-        public static final int PIVOT_ANGLE_AMP = 45; // TODO: Adjust this angle
+        public static final int PIVOT_ANGLE_AMP = 35; // TODO: Adjust this angle
 
         public static final double EXTENSION_METERS_CLIMB = 0.279;
         public static final int PIVOT_ANGLE_CLIMB = 75; // TODO: Adjust this angle
 
 
         public static final double MANUAL_EXTENSION_SPEED = 0.005; //TODO: Adjust this
+        public static final double MANUAL_PIVOT_SPEED = 0.1; //TODO: Adjust this
 
 
         public static final double PIVOT_GEAR_RATIO = (12.0 / 5.0) * 75.0; // 12/5 is the ratio of the large pulley to small pulley. 75 is from the gearbox.
@@ -322,10 +323,10 @@ public final class Constants {
         public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI;
 
 
-        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(145.02+180); // 
-        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(339.785-180); // 
-        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(62.93+180);    // 
-        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(3.867+180); // 
+        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(320.977); // 145.02+180
+        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(159.17); // 339.785-180
+        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(249.961);    // 62.93+180 // 246.709
+        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(174.639); // 3.867+180
 
 
         public static final double TRANSLATE_POWER_FAST = 1.0; // Scaling for teleop driving. 1.0 is maximum
@@ -379,6 +380,6 @@ public final class Constants {
     }
 
     public class RANGE_TABLE{
-        public static final double OFFSET_ANGLE = 0.5; // prev. -0.5
+        public static final double OFFSET_ANGLE = 0.25; // prev. 0.5
     }
 }

@@ -54,7 +54,7 @@ public class Intake {
      */
     public double getTopMotorVelocityRPM() {
         double topMotorVelocity = topMotor.getVelocity();
-        SmartDashboard.putNumber("Measured Intake Top RPM", topMotorVelocity);
+        // SmartDashboard.putNumber("Measured Intake Top RPM", topMotorVelocity);
         return topMotorVelocity;
     }
 

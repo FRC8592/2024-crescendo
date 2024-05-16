@@ -1,5 +1,6 @@
 package frc.robot;
 
+import org.ejml.equation.IntegerSequence.Range;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -108,7 +109,9 @@ public class MainSubsystemsManager {
             // Does nothing; assumes STOWING has put everything in the robot in the home position
 
             case STOWED:
-
+                if(userControls.score){
+                    this.staticPrime(RangeTable.getSubwoofer());
+                }
                 if(userControls.climb){
                     this.mechanismState = MechanismState.CLIMB_PRIME;
                 }
@@ -147,7 +150,7 @@ public class MainSubsystemsManager {
                 if (userControls.amp) {
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 }
-                else if(shooter.readyToShoot() && elevator.isAtTargetPosition()) {
+                else if(shooter.readyToShoot()) {
                     this.mechanismState = MechanismState.PRIMED;
                 }
                 else if(userControls.manualExtend){
@@ -237,7 +240,8 @@ public class MainSubsystemsManager {
                 leds.solidColor(LEDS.CYAN);
 
                 if(userControls.score){
-                    this.mechanismState = MechanismState.AMP_SCORING;
+                    this.staticPrime(RangeTable.getPodium());
+                    this.mechanismState = MechanismState.PRIMING;
                 }
                 else if (desireShot(userControls)){
                     this.mechanismState = MechanismState.PRIMING;

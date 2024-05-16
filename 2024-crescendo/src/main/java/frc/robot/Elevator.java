@@ -31,13 +31,13 @@ public class Elevator {
         pivotMotor.setInverted();
         pivotMotor.motorControl.setIZone(ELEVATOR.PIVOT_IZONE * ELEVATOR.PIVOT_GEAR_RATIO); // pivot degrees
 
-        pivotMotor.setMaxVelocity(6500, 0);
-        pivotFollowMotor.setMaxVelocity(6500, 0);
+        pivotMotor.setMaxVelocity(2000, 0);
+        pivotFollowMotor.setMaxVelocity(2000, 0);
 
-        extensionMotor.setMaxVelocity(5000, 0); // TODO: Why is this so slow?????
+        extensionMotor.setMaxVelocity(6400, 0);
 
-        pivotMotor.setMaxAcceleration(7000, 0);
-        pivotFollowMotor.setMaxAcceleration(7000, 0);
+        pivotMotor.setMaxAcceleration(2000, 0);
+        pivotFollowMotor.setMaxAcceleration(2000, 0);
 
         extensionMotor.setMaxAcceleration(10000, 0);
         
@@ -179,12 +179,12 @@ public class Elevator {
     }
     
     public void pivotIncrease() {
-        desiredPivot += ELEVATOR.MANUAL_EXTENSION_SPEED;
-        desiredPivot = Math.min(desiredPivot, ELEVATOR.EXTENSION_METERS_MAX);
+        desiredPivot += ELEVATOR.MANUAL_PIVOT_SPEED;
+        desiredPivot = Math.min(desiredPivot, ELEVATOR.PIVOT_ANGLE_MAX);
     }
 
     public void pivotDecrease() {
-        desiredPivot -= ELEVATOR.MANUAL_EXTENSION_SPEED;
+        desiredPivot -= ELEVATOR.MANUAL_PIVOT_SPEED;
         desiredPivot = Math.max(desiredPivot, 0);
     }
 
@@ -196,4 +196,7 @@ public class Elevator {
     public boolean isAtTargetPosition(){
         return isTargetAngle() && isTargetLength();
     }
+    // public boolean isStowed(){
+    //     return this.isAtTargetPosition() && this.desiredExtension == ELEVATOR.EXTENSION_METERS_STOWED && this.desiredPivot == ELEVATOR.PIVOT_ANGLE_STOWED
+    // }
 }

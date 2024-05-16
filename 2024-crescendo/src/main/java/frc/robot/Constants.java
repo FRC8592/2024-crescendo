@@ -324,7 +324,7 @@ public final class Constants {
 
         public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(320.977); // 145.02+180
         public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(159.17); // 339.785-180
-        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(246.709);    // 62.93+180
+        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -Math.toRadians(249.961);    // 62.93+180 // 246.709
         public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(174.639); // 3.867+180
 
 

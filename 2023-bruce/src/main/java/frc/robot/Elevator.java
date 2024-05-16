@@ -29,16 +29,16 @@ public class Elevator {
     private final int PID_TILT_DOWN_SLOT = 1;
 
     // Acceleration in RPM per second
-    private final double MAX_ACCELERATION_UP_LIFT = 6000d;
-    private final double MAX_ACCELERATION_DOWN_LIFT = 6000d;
-    private final double MAX_ACCELERATION_TILT_UP = 10000d;
-    private final double MAX_ACCELERATION_TILT_DOWN = 5000d;
+    private final double MAX_ACCELERATION_UP_LIFT = 2000d;
+    private final double MAX_ACCELERATION_DOWN_LIFT = 2000d;
+    private final double MAX_ACCELERATION_TILT_UP = 3000d;
+    private final double MAX_ACCELERATION_TILT_DOWN = 2000d;
 
     // Velocity in RPM
-    private final double MAX_VELOCITY_UP_LIFT = 6000d;
-    private final double MAX_VELOCITY_DOWN_LIFT = 6000d;
-    private final double MAX_VELOCITY_TILT_UP = 4000d;
-    private final double MAX_VELOCITY_TILT_DOWN = 6000d;
+    private final double MAX_VELOCITY_UP_LIFT = 2000d;
+    private final double MAX_VELOCITY_DOWN_LIFT = 2000d;
+    private final double MAX_VELOCITY_TILT_UP = 1250d;
+    private final double MAX_VELOCITY_TILT_DOWN = 2000d;
 
     // Current in Amps
     private final int MAX_CURRENT_LIFT = 30; // Amps

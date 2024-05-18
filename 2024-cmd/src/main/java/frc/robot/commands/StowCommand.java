@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
+import frc.robot.commands.proxies.OverrideEverythingCommand;
 import frc.robot.subsystems.*;
 
 public class StowCommand extends ProxyCommand {

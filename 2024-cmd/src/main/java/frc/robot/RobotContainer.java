@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.*;
 import frc.robot.commands.*;
+import frc.robot.commands.proxies.*;
 import frc.robot.helpers.*;
 import frc.robot.subsystems.*;
 
@@ -17,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -162,10 +164,20 @@ public class RobotContainer {
         );
 
         // Amp-score or shoot (press) + force-shoot (hold)
-        driverController.rightTrigger(0.1).onTrue( // <-- The 0.1 is the threshold
+        driverController.rightTrigger(0.1).whileTrue( // <-- The 0.1 is the threshold
+
+            /*
+             * This is a bit of a weird trigger. We want it to handle amp scoring, static shots, and vision shots.
+             * To do that, we use a whileTrue trigger and override it where necessary. On the amp score, we always
+             * override it with the ScheduleCommand. On the speaker score, we apply the whileTrue to a
+             * WaitForCondition command, but then don't apply it to the the ShootCommand inside. This means that
+             * it won't keep trying to shoot after the trigger is released, but it will finish shooting if the
+             * trigger is released in the middle of the shot.
+            */
+
             elevator.isAmp()
             ?( // This runs if the elevator is in the amp position
-                new AmpScoreCommand(shooter, elevator, intake, leds)
+                new ScheduleCommand(new AmpScoreCommand(shooter, elevator, intake, leds))
             )
             :( // This block runs if the elevator is NOT in the amp position
 
@@ -178,8 +190,10 @@ public class RobotContainer {
                 :( // If the force-shoot button is NOT pressed,
 
                     // Refuse to shoot if we're not reasonably prepared
-                    new ShootCommand(shooter, elevator, intake, leds).onlyIf(() ->
-                        shooter.readyToShoot() && elevator.isAtTargetPosition()
+                    new WaitForConditionCommand(
+                        () -> shooter.readyToShoot() && elevator.isAtTargetPosition(),
+                        new ShootCommand(shooter, elevator, intake, leds)
+                        .andThen(new StowCommand(shooter, elevator, intake))
                     )
                 )
             )

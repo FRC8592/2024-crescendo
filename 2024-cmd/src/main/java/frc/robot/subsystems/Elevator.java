@@ -19,6 +19,19 @@ import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
 public class Elevator extends SubsystemBase {
+    public enum Positions{
+        STOWED(ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_METERS_STOWED),
+        AMP(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP),
+        CLIMB(ELEVATOR.PIVOT_ANGLE_CLIMB, ELEVATOR.EXTENSION_METERS_CLIMB),;
+
+        public double pivot;
+        public double extension;
+        Positions(double pivot, double extension){
+            this.pivot = pivot;
+            this.extension = extension;
+        }
+    }
+
     private SparkFlexControl extensionMotor;
     private SparkFlexControl pivotMotor;
     private SparkFlexControl pivotFollowMotor;
@@ -66,6 +79,24 @@ public class Elevator extends SubsystemBase {
     }
 
     /**
+     * Command to put the elevator at the given position. Ends when the elevator is at the target.
+     *
+     * @param position {@code Positions}: the position to go to
+     *
+     * @return the command
+     *
+     * @apiNote This command runs until {@link Elevator#isAtTargetPosition()} returns {@code true}
+     */
+    public Command setStaticPositionCommand(Positions position){
+        return run(() -> {
+            targetPivot = position.pivot;
+            targetExtension = position.extension;
+            runElevator();
+        }).until(() -> isAtTargetPosition())
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+
+    /**
      * Command to contantly drive the elevator towards a setpoint that can change as desired.
      * This command never ends on its own.
      *
@@ -101,6 +132,26 @@ public class Elevator extends SubsystemBase {
     public Command setMalleablePositionCommand(double pivotDegrees, double extensionMeters){
         targetPivot = pivotDegrees;
         targetExtension = extensionMeters;
+        return run(() -> {
+            runElevator();
+        })
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+
+    /**
+     * The same as {@link Elevator#setStaticPositionCommand(Position)}, but allows the setpoint
+     * to be edited  on the fly and won't end on its own. This is meant to be used together with 
+     * {@link Elevator#incrementElevatorPositionCommand(double, double)}.
+     *
+     * @param position {@code Positions}: the position to go to
+     *
+     * @return the command
+     *
+     * @apiNote This command never ends on its own; it must be interrupted to end
+     */
+    public Command setMalleablePositionCommand(Positions position){
+        targetPivot = position.pivot;
+        targetExtension = position.extension;
         return run(() -> {
             runElevator();
         })

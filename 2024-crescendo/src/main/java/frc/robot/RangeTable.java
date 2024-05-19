@@ -158,7 +158,7 @@ public class RangeTable {
 
     public static RangeEntry getPodium() { // TODO:  Return this to a normal podium shot.  It has a temporary power boost.
         // return get(2.83);
-        return new RangeEntry(3000, 1500, 27.5, 0.0);
+        return new RangeEntry(2500, 2500, 27.5, 0.0);
     }
 
     public static RangeEntry getTrap() { // TODO:  Return this to a normal podium shot.  It has a temporary power boost.

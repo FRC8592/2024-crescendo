@@ -133,7 +133,7 @@ public class MainSubsystemsManager {
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0); // Set PID to when note is disenganged
                 shooter.setShootVelocity(0,0);
 
-                if(shooter.isTopBeamBreakTripped()){
+                if(shooter.isMiddleBeamBreakTripped()){
                     shooter.setFeederPower(0);
                     this.mechanismState = MechanismState.AMP_PRIMED;
                 }
@@ -208,6 +208,8 @@ public class MainSubsystemsManager {
 
 
                 if(shootTimer.hasElapsed(SHOOTER.SHOOT_SCORE_TIME)){
+                    shooter.setFeederPower(0);
+                    shooter.setShootVelocity(0, 0);
                     this.mechanismState = MechanismState.PRIMING_AMP;
                 }
                 break;

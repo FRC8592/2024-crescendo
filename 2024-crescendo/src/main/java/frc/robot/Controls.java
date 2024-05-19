@@ -42,7 +42,7 @@ public class Controls {
     public void update(XboxController driverController, XboxController operatorController){
         this.resetGyro = driverController.getBackButton();
 
-        this.autoAim = operatorController.getLeftBumper();
+        this.autoAim = driverController.getLeftBumper();//changed operator to driver
         this.score = operatorController.getRightTriggerAxis()>0.1;
         this.partyMode = operatorController.getStartButton();
         this.intake = operatorController.getLeftTriggerAxis() > 0.1;

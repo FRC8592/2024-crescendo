@@ -73,14 +73,14 @@ public final class Constants {
 
         public static final int LEFT_SHOOTER_MOTOR_CURRENT_LIMIT = 60;
         public static final int RIGHT_SHOOTER_MOTOR_CURRENT_LIMIT = 60;
-        public static final int FEEDER_MOTOR_CURRENT_LIMIT = 30;
+        public static final int FEEDER_MOTOR_CURRENT_LIMIT = 40;
 
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 60;
         public static final int PIVOT_MOTOR_CURRENT_LIMIT = 40;
         public static final int PIVOT_FOLLOW_MOTOR_CURRENT_LIMIT = 40;
 
         public static final int SWERVE_MAX_VOLTAGE = 12;
-        public static final int SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 10;
+        public static final int SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 12;
         public static final int SWERVE_AUTO_THROTTLE_CURRENT_LIMIT = 60;
         public static final int SWERVE_AZIMUTH_CURRENT_LIMIT = 40;
 
@@ -205,11 +205,11 @@ public final class Constants {
         public static final int AMP_FEEDER_SPEED = -3000; //TODO: Figure out what this should actually be
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
-        public static final int INTAKE_FEEDER_SPEED = 1000;
+        public static final int INTAKE_FEEDER_SPEED = 1500;
 
         //No shooter speed because we use the range table
         // public static final int SHOOTING_FEEDER_SPEED = 2500;
-        public static final double SHOOTING_FEEDER_POWER = 1;
+        public static final double SHOOTING_FEEDER_POWER = 0.75;
 
         public static final int OUTAKE_FLYWHEEL_SPEED = -500; //TODO: Figure out what this should be.
         public static final double OUTAKE_FEEDER_SPEED = -2000;

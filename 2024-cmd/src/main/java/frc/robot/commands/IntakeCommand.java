@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.subsystems.*;
 import frc.robot.Constants.*;
+import frc.robot.commands.proxies.*;
 
-public class IntakeCommand extends ProxyCommand {
+public class IntakeCommand extends NewtonCommand {
     /**
      * Command to run the full intake routine
      *

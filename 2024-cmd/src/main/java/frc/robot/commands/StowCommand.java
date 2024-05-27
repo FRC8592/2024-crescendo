@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.commands.proxies.OverrideEverythingCommand;
 import frc.robot.subsystems.*;
+import frc.robot.commands.proxies.*;
 
-public class StowCommand extends ProxyCommand {
+public class StowCommand extends NewtonCommand {
     /**
      * Command to stow the robot. Does not automatically override other commands; use
      * {@link OverrideEverythingCommand} for that

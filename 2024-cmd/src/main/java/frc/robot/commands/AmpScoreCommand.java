@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.subsystems.*;
 import frc.robot.Constants.*;
+import frc.robot.commands.proxies.NewtonCommand;
 
-public class AmpScoreCommand extends ProxyCommand {
+public class AmpScoreCommand extends NewtonCommand {
     /**
      * Command to score in the amp. Assumes the elevator is already in the amp
      * position (must be checked elsewhere)

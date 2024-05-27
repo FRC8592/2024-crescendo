@@ -3,11 +3,11 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.helpers.RangeTable;
 import frc.robot.subsystems.*;
+import frc.robot.commands.proxies.*;
 
-public class PrimeCommand extends ProxyCommand {
+public class PrimeCommand extends NewtonCommand {
 
     /**
      * Command to do a static prime (see the other constructor for this class for vision-prime). Command

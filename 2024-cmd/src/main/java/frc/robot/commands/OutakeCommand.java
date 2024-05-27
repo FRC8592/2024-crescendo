@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.commands.proxies.*;
 
-public class OutakeCommand extends ProxyCommand {
+public class OutakeCommand extends NewtonCommand {
     /**
      * Command to outake. Note that this command is independent of what the elevator might be doing
      *

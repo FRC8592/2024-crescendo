@@ -13,12 +13,20 @@ import com.NewtonSwerve.*;
 import com.NewtonSwerve.Mk4.*;
 import com.NewtonSwerve.Gyro.Gyro;
 import frc.robot.Constants.*;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.Timer;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 import frc.robot.*;
@@ -474,5 +482,111 @@ public class Swerve extends SubsystemBase {
         );
 
         return currentSpeeds;
+    }
+
+    private class FollowPathCommand extends Command{
+        private Trajectory trajectory;
+        private Timer timer = new Timer();
+
+        private BooleanSupplier useAlternateRotation = () -> {return true;};
+        private Supplier<Rotation2d> alternateRotation = () -> {return new Rotation2d();};
+        private BooleanSupplier useAlternateTranslation = () -> {return false;};
+        private Supplier<ChassisSpeeds> alternateTranslation = () -> {return new ChassisSpeeds();};
+
+
+        private ProfiledPIDController turnController;
+        private HolonomicDriveController drivePID;
+        private PIDController xController;
+        private PIDController yController;
+
+        public FollowPathCommand(Trajectory trajectory){
+            this.trajectory = trajectory;
+
+            this.xController = new PIDController(
+                SWERVE.PATH_FOLLOW_DRIVE_kP,
+                SWERVE.PATH_FOLLOW_DRIVE_kI,
+                SWERVE.PATH_FOLLOW_DRIVE_kD
+            );
+            this.xController.setTolerance(
+                SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
+                SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
+            );
+
+            this.yController = new PIDController(
+                SWERVE.PATH_FOLLOW_DRIVE_kP,
+                SWERVE.PATH_FOLLOW_DRIVE_kI,
+                SWERVE.PATH_FOLLOW_DRIVE_kD
+            );
+            this.yController.setTolerance(
+                SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
+                SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
+            );
+
+            this.turnController = new ProfiledPIDController(
+                SWERVE.PATH_FOLLOW_STEER_kP,
+                SWERVE.PATH_FOLLOW_STEER_kI,
+                SWERVE.PATH_FOLLOW_STEER_kD,
+                new Constraints(
+                    SWERVE.PATH_FOLLOW_STEER_MAX_VELOCITY,
+                    SWERVE.PATH_FOLLOW_STEER_MAX_ACCELLERATION
+                )
+            );
+            this.turnController.setTolerance(
+                SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
+                SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
+            );
+            this.turnController.enableContinuousInput(-Math.PI, Math.PI);
+
+            this.drivePID = new HolonomicDriveController(xController, yController, turnController);
+        }
+
+        public FollowPathCommand(
+            Trajectory trajectory,
+            BooleanSupplier useAlternateRotation, Supplier<Rotation2d> rotationSupplier,
+            BooleanSupplier useAlternateTranslation, Supplier<ChassisSpeeds> translationSupplier
+        ){
+            this(trajectory);
+            this.useAlternateRotation = useAlternateRotation;
+            this.alternateRotation = rotationSupplier;
+            this.useAlternateRotation = useAlternateTranslation;
+            this.alternateTranslation = translationSupplier;
+        }
+
+        public void initialize(){
+            timer.reset();
+            timer.start();
+            Swerve.this.swerve.drive(new ChassisSpeeds());
+        }
+        public void execute(){
+            State desiredState = trajectory.sample(timer.get());
+            if(Robot.isReal()){
+                ChassisSpeeds driveSpeeds = drivePID.calculate(
+                    getCurrentPos(),
+                    desiredState,
+                    desiredState.poseMeters.getRotation()
+                );
+
+                if(useAlternateRotation.getAsBoolean()){
+                    driveSpeeds.omegaRadiansPerSecond = alternateRotation.get().getRadians();
+                }
+
+                if(useAlternateTranslation.getAsBoolean()){
+                    driveSpeeds.vxMetersPerSecond = alternateTranslation.get().vxMetersPerSecond;
+                    driveSpeeds.vyMetersPerSecond = alternateTranslation.get().vyMetersPerSecond;
+                }
+
+                Swerve.this.swerve.drive(driveSpeeds);
+            }
+            else{
+                Robot.FIELD.setRobotPose(desiredState.poseMeters);
+            }
+        }
+        public boolean isFinished(){
+            return (
+                timer.hasElapsed(trajectory.getTotalTimeSeconds())
+                && !useAlternateRotation.getAsBoolean()
+                && !useAlternateTranslation.getAsBoolean()
+            );
+        }
     }
 }

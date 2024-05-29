@@ -316,7 +316,7 @@ public class Swerve extends SubsystemBase {
      * @apiNote This command runs for one frame and ends immediately
      */
     public Command autonomousInit(){
-        return runOnce(() -> {
+        return Commands.runOnce(() -> {
             this.resetEncoder();
             this.resetPose(new Pose2d());
             this.resetToAbsEncoders();
@@ -325,6 +325,52 @@ public class Swerve extends SubsystemBase {
             this.chassisSpeedsDriveCommand(new ChassisSpeeds())
         ).alongWith(
             this.zeroGyroscopeCommand()
+        );
+    }
+
+    /**
+     * Command to follow the given path.
+     *
+     * @param trajectory {@code Trajectory}: the path to follow
+     * @return the command
+     *
+     * @apiNote this command ends when the entire path has been followed. See the FollowPathCommand class in {@link Swerve}
+     */
+    public Command followPathCommand(Trajectory trajectory){
+        return new FollowPathCommand(trajectory).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+
+    /**
+     * Command to follow a path with the option to deviate from it as configured by the parameters
+     *
+     * @param trajectory {@code Trajectory}: the path to follow
+     *
+     * @param useAlternateRotation {@code BooleanSupplier}: a lambda that returns whether to use
+     * the alternate rotation provided by {@code rotationSupplier}
+     *
+     * @param rotationSupplier {@code Supplier<Rotation2d>}: a lambda that returns the alternate
+     * rotation to be used when {@code useAlternateRotation} returns {@code true}. NOTE: The degree
+     * and radian values stored in the Rotation2d are used as a velocity setpoint, not a position
+     * setpoint, so you have to run your own control loop (as needed) for this to work.
+     *
+     * @param useAlternateTranslation {@code BooleanSupplier}: a lambda that returns whether to use
+     * the alternate translation provided by {@code translationSupplier}
+     *
+     * @param translationSupplier {@code Supplier<ChassisSpeeds}: a lambda that returns the alternate
+     * translation to be used when {@code useAlternatTranslation} returns {@code true}. The rotation
+     * component of the {@code ChassisSpeeds} is ignored.
+     */
+    public Command followPathCommand(
+        Trajectory trajectory,
+        BooleanSupplier useAlternateRotation, Supplier<Rotation2d> rotationSupplier,
+        BooleanSupplier useAlternateTranslation, Supplier<ChassisSpeeds> translationSupplier
+    ){
+        return new FollowPathCommand(
+            trajectory,
+            useAlternateRotation, rotationSupplier,
+            useAlternateTranslation, translationSupplier
+        ).withInterruptBehavior(
+            InterruptionBehavior.kCancelIncoming
         );
     }
 
@@ -493,7 +539,6 @@ public class Swerve extends SubsystemBase {
         private BooleanSupplier useAlternateTranslation = () -> {return false;};
         private Supplier<ChassisSpeeds> alternateTranslation = () -> {return new ChassisSpeeds();};
 
-
         private ProfiledPIDController turnController;
         private HolonomicDriveController drivePID;
         private PIDController xController;
@@ -582,8 +627,9 @@ public class Swerve extends SubsystemBase {
             }
         }
         public boolean isFinished(){
-            return (
+            return ( // Only return true if enough time has elapsed, we're at the target location, and we're not using alternate movement.
                 timer.hasElapsed(trajectory.getTotalTimeSeconds())
+                && drivePID.atReference()
                 && !useAlternateRotation.getAsBoolean()
                 && !useAlternateTranslation.getAsBoolean()
             );

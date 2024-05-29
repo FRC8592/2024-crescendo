@@ -7,6 +7,7 @@ package frc.robot;
 import org.littletonrobotics.junction.LoggedRobot;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -37,6 +38,10 @@ public class Robot extends LoggedRobot {
         // and put our
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
+
+        if(!isReal()){
+            SmartDashboard.putData(FIELD);
+        }
     }
 
     /**

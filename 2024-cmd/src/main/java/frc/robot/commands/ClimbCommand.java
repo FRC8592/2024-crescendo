@@ -29,6 +29,5 @@ public class ClimbCommand extends NewtonCommand {
                 )
             )
         );
-        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

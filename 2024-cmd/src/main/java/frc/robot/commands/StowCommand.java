@@ -19,6 +19,5 @@ public class StowCommand extends NewtonCommand {
             .alongWith(intake.stopCommand())
             .alongWith(elevator.setStaticPositionCommand(0, 0))
         );
-        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

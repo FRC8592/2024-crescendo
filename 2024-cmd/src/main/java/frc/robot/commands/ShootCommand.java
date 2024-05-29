@@ -21,6 +21,5 @@ public class ShootCommand extends NewtonCommand {
             shooter.fireCommand()
             .alongWith(leds.singleColorCommand(LEDS.OFF))
         );
-        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

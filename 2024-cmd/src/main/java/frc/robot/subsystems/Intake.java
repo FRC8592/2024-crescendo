@@ -8,7 +8,6 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
@@ -37,7 +36,7 @@ public class Intake extends SubsystemBase {
             // Run once when interrupted
             targetIntakeVelocity = 0;
             intakeMotor.setVelocity(0);
-        }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        });
     }
 
     /**
@@ -54,7 +53,7 @@ public class Intake extends SubsystemBase {
         }, () -> {
             targetIntakeVelocity = 0;
             intakeMotor.setVelocity(0);
-        }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        });
     }
 
     /**

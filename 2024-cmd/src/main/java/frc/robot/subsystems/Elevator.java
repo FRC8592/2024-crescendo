@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -14,7 +13,6 @@ import com.revrobotics.CANSparkBase.ControlType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
@@ -74,8 +72,7 @@ public class Elevator extends SubsystemBase {
             targetPivot = pivotDegrees;
             targetExtension = extensionMeters;
             runElevator();
-        }).until(() -> isAtTargetPosition())
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        }).until(() -> isAtTargetPosition());
     }
 
     /**
@@ -92,8 +89,7 @@ public class Elevator extends SubsystemBase {
             targetPivot = position.pivot;
             targetExtension = position.extension;
             runElevator();
-        }).until(() -> isAtTargetPosition())
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        }).until(() -> isAtTargetPosition());
     }
 
     /**
@@ -113,8 +109,7 @@ public class Elevator extends SubsystemBase {
             targetPivot = pivotDegrees.getAsDouble();
             targetExtension = extensionMeters.getAsDouble();
             runElevator();
-        })
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        });
     }
 
     /**
@@ -134,8 +129,7 @@ public class Elevator extends SubsystemBase {
         targetExtension = extensionMeters;
         return run(() -> {
             runElevator();
-        })
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        });
     }
 
     /**
@@ -154,8 +148,7 @@ public class Elevator extends SubsystemBase {
         targetExtension = position.extension;
         return run(() -> {
             runElevator();
-        })
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        });
     }
 
     /**
@@ -168,6 +161,7 @@ public class Elevator extends SubsystemBase {
      * @return the command
      *
      * @apiNote This command never ends on its own; it must be interrupted to end
+     * @apiNote This command does NOT require the Elevator subsystem
      */
     public Command incrementElevatorPositionCommand(double pivotDegrees, double extensionMeters){
         return Commands.run(() -> {

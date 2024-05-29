@@ -169,7 +169,7 @@ public class Swerve extends SubsystemBase {
                 suppliedRot.getAsDouble(),
                 true
             ));
-        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        });
     }
 
     /**
@@ -201,7 +201,7 @@ public class Swerve extends SubsystemBase {
 
             processed.omegaRadiansPerSecond = snapToAngle(angle);
             swerve.drive(processed);
-        }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        });
     }
 
     /**
@@ -232,7 +232,7 @@ public class Swerve extends SubsystemBase {
 
             processed.omegaRadiansPerSecond = rotationSpeedSupplier.getAsDouble();
             swerve.drive(processed);
-        }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        });
     }
 
     /**
@@ -337,7 +337,7 @@ public class Swerve extends SubsystemBase {
      * @apiNote this command ends when the entire path has been followed. See the FollowPathCommand class in {@link Swerve}
      */
     public Command followPathCommand(Trajectory trajectory){
-        return new FollowPathCommand(trajectory).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        return new FollowPathCommand(trajectory);
     }
 
     /**
@@ -369,8 +369,6 @@ public class Swerve extends SubsystemBase {
             trajectory,
             useAlternateRotation, rotationSupplier,
             useAlternateTranslation, translationSupplier
-        ).withInterruptBehavior(
-            InterruptionBehavior.kCancelIncoming
         );
     }
 

@@ -37,6 +37,5 @@ public class IntakeCommand extends NewtonCommand {
                 )
             )
         );
-        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

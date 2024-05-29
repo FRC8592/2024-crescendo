@@ -346,7 +346,6 @@ public class Shooter extends SubsystemBase {
             this.leftRPM = leftRPM;
             this.rightRPM = rightRPM;
             addRequirements(Shooter.this); //Refers to the instance of Shooter that parents this instance of ShooterPrimeCommand.
-            this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
         }
 
         /**

@@ -35,7 +35,6 @@ public class PrimeCommand extends NewtonCommand {
             .alongWith(leds.honeCommand(offsetSupplier))
         );
         addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime
-        this.withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
     /**
@@ -58,6 +57,5 @@ public class PrimeCommand extends NewtonCommand {
             .alongWith(leds.honeCommand(offsetSupplier))
         );
         addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime
-        this.withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 }

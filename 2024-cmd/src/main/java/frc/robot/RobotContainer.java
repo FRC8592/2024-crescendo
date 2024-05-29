@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.*;
 import frc.robot.commands.*;
+import frc.robot.commands.autonomous.Autos;
 import frc.robot.commands.proxies.*;
 import frc.robot.helpers.*;
 import frc.robot.subsystems.*;
@@ -204,12 +205,14 @@ public class RobotContainer {
             leds.partyCommand()
         );
 
-        // Pass-aim (hold)
-        driverController.y().whileTrue(
-            snapToCommand(Rotation2d.fromDegrees(
-                DriverStation.getAlliance().get() == Alliance.Red ? 330 : 30
-            ))
-        );
+        try{
+            // Pass-aim (hold)
+            driverController.y().whileTrue(
+                snapToCommand(Rotation2d.fromDegrees(
+                    DriverStation.getAlliance().get() == Alliance.Red ? 330 : 30
+                ))
+            );
+        }catch(Exception e){}
 
         // Stow (press)
         driverController.b().onTrue(
@@ -316,7 +319,7 @@ public class RobotContainer {
         // An example command will be run in autonomous
         // return Autos.exampleAuto(m_exampleSubsystem);
         // TODO finish autoInit and figure out the auto framework
-        return swerve.autonomousInit();
+        return swerve.autonomousInit().andThen(Autos.exampleAuto(swerve, shooter, elevator, intake, leds));
     }
 
     /**

@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Constants.*;
 
 public class LEDs extends SubsystemBase{
@@ -40,7 +39,7 @@ public class LEDs extends SubsystemBase{
     public Command indicateLoadedCommand(BooleanSupplier isLoaded){
         return run(() -> {
             setSolidColor(isLoaded.getAsBoolean() ? LEDS.CYAN : LEDS.OFF);
-        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        });
     }
 
     /**
@@ -76,7 +75,7 @@ public class LEDs extends SubsystemBase{
             else {
                 setSolidColor(LEDS.OFF);
             }
-        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        });
     }
 
     /**
@@ -98,7 +97,7 @@ public class LEDs extends SubsystemBase{
                 ledBuffer.setRGB(i, RGB[0], RGB[1], RGB[2]);
             }
             ledStrip.setData(ledBuffer);
-        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        });
     }
 
     /**
@@ -130,7 +129,7 @@ public class LEDs extends SubsystemBase{
             else{
                 setSolidColor(LEDS.GREEN);
             }
-        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        });
     }
 
     private void setSolidColor(Color color){

@@ -18,6 +18,5 @@ public class OutakeCommand extends NewtonCommand {
             shooter.outakeCommand()
             .alongWith(intake.outakeCommand())
         );
-        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

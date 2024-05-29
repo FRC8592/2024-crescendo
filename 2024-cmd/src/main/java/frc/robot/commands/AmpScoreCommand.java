@@ -21,6 +21,5 @@ public class AmpScoreCommand extends NewtonCommand {
             shooter.ampScoreCommand()
             .alongWith(leds.singleColorCommand(LEDS.OFF))
         );
-        this.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

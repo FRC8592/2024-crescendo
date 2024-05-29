@@ -79,10 +79,12 @@ public class RobotContainer {
             () -> driverController.getLeftX(),
             () -> driverController.getLeftY(),
             () -> driverController.getRightX()
-        ));
+        ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         // Set the LED strip's default command to showing whether or not the robot is loaded
-        setDefaultCommand(leds, leds.indicateLoadedCommand(() -> shooter.isMiddleBeamBreakTripped()));
+        setDefaultCommand(leds, leds.indicateLoadedCommand(
+            () -> shooter.isMiddleBeamBreakTripped()
+        ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
 
 
@@ -155,7 +157,7 @@ public class RobotContainer {
                 drivePID,
                 NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE
             ).omegaRadiansPerSecond
-        ));
+        ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
         // Robot-oriented (hold)
         driverController.leftBumper().onTrue(
@@ -178,7 +180,10 @@ public class RobotContainer {
 
             elevator.isAmp()
             ?( // This runs if the elevator is in the amp position
-                new ScheduleCommand(new AmpScoreCommand(shooter, elevator, intake, leds))
+                new ScheduleCommand(
+                    new AmpScoreCommand(shooter, elevator, intake, leds)
+                    .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                )
             )
             :( // This block runs if the elevator is NOT in the amp position
 
@@ -186,7 +191,10 @@ public class RobotContainer {
                 ?( //If X button (force-shoot) pressed,
 
                     //Override any elevator positioning that might have been happening and shoot
-                    new OverrideEverythingCommand(new ShootCommand(shooter, elevator, intake, leds))
+                    new OverrideEverythingCommand(
+                        new ShootCommand(shooter, elevator, intake, leds)
+                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                    )
                 )
                 :( // If the force-shoot button is NOT pressed,
 
@@ -195,6 +203,7 @@ public class RobotContainer {
                         () -> shooter.readyToShoot() && elevator.isAtTargetPosition(),
                         new ShootCommand(shooter, elevator, intake, leds)
                         .andThen(new StowCommand(shooter, elevator, intake))
+                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                     )
                 )
             )
@@ -202,15 +211,17 @@ public class RobotContainer {
 
         // Party Mode (hold)
         driverController.start().whileTrue(
-            leds.partyCommand()
+            leds.partyCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         try{
             // Pass-aim (hold)
             driverController.y().whileTrue(
-                snapToCommand(Rotation2d.fromDegrees(
-                    DriverStation.getAlliance().get() == Alliance.Red ? 330 : 30
-                ))
+                snapToCommand(
+                    Rotation2d.fromDegrees(
+                        DriverStation.getAlliance().get() == Alliance.Red ? 330 : 30
+                    )
+                ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
             );
         }catch(Exception e){}
 
@@ -218,21 +229,28 @@ public class RobotContainer {
         driverController.b().onTrue(
             // This clears all scheduled commands and stows, meaning the robot
             // will stow without reference to what it was previously doing.
-            new OverrideEverythingCommand(new StowCommand(shooter, elevator, intake))
+            new OverrideEverythingCommand(
+                new StowCommand(shooter, elevator, intake)
+                .withInterruptBehavior(InterruptionBehavior.kCancelSelf) //Cancel self so we don't have to wait for a full stow before moving on
+            )
         );
 
         // Snap-to (hold)
         driverController.pov(0).whileTrue(
             snapToCommand(Rotation2d.fromDegrees(0))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
         driverController.pov(90).whileTrue(
             snapToCommand(Rotation2d.fromDegrees(90))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
         driverController.pov(180).whileTrue(
             snapToCommand(Rotation2d.fromDegrees(180))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
         driverController.pov(270).whileTrue(
             snapToCommand(Rotation2d.fromDegrees(270))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
 
@@ -240,6 +258,7 @@ public class RobotContainer {
         //Passthrough (hold)
         operatorController.rightTrigger(0.1).whileTrue(
             new PassThroughCommand(shooter, elevator, intake, leds)
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         //Vision Prime (press)
@@ -250,7 +269,7 @@ public class RobotContainer {
                 shooter, elevator, intake, leds,
                 // For the honing lights
                 () -> poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
-            )
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         //Podium Prime (press)
@@ -259,54 +278,64 @@ public class RobotContainer {
                 RangeTable.getPodium(), shooter, elevator, intake, leds,
                 // For the honing lights
                 () -> poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
-            )
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Outake (hold)
         operatorController.leftBumper().whileTrue(
             new OutakeCommand(shooter, intake)
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Intake (press)
         operatorController.leftTrigger(0.1).onTrue(
             new IntakeCommand(shooter, elevator, intake, leds)
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Stow (press)
         operatorController.a().onTrue(
-            new OverrideEverythingCommand(new StowCommand(shooter, elevator, intake))
+            new OverrideEverythingCommand(
+                new StowCommand(shooter, elevator, intake)
+                .withInterruptBehavior(InterruptionBehavior.kCancelSelf) //Cancel self so we don't have to wait for a full stow before moving on
+            )
         );
 
         // Amp prime (press)
         operatorController.x().onTrue(
             elevator.setStaticPositionCommand(
                 ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP
-            )
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Climb position (press)
         operatorController.y().onTrue(
             new ClimbCommand(elevator, intake, shooter)
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Extend (hold)
         operatorController.pov(0).whileTrue(
             elevator.incrementElevatorPositionCommand(0, ELEVATOR.MANUAL_EXTENSION_SPEED)
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Retract (hold)
         operatorController.pov(180).whileTrue(
             elevator.incrementElevatorPositionCommand(0, -ELEVATOR.MANUAL_EXTENSION_SPEED)
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Note Request (hold)
         operatorController.back().whileTrue(
             leds.blinkCommand(LEDS.YELLOW, 2)
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Trap Prime (press)
         operatorController.start().onTrue(
             new PrimeCommand(RangeTable.getTrap(), shooter, elevator, intake, leds, () -> 0)
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
     }
 

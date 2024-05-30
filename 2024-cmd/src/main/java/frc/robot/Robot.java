@@ -6,6 +6,8 @@ package frc.robot;
 
 import org.littletonrobotics.junction.LoggedRobot;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
+
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,6 +44,9 @@ public class Robot extends LoggedRobot {
         if(!isReal()){
             SmartDashboard.putData(FIELD);
         }
+
+        // Fixes performance problems by loading everything necessary to follow auto paths
+        FollowPathCommand.warmupCommand().schedule();
     }
 
     /**

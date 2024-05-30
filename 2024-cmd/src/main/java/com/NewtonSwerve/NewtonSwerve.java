@@ -217,7 +217,7 @@ public class NewtonSwerve {
         Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/ThrottleAssigned", states[2].speedMetersPerSecond);
         Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/AzimuthAssigned", states[2].angle);
         Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/ThrottleAssigned", states[3].speedMetersPerSecond);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/AzimuthAssigned", states[3].angle);
+        Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/AzimuthAssispeedsgned", states[3].angle);
 
         m_frontLeftModule.setModule(states[0].angle.getRadians(), metersPerSecondToTicks(frontLeftVelo));
         m_frontRightModule.setModule(states[1].angle.getRadians(), metersPerSecondToTicks(frontRightVelo));
@@ -286,6 +286,16 @@ public class NewtonSwerve {
 
     public SwerveDriveKinematics getKinematics() {
         return m_kinematics;
+    }
+
+    public ChassisSpeeds getCurrentSpeeds(){
+        SwerveModuleState[] readStates = new SwerveModuleState[]{
+            m_frontLeftModule.getModuleState(),
+            m_frontRightModule.getModuleState(),
+            m_backLeftModule.getModuleState(),
+            m_backRightModule.getModuleState()
+        };
+        return m_kinematics.toChassisSpeeds(readStates);
     }
 
     public double[] getThrottleAppliedCurrent() {

@@ -6,13 +6,14 @@ package frc.robot;
 
 import frc.robot.Constants.*;
 import frc.robot.commands.*;
-import frc.robot.commands.autonomous.Autos;
+import frc.robot.commands.autonomous.*;
 import frc.robot.commands.proxies.*;
 import frc.robot.helpers.*;
 import frc.robot.subsystems.*;
 
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -65,6 +67,8 @@ public class RobotContainer {
     public RobotContainer() {
         configureDefaults();
         configureBindings();
+
+        Autos.broadcastChooser();
     }
 
     //Please use this.setDefaultCommand() instead of SubsystemBase.setDefaultCommand() here.
@@ -348,7 +352,7 @@ public class RobotContainer {
         // An example command will be run in autonomous
         // return Autos.exampleAuto(m_exampleSubsystem);
         // TODO finish autoInit and figure out the auto framework
-        return swerve.autonomousInit().andThen(Autos.exampleAuto(swerve, shooter, elevator, intake, leds));
+        return null;//swerve.autonomousInit().andThen(Autos.exampleAuto(swerve, shooter, elevator, intake, leds));
     }
 
     /**

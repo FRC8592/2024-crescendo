@@ -9,6 +9,7 @@ import frc.robot.subsystems.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
@@ -17,29 +18,24 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public final class Autos {
-    /** Example static factory for an autonomous command. */
-    public static Command exampleAuto(Swerve swerve, Shooter shooter, Elevator elevator, Intake intake, LEDs leds) {
-        PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("Final");
-        PathPlannerTrajectory traj = path.getTrajectory(new ChassisSpeeds(), Rotation2d.fromDegrees(0));
-        List<PathPlannerTrajectory.State> states = traj.getStates();
-        ArrayList<State> states2 = new ArrayList<>();
-        for(PathPlannerTrajectory.State state : states){
-            State state2 = new State(
-                state.timeSeconds,
-                state.velocityMps,
-                state.accelerationMpsSq,
-                new Pose2d(state.positionMeters, state.targetHolonomicRotation),
-                state.curvatureRadPerMeter
-            );
-            states2.add(state2);
-        }
-        Trajectory traj2 = new Trajectory(states2);
-        return swerve.followPathCommand(traj2);
+    private static final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
+    public static Command getAutonomousCommand(){
+        return autoChooser.getSelected();
+    }
+
+    public static void loadAutos(){
+    }
+    public static void broadcastChooser(){
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     private Autos() {

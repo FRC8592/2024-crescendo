@@ -7,6 +7,7 @@ import com.NewtonSwerve.SwerveModule;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class NewtonModule {
     public SwerveModule module;
@@ -67,5 +68,9 @@ public class NewtonModule {
     public SwerveModulePosition getModulePosition() {
         return new SwerveModulePosition(this.getThrottleEncoder() / 4096.0 / this.wheelCircumference,
                 new Rotation2d(this.getSteerAngle()));
+    }
+
+    public SwerveModuleState getModuleState(){
+        return new SwerveModuleState(this.module.getDriveVelocity(), Rotation2d.fromRadians(this.getSteerAngle()));
     }
 }

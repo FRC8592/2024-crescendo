@@ -2,9 +2,9 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import frc.robot.commands.proxies.*;
+import edu.wpi.first.wpilibj2.command.WrapperCommand;
 
-public class OutakeCommand extends NewtonCommand {
+public class OutakeCommand extends WrapperCommand {
     /**
      * Command to outake. Note that this command is independent of what the elevator might be doing
      *

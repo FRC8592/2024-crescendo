@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.robot.Constants.*;
 import frc.robot.subsystems.*;
-import frc.robot.commands.proxies.*;
 
-public class PassThroughCommand extends NewtonCommand {
+public class PassThroughCommand extends WrapperCommand {
     /**
      * Command to stow, then run pass-through indefinitely
      *

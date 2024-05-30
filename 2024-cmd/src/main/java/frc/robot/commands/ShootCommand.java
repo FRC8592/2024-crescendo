@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.robot.Constants.*;
 import frc.robot.subsystems.*;
-import frc.robot.commands.proxies.*;
 
-public class ShootCommand extends NewtonCommand {
+public class ShootCommand extends WrapperCommand {
     /**
      * Command that, assuming the robot is primed (this is NOT checked), shoots
      * the currently loaded note.

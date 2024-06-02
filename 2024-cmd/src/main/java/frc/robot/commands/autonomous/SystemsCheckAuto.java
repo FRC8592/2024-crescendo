@@ -1,6 +1,5 @@
 package frc.robot.commands.autonomous;
 
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.LEDS;

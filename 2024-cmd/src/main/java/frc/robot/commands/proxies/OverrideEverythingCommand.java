@@ -4,10 +4,8 @@
 
 package frc.robot.commands.proxies;
 
-import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 
 public class OverrideEverythingCommand extends Command {
     Command command;

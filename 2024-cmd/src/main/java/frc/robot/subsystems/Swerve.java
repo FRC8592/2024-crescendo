@@ -6,19 +6,17 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 import com.NewtonSwerve.*;
 import com.NewtonSwerve.Mk4.*;
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectory;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.NewtonSwerve.Gyro.Gyro;
 import frc.robot.Constants.*;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -27,13 +25,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -41,7 +35,7 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.*;
 import frc.robot.helpers.*;
 
-public class Swerve extends SubsystemBase {
+public class Swerve extends NewtonSubsystem {
     private Mk4ModuleConfiguration swerveConfig;
     private NewtonSwerve swerve;
     private PIDController snapToController;
@@ -154,30 +148,6 @@ public class Swerve extends SubsystemBase {
             m_backLeftModule,
             m_backRightModule
         );
-
-        AutoBuilder.configureHolonomic(
-            this::getCurrentPos,
-            this::resetPose,
-            this.swerve::getCurrentSpeeds,
-            this.swerve::drive,
-            new HolonomicPathFollowerConfig(
-                new PIDConstants(
-                    SWERVE.PATH_FOLLOW_DRIVE_kP,
-                    SWERVE.PATH_FOLLOW_DRIVE_kI,
-                    SWERVE.PATH_FOLLOW_DRIVE_kD
-                ),
-                new PIDConstants(
-                    SWERVE.PATH_FOLLOW_STEER_kP,
-                    SWERVE.PATH_FOLLOW_STEER_kI,
-                    SWERVE.PATH_FOLLOW_STEER_kD
-                ),
-                SWERVE.MAX_VELOCITY_METERS_PER_SECOND,
-                0.4,
-                new ReplanningConfig()
-            ),
-            () -> DriverStation.getAlliance().isPresent()?DriverStation.getAlliance().get() == Alliance.Red:false,
-            this
-        );
     }
 
     /**
@@ -277,8 +247,8 @@ public class Swerve extends SubsystemBase {
      *
      * @apiNote This command runs for one frame and ends immediately
      */
-    private Command chassisSpeedsDriveCommand(ChassisSpeeds speeds){
-        return runOnce(() -> {swerve.drive(speeds);});
+    public Command stopCommand(){
+        return runOnce(() -> {swerve.drive(new ChassisSpeeds());});
     }
 
     // NOTE: We return Commands.runOnce() instead of this.runOnce() on the slowMode,
@@ -347,16 +317,60 @@ public class Swerve extends SubsystemBase {
      *
      * @apiNote This command runs for one frame and ends immediately
      */
-    public Command autonomousInit(){
+    public Command autonomousInitCommand(){
         return Commands.runOnce(() -> {
             this.resetEncoder();
             this.resetPose(new Pose2d());
             this.resetToAbsEncoders();
             this.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
         }).alongWith(
-            this.chassisSpeedsDriveCommand(new ChassisSpeeds())
+            this.stopCommand()
         ).alongWith(
             this.zeroGyroscopeCommand()
+        );
+    }
+
+    /**
+     * Command to follow the given path.
+     *
+     * @param trajectory {@code Trajectory}: the path to follow
+     * @return the command
+     *
+     * @apiNote this command ends when the entire path has been followed. See the FollowPathCommand class in {@link Swerve}
+     */
+    public Command followPathCommand(Trajectory trajectory, BooleanSupplier flip){
+        return new FollowPathCommand(trajectory, flip);
+    }
+
+    /**
+     * Command to follow a path with the option to deviate from it as configured by the parameters
+     *
+     * @param trajectory {@code Trajectory}: the path to follow
+     *
+     * @param useAlternateRotation {@code BooleanSupplier}: a lambda that returns whether to use
+     * the alternate rotation provided by {@code rotationSupplier}
+     *
+     * @param rotationSupplier {@code Supplier<Rotation2d>}: a lambda that returns the alternate
+     * rotation to be used when {@code useAlternateRotation} returns {@code true}. NOTE: The degree
+     * and radian values stored in the Rotation2d are used as a velocity setpoint, not a position
+     * setpoint, so you have to run your own control loop (as needed) for this to work.
+     *
+     * @param useAlternateTranslation {@code BooleanSupplier}: a lambda that returns whether to use
+     * the alternate translation provided by {@code translationSupplier}
+     *
+     * @param translationSupplier {@code Supplier<ChassisSpeeds}: a lambda that returns the alternate
+     * translation to be used when {@code useAlternatTranslation} returns {@code true}. The rotation
+     * component of the {@code ChassisSpeeds} is ignored.
+     */
+    public Command followPathCommand(
+        Trajectory trajectory, BooleanSupplier flip,
+        BooleanSupplier useAlternateRotation, Supplier<Rotation2d> rotationSupplier,
+        BooleanSupplier useAlternateTranslation, Supplier<ChassisSpeeds> translationSupplier
+    ){
+        return new FollowPathCommand(
+            trajectory, flip,
+            useAlternateRotation, rotationSupplier,
+            useAlternateTranslation, translationSupplier
         );
     }
 
@@ -365,8 +379,6 @@ public class Swerve extends SubsystemBase {
     }
 
     public void simulationPeriodic() {
-        Logger.recordOutput(SWERVE.LOG_PATH+"OdometryPosition", getCurrentPos());
-        Robot.FIELD.setRobotPose(getCurrentPos());
     }
 
     public double getYaw() {
@@ -514,5 +526,132 @@ public class Swerve extends SubsystemBase {
         );
 
         return currentSpeeds;
+    }
+
+    private class FollowPathCommand extends Command{
+        private Trajectory trajectory;
+        private Timer timer = new Timer();
+
+        private BooleanSupplier useAlternateRotation = () -> {return true;};
+        private Supplier<Rotation2d> alternateRotation = () -> {return new Rotation2d();};
+        private BooleanSupplier useAlternateTranslation = () -> {return false;};
+        private Supplier<ChassisSpeeds> alternateTranslation = () -> {return new ChassisSpeeds();};
+
+        private ProfiledPIDController turnController;
+        private HolonomicDriveController drivePID;
+        private PIDController xController;
+        private PIDController yController;
+
+        private BooleanSupplier flip;
+
+        public FollowPathCommand(Trajectory trajectory, BooleanSupplier flip){
+            this.trajectory = trajectory;
+
+            this.xController = new PIDController(
+                SWERVE.PATH_FOLLOW_DRIVE_kP,
+                SWERVE.PATH_FOLLOW_DRIVE_kI,
+                SWERVE.PATH_FOLLOW_DRIVE_kD
+            );
+            this.xController.setTolerance(
+                SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
+                SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
+            );
+
+            this.yController = new PIDController(
+                SWERVE.PATH_FOLLOW_DRIVE_kP,
+                SWERVE.PATH_FOLLOW_DRIVE_kI,
+                SWERVE.PATH_FOLLOW_DRIVE_kD
+            );
+            this.yController.setTolerance(
+                SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
+                SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
+            );
+
+            this.turnController = new ProfiledPIDController(
+                SWERVE.PATH_FOLLOW_STEER_kP,
+                SWERVE.PATH_FOLLOW_STEER_kI,
+                SWERVE.PATH_FOLLOW_STEER_kD,
+                new Constraints(
+                    SWERVE.PATH_FOLLOW_STEER_MAX_VELOCITY,
+                    SWERVE.PATH_FOLLOW_STEER_MAX_ACCELLERATION
+                )
+            );
+            this.turnController.setTolerance(
+                SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
+                SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
+            );
+            this.turnController.enableContinuousInput(-Math.PI, Math.PI);
+
+            this.drivePID = new HolonomicDriveController(xController, yController, turnController);
+
+            this.flip = flip;
+        }
+
+        public FollowPathCommand(
+            Trajectory trajectory, BooleanSupplier flip,
+            BooleanSupplier useAlternateRotation, Supplier<Rotation2d> rotationSupplier,
+            BooleanSupplier useAlternateTranslation, Supplier<ChassisSpeeds> translationSupplier
+        ){
+            this(trajectory, flip);
+            this.useAlternateRotation = useAlternateRotation;
+            this.alternateRotation = rotationSupplier;
+            this.useAlternateRotation = useAlternateTranslation;
+            this.alternateTranslation = translationSupplier;
+        }
+
+        public void initialize(){
+            timer.reset();
+            timer.start();
+            Swerve.this.swerve.drive(new ChassisSpeeds());
+        }
+        public void execute(){
+            State desiredState = trajectory.sample(timer.get());
+            if(flip.getAsBoolean()){
+                desiredState = flip(desiredState);
+            }
+            if(Robot.isReal()){
+                ChassisSpeeds driveSpeeds = drivePID.calculate(
+                    getCurrentPos(),
+                    desiredState,
+                    desiredState.poseMeters.getRotation()
+                );
+
+                if(useAlternateRotation.getAsBoolean()){
+                    driveSpeeds.omegaRadiansPerSecond = alternateRotation.get().getRadians();
+                }
+
+                if(useAlternateTranslation.getAsBoolean()){
+                    driveSpeeds.vxMetersPerSecond = alternateTranslation.get().vxMetersPerSecond;
+                    driveSpeeds.vyMetersPerSecond = alternateTranslation.get().vyMetersPerSecond;
+                }
+
+                Swerve.this.swerve.drive(driveSpeeds);
+            }
+            else{
+                Robot.FIELD.setRobotPose(desiredState.poseMeters);
+            }
+        }
+        public boolean isFinished(){
+            return ( // Only return true if enough time has elapsed, we're at the target location, and we're not using alternate movement.
+                timer.hasElapsed(trajectory.getTotalTimeSeconds())
+                // && (drivePID.atReference() || !Robot.isReal())
+                // && !useAlternateRotation.getAsBoolean()
+                // && !useAlternateTranslation.getAsBoolean()
+            );
+        }
+
+        private State flip(State state){
+            return new State(
+                state.timeSeconds,
+                state.velocityMetersPerSecond,
+                state.accelerationMetersPerSecondSq,
+                new Pose2d(
+                    MEASUREMENTS.FIELD_LENGTH_METERS - state.poseMeters.getX(),
+                    state.poseMeters.getY(),
+                    Rotation2d.fromRadians(Math.PI).minus(state.poseMeters.getRotation())
+                ),
+                -state.curvatureRadPerMeter
+            );
+        }
     }
 }

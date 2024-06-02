@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.helpers.*;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends NewtonSubsystem {
     private SparkFlexControl leftShooterMotor;
     private SparkFlexControl rightShooterMotor;
     private SparkFlexControl feederMotor;
@@ -177,6 +177,10 @@ public class Shooter extends SubsystemBase {
             rightTargetSpeed = 0;
             feederMotor.setVelocity(0);
         });
+    }
+
+    public Command autonomousInitCommand(){
+        return stopCommand();
     }
 
 

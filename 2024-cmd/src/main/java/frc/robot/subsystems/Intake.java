@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
-public class Intake extends SubsystemBase {
+public class Intake extends NewtonSubsystem {
     private SparkFlexControl intakeMotor;
     private double targetIntakeVelocity = 0;
     public Intake() {
@@ -68,6 +68,10 @@ public class Intake extends SubsystemBase {
             targetIntakeVelocity = 0;
             intakeMotor.setVelocity(0);
         });
+    }
+
+    public Command autonomousInitCommand(){
+        return stopCommand();
     }
 
     public void periodic() {

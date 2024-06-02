@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
-public class Elevator extends SubsystemBase {
+public class Elevator extends NewtonSubsystem {
     public enum Positions{
         STOWED(ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_METERS_STOWED),
         AMP(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP),

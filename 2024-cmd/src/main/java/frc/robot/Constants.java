@@ -29,6 +29,10 @@ public final class Constants {
         public static final double METERS_TO_FEET = 3.28084;
     }
 
+    public final class MEASUREMENTS {
+        public static final double FIELD_LENGTH_METERS = 16.5410515;
+    }
+
     public final class CONTROLLERS {
         public static final int DRIVER_PORT = 0;
         public static final int OPERATOR_PORT = 1;

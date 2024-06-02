@@ -68,7 +68,8 @@ public class RobotContainer {
         configureDefaults();
         configureBindings();
 
-        Autos.broadcastChooser();
+        AutoManager.loadAutos(swerve, intake, elevator, shooter, leds);
+        AutoManager.broadcastChooser();
     }
 
     //Please use this.setDefaultCommand() instead of SubsystemBase.setDefaultCommand() here.
@@ -349,10 +350,12 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // An example command will be run in autonomous
-        // return Autos.exampleAuto(m_exampleSubsystem);
-        // TODO finish autoInit and figure out the auto framework
-        return null;//swerve.autonomousInit().andThen(Autos.exampleAuto(swerve, shooter, elevator, intake, leds));
+        return AutoManager.getAutonomousCommand(swerve, intake, elevator, shooter, leds);
+    }
+
+    public void regenerateAutoCommands(){
+        AutoManager.loadAutos(swerve, intake, elevator, shooter, leds);
+        AutoManager.broadcastChooser();
     }
 
     /**

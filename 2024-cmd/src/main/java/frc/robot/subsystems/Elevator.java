@@ -205,6 +205,14 @@ public class Elevator extends NewtonSubsystem {
         );
     }
 
+    public double getTargetExtension(){
+        return this.targetExtension;
+    }
+
+    public double getTargetPivot(){
+        return this.targetPivot;
+    }
+
     private double getExtensionLength() {
         return (extensionMotor.getPosition()*ELEVATOR.ELEVATOR_GEAR_RATIO);
     }

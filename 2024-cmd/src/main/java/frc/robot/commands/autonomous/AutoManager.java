@@ -39,6 +39,7 @@ public final class AutoManager {
     public static void loadAutos(Swerve swerve, Intake intake, Elevator elevator, Shooter shooter, LEDs leds){
         autoCommands = new ArrayList<>();
         autoCommands.add(new Testing5Note(swerve, intake, elevator, shooter, leds));
+        autoCommands.add(new SystemsCheckAuto(swerve, intake, elevator, shooter, leds));
     }
 
     public static void broadcastChooser(){

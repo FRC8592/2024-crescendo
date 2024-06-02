@@ -175,6 +175,30 @@ public class Swerve extends NewtonSubsystem {
     }
 
     /**
+     * Command to drive the swerve based on the inputted lambdas until interrupted. Does not apply any processing
+     * to the inputs; don't use this for human input.
+     *
+     * @param suppliedX {@code DoubleSupplier}: a lambda for X translation input
+     * @param suppliedY {@code DoubleSupplier}: a lambda for Y translation input
+     * @param suppliedRot {@code DoubleSupplier}: a lambda for rotation input
+     *
+     * @return the command
+     *
+     * @apiNote This command never ends on its own; it must be interrupted to end
+     */
+    public Command rawDriveCommand(DoubleSupplier suppliedX, DoubleSupplier suppliedY, DoubleSupplier suppliedRot) {
+        return run(() -> {
+            swerve.drive(
+                new ChassisSpeeds(
+                    suppliedX.getAsDouble(),
+                    suppliedY.getAsDouble(),
+                    suppliedRot.getAsDouble()
+                )
+            );
+        });
+    }
+
+    /**
      * Command to snap to the specified angle while driving with human input. The translation inputs
      * are processed for human comfort and control, so these should almost always be joystick inputs.
      *

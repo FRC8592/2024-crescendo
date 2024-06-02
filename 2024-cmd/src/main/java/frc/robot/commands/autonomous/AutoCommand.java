@@ -18,14 +18,15 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
 
 public class AutoCommand extends WrapperCommand {
     protected static BooleanSupplier flipPathToRedSide = (
         () -> DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red
     );
-    public AutoCommand(Command command) {
-        super(command);
+    public AutoCommand(Command... commands) {
+        super(new SequentialCommandGroup(commands));
     }
 
     protected static Trajectory getChoreoTrajectory(String name) {

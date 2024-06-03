@@ -5,6 +5,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class NewtonSubsystem extends SubsystemBase {
+    /**
+     * Command to run on autonomous init. Returns
+     * {@link Commands#none()} if the subsystem doesn't
+     * override it.
+     */
     public Command autonomousInitCommand(){
         return Commands.none();
     }

@@ -12,11 +12,11 @@ public class Testing5Note extends AutoCommand{
                 swerve.followPathCommand(getChoreoTrajectory("Testing5Note_1"), flipPathToRedSide),
                 new WaitCommand(1),
                 swerve.followPathCommand(getChoreoTrajectory("Testing5Note_2"), flipPathToRedSide),
-                new WaitCommand(2),
+                new WaitCommand(1),
                 swerve.followPathCommand(getChoreoTrajectory("Testing5Note_3"), flipPathToRedSide),
-                new WaitCommand(3),
+                new WaitCommand(1),
                 swerve.followPathCommand(getChoreoTrajectory("Testing5Note_4"), flipPathToRedSide),
-                new WaitCommand(4),
+                new WaitCommand(1),
                 swerve.followPathCommand(getChoreoTrajectory("Testing5Note_5"), flipPathToRedSide)
             ).alongWith(leds.blinkCommand(LEDS.RED, 3))
         );

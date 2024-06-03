@@ -51,9 +51,9 @@ public final class Constants {
 
         public static final int PDH_CAN_ID = 1;
 
-        public static final int SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID = 14; 
-        public static final int SWERVE_BLACK_FRONT_LEFT_STEER_CAN_ID = 13; 
-        public static final int SWERVE_BLACK_FRONT_LEFT_ENCODER_CAN_ID = 15; 
+        public static final int SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID = 14;
+        public static final int SWERVE_BLACK_FRONT_LEFT_STEER_CAN_ID = 13;
+        public static final int SWERVE_BLACK_FRONT_LEFT_ENCODER_CAN_ID = 15;
 
         public static final int SWERVE_ORANGE_FRONT_RIGHT_DRIVE_CAN_ID = 20;
         public static final int SWERVE_ORANGE_FRONT_RIGHT_STEER_CAN_ID = 19;
@@ -292,7 +292,7 @@ public final class Constants {
 
     public final class LEDS {
         public static final int LED_LENGTH = 30;
-        public static final double INTAKING_TIMEOUT = 0.5; //Intake for this long before the LEDs start reporting a jam
+        public static final int LED_STRIP_PWM_PORT = 0;
 
         //TODO: Once the LED code is back in, uncomment and use this
         public static final Color RED = new Color(255, 0, 0);

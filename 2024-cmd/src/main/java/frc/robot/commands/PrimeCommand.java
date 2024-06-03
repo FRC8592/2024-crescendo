@@ -4,14 +4,14 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
-import frc.robot.helpers.RangeTable;
+import frc.robot.helpers.RangeTable.RangeEntry;
 import frc.robot.subsystems.*;
 
 public class PrimeCommand extends WrapperCommand {
 
     /**
-     * Command to do a static prime (see the other constructor for this class for vision-prime). Command
-     * never ends on its own; the shoot command logic must cancel this command.
+     * Command to do a static prime (see {@link PrimeCommand#PrimeCommand(Supplier, Shooter, Elevator, Intake, LEDs, DoubleSupplier)}
+     * for vision-prime). Command never ends on its own; the shoot command logic must cancel this command.
      *
      * @param entry {@code RangeEntry}: the {@code RangeEntry} to prime to
      * @param shooter
@@ -22,7 +22,7 @@ public class PrimeCommand extends WrapperCommand {
      * for the honing LEDs
      */
     public PrimeCommand(
-        RangeTable.RangeEntry entry,
+        RangeEntry entry,
         Shooter shooter,
         Elevator elevator,
         Intake intake,
@@ -30,7 +30,7 @@ public class PrimeCommand extends WrapperCommand {
         DoubleSupplier offsetSupplier
     ){
         super(
-            shooter.shooterPrimeCommand(entry)
+            shooter.primeCommand(entry)
             .alongWith(elevator.setStaticPositionCommand(entry.pivotAngle, entry.elevatorHeight))
             .alongWith(leds.honeCommand(offsetSupplier))
         );
@@ -38,8 +38,8 @@ public class PrimeCommand extends WrapperCommand {
     }
 
     /**
-     * Command to do a vision prime (see the other constructor for this class for static prime). Command
-     * never ends on its own; the shoot command logic must cancel this command.
+     * Command to do a vision prime (see {@link PrimeCommand#PrimeCommand(RangeEntry, Shooter, Elevator, Intake, LEDs, DoubleSupplier)}
+     * for static prime). Command never ends on its own; the shoot command logic must cancel this command.
      *
      * @param entry {@code Supplier<RangeEntry>}: lambda that returns the latest update of the {@code RangeEntry}
      * to prime to
@@ -50,9 +50,9 @@ public class PrimeCommand extends WrapperCommand {
      * @param offsetSupplier {@code DoubleSupplier} lambda that returns the current offset from the target
      * for the honing LEDs
      */
-    public PrimeCommand(Supplier<RangeTable.RangeEntry> entry, Shooter shooter, Elevator elevator, Intake intake, LEDs leds, DoubleSupplier offsetSupplier){
+    public PrimeCommand(Supplier<RangeEntry> entry, Shooter shooter, Elevator elevator, Intake intake, LEDs leds, DoubleSupplier offsetSupplier){
         super(
-            shooter.shooterPrimeCommand(entry)
+            shooter.primeCommand(entry)
             .alongWith(elevator.setUpdatingPositionCommand(() -> entry.get().pivotAngle, () -> entry.get().elevatorHeight))
             .alongWith(leds.honeCommand(offsetSupplier))
         );

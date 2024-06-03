@@ -61,7 +61,10 @@ public class RobotContainer {
         CONTROLLERS.OPERATOR_PORT
     );
 
-    //Run config functions here
+    /**
+     * Create the robot container. This creates and configures subsystems, sets
+     * up button bindings, and prepares for autonomous.
+     */
     public RobotContainer() {
         configureDefaults();
         configureBindings();
@@ -98,6 +101,8 @@ public class RobotContainer {
      *
      * @param angle Rotation2d containing the angle setpoint
      * @return the swerve.snapToCommand
+     *
+     * @apiNote this command never ends on its own; it must be interrupted to end
      */
     private Command snapToCommand(Rotation2d angle){
         return swerve.snapToCommand(
@@ -108,34 +113,9 @@ public class RobotContainer {
     }
 
     /**
-     * Configure all button bindings here
+     * Configure all button bindings
      */
     private void configureBindings() {
-        // Translate on Driver Left Stick -------------- DONE
-        // Rotate on Driver Right Stick ---------------- DONE
-        // Slow Mode on Driver Right Bumper ------------ DONE
-        // Reset Gyro on Driver Back ------------------- DONE
-        // Auto Collect on Driver A -------------------- DONE
-        // Robot Oriented on Driver Left Bumper -------- DONE
-        // Score on Driver Right Trigger --------------- DONE
-        // Party Mode on Driver Start ------------------ DONE
-        // Pass Aim on Driver Y ------------------------ DONE
-        // Force Shoot on Driver X --------------------- DONE
-        // Snap-to on Driver DPAD ---------------------- DONE
-
-        // Passthrough on Operator Right Trigger ------- DONE
-        // Range Table Shoot on Operator Right Bumper -- DONE
-        // Shoot From Podium on Operator B ------------- DONE
-        // Outake on Operator Left Bumper -------------- DONE
-        // Intake on Operator Left Trigger ------------- DONE
-        // Stow on Operator A or Driver B -------------- DONE
-        // Amp on Operator X --------------------------- DONE
-        // Climb on Operator Y ------------------------- DONE
-        // Manual Extend on Operator DPAD Up ----------- DONE
-        // Manual Retract on Operator DPAD Down -------- DONE
-        // Led Amp Signal on Operator Back ------------- DONE
-        // Trap Prime on Operator Start ---------------- DONE
-
         // Slow Mode (hold)
         driverController.rightBumper()
         .onTrue(
@@ -150,7 +130,7 @@ public class RobotContainer {
         );
 
         //Autocollect (hold)
-        driverController.a().whileTrue(swerve.noExpoRotationCommand(
+        driverController.a().whileTrue(swerve.rawRotationCommand(
             () -> driverController.getLeftX(), // Drive forward and back freely
             () -> 0, // No side-to-side
 
@@ -351,6 +331,10 @@ public class RobotContainer {
         return AutoManager.getAutonomousCommand(swerve, intake, elevator, shooter, leds);
     }
 
+    /**
+     * Regenerate the auto commands so the auto can be run again without causing a crash. Only run
+     * this when it doesn't matter if the robot hangs for a moment.
+     */
     public void regenerateAutoCommands(){
         AutoManager.loadAutos(swerve, intake, elevator, shooter, leds);
         AutoManager.broadcastChooser();

@@ -11,17 +11,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.*;
 
 public class LEDs extends NewtonSubsystem {
+    // Represents the real strip. Should only be written to once per frame.
     private AddressableLED ledStrip;
+
+    // An array of color data that's separate from the strip. This can be
+    // edited as much as you want, and must be manually written to the strip
+    // for the LEDs to display anything.
     private AddressableLEDBuffer ledBuffer;
-    public Timer flashTimer;
 
     public LEDs() {
-        ledStrip = new AddressableLED(0);
+        ledStrip = new AddressableLED(LEDS.LED_STRIP_PWM_PORT);
         ledStrip.setLength(LEDS.LED_LENGTH);
         ledBuffer = new AddressableLEDBuffer(LEDS.LED_LENGTH);
         ledStrip.start();
-        flashTimer = new Timer();
-        flashTimer.start();
     }
 
     /**
@@ -67,6 +69,9 @@ public class LEDs extends NewtonSubsystem {
      * @apiNote This command doesn't end on its own; it must be interrupted to end
      */
     public Command blinkCommand(Color color, int hertz){
+        Timer flashTimer = new Timer();
+        flashTimer.start();
+
         return run(() -> {
             if (((int) (flashTimer.get() * hertz * 2)) % 2 == 0) {
                 setSolidColor(color);

@@ -37,6 +37,8 @@ public class Swerve extends NewtonSubsystem {
 
     private boolean isSlowMode;
     private boolean robotOriented;
+
+    // Yaw lock is not currently implemented
     private boolean yawLock;
     private double yawLockValue;
 
@@ -202,7 +204,8 @@ public class Swerve extends NewtonSubsystem {
      * @param translationYSupplier {@code DoubleSupplier}: a lambda for Y translation input (will be
      * optimized for human control)
      *
-     * @param angle {@code Rotation2d}: the angle to snap to (doesn't have any corrections applied)
+     * @param angle {@code Rotation2d}: the angle to snap to (doesn't have any corrections applied;
+     * this should be left-right inverted).
      *
      * @return the command
      *
@@ -238,12 +241,13 @@ public class Swerve extends NewtonSubsystem {
      *
      * @apiNote This command never ends on its own; it must be interrupted to end
      */
-    public Command noExpoRotationCommand(
+    public Command rawRotationCommand(
         DoubleSupplier translationXSupplier,
         DoubleSupplier translationYSupplier,
         DoubleSupplier rotationSpeedSupplier){
 
         return run(() -> {
+            // Process translation for human input
             ChassisSpeeds processed = processJoystickInputs(
                 translationXSupplier.getAsDouble(),
                 translationYSupplier.getAsDouble(),
@@ -251,6 +255,8 @@ public class Swerve extends NewtonSubsystem {
                 false
             );
 
+            // Override whatever the human input processing spat out for rotation
+            // with the output of the passed-in lambda.
             processed.omegaRadiansPerSecond = rotationSpeedSupplier.getAsDouble();
             swerve.drive(processed);
         });
@@ -270,16 +276,6 @@ public class Swerve extends NewtonSubsystem {
         return runOnce(() -> {swerve.drive(new ChassisSpeeds());});
     }
 
-    // NOTE: We return Commands.runOnce() instead of this.runOnce() on the slowMode,
-    // robotOriented, and zeroGyroscope commands. This means the commands don't
-    // require this subsystem, which will avoid any problems from the scheduler
-    // being fussy about same-subsystem commands running at the same time.
-    //
-    // PLEASE NOTE that this is usually a horrible idea because of the risk of
-    // commands fighting each other. It should be fine in this case because these
-    // commands don't move the swerve, but this should generally be done with
-    // caution.
-
     /**
      * Command to enable or disable slow mode for all inputs that are processed for
      * human comfort
@@ -291,6 +287,8 @@ public class Swerve extends NewtonSubsystem {
      * @apiNote This command runs for one frame and ends immediately
      */
     public Command slowModeCommand(boolean slowMode){
+        // Notice the Commands.runOnce() here. This is so the slowModeCommand doesn't "require" the
+        // swerve subsystem, which means it can run while other commands (usually a driving command) run.
         return Commands.runOnce(() -> {
             this.isSlowMode = slowMode;
             Logger.recordOutput(SWERVE.LOG_PATH+"Console", slowMode?"Slow mode enabled":"Slow mode disabled");
@@ -308,6 +306,7 @@ public class Swerve extends NewtonSubsystem {
      * @apiNote This command runs for one frame and ends immediately
      */
     public Command robotOrientedCommand(boolean robotOriented){
+        // See slowModeCommand above for comment on the Commands.runOnce
         return Commands.runOnce(() -> {
             this.robotOriented = robotOriented;
             Logger.recordOutput(SWERVE.LOG_PATH+"Console", robotOriented?"Robot-oriented enabled":"Robot-oriented disabled");
@@ -322,6 +321,7 @@ public class Swerve extends NewtonSubsystem {
      * @apiNote This command runs for one frame and ends immediately
      */
     public Command zeroGyroscopeCommand() {
+        // See slowModeCommand above for comment on the Commands.runOnce
         return Commands.runOnce(() -> {
             swerve.zeroGyroscope();
             Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zeroed");
@@ -337,8 +337,13 @@ public class Swerve extends NewtonSubsystem {
      * @apiNote This command runs for one frame and ends immediately
      */
     public Command autonomousInitCommand(){
+        // We use Commands.runOnce here because this.stopCommand() requires the
+        // swerve subsystem, meaning the alongWith() method would throw an exception
+        // if it were this.runOnce() (because we'd be trying to run two commands that)
+        // both require the same subsystem at once.
+
         return Commands.runOnce(() -> {
-            this.resetEncoder();
+            this.resetEncoders();
             this.resetPose(new Pose2d());
             this.resetToAbsEncoders();
             this.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
@@ -353,9 +358,12 @@ public class Swerve extends NewtonSubsystem {
      * Command to follow the given path.
      *
      * @param trajectory {@code Trajectory}: the path to follow
+     * @param flip {@code BooleanSupplier}: lambda that returns whether the path should be flipped to
+     * the red side of the field.
      * @return the command
      *
-     * @apiNote this command ends when the entire path has been followed. See the FollowPathCommand class in {@link Swerve}
+     * @apiNote this command ends when the entire path has been followed. See the FollowPathCommand
+     * class in {@link Swerve}
      */
     public Command followPathCommand(Trajectory trajectory, BooleanSupplier flip){
         return new FollowPathCommand(trajectory, flip);
@@ -365,6 +373,9 @@ public class Swerve extends NewtonSubsystem {
      * Command to follow a path with the option to deviate from it as configured by the parameters
      *
      * @param trajectory {@code Trajectory}: the path to follow
+     *
+     * @param flip {@code BooleanSupplier}: lambda that returns whether the path should be mirrored
+     * to the red side of the field.
      *
      * @param useAlternateRotation {@code BooleanSupplier}: a lambda that returns whether to use
      * the alternate rotation provided by {@code rotationSupplier}
@@ -400,22 +411,36 @@ public class Swerve extends NewtonSubsystem {
     public void simulationPeriodic() {
     }
 
+    /**
+     * Get the current robot yaw in degrees. This method is somewhat
+     * deprecated and is replaced by {@link Swerve#getGyroscopeRotation()},
+     * which returns a Rotation2d instead.
+     */
     public double getYaw() {
         return swerve.getYaw();
     }
 
+    /**
+     * Get the current robot yaw rate in degrees per second.
+     * Note that this assumes a loop time of 0.02 seconds exactly,
+     * so don't depend on it for anything requiring accuracy.
+     */
     public double getYawRate() {
         return swerve.gyro.getYawRate();
     }
 
-    public double getMaxTranslateVelo() {
+    public double getMaxTranslateVelocity() {
         return swerve.getMaxTranslateVelocity();
     }
 
-    public double getMaxAngularVelo() {
+    public double getMaxAngularVelocity() {
         return swerve.getMaxAngularVelocity();
     }
 
+    /**
+     * Get the current position of the swerve as judged by odometry. If
+     * in simulation, returns the robot's position on the simulated field
+     */
     public Pose2d getCurrentPos() {
         if(Robot.isReal()){
             return swerve.getCurrentPos();
@@ -425,24 +450,44 @@ public class Swerve extends NewtonSubsystem {
         }
     }
 
+    /**
+     * Get the robot's rotation as a Rotation2d. Preferable
+     * to {@link Swerve#getYaw()}.
+     */
     public Rotation2d getGyroscopeRotation() {
         return swerve.getGyroscopeRotation();
     }
 
+    /**
+     * Set the robot's known rotation.
+     * @param yaw {@code double}: the rotation to set in degrees
+     */
     public void setGyroscopeRotation(double yaw){
         swerve.gyro.setYaw(yaw);
     }
 
+    /**
+     * Reset the swerve modules' known rotations to the readings from the abolute
+     * encoders.
+     */
     private void resetToAbsEncoders() {
         swerve.resetSteerAngles();
         Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve steer angles reset.");
     }
 
+    /**
+     * Set the throttle motors' current limits.
+     * @param limit {@code double}: the limit to set in amps
+     */
     private void setThrottleCurrentLimit(double limit) {
         swerve.setThrottleCurrentLimit(limit);
         Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle current limit set.");
     }
 
+    /**
+     * Reset the robot's known position.
+     * @param pose {@code Pose2d}: the pose to set the robot's known position to.
+     */
     private void resetPose(Pose2d pose) {
         swerve.resetPose(pose);
         Logger.recordOutput(
@@ -458,12 +503,20 @@ public class Swerve extends NewtonSubsystem {
         );
     }
 
-    private void resetEncoder() {
-        swerve.resetEncoder();
+    /**
+     * Reset all throttle encoders to 0.
+     */
+    private void resetEncoders() {
+        swerve.resetEncoders();
         Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle encoders reset.");
     }
 
-    private double snapToAngle (Rotation2d setpoint) {
+    /**
+     * Use PID to snap the robot to the setpoint.
+     * @param setpoint {@code Rotation2d}: the setpoint to snap to
+     * @return the rotational velocity setpoint in radians/second
+     */
+    private double snapToAngle(Rotation2d setpoint) {
         double currYaw = getGyroscopeRotation().getRadians();
         double errorAngle = setpoint.getRadians() - currYaw;
 
@@ -479,6 +532,15 @@ public class Swerve extends NewtonSubsystem {
         return out;
     }
 
+    /**
+     * Process joystick inputs for human control
+     * @param rawX {@code double}: the raw X input from a joystick. Should be -1 to 1
+     * @param rawY {@code double}: the raw Y input from a joystick. Should be -1 to 1
+     * @param rawRot {@code double}: the raw rotation input from a joystick. Should be -1 to 1
+     * @param fieldOrientedAllowed {@code boolean}: if this is true, switch between field- and
+     * robot-oriented based on {@link Swerve#robotOriented}. Otherwise, force robot-oriented.
+     * @return a ChassisSpeeds ready to be sent to the swerve.
+     */
     private ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot, boolean fieldOrientedAllowed){
         double driveTranslateY = (
             rawY >= 0
@@ -523,16 +585,16 @@ public class Swerve extends NewtonSubsystem {
 
         if (isSlowMode) { //Slow Mode slows down the robot for better precision & control
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelo(),
-                driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelo(),
-                driveRotate * SWERVE.ROTATE_POWER_SLOW * getMaxAngularVelo()
+                driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelocity(),
+                driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelocity(),
+                driveRotate * SWERVE.ROTATE_POWER_SLOW * getMaxAngularVelocity()
             ));
         }
         else {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelo(),
-                driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelo(),
-                driveRotate * SWERVE.ROTATE_POWER_FAST * getMaxAngularVelo()
+                driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelocity(),
+                driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelocity(),
+                driveRotate * SWERVE.ROTATE_POWER_FAST * getMaxAngularVelocity()
             ));
         }
 
@@ -548,21 +610,31 @@ public class Swerve extends NewtonSubsystem {
     }
 
     private class FollowPathCommand extends Command{
+        // Pathing variables
         private Trajectory trajectory;
         private Timer timer = new Timer();
 
+        // Alternate movement variables
         private BooleanSupplier useAlternateRotation = () -> {return true;};
         private Supplier<Rotation2d> alternateRotation = () -> {return new Rotation2d();};
         private BooleanSupplier useAlternateTranslation = () -> {return false;};
         private Supplier<ChassisSpeeds> alternateTranslation = () -> {return new ChassisSpeeds();};
 
+        // PID controllers
         private ProfiledPIDController turnController;
         private HolonomicDriveController drivePID;
         private PIDController xController;
         private PIDController yController;
 
+        // Whether to flip to the red side of the field
         private BooleanSupplier flip;
 
+        /**
+         * Command to follow a trajectory
+         * @param trajectory {@code Trajectory}: the trajectory to follow
+         * @param flip {@code BooleanSupplier}: lambda that returns whether to
+         * mirror the path to the red side of the field.
+         */
         public FollowPathCommand(Trajectory trajectory, BooleanSupplier flip){
             this.trajectory = trajectory;
 
@@ -595,6 +667,7 @@ public class Swerve extends NewtonSubsystem {
                     SWERVE.PATH_FOLLOW_STEER_MAX_ACCELLERATION
                 )
             );
+
             this.turnController.setTolerance(
                 SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
                 SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
@@ -606,6 +679,22 @@ public class Swerve extends NewtonSubsystem {
             this.flip = flip;
         }
 
+        /**
+         * Command to follow a path with the option to deviate from it as configured by the parameters
+         *
+         * @param trajectory {@code Trajectory}: the path to follow
+         * @param flip {@code BooleanSupplier}: lambda that returns whether the path should be mirrored
+         * to the red side of the field.
+         * @param useAlternateRotation {@code BooleanSupplier}: a lambda that returns whether to use
+         * the alternate rotation provided by {@code rotationSupplier}
+         * @param rotationSupplier {@code Supplier<Rotation2d>}: a lambda that returns the alternate
+         * rotation to be used when {@code useAlternateRotation} returns {@code true}.
+         * @param useAlternateTranslation {@code BooleanSupplier}: a lambda that returns whether to use
+         * the alternate translation provided by {@code translationSupplier}
+         * @param translationSupplier {@code Supplier<ChassisSpeeds}: a lambda that returns the alternate
+         * translation to be used when {@code useAlternatTranslation} returns {@code true}. The rotation
+         * component of the {@code ChassisSpeeds} is ignored.
+         */
         public FollowPathCommand(
             Trajectory trajectory, BooleanSupplier flip,
             BooleanSupplier useAlternateRotation, Supplier<Rotation2d> rotationSupplier,
@@ -621,13 +710,18 @@ public class Swerve extends NewtonSubsystem {
         public void initialize(){
             timer.reset();
             timer.start();
+
+            // Stop the swerve
             Swerve.this.swerve.drive(new ChassisSpeeds());
         }
         public void execute(){
+            // Instances of State contain information about pose, velocity, accelleration, curvature, etc.
             State desiredState = trajectory.sample(timer.get());
+
             if(flip.getAsBoolean()){
                 desiredState = flip(desiredState);
             }
+
             if(Robot.isReal()){
                 ChassisSpeeds driveSpeeds = drivePID.calculate(
                     getCurrentPos(),
@@ -635,6 +729,8 @@ public class Swerve extends NewtonSubsystem {
                     desiredState.poseMeters.getRotation()
                 );
 
+                // Override the rotation speed (NOT position target) if useAlternativeRotation
+                // returns true.
                 if(useAlternateRotation.getAsBoolean()){
                     driveSpeeds.omegaRadiansPerSecond = alternateRotation.get().getRadians();
                 }
@@ -647,6 +743,7 @@ public class Swerve extends NewtonSubsystem {
                 Swerve.this.swerve.drive(driveSpeeds);
             }
             else{
+                //If simulated, set the robot's position on the simulated field
                 Robot.FIELD.setRobotPose(desiredState.poseMeters);
             }
         }
@@ -659,6 +756,12 @@ public class Swerve extends NewtonSubsystem {
             );
         }
 
+        /**
+         * Mirror a State object to the other side of the field.
+         *
+         * @param state {@code State}: the state to mirror
+         * @return the mirrored state
+         */
         private State flip(State state){
             return new State(
                 state.timeSeconds,

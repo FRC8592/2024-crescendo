@@ -16,6 +16,8 @@ import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
 public class Elevator extends NewtonSubsystem {
+
+    // Small enum for conveniently referencing elevator positions
     public enum Positions{
         STOWED(ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_METERS_STOWED),
         AMP(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP),
@@ -33,6 +35,8 @@ public class Elevator extends NewtonSubsystem {
     private SparkFlexControl pivotMotor;
     private SparkFlexControl pivotFollowMotor;
 
+    // Unlike the similarly named variables in Shooter, these are used for
+    // subsystem control and aren't just logging
     private double targetExtension;
     private double targetPivot;
 
@@ -45,8 +49,8 @@ public class Elevator extends NewtonSubsystem {
         pivotMotor = new SparkFlexControl(CAN.PIVOT_MOTOR_CAN_ID, false);
         pivotMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
         pivotMotor.setMaxVelocity(6500, 0);
-        pivotMotor.setMaxAcceleration(7000, 0);
-        pivotMotor.motorControl.setIZone(ELEVATOR.PIVOT_IZONE * ELEVATOR.PIVOT_GEAR_RATIO); // pivot degrees
+        pivotMotor.setMaxAcceleration(7000, 0); //Going higher than this caused slamming
+        pivotMotor.motorControl.setIZone(ELEVATOR.PIVOT_IZONE * ELEVATOR.PIVOT_GEAR_RATIO);
         pivotMotor.motorControl.setReference(0, ControlType.kVoltage);
         pivotMotor.setInverted();
 
@@ -154,8 +158,8 @@ public class Elevator extends NewtonSubsystem {
      * If a {@link Elevator#setMalleablePositionCommand(double, double)} command is running, change
      * the pivot and extension setpoints for the elevator to target. Otherwise, does nothing functional.
      *
-     * @param pivotDegrees {@code double}: the amount to change the pivot target by
-     * @param extensionMeters {@code double}: the amount to change the extension setpoint by
+     * @param pivotDegrees {@code double}: the amount to change the pivot target by each frame
+     * @param extensionMeters {@code double}: the amount to change the extension setpoint by each frame
      *
      * @return the command
      *
@@ -180,6 +184,9 @@ public class Elevator extends NewtonSubsystem {
         // This method will be called once per scheduler run during simulation
     }
 
+    /**
+     * Return whether the elevator is within tolerance of the amp position
+     */
     public boolean isAmp(){
         return (
             isAtTargetPosition()
@@ -188,6 +195,9 @@ public class Elevator extends NewtonSubsystem {
         );
     }
 
+    /**
+     * Return whether the elevator is within tolerance of the climb position
+     */
     public boolean isClimb(){
         return (
             isAtTargetPosition()
@@ -196,6 +206,9 @@ public class Elevator extends NewtonSubsystem {
         );
     }
 
+    /**
+     * Return whether the elevator is within tolerance of the stowed position
+     */
     public boolean isStowed(){
         return (
             isAtTargetPosition()
@@ -204,42 +217,69 @@ public class Elevator extends NewtonSubsystem {
         );
     }
 
+    /**
+     * Return the elevator's target extension length
+     */
     public double getTargetExtension(){
         return this.targetExtension;
     }
 
+    /**
+     * Return the elevator's target pivot angle
+     */
     public double getTargetPivot(){
         return this.targetPivot;
     }
 
+    /**
+     * Return the elevator's measured extension length
+     */
     private double getExtensionLength() {
         return (extensionMotor.getPosition()*ELEVATOR.ELEVATOR_GEAR_RATIO);
     }
 
+    /**
+     * Return the elevator's measured pivot angle
+     */
     private double getPivotAngle() {
         double ticksConverted = (
-                (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES_SPARKFLEX)
-                /ELEVATOR.PIVOT_GEAR_RATIO
+            (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES_SPARKFLEX)
+            /ELEVATOR.PIVOT_GEAR_RATIO
         );
         return ticksConverted;
     }
 
+    /**
+     * Return whether the elevator is at its target angle
+     */
     private boolean isTargetAngle() {
         return Math.abs(getPivotAngle() - targetPivot) < ELEVATOR.ANGLE_TOLERANCE;
     }
 
+    /**
+     * Return whether the elevator is at its target length
+     */
     private boolean isTargetLength() {
         return Math.abs(getExtensionLength() - targetExtension) < ELEVATOR.LENGTH_TOLERANCE;
     }
 
+    /**
+     * Return whether the elevator is at its target angle and length
+     */
     public boolean isAtTargetPosition(){
         return isTargetAngle() && isTargetLength();
     }
 
+    /**
+     * Method to run the elevator with safety features. DO NOT COMMAND THE ELEVATOR
+     * MOTORS OTHER THAN THROUGH THIS METHOD unless you are stopping them.
+     */
     private void runElevator(){
         double actualPivot = getPivotAngle();
         double actualExtension = getExtensionLength();
 
+        // If the target pivot angle is above maximum or below minimum,
+        // force it back to a value within its physical capabilities
         targetPivot = Math.max(
             Math.min(
                 targetPivot,
@@ -248,6 +288,9 @@ public class Elevator extends NewtonSubsystem {
             ELEVATOR.PIVOT_ANGLE_MIN
         );
 
+        // If the target extension length is above maximum or below
+        // minimum, force it back to a value within its physical
+        // capabilities
         targetExtension = Math.max(
             Math.min(
                 targetExtension,
@@ -256,13 +299,22 @@ public class Elevator extends NewtonSubsystem {
             ELEVATOR.EXTENSION_METERS_MIN
         );
 
+        // If the read pivot angle is outside of tolerance of the lowest the pivot can go with the extension
+        // out, stop the extension (used to keep the extension in when going up from stowed)
         if (actualPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD - ELEVATOR.RETRACT_THRESHOLD_TOLERANCE){
             targetExtension = actualExtension;
         }
 
+        // If the extension is out and the pivot is lower than it can go with the extension out, force the pivot
+        // back up
         if (actualExtension > ELEVATOR.EXTENSION_FULLY_RETRACTED && targetPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD) {
             targetPivot = ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD;
         }
+
+        // NOTE: the above two if-statements combined mean that the extension can't extend itself when the hooks
+        // on it could hit something, and if it gets into the danger zone while extended (from the pivot going
+        // down before the extension is fully in), the pivot will stay at a safe height until the extension is
+        // fully retracted.
 
         double extensionRotations = targetExtension / ELEVATOR.ELEVATOR_GEAR_RATIO;
         extensionMotor.setPositionSmartMotion(extensionRotations);

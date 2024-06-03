@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.*;
 
@@ -24,13 +23,14 @@ public class Shooter extends NewtonSubsystem {
     private DigitalInput topBeamBreak;
     private DigitalInput middleBeamBreak;
 
+    // Only used for logging
     private int leftTargetSpeed = 0;
     private int rightTargetSpeed = 0;
 
     public Shooter() {
-        leftShooterMotor = new SparkFlexControl (CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
+        leftShooterMotor = new SparkFlexControl(CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
         leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP,  SHOOTER.LEFT_SHOOTER_MOTOR_kI,  SHOOTER.LEFT_SHOOTER_MOTOR_kD,  SHOOTER.LEFT_SHOOTER_MOTOR_kF,  0);
-        leftShooterMotor.motorControl.setIZone (SHOOTER.SHOOTER_MOTOR_IZONE);
+        leftShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         leftShooterMotor.setCurrentLimit (POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT,  POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT);
         leftShooterMotor.setInverted();
         leftShooterMotor.setPercentOutput(0);
@@ -66,12 +66,13 @@ public class Shooter extends NewtonSubsystem {
      *
      * @return the command
      *
-     * @apiNote This command runs until {@link Shooter#readyToShoot()}
-     * returns {@code true}.
+     * @apiNote This command doesn't end on its own; it must be interrupted
+     * to end
      */
-    public Command shooterPrimeCommand(int leftRPM, int rightRPM){
-        return new ShooterPrimeCommand(leftRPM, rightRPM)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    public Command primeCommand(int leftRPM, int rightRPM){
+        return run(() -> {
+            setShooterVelocity(leftRPM, rightRPM);
+        });
     }
 
     /**
@@ -88,9 +89,10 @@ public class Shooter extends NewtonSubsystem {
      * @apiNote This command doesn't end on its own; it must be interrupted
      * to end
      */
-    public Command shooterPrimeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
-        return new ShooterPrimeCommand(leftRPM, rightRPM)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    public Command primeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
+        return run(() -> {
+            setShooterVelocity(leftRPM.getAsInt(), rightRPM.getAsInt());
+        });
     }
 
     /**
@@ -102,12 +104,11 @@ public class Shooter extends NewtonSubsystem {
      *
      * @return the command
      *
-     * @apiNote This command runs until {@link Shooter#readyToShoot()}
-     * returns {@code true}.
+     * @apiNote This command doesn't end on its own; it must be interrupted
+     * to end
      */
-    public Command shooterPrimeCommand(RangeTable.RangeEntry entry){
-        return new ShooterPrimeCommand(entry)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    public Command primeCommand(RangeTable.RangeEntry entry){
+        return primeCommand(entry.leftFlywheelSpeed, entry.rightFlywheelSpeed);
     }
 
     /**
@@ -122,9 +123,8 @@ public class Shooter extends NewtonSubsystem {
      * @apiNote This command doesn't end on its own; it must be interrupted
      * to end
      */
-    public Command shooterPrimeCommand(Supplier<RangeTable.RangeEntry> entry){
-        return new ShooterPrimeCommand(entry)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    public Command primeCommand(Supplier<RangeTable.RangeEntry> entry){
+        return primeCommand(() -> entry.get().leftFlywheelSpeed, () -> entry.get().rightFlywheelSpeed);
     }
 
     /**
@@ -139,8 +139,7 @@ public class Shooter extends NewtonSubsystem {
     public Command fireCommand(){
         return run(() -> {
             feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);
-        }).withTimeout(SHOOTER.SHOOT_SCORE_TIME)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        }).withTimeout(SHOOTER.SHOOT_SCORE_TIME);
     }
 
     /**
@@ -156,8 +155,7 @@ public class Shooter extends NewtonSubsystem {
         return run(() -> {
             feederMotor.setVelocity(SHOOTER.AMP_FEEDER_SPEED);
             setFlywheelVelocity(SHOOTER.AMP_FLYWHEEL_SPEED);
-        }).withTimeout(SHOOTER.AMP_SCORE_TIME)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        }).withTimeout(SHOOTER.AMP_SCORE_TIME);
     }
 
     /**
@@ -178,6 +176,13 @@ public class Shooter extends NewtonSubsystem {
         });
     }
 
+    /**
+     * Command to stop everything in preparation for auto
+     *
+     * @return the command
+     *
+     * @apiNote This command runs for one frame and ends immediately
+     */
     public Command autonomousInitCommand(){
         return stopCommand();
     }
@@ -196,8 +201,7 @@ public class Shooter extends NewtonSubsystem {
         return run(() -> {
             feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
             setFlywheelVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
-        }).until(() -> isBottomBeamBreakTripped())
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        }).until(() -> isBottomBeamBreakTripped());
     }
 
     /**
@@ -213,8 +217,7 @@ public class Shooter extends NewtonSubsystem {
         return run(() -> {
             feederMotor.setPercentOutput(SHOOTER.INTAKE_FEEDER_POWER);
             setFlywheelVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
-        }).until(() -> !isBottomBeamBreakTripped())
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        }).until(() -> !isBottomBeamBreakTripped());
     }
 
     /**
@@ -224,16 +227,21 @@ public class Shooter extends NewtonSubsystem {
      * @return the command
      */
     public Command intakeAdjustNoteCommand(){
-        return run(() -> {
-            setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
-            feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
-        }).until(() -> isTopBeamBreakTripped() && feederMotor.getVelocity() < 0)
-
-        .andThen(run(() -> {
-            setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
-            feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
-        }).until(() -> !isTopBeamBreakTripped()))
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        return run(
+            () -> {
+                setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
+                feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+            }
+        ).until(
+            () -> isTopBeamBreakTripped() && feederMotor.getVelocity() < 0
+        ).andThen(
+            run(() -> {
+                setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
+                feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+            }
+        ).until(
+            () -> !isTopBeamBreakTripped())
+        );
     }
 
     /**
@@ -249,8 +257,7 @@ public class Shooter extends NewtonSubsystem {
         return run(() -> {
             setFlywheelVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED);
             feederMotor.setVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
-        })
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        });
     }
 
     /**
@@ -271,8 +278,7 @@ public class Shooter extends NewtonSubsystem {
                 feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
             }
             setFlywheelVelocity(5000);
-        })
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        });
     }
 
 
@@ -293,10 +299,7 @@ public class Shooter extends NewtonSubsystem {
     }
 
     /**
-     * checks if flywheels are at target speed to shoot
-     * and resets hasNote cuz that means we're gonna shoot
-     * 
-     * @apiNote You must call this method before shooting
+     * @return whether the flywheels have spun up to within tolerance of their targets.
      */
     public boolean readyToShoot() {
         if (Math.abs(leftShooterMotor.getVelocity() - leftTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE
@@ -308,10 +311,20 @@ public class Shooter extends NewtonSubsystem {
         return false;
     }
 
+    /**
+     * Set the velocity of both flywheels. Runs {@link Shooter#setShooterVelocity(int, int)}
+     * with the passed-in int.
+     * @param both {@code int}: the speed in RPM to target for both flywheels
+     */
     private void setFlywheelVelocity(int both){
         setShooterVelocity(both, both);
     }
 
+    /**
+     * Set the velocity of each flywheel.
+     * @param left {@code int}: the velocity for the left flywheel
+     * @param right {@code int}: the velocity for the right flywheel
+     */
     private void setShooterVelocity(int left, int right){
         leftTargetSpeed = left;
         rightTargetSpeed = right;
@@ -319,82 +332,24 @@ public class Shooter extends NewtonSubsystem {
         rightShooterMotor.setVelocity(rightTargetSpeed);
     }
 
+    /**
+     * Returns {@code true} if the bottom beam-break sees a note.
+     */
     private boolean isBottomBeamBreakTripped(){
         return !bottomBeamBreak.get(); //The beam break pulls low when triggered (notice exclamation point)
     }
 
+    /**
+     * Returns {@code true} if the top beam-break sees a note.
+     */
     private boolean isTopBeamBreakTripped(){
         return !topBeamBreak.get(); //The beam break pulls low when triggered (notice exclamation point)
     }
 
+    /**
+     * Returns {@code true} if the middle beam-break sees a note.
+     */
     public boolean isMiddleBeamBreakTripped(){
         return !middleBeamBreak.get(); //The beam break pulls low when triggered (notice exclamation point)
-    }
-
-
-
-    private class ShooterPrimeCommand extends Command{
-        private IntSupplier leftRPM;
-        private IntSupplier rightRPM;
-
-        /**
-         * Command to constantly drive the flywheels towards the setpoints specified by the {@code IntSupplier} arguments
-         *
-         * @param leftRPM {@code IntSupplier}: lambda that returns the left flywheel setpoint
-         * @param rightRPM {@code IntSupplier}: lambda that returns the right flywheel setpoint
-         *
-         * @apiNote This command does not end on its own; it must be interrupted to end
-         */
-        public ShooterPrimeCommand(IntSupplier leftRPM, IntSupplier rightRPM){
-            this.leftRPM = leftRPM;
-            this.rightRPM = rightRPM;
-            addRequirements(Shooter.this); //Refers to the instance of Shooter that parents this instance of ShooterPrimeCommand.
-        }
-
-        /**
-         * Command to spin up the flywheels to the setpoints in the {@code int} arguments
-         *
-         * @param leftRPM {@code int}: the left flywheel setpoint
-         * @param rightRPM {@code int}: the right flywheel setpoint
-         *
-         * @apiNote This command does not end on its own; it must be interrupted to end
-         */
-        public ShooterPrimeCommand(int leftRPM, int rightRPM){
-            this(() -> leftRPM, () -> rightRPM);
-        }
-
-        /**
-         * Command to constantly drive the flywheels towards the setpoints specified by {@code Supplier<RangeEntry>} argument
-         *
-         * @param entrySupplier {@code Supplier<RangeEntry>} lambda that returns a {@code RangeEntry} containing the target
-         * left and right flywheel speeds.
-         *
-         * @apiNote This command does not end on its own; it must be interrupted to end
-         */
-        public ShooterPrimeCommand(Supplier<RangeTable.RangeEntry> entrySupplier){
-            this(
-                () -> entrySupplier.get().leftFlywheelSpeed,
-                () -> entrySupplier.get().rightFlywheelSpeed
-            );
-        }
-
-        /**
-         * Command to spin up the flywheels to the setpoints in the {@code RangeEntry} argument
-         *
-         * @param entry {@code RangeEntry}: contains the target left and right flywheel speeds.
-         *
-         * @apiNote This command does not end on its own; it must be interrupted to end
-         */
-        public ShooterPrimeCommand(RangeTable.RangeEntry entry){
-            this(() -> entry.leftFlywheelSpeed, () -> entry.rightFlywheelSpeed);
-        }
-        public void initialize(){}
-        public void execute(){
-            setShooterVelocity(leftRPM.getAsInt(), rightRPM.getAsInt());
-        }
-        public void end(boolean interrupted){}
-        public boolean isFinished(){
-            return false;
-        }
     }
 }

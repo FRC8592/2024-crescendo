@@ -6,7 +6,7 @@ import frc.robot.Constants.*;
 
 public class IntakeCommand extends WrapperCommand {
     /**
-     * Command to run the full intake routine
+     * Command to stow, then run the full intake routine
      *
      * @param shooter
      * @param elevator

@@ -250,7 +250,7 @@ public class NewtonSwerve {
     }
 
     // zero the absolute encoder for all modules
-    public void resetEncoder() {
+    public void resetEncoders() {
         m_frontLeftModule.resetThrottleEncoder();
         m_frontRightModule.resetThrottleEncoder();
         m_backLeftModule.resetThrottleEncoder();

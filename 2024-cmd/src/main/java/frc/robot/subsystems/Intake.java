@@ -69,6 +69,13 @@ public class Intake extends NewtonSubsystem {
         });
     }
 
+    /**
+     * Command to stop the intake
+     *
+     * @return the command
+     *
+     * @apiNote This command runs for one frame and ends immediately
+     */
     public Command autonomousInitCommand(){
         return stopCommand();
     }

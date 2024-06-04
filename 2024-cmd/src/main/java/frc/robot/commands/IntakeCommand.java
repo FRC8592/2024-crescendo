@@ -1,8 +1,12 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.robot.Constants.*;
+import frc.robot.subsystems.*;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.shooter.Shooter;
 
 public class IntakeCommand extends WrapperCommand {
     /**
@@ -17,23 +21,23 @@ public class IntakeCommand extends WrapperCommand {
         super(
             new StowCommand(shooter, elevator, intake)
             .andThen(
-                shooter.intakeNoContactCommand()
+                shooter.commands.intakeNoContactCommand()
                 .deadlineWith(
-                    intake.intakeCommand()
-                    .alongWith(leds.singleColorCommand(LEDS.ORANGE))
+                    intake.commands.intakeCommand()
+                    .alongWith(leds.commands.singleColorCommand(LEDS.ORANGE))
                 )
             )
             .andThen(
-                shooter.intakeWithContactCommand()
+                shooter.commands.intakeWithContactCommand()
                 .deadlineWith(
-                    intake.intakeCommand()
-                    .alongWith(leds.blinkCommand(LEDS.ORANGE, 2))
+                    intake.commands.intakeCommand()
+                    .alongWith(leds.commands.blinkCommand(LEDS.ORANGE, 2))
                 )
             ).andThen(
-                shooter.intakeAdjustNoteCommand()
+                shooter.commands.intakeAdjustNoteCommand()
                 .deadlineWith(
-                    intake.stopCommand()
-                    .alongWith(leds.blinkCommand(LEDS.ORANGE, 2))
+                    intake.commands.stopCommand()
+                    .alongWith(leds.commands.blinkCommand(LEDS.ORANGE, 2))
                 )
             )
         );

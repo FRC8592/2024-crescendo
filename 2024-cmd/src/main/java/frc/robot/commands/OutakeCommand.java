@@ -1,7 +1,9 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
+import frc.robot.subsystems.*;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter;
 
 public class OutakeCommand extends WrapperCommand {
     /**
@@ -14,8 +16,8 @@ public class OutakeCommand extends WrapperCommand {
      */
     public OutakeCommand(Shooter shooter, Intake intake){
         super(
-            shooter.outakeCommand()
-            .alongWith(intake.outakeCommand())
+            shooter.commands.outakeCommand()
+            .alongWith(intake.commands.outakeCommand())
         );
     }
 }

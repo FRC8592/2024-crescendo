@@ -1,29 +1,19 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.leds;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+
 import frc.robot.Constants.*;
+import frc.robot.subsystems.SubsystemCommands;
 
-public class LEDs extends NewtonSubsystem {
-    // Represents the real strip. Should only be written to once per frame.
-    private AddressableLED ledStrip;
-
-    // An array of color data that's separate from the strip. This can be
-    // edited as much as you want, and must be manually written to the strip
-    // for the LEDs to display anything.
-    private AddressableLEDBuffer ledBuffer;
-
-    public LEDs() {
-        ledStrip = new AddressableLED(LEDS.LED_STRIP_PWM_PORT);
-        ledStrip.setLength(LEDS.LED_LENGTH);
-        ledBuffer = new AddressableLEDBuffer(LEDS.LED_LENGTH);
-        ledStrip.start();
+public class LEDCommands extends SubsystemCommands{
+    private LEDs leds;
+    public LEDCommands(LEDs leds){
+        this.leds = leds;
     }
 
     /**
@@ -38,8 +28,8 @@ public class LEDs extends NewtonSubsystem {
      * @apiNote This command doesn't end on its own; it must be interrupted to end
      */
     public Command indicateLoadedCommand(BooleanSupplier isLoaded){
-        return run(() -> {
-            setSolidColor(isLoaded.getAsBoolean() ? LEDS.CYAN : LEDS.OFF);
+        return leds.run(() -> {
+            leds.setSolidColor(isLoaded.getAsBoolean() ? LEDS.CYAN : LEDS.OFF);
         });
     }
 
@@ -53,8 +43,8 @@ public class LEDs extends NewtonSubsystem {
      * @apiNote This command runs instantly and ends on the same frame
      */
     public Command singleColorCommand(Color color){
-        return runOnce(() -> {
-            setSolidColor(color);
+        return leds.runOnce(() -> {
+            leds.setSolidColor(color);
         });
     }
 
@@ -72,12 +62,12 @@ public class LEDs extends NewtonSubsystem {
         Timer flashTimer = new Timer();
         flashTimer.start();
 
-        return run(() -> {
+        return leds.run(() -> {
             if (((int) (flashTimer.get() * hertz * 2)) % 2 == 0) {
-                setSolidColor(color);
+                leds.setSolidColor(color);
             }
             else {
-                setSolidColor(LEDS.OFF);
+                leds.setSolidColor(LEDS.OFF);
             }
         });
     }
@@ -94,13 +84,13 @@ public class LEDs extends NewtonSubsystem {
         // put the editable value in a final array
 
         final int[] counter = {0};
-        return run(() -> {
+        return leds.run(() -> {
             counter[0]+=10;
             for(int i = 0; i < LEDS.LED_LENGTH; i++) {
-                int[] RGB = HSVtoRGB((counter[0]+(i*5))%360);
-                ledBuffer.setRGB(i, RGB[0], RGB[1], RGB[2]);
+                int[] RGB = leds.HSVtoRGB((counter[0]+(i*5))%360);
+                leds.ledBuffer.setRGB(i, RGB[0], RGB[1], RGB[2]);
             }
-            ledStrip.setData(ledBuffer);
+            leds.ledStrip.setData(leds.ledBuffer);
         });
     }
 
@@ -115,75 +105,24 @@ public class LEDs extends NewtonSubsystem {
      * @apiNote This command doesn't end on its own; it must be interrupted to end
      */
     public Command honeCommand(DoubleSupplier offset){
-        return run(() -> {
+        return leds.run(() -> {
             if (offset.getAsDouble() >= LEDS.NOT_AIMED_OFFSET){
-                setSolidColor(LEDS.RED);
+                leds.setSolidColor(LEDS.RED);
             }
             else if (offset.getAsDouble() <= LEDS.NOT_AIMED_OFFSET && offset.getAsDouble() > LEDS.FULLY_AIMED_OFFSET){
-                setSolidColor(LEDS.RED);
+                leds.setSolidColor(LEDS.RED);
                 double ledOffsetScale = 1 - ((offset.getAsDouble() - LEDS.FULLY_AIMED_OFFSET)
                         /(LEDS.NOT_AIMED_OFFSET - LEDS.FULLY_AIMED_OFFSET)); //a value of 0-1 where 0 means equal to NOT_AIMED_OFFSET and
                                                                             //1 means FULLY_AIMED_OFFSET
                 double ledsToLight = ledOffsetScale * (LEDS.LED_LENGTH/2);
                 for (int i = 0; i < ledsToLight; i ++){
-                    ledBuffer.setLED(i, LEDS.GREEN);
-                    ledBuffer.setLED(LEDS.LED_LENGTH - i - 1, LEDS.GREEN);
+                    leds.ledBuffer.setLED(i, LEDS.GREEN);
+                    leds.ledBuffer.setLED(LEDS.LED_LENGTH - i - 1, LEDS.GREEN);
                 }
             }
             else{
-                setSolidColor(LEDS.GREEN);
+                leds.setSolidColor(LEDS.GREEN);
             }
         });
     }
-
-    private void setSolidColor(Color color){
-        for(int i = 0; i < LEDS.LED_LENGTH; i++){
-            ledBuffer.setLED(i, color);
-        }
-        ledStrip.setData(ledBuffer);
-    }
-
-    public void periodic(){}
-    public void simulationPeriodic(){}
-
-    private int[] HSVtoRGB(double h){
-        double R1 = 0;
-        double G1 = 0;
-        double B1 = 0;
-        if(0 <= h && h < 60){
-            R1 = 255;
-            G1 = (h-0)*(255d/60d);
-            B1 = 0;
-        }
-        else if(60 <= h && h < 120){
-            R1 = (120-h)*(255d/60d);
-            G1 = 255;
-            B1 = 0;
-        }
-        else if(120 <= h && h < 180){
-            R1 = 0;
-            G1 = 255;
-            B1 = (h-120)*(255d/60d);
-        }
-        else if(180 <= h && h < 240){
-            R1 = 0;
-            G1 = (240-h)*(255d/60d);
-            B1 = 255;
-        }
-        else if(240 <= h && h < 300){
-            R1 = (h-240)*(255d/60d);
-            G1 = 0;
-            B1 = 255;
-        }
-        else if(300 <= h && h < 360){
-            R1 = 255;
-            G1 = 0;
-            B1 = (360-h)*(255d/60d);
-        }
-        R1=Math.max(Math.min(R1, 255), 0);
-        G1=Math.max(Math.min(G1, 255), 0);
-        B1=Math.max(Math.min(B1, 255), 0);
-        return new int[]{(int)R1, (int)G1, (int)B1};
-    }
-
 }

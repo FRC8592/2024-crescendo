@@ -11,18 +11,34 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorCommands;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeCommands;
+import frc.robot.subsystems.leds.LEDCommands;
+import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterCommands;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveCommands;
 
 public final class AutoManager {
     private static SendableChooser<Command> autoChooser;
     private static ArrayList<Command> autoCommands = new ArrayList<>();
 
-    public static Command getAutonomousCommand(Swerve swerve, Intake intake, Elevator elevator, Shooter shooter, LEDs leds){
+    public static Command getAutonomousCommand(
+        Swerve swerve,
+        Intake intake,
+        Elevator elevator,
+        Shooter shooter,
+        LEDs leds
+    ){
         return new ParallelCommandGroup(
-            swerve.autonomousInitCommand(),
-            intake.autonomousInitCommand(),
-            elevator.autonomousInitCommand(),
-            shooter.autonomousInitCommand(),
-            leds.autonomousInitCommand()
+            swerve.commands.autonomousInitCommand(),
+            intake.commands.autonomousInitCommand(),
+            elevator.commands.autonomousInitCommand(),
+            shooter.commands.autonomousInitCommand(),
+            leds.commands.autonomousInitCommand()
         ).andThen(autoChooser.getSelected());
     }
 

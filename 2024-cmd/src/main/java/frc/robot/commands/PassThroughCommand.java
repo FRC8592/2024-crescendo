@@ -3,6 +3,10 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.robot.Constants.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.shooter.Shooter;
 
 public class PassThroughCommand extends WrapperCommand {
     /**
@@ -19,9 +23,9 @@ public class PassThroughCommand extends WrapperCommand {
         super(
             new StowCommand(shooter, elevator, intake)
             .andThen(
-                intake.intakeCommand()
-                .alongWith(shooter.passThroughCommand())
-                .alongWith(leds.blinkCommand(LEDS.ORANGE, 4))
+                intake.commands.intakeCommand()
+                .alongWith(shooter.commands.passThroughCommand())
+                .alongWith(leds.commands.blinkCommand(LEDS.ORANGE, 4))
             )
         );
     }

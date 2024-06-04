@@ -1,8 +1,12 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.robot.Constants.*;
+import frc.robot.subsystems.*;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.shooter.Shooter;
 
 public class AmpScoreCommand extends WrapperCommand {
     /**
@@ -18,8 +22,8 @@ public class AmpScoreCommand extends WrapperCommand {
      */
     public AmpScoreCommand(Shooter shooter, Elevator elevator, Intake intake, LEDs leds){
         super(
-            shooter.ampScoreCommand()
-            .alongWith(leds.singleColorCommand(LEDS.OFF))
+            shooter.commands.ampScoreCommand()
+            .alongWith(leds.commands.singleColorCommand(LEDS.OFF))
         );
     }
 }

@@ -2,6 +2,9 @@ package frc.robot.commands;
 
 import frc.robot.commands.proxies.OverrideEverythingCommand;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
 
 public class StowCommand extends WrapperCommand {
@@ -15,9 +18,9 @@ public class StowCommand extends WrapperCommand {
      */
     public StowCommand(Shooter shooter, Elevator elevator, Intake intake){
         super(
-            shooter.stopCommand()
-            .alongWith(intake.stopCommand())
-            .alongWith(elevator.setStaticPositionCommand(0, 0))
+            shooter.commands.stopCommand()
+            .alongWith(intake.commands.stopCommand())
+            .alongWith(elevator.commands.setStaticPositionCommand(0, 0))
         );
     }
 }

@@ -6,6 +6,10 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.robot.helpers.RangeTable.RangeEntry;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.shooter.Shooter;
 
 public class PrimeCommand extends WrapperCommand {
 
@@ -30,9 +34,9 @@ public class PrimeCommand extends WrapperCommand {
         DoubleSupplier offsetSupplier
     ){
         super(
-            shooter.primeCommand(entry)
-            .alongWith(elevator.setStaticPositionCommand(entry.pivotAngle, entry.elevatorHeight))
-            .alongWith(leds.honeCommand(offsetSupplier))
+            shooter.commands.primeCommand(entry)
+            .alongWith(elevator.commands.setStaticPositionCommand(entry.pivotAngle, entry.elevatorHeight))
+            .alongWith(leds.commands.honeCommand(offsetSupplier))
         );
         addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime
     }
@@ -52,9 +56,9 @@ public class PrimeCommand extends WrapperCommand {
      */
     public PrimeCommand(Supplier<RangeEntry> entry, Shooter shooter, Elevator elevator, Intake intake, LEDs leds, DoubleSupplier offsetSupplier){
         super(
-            shooter.primeCommand(entry)
-            .alongWith(elevator.setUpdatingPositionCommand(() -> entry.get().pivotAngle, () -> entry.get().elevatorHeight))
-            .alongWith(leds.honeCommand(offsetSupplier))
+            shooter.commands.primeCommand(entry)
+            .alongWith(elevator.commands.setUpdatingPositionCommand(() -> entry.get().pivotAngle, () -> entry.get().elevatorHeight))
+            .alongWith(leds.commands.honeCommand(offsetSupplier))
         );
         addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime
     }

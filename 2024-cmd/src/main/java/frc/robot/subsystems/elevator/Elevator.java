@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.elevator;
 
 import java.util.function.DoubleSupplier;
 
@@ -12,10 +12,13 @@ import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.helpers.*;
+import frc.robot.subsystems.SubsystemCommands;
 import frc.robot.Constants.*;
 
-public class Elevator extends NewtonSubsystem {
+public class Elevator extends SubsystemBase {
+    public ElevatorCommands commands = new ElevatorCommands(this);
 
     // Small enum for conveniently referencing elevator positions
     public enum Positions{
@@ -37,8 +40,8 @@ public class Elevator extends NewtonSubsystem {
 
     // Unlike the similarly named variables in Shooter, these are used for
     // subsystem control and aren't just logging
-    private double targetExtension;
-    private double targetPivot;
+    protected double targetExtension;
+    protected double targetPivot;
 
     public Elevator(){
         extensionMotor = new SparkFlexControl(CAN.ELEVATOR_MOTOR_CAN_ID, false);
@@ -58,119 +61,6 @@ public class Elevator extends NewtonSubsystem {
         pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
         pivotFollowMotor.setMaxVelocity(6500, 0);
         pivotFollowMotor.setMaxAcceleration(7000, 0);
-    }
-
-    /**
-     * Command to put the elevator at the given setpoint. Ends when the elevator is at the target.
-     *
-     * @param pivotDegrees {@code double}: the pivot target in degrees
-     * @param extensionMeters {@code double}: the extension target in meters
-     *
-     * @return the command
-     *
-     * @apiNote This command runs until {@link Elevator#isAtTargetPosition()} returns {@code true}
-     */
-    public Command setStaticPositionCommand(double pivotDegrees, double extensionMeters){
-        return run(() -> {
-            targetPivot = pivotDegrees;
-            targetExtension = extensionMeters;
-            runElevator();
-        }).until(() -> isAtTargetPosition());
-    }
-
-    /**
-     * Command to put the elevator at the given position. Ends when the elevator is at the target.
-     *
-     * @param position {@code Positions}: the position to go to
-     *
-     * @return the command
-     *
-     * @apiNote This command runs until {@link Elevator#isAtTargetPosition()} returns {@code true}
-     */
-    public Command setStaticPositionCommand(Positions position){
-        return run(() -> {
-            targetPivot = position.pivot;
-            targetExtension = position.extension;
-            runElevator();
-        }).until(() -> isAtTargetPosition());
-    }
-
-    /**
-     * Command to contantly drive the elevator towards a setpoint that can change as desired.
-     * This command never ends on its own.
-     *
-     * @param pivotDegrees {@code DoubleSupplier}: a lambda that returns where the pivot should be
-     * @param extensionMeters {@code DoubleSupplier}: a lambda that returns how far the extension
-     * should go
-     *
-     * @return the command
-     *
-     * @apiNote This command never ends on its own; it must be interrupted to end
-     */
-    public Command setUpdatingPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters){
-        return run(() -> {
-            targetPivot = pivotDegrees.getAsDouble();
-            targetExtension = extensionMeters.getAsDouble();
-            runElevator();
-        });
-    }
-
-    /**
-     * The same as {@link Elevator#setStaticPositionCommand(double, double)}, but allows the setpoint
-     * to be edited  on the fly and won't end on its own. This is meant to be used together with 
-     * {@link Elevator#incrementElevatorPositionCommand(double, double)}.
-     *
-     * @param pivotDegrees {@code double}: the pivot setpoint to start with
-     * @param extensionMeters {@code double}: the extension setpoint to start with
-     *
-     * @return the command
-     *
-     * @apiNote This command never ends on its own; it must be interrupted to end
-     */
-    public Command setMalleablePositionCommand(double pivotDegrees, double extensionMeters){
-        targetPivot = pivotDegrees;
-        targetExtension = extensionMeters;
-        return run(() -> {
-            runElevator();
-        });
-    }
-
-    /**
-     * The same as {@link Elevator#setStaticPositionCommand(Position)}, but allows the setpoint
-     * to be edited  on the fly and won't end on its own. This is meant to be used together with 
-     * {@link Elevator#incrementElevatorPositionCommand(double, double)}.
-     *
-     * @param position {@code Positions}: the position to go to
-     *
-     * @return the command
-     *
-     * @apiNote This command never ends on its own; it must be interrupted to end
-     */
-    public Command setMalleablePositionCommand(Positions position){
-        targetPivot = position.pivot;
-        targetExtension = position.extension;
-        return run(() -> {
-            runElevator();
-        });
-    }
-
-    /**
-     * If a {@link Elevator#setMalleablePositionCommand(double, double)} command is running, change
-     * the pivot and extension setpoints for the elevator to target. Otherwise, does nothing functional.
-     *
-     * @param pivotDegrees {@code double}: the amount to change the pivot target by each frame
-     * @param extensionMeters {@code double}: the amount to change the extension setpoint by each frame
-     *
-     * @return the command
-     *
-     * @apiNote This command never ends on its own; it must be interrupted to end
-     * @apiNote This command does NOT require the Elevator subsystem
-     */
-    public Command incrementElevatorPositionCommand(double pivotDegrees, double extensionMeters){
-        return Commands.run(() -> {
-            this.targetPivot += pivotDegrees;
-            this.targetExtension += extensionMeters;
-        });
     }
 
     public void periodic() {
@@ -274,7 +164,7 @@ public class Elevator extends NewtonSubsystem {
      * Method to run the elevator with safety features. DO NOT COMMAND THE ELEVATOR
      * MOTORS OTHER THAN THROUGH THIS METHOD unless you are stopping them.
      */
-    private void runElevator(){
+    protected void runElevator(){
         double actualPivot = getPivotAngle();
         double actualExtension = getExtensionLength();
 

@@ -10,6 +10,15 @@ import frc.robot.commands.autonomous.*;
 import frc.robot.commands.proxies.*;
 import frc.robot.helpers.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.elevator.ElevatorCommands;
+import frc.robot.subsystems.intake.IntakeCommands;
+import frc.robot.subsystems.leds.LEDCommands;
+import frc.robot.subsystems.shooter.ShooterCommands;
 
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
@@ -81,14 +90,14 @@ public class RobotContainer {
      */
     private void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
-        setDefaultCommand(swerve, swerve.driveCommand(
+        setDefaultCommand(swerve, swerve.commands.driveCommand(
             () -> driverController.getLeftX(),
             () -> driverController.getLeftY(),
             () -> driverController.getRightX()
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         // Set the LED strip's default command to showing whether or not the robot is loaded
-        setDefaultCommand(leds, leds.indicateLoadedCommand(
+        setDefaultCommand(leds, leds.commands.indicateLoadedCommand(
             () -> shooter.isMiddleBeamBreakTripped()
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
@@ -105,7 +114,7 @@ public class RobotContainer {
      * @apiNote this command never ends on its own; it must be interrupted to end
      */
     private Command snapToCommand(Rotation2d angle){
-        return swerve.snapToCommand(
+        return swerve.commands.snapToCommand(
             () -> driverController.getLeftX(),
             () -> driverController.getLeftY(),
             Rotation2d.fromDegrees((360-angle.getDegrees())%360)
@@ -119,18 +128,18 @@ public class RobotContainer {
         // Slow Mode (hold)
         driverController.rightBumper()
         .onTrue(
-            swerve.slowModeCommand(true) // Enable slow mode
+            swerve.commands.slowModeCommand(true) // Enable slow mode
         ).onFalse(
-            swerve.slowModeCommand(false) // Disable slow mode
+            swerve.commands.slowModeCommand(false) // Disable slow mode
         );
 
         // Reset Gyroscope (press)
         driverController.back().onTrue(
-            swerve.zeroGyroscopeCommand()
+            swerve.commands.zeroGyroscopeCommand()
         );
 
         //Autocollect (hold)
-        driverController.a().whileTrue(swerve.rawRotationCommand(
+        driverController.a().whileTrue(swerve.commands.rawRotationCommand(
             () -> driverController.getLeftX(), // Drive forward and back freely
             () -> 0, // No side-to-side
 
@@ -144,9 +153,9 @@ public class RobotContainer {
 
         // Robot-oriented (hold)
         driverController.leftBumper().onTrue(
-            swerve.robotOrientedCommand(true) // Enable robot-oriented driving
+            swerve.commands.robotOrientedCommand(true) // Enable robot-oriented driving
         ).onFalse(
-            swerve.robotOrientedCommand(false) // Disable robot-oriented driving
+            swerve.commands.robotOrientedCommand(false) // Disable robot-oriented driving
         );
 
         // Amp-score or shoot (press) + force-shoot (hold)
@@ -194,7 +203,7 @@ public class RobotContainer {
 
         // Party Mode (hold)
         driverController.start().whileTrue(
-            leds.partyCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            leds.commands.partyCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         try{
@@ -252,7 +261,7 @@ public class RobotContainer {
                 shooter, elevator, intake, leds,
                 // For the honing lights
                 () -> poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
-            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
 
         //Podium Prime (press)
@@ -261,7 +270,7 @@ public class RobotContainer {
                 RangeTable.getPodium(), shooter, elevator, intake, leds,
                 // For the honing lights
                 () -> poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
-            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
 
         // Outake (hold)
@@ -273,6 +282,9 @@ public class RobotContainer {
         // Intake (press)
         operatorController.leftTrigger(0.1).onTrue(
             new IntakeCommand(shooter, elevator, intake, leds)
+            .andThen(new ScheduleCommand(
+                shooter.commands.primeCommand(RangeTable.getSubwoofer())
+            ))
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
@@ -286,7 +298,7 @@ public class RobotContainer {
 
         // Amp prime (press)
         operatorController.x().onTrue(
-            elevator.setStaticPositionCommand(
+            elevator.commands.setStaticPositionCommand(
                 ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
@@ -299,26 +311,26 @@ public class RobotContainer {
 
         // Extend (hold)
         operatorController.pov(0).whileTrue(
-            elevator.incrementElevatorPositionCommand(0, ELEVATOR.MANUAL_EXTENSION_SPEED)
+            elevator.commands.incrementElevatorPositionCommand(0, ELEVATOR.MANUAL_EXTENSION_SPEED)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Retract (hold)
         operatorController.pov(180).whileTrue(
-            elevator.incrementElevatorPositionCommand(0, -ELEVATOR.MANUAL_EXTENSION_SPEED)
+            elevator.commands.incrementElevatorPositionCommand(0, -ELEVATOR.MANUAL_EXTENSION_SPEED)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Note Request (hold)
         operatorController.back().whileTrue(
-            leds.blinkCommand(LEDS.YELLOW, 2)
+            leds.commands.blinkCommand(LEDS.YELLOW, 2)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Trap Prime (press)
         operatorController.start().onTrue(
             new PrimeCommand(RangeTable.getTrap(), shooter, elevator, intake, leds, () -> 0)
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
     }
 

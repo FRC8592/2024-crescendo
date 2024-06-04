@@ -10,7 +10,6 @@ import frc.robot.Constants.*;
 
 import org.littletonrobotics.junction.Logger;
 import frc.robot.helpers.*;
-import frc.robot.subsystems.SubsystemCommands;
 
 public class Shooter extends SubsystemBase {
     public ShooterCommands commands = new ShooterCommands(this);

@@ -6,17 +6,11 @@ import frc.robot.Constants.LEDS;
 import frc.robot.commands.*;
 import frc.robot.commands.proxies.*;
 import frc.robot.helpers.*;
-import frc.robot.subsystems.*;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeCommands;
-import frc.robot.subsystems.leds.LEDCommands;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterCommands;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.subsystems.swerve.SwerveCommands;
 
 public class SystemsCheckAuto extends AutoCommand {
     public SystemsCheckAuto(Swerve swerve, Intake intake, Elevator elevator, Shooter shooter, LEDs leds){

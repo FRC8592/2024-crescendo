@@ -4,17 +4,11 @@
 
 package frc.robot.subsystems.elevator;
 
-import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.CANSparkBase.ControlType;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.helpers.*;
-import frc.robot.subsystems.SubsystemCommands;
 import frc.robot.Constants.*;
 
 public class Elevator extends SubsystemBase {

@@ -10,19 +10,24 @@ import frc.robot.subsystems.shooter.Shooter;
 public class ShootCommand extends WrapperCommand {
     /**
      * Command that, assuming the robot is primed (this is NOT checked), shoots
-     * the currently loaded note.
-     *
-     * @apiNote This command runs for {@link SHOOTER#SHOOT_SCORE_TIME} seconds.
+     * the currently loaded note (the command also doesn't check that there is
+     * a note)
      *
      * @param shooter
      * @param elevator
      * @param intake
      * @param leds
+     *
+     * @apiNote This command runs for {@link SHOOTER#SHOOT_SCORE_TIME} seconds.
      */
     public ShootCommand(Shooter shooter, Elevator elevator, Intake intake, LEDs leds){
         super(
+            // Simply runs the shooter's feeder
             shooter.commands.fireCommand()
-            .alongWith(leds.commands.singleColorCommand(LEDS.OFF))
+
+            // singleColorCommand is instant for now, but the deadline ensures
+            // that nothing will break if that changes.
+            .deadlineWith(leds.commands.singleColorCommand(LEDS.OFF))
         );
         addRequirements(elevator, intake);
     }

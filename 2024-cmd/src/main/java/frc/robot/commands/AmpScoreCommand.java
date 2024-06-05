@@ -24,5 +24,9 @@ public class AmpScoreCommand extends WrapperCommand {
             shooter.commands.ampScoreCommand()
             .alongWith(leds.commands.singleColorCommand(LEDS.OFF))
         );
+
+        // Keep the elevator and intake from doing anything funky
+        // while we score.
+        addRequirements(elevator, intake);
     }
 }

@@ -20,7 +20,10 @@ public class PassThroughCommand extends WrapperCommand {
      */
     public PassThroughCommand(Shooter shooter, Elevator elevator, Intake intake, LEDs leds){
         super(
+            // Make sure we're stowed before we run anything
             new StowCommand(shooter, elevator, intake)
+
+            // Reusing the intake's intakeCommand may or may not be permanent
             .andThen(
                 intake.commands.intakeCommand()
                 .alongWith(shooter.commands.passThroughCommand())

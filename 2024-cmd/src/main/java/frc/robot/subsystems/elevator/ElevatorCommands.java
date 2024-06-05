@@ -49,8 +49,7 @@ public class ElevatorCommands extends SubsystemCommands{
     }
 
     /**
-     * Command to contantly drive the elevator towards a setpoint that can change as desired.
-     * This command never ends on its own.
+     * Command to constantly drive the elevator towards a setpoint that can change as desired.
      *
      * @param pivotDegrees {@code DoubleSupplier}: a lambda that returns where the pivot should be
      * @param extensionMeters {@code DoubleSupplier}: a lambda that returns how far the extension

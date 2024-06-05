@@ -14,6 +14,9 @@ public class StowCommand extends WrapperCommand {
      * @param shooter
      * @param elevator
      * @param intake
+     *
+     * @apiNote This command ends when {@link Elevator#isAtTargetPosition()} returns
+     * {@code true}.
      */
     public StowCommand(Shooter shooter, Elevator elevator, Intake intake){
         super(

@@ -23,6 +23,8 @@ public class PrimeCommand extends WrapperCommand {
      * @param leds
      * @param offsetSupplier {@code DoubleSupplier} lambda that returns the current offset from the target
      * for the honing LEDs
+     *
+     * @apiNote This command does not end on its own; it must be interrupted to stop
      */
     public PrimeCommand(
         RangeEntry entry,
@@ -33,8 +35,13 @@ public class PrimeCommand extends WrapperCommand {
         DoubleSupplier offsetSupplier
     ){
         super(
+            // Spins up the shooter flywheels
             shooter.commands.primeCommand(entry)
+
+            // Gets the elevator in position
             .alongWith(elevator.commands.setStaticPositionCommand(entry.pivotAngle, entry.elevatorHeight))
+
+            // Runs the honing lights (which indicate to the drivers how far off their target they are)
             .alongWith(leds.commands.honeCommand(offsetSupplier))
         );
         addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime
@@ -52,11 +59,22 @@ public class PrimeCommand extends WrapperCommand {
      * @param leds
      * @param offsetSupplier {@code DoubleSupplier} lambda that returns the current offset from the target
      * for the honing LEDs
+     *
+     * @apiNote This command does not end on its own; it must be interrupted to stop
      */
     public PrimeCommand(Supplier<RangeEntry> entry, Shooter shooter, Elevator elevator, Intake intake, LEDs leds, DoubleSupplier offsetSupplier){
         super(
+            // The shooter's primeCommand is overloaded; the version that
+            // takes in a Supplier will automatically update the flywheel
+            // target speeds as the RangeEntry returned by the Supplier
+            // changes.
             shooter.commands.primeCommand(entry)
+
+            // This is similar to the primeCommand; the elevator will update
+            // itself with the supplier.
             .alongWith(elevator.commands.setUpdatingPositionCommand(() -> entry.get().pivotAngle, () -> entry.get().elevatorHeight))
+
+            // Commented above
             .alongWith(leds.commands.honeCommand(offsetSupplier))
         );
         addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime

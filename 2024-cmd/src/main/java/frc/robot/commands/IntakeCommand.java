@@ -18,7 +18,12 @@ public class IntakeCommand extends WrapperCommand {
      */
     public IntakeCommand(Shooter shooter, Elevator elevator, Intake intake, LEDs leds){
         super(
+            // Make sure we're stowed
             new StowCommand(shooter, elevator, intake)
+
+            // Run the intake and feeders as if there is no contact with
+            // a note. This stopw when the intakeNoContactCommand ends,
+            // which is when the bottom beam-break sees a note.
             .andThen(
                 shooter.commands.intakeNoContactCommand()
                 .deadlineWith(
@@ -26,13 +31,20 @@ public class IntakeCommand extends WrapperCommand {
                     .alongWith(leds.commands.singleColorCommand(LEDS.ORANGE))
                 )
             )
+
+            // Now that the robot knows there's a note, suck it up into the
+            // shooter using motor control that assumes there is a note.
             .andThen(
                 shooter.commands.intakeWithContactCommand()
                 .deadlineWith(
                     intake.commands.intakeCommand()
                     .alongWith(leds.commands.blinkCommand(LEDS.ORANGE, 2))
                 )
-            ).andThen(
+            )
+
+            // Once the note is all the way at the top, adjust it to a good
+            // position to shoot.
+            .andThen(
                 shooter.commands.intakeAdjustNoteCommand()
                 .deadlineWith(
                     intake.commands.stopCommand()

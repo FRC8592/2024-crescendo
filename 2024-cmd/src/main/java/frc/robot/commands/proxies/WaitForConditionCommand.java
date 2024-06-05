@@ -8,7 +8,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class WaitForConditionCommand extends Command{
     private BooleanSupplier condition;
     private Command command;
-    private boolean commandIsScheduled;
+    private boolean triggered;
+    private boolean scheduleCommand;
     /**
      * Proxy command that waits until a condition is {@code true}, then schedules a command.
      * If the condition is still {@code true} when the command finishes, does not reschedule
@@ -23,18 +24,32 @@ public class WaitForConditionCommand extends Command{
     public WaitForConditionCommand(BooleanSupplier condition, Command command){
         this.condition = condition;
         this.command = command;
+        this.scheduleCommand = true;
     }
+
+    /**
+     * Command that waits until a condition is true, then ends.
+     * @param condition {@code BooleanSupplier} a lambda that
+     * returns true when this command should end.
+     */
+    public WaitForConditionCommand(BooleanSupplier condition){
+        this.condition = condition;
+        this.scheduleCommand = false;
+    }
+
     public void initialize(){
-        this.commandIsScheduled = false;
+        this.triggered = false;
     }
     public void execute(){
-        if(condition.getAsBoolean() && !this.commandIsScheduled){
-            CommandScheduler.getInstance().schedule(command);
-            this.commandIsScheduled = true;
+        if(condition.getAsBoolean() && !this.triggered){
+            if(this.scheduleCommand){
+                CommandScheduler.getInstance().schedule(command);
+            }
+            this.triggered = true;
         }
     }
     public void end(){}
     public boolean isFinished(){
-        return this.commandIsScheduled;
+        return this.triggered;
     }
 }

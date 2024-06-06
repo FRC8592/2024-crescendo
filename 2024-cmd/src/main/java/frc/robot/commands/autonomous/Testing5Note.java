@@ -10,6 +10,9 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 
 public class Testing5Note extends AutoCommand{
+    /**
+     * 5-mid-note auto for testing in simulation. This won't fit on the quarter-field and doesn't run in 15s
+     */
     public Testing5Note(Swerve swerve, Intake intake, Elevator elevator, Shooter shooter, LEDs leds){
         super(
             new SequentialCommandGroup(

@@ -16,6 +16,10 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 
+/**
+ * General class for autonomous management (loading autos, sending the chooser, getting the
+ * user-selected auto command, etc).
+ */
 public final class AutoManager {
     private static SendableChooser<Command> autoChooser;
     private static ArrayList<AutoCommand> autoCommands = new ArrayList<>();
@@ -63,6 +67,7 @@ public final class AutoManager {
      */
     public static void loadAutos(Swerve swerve, Intake intake, Elevator elevator, Shooter shooter, LEDs leds){
         autoCommands = new ArrayList<>();
+        autoCommands.add(new PreloadThreeWingNoteAuto(swerve, intake, elevator, shooter, leds));
         autoCommands.add(new Testing5Note(swerve, intake, elevator, shooter, leds));
         autoCommands.add(new SystemsCheckAuto(swerve, intake, elevator, shooter, leds));
     }

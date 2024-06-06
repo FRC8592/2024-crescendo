@@ -13,6 +13,9 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 
 public class SystemsCheckAuto extends AutoCommand {
+    /**
+     * Run an automated systems-check as an autonomous routine
+     */
     public SystemsCheckAuto(Swerve swerve, Intake intake, Elevator elevator, Shooter shooter, LEDs leds){
         super(
             // Drive the swerve in all four directions at low speed to confirm that it works

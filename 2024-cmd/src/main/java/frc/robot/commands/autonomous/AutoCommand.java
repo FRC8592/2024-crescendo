@@ -17,6 +17,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
 
+/**
+ * Class to provide methods, variables, and a convenient constructor to autonomous commands
+ */
 public class AutoCommand extends WrapperCommand {
     /**
      * {@code getAsBoolean()} returns {@code true} when the robot it running on the red side and

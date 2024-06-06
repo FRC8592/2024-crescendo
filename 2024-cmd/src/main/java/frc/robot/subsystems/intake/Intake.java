@@ -14,8 +14,11 @@ import frc.robot.Constants.*;
 public class Intake extends SubsystemBase{
     public IntakeCommands commands = new IntakeCommands(this);
 
-    protected SparkFlexControl intakeMotor;
-    protected double targetIntakeVelocity = 0;
+    private SparkFlexControl intakeMotor;
+
+    // Used for logging
+    private double targetIntakeVelocity = 0;
+
     public Intake() {
         intakeMotor = new SparkFlexControl(CAN.INTAKE_MOTOR_CAN_ID, true);
         intakeMotor.setPIDF(INTAKE.MOTOR_kP, INTAKE.MOTOR_kI, INTAKE.MOTOR_kD, INTAKE.MOTOR_kFF, 0);
@@ -29,5 +32,14 @@ public class Intake extends SubsystemBase{
 
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
+    }
+
+    /**
+     * Set the intake motor's velocity
+     * @param velocity {@code double} the target velocity in RPM
+     */
+    protected void setIntakeVelocity(double velocity){
+        targetIntakeVelocity = velocity;
+        intakeMotor.setVelocity(velocity);
     }
 }

@@ -95,7 +95,7 @@ public class ShooterCommands extends SubsystemCommands{
      */
     public Command fireCommand(){
         return shooter.run(() -> {
-            shooter.feederMotor.setPercentOutput(SHOOTER.SHOOTING_FEEDER_POWER);
+            shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
         }).withTimeout(SHOOTER.SHOOT_SCORE_TIME);
     }
 
@@ -110,8 +110,8 @@ public class ShooterCommands extends SubsystemCommands{
      */
     public Command ampScoreCommand(){
         return shooter.run(() -> {
-            shooter.feederMotor.setVelocity(SHOOTER.AMP_FEEDER_SPEED);
-            shooter.setFlywheelVelocity(SHOOTER.AMP_FLYWHEEL_SPEED);
+            shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_SPEED);
+            shooter.setShooterVelocity(SHOOTER.AMP_FLYWHEEL_SPEED);
         }).withTimeout(SHOOTER.AMP_SCORE_TIME);
     }
 
@@ -125,11 +125,8 @@ public class ShooterCommands extends SubsystemCommands{
      */
     public Command stopCommand(){
         return shooter.runOnce(() -> {
-            shooter.leftShooterMotor.setVelocity(0);
-            shooter.leftTargetSpeed = 0;
-            shooter.rightShooterMotor.setVelocity(0);
-            shooter.rightTargetSpeed = 0;
-            shooter.feederMotor.setVelocity(0);
+            shooter.setShooterVelocity(0, 0);
+            shooter.setFeederVelocity(0);
         });
     }
 
@@ -156,8 +153,8 @@ public class ShooterCommands extends SubsystemCommands{
      */
     public Command intakeNoContactCommand(){
         return shooter.run(() -> {
-            shooter.feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
-            shooter.setFlywheelVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
+            shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
+            shooter.setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
         }).until(() -> shooter.isBottomBeamBreakTripped());
     }
 
@@ -172,8 +169,8 @@ public class ShooterCommands extends SubsystemCommands{
      */
     public Command intakeWithContactCommand(){
         return shooter.run(() -> {
-            shooter.feederMotor.setPercentOutput(SHOOTER.INTAKE_FEEDER_POWER);
-            shooter.setFlywheelVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
+            shooter.setFeederPower(SHOOTER.INTAKE_FEEDER_POWER);
+            shooter.setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
         }).until(() -> !shooter.isBottomBeamBreakTripped());
     }
 
@@ -186,15 +183,15 @@ public class ShooterCommands extends SubsystemCommands{
     public Command intakeAdjustNoteCommand(){
         return shooter.run(
             () -> {
-                shooter.setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
-                shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+                shooter.setShooterVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
+                shooter.setFeederVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
             }
         ).until(
-            () -> shooter.isTopBeamBreakTripped() && shooter.feederMotor.getVelocity() < 0
+            () -> shooter.isTopBeamBreakTripped() && shooter.getFeederVelocity() < 0
         ).andThen(
             shooter.run(() -> {
-                shooter.setFlywheelVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
-                shooter.feederMotor.setVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
+                shooter.setShooterVelocity(SHOOTER.ALIGN_FLYWHEEL_SPEED);
+                shooter.setFeederVelocity(SHOOTER.ALIGN_FEEDER_SPEED, 1);
             }
         ).until(
             () -> !shooter.isTopBeamBreakTripped())
@@ -212,8 +209,8 @@ public class ShooterCommands extends SubsystemCommands{
      */
     public Command outakeCommand(){
         return shooter.run(() -> {
-            shooter.setFlywheelVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED);
-            shooter.feederMotor.setVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
+            shooter.setShooterVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED);
+            shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
         });
     }
 
@@ -229,12 +226,12 @@ public class ShooterCommands extends SubsystemCommands{
     public Command passThroughCommand(){
         return shooter.run(() -> {
             if(shooter.isBottomBeamBreakTripped()){
-                shooter.feederMotor.setVelocity(1);
+                shooter.setFeederVelocity(1);
             }
             else{
-                shooter.feederMotor.setVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
+                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
             }
-            shooter.setFlywheelVelocity(5000);
+            shooter.setShooterVelocity(5000);
         });
     }
 }

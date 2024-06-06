@@ -14,17 +14,17 @@ import frc.robot.helpers.*;
 public class Shooter extends SubsystemBase {
     public ShooterCommands commands = new ShooterCommands(this);
 
-    protected SparkFlexControl leftShooterMotor;
-    protected SparkFlexControl rightShooterMotor;
-    protected SparkFlexControl feederMotor;
+    private SparkFlexControl leftShooterMotor;
+    private SparkFlexControl rightShooterMotor;
+    private SparkFlexControl feederMotor;
 
     private DigitalInput bottomBeamBreak;
     private DigitalInput topBeamBreak;
     private DigitalInput middleBeamBreak;
 
     // Only used for logging
-    protected int leftTargetSpeed = 0;
-    protected int rightTargetSpeed = 0;
+    private int leftTargetSpeed = 0;
+    private int rightTargetSpeed = 0;
 
     public Shooter() {
         leftShooterMotor = new SparkFlexControl(CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
@@ -88,7 +88,7 @@ public class Shooter extends SubsystemBase {
      * with the passed-in int.
      * @param both {@code int}: the speed in RPM to target for both flywheels
      */
-    protected void setFlywheelVelocity(int both){
+    protected void setShooterVelocity(int both){
         setShooterVelocity(both, both);
     }
 
@@ -102,6 +102,34 @@ public class Shooter extends SubsystemBase {
         rightTargetSpeed = right;
         leftShooterMotor.setVelocity(leftTargetSpeed);
         rightShooterMotor.setVelocity(rightTargetSpeed);
+    }
+
+    /**
+     * Run the feeder motor at a set power
+     * @param power {@code double}: the power to apply, (-1 to 1)
+     */
+    protected void setFeederPower(double power){
+        feederMotor.setPercentOutput(power);
+    }
+
+    /**
+     * Run the feeder motor at a set velocity using the default PID constants
+     * @param velocity {@code int}: the velocity to run the motor at in RPM
+     */
+    protected void setFeederVelocity(double velocity){
+        feederMotor.setVelocity(velocity);
+    }
+
+    /**
+     * Run the feeder motor at a set velocity using specific PID constants
+     * @param velocity {@code int}: the velocity to run the motor at in RPM
+     */
+    protected void setFeederVelocity(double velocity, int pidSlot){
+        feederMotor.setVelocity(velocity, pidSlot);
+    }
+
+    protected double getFeederVelocity(){
+        return feederMotor.getVelocity();
     }
 
     /**

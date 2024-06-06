@@ -25,11 +25,11 @@ public class Swerve extends SubsystemBase {
     public SwerveCommands commands = new SwerveCommands(this);
 
     private Mk4ModuleConfiguration swerveConfig;
-    protected NewtonSwerve swerve;
+    private NewtonSwerve swerve;
     private PIDController snapToController;
 
-    protected boolean isSlowMode;
-    protected boolean robotOriented;
+    private boolean isSlowMode;
+    private boolean robotOriented;
 
     // Yaw lock is not currently implemented
     private boolean yawLock;
@@ -145,6 +145,40 @@ public class Swerve extends SubsystemBase {
     }
 
     public void simulationPeriodic() {
+    }
+
+    /**
+     * Send a {@code ChassisSpeeds} to the drivetrain
+     * @param speeds {@code ChassisSpeeds}: the speeds to run the drivetrain at
+     */
+    protected void drive(ChassisSpeeds speeds){
+        swerve.drive(speeds);
+    }
+
+    /**
+     * Set whether human-input-processed joystick input should be slowed
+     *
+     * @param slowMode {@code boolean}: whether to slow the drivetrain
+     */
+    protected void setSlowMode(boolean slowMode){
+        this.isSlowMode = slowMode;
+    }
+
+    /**
+     * Set whether human-input-processed joystick input should be robot-oriented
+     * (as opposed to field-oriented)
+     *
+     * @param robotOriented {@code boolean}: whether to run the drivetrain robot-oriented
+     */
+    protected void setRobotOriented(boolean robotOriented){
+        this.robotOriented = robotOriented;
+    }
+
+    /**
+     * Set the gyroscope heading to 0
+     */
+    protected void zeroGyroscope(){
+        swerve.zeroGyroscope();
     }
 
     /**

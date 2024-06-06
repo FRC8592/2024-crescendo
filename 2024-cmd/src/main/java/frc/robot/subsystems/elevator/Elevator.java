@@ -34,8 +34,8 @@ public class Elevator extends SubsystemBase {
 
     // Unlike the similarly named variables in Shooter, these are used for
     // subsystem control and aren't just logging
-    protected double targetExtension;
-    protected double targetPivot;
+    private double targetExtension;
+    private double targetPivot;
 
     public Elevator(){
         extensionMotor = new SparkFlexControl(CAN.ELEVATOR_MOTOR_CAN_ID, false);
@@ -113,6 +113,22 @@ public class Elevator extends SubsystemBase {
      */
     public double getTargetPivot(){
         return this.targetPivot;
+    }
+
+    /**
+     * Set the target pivot angle used by {@link Elevator#runElevator()}
+     * @param pivotAngle {@code double} the angle setpoint in degrees
+     */
+    protected void setTargetPivot(double pivotAngle){
+        this.targetPivot = pivotAngle;
+    }
+
+    /**
+     * Set the target extension length used by {@link Elevator#runElevator()}
+     * @param extensionLength {@code double} the extension setpoint in meters
+     */
+    protected void setTargetExtension(double extensionLength){
+        this.targetExtension = extensionLength;
     }
 
     /**

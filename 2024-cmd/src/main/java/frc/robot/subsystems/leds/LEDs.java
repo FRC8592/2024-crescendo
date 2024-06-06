@@ -9,13 +9,14 @@ import frc.robot.Constants.*;
 
 public class LEDs extends SubsystemBase {
     public LEDCommands commands = new LEDCommands(this);
+
     // Represents the real strip. Should only be written to once per frame.
-    protected AddressableLED ledStrip;
+    private AddressableLED ledStrip;
 
     // An array of color data that's separate from the strip. This can be
     // edited as much as you want, and must be manually written to the strip
     // for the LEDs to display anything.
-    protected AddressableLEDBuffer ledBuffer;
+    private AddressableLEDBuffer ledBuffer;
 
     public LEDs() {
         ledStrip = new AddressableLED(LEDS.LED_STRIP_PWM_PORT);
@@ -24,15 +25,38 @@ public class LEDs extends SubsystemBase {
         ledStrip.start();
     }
 
+    /**
+     * Set the entire LED strip to a color (doesn't write to the physical
+     * strip; see {@link LEDs#write()})
+     *
+     * @param color {@code Color}: the color to set the strip to
+     */
     protected void setSolidColor(Color color){
         for(int i = 0; i < LEDS.LED_LENGTH; i++){
             ledBuffer.setLED(i, color);
         }
-        ledStrip.setData(ledBuffer);
     }
 
     public void periodic(){}
     public void simulationPeriodic(){}
+
+    /**
+     * Set an individual LED to a specific color (doesn't write to the
+     * strip; see {@link LEDs#write()})
+     *
+     * @param index {@code int}: the index of the LED to set
+     * @param color {@code Color}: the color to set the LED to
+     */
+    protected void setLED(int index, Color color){
+        ledBuffer.setLED(index, color);
+    }
+
+    /**
+     * Write the buffer data to the LED strip
+     */
+    protected void write(){
+        ledStrip.setData(ledBuffer);
+    }
 
     protected int[] HSVtoRGB(double h){
         double R1 = 0;

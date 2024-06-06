@@ -7,6 +7,7 @@ import frc.robot.subsystems.SubsystemCommands;
 
 public class IntakeCommands extends SubsystemCommands{
     private Intake intake;
+
     public IntakeCommands(Intake intake){
         this.intake = intake;
     }
@@ -21,12 +22,10 @@ public class IntakeCommands extends SubsystemCommands{
     public Command outakeCommand() {
         return intake.runEnd(() -> {
             // Run continuously until interrupted
-            intake.targetIntakeVelocity = INTAKE.OUTAKE_VELOCITY;
-            intake.intakeMotor.setVelocity(INTAKE.OUTAKE_VELOCITY);
+            intake.setIntakeVelocity(INTAKE.OUTAKE_VELOCITY);
         }, () -> {
             // Run once when interrupted
-            intake.targetIntakeVelocity = 0;
-            intake.intakeMotor.setVelocity(0);
+            intake.setIntakeVelocity(0);
         });
     }
 
@@ -39,11 +38,9 @@ public class IntakeCommands extends SubsystemCommands{
      */
     public Command intakeCommand(){
         return intake.runEnd(() -> {
-            intake.targetIntakeVelocity = INTAKE.INTAKE_VELOCITY;
-            intake.intakeMotor.setVelocity(INTAKE.INTAKE_VELOCITY);
+            intake.setIntakeVelocity(INTAKE.INTAKE_VELOCITY);
         }, () -> {
-            intake.targetIntakeVelocity = 0;
-            intake.intakeMotor.setVelocity(0);
+            intake.setIntakeVelocity(0);
         });
     }
 
@@ -56,8 +53,7 @@ public class IntakeCommands extends SubsystemCommands{
      */
     public Command stopCommand(){
         return intake.runOnce(() -> {
-            intake.targetIntakeVelocity = 0;
-            intake.intakeMotor.setVelocity(0);
+            intake.setIntakeVelocity(0);
         });
     }
 

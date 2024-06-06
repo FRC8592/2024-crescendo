@@ -29,7 +29,9 @@ public class LEDCommands extends SubsystemCommands{
      */
     public Command indicateLoadedCommand(BooleanSupplier isLoaded){
         return leds.run(() -> {
+            // If loaded, show cyan lights; otherwise, do nothing
             leds.setSolidColor(isLoaded.getAsBoolean() ? LEDS.CYAN : LEDS.OFF);
+            leds.write();
         });
     }
 
@@ -45,6 +47,7 @@ public class LEDCommands extends SubsystemCommands{
     public Command singleColorCommand(Color color){
         return leds.runOnce(() -> {
             leds.setSolidColor(color);
+            leds.write();
         });
     }
 
@@ -69,6 +72,7 @@ public class LEDCommands extends SubsystemCommands{
             else {
                 leds.setSolidColor(LEDS.OFF);
             }
+            leds.write();
         });
     }
 
@@ -80,17 +84,17 @@ public class LEDCommands extends SubsystemCommands{
      * @apiNote This command doesn't end on its own; it must be interrupted to end
      */
     public Command partyCommand(){
+
         // The counter variable is required to be final for some reason, so
         // put the editable value in a final array
-
         final int[] counter = {0};
         return leds.run(() -> {
             counter[0]+=10;
             for(int i = 0; i < LEDS.LED_LENGTH; i++) {
                 int[] RGB = leds.HSVtoRGB((counter[0]+(i*5))%360);
-                leds.ledBuffer.setRGB(i, RGB[0], RGB[1], RGB[2]);
+                leds.setLED(i, new Color(RGB[0], RGB[1], RGB[2]));
             }
-            leds.ledStrip.setData(leds.ledBuffer);
+            leds.write();
         });
     }
 
@@ -106,23 +110,29 @@ public class LEDCommands extends SubsystemCommands{
      */
     public Command honeCommand(DoubleSupplier offset){
         return leds.run(() -> {
+            // If we're completely off-aim, just show red lights
             if (offset.getAsDouble() >= LEDS.NOT_AIMED_OFFSET){
                 leds.setSolidColor(LEDS.RED);
             }
-            else if (offset.getAsDouble() <= LEDS.NOT_AIMED_OFFSET && offset.getAsDouble() > LEDS.FULLY_AIMED_OFFSET){
+
+            // Otherwise (if we're not off-aim), if we're too far off to be fully aimed, show the honing lights
+            else if (offset.getAsDouble() > LEDS.FULLY_AIMED_OFFSET){
                 leds.setSolidColor(LEDS.RED);
                 double ledOffsetScale = 1 - ((offset.getAsDouble() - LEDS.FULLY_AIMED_OFFSET)
                         /(LEDS.NOT_AIMED_OFFSET - LEDS.FULLY_AIMED_OFFSET)); //a value of 0-1 where 0 means equal to NOT_AIMED_OFFSET and
                                                                             //1 means FULLY_AIMED_OFFSET
                 double ledsToLight = ledOffsetScale * (LEDS.LED_LENGTH/2);
                 for (int i = 0; i < ledsToLight; i ++){
-                    leds.ledBuffer.setLED(i, LEDS.GREEN);
-                    leds.ledBuffer.setLED(LEDS.LED_LENGTH - i - 1, LEDS.GREEN);
+                    leds.setLED(i, LEDS.GREEN);
+                    leds.setLED(LEDS.LED_LENGTH - i - 1, LEDS.GREEN);
                 }
             }
+
+            // If we're fully aimed, simply show green
             else{
                 leds.setSolidColor(LEDS.GREEN);
             }
+            leds.write();
         });
     }
 }

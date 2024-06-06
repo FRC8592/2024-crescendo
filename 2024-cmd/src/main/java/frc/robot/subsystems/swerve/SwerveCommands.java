@@ -45,7 +45,7 @@ public class SwerveCommands extends SubsystemCommands{
      */
     public Command driveCommand(DoubleSupplier suppliedX, DoubleSupplier suppliedY, DoubleSupplier suppliedRot) {
         return swerve.run(() -> {
-            swerve.swerve.drive(swerve.processJoystickInputs(
+            swerve.drive(swerve.processJoystickInputs(
                 suppliedX.getAsDouble(),
                 suppliedY.getAsDouble(),
                 suppliedRot.getAsDouble(),
@@ -68,7 +68,7 @@ public class SwerveCommands extends SubsystemCommands{
      */
     public Command rawDriveCommand(DoubleSupplier suppliedX, DoubleSupplier suppliedY, DoubleSupplier suppliedRot) {
         return swerve.run(() -> {
-            swerve.swerve.drive(
+            swerve.drive(
                 new ChassisSpeeds(
                     suppliedX.getAsDouble(),
                     suppliedY.getAsDouble(),
@@ -107,7 +107,7 @@ public class SwerveCommands extends SubsystemCommands{
             );
 
             processed.omegaRadiansPerSecond = swerve.snapToAngle(angle);
-            swerve.swerve.drive(processed);
+            swerve.drive(processed);
         });
     }
 
@@ -141,7 +141,7 @@ public class SwerveCommands extends SubsystemCommands{
             // Override whatever the human input processing spat out for rotation
             // with the output of the passed-in lambda.
             processed.omegaRadiansPerSecond = rotationSpeedSupplier.getAsDouble();
-            swerve.swerve.drive(processed);
+            swerve.drive(processed);
         });
     }
 
@@ -156,7 +156,7 @@ public class SwerveCommands extends SubsystemCommands{
      * @apiNote This command runs for one frame and ends immediately
      */
     public Command stopCommand(){
-        return swerve.runOnce(() -> {swerve.swerve.drive(new ChassisSpeeds());});
+        return swerve.runOnce(() -> {swerve.drive(new ChassisSpeeds());});
     }
 
     /**
@@ -173,7 +173,7 @@ public class SwerveCommands extends SubsystemCommands{
         // Notice the Commands.runOnce() here. This is so the slowModeCommand doesn't "require" the
         // swerve subsystem, which means it can run while other commands (usually a driving command) run.
         return Commands.runOnce(() -> {
-            swerve.isSlowMode = slowMode;
+            swerve.setSlowMode(slowMode);
             Logger.recordOutput(SWERVE.LOG_PATH+"Console", slowMode?"Slow mode enabled":"Slow mode disabled");
         });
     }
@@ -191,7 +191,7 @@ public class SwerveCommands extends SubsystemCommands{
     public Command robotOrientedCommand(boolean robotOriented){
         // See slowModeCommand above for comment on the Commands.runOnce
         return Commands.runOnce(() -> {
-            swerve.robotOriented = robotOriented;
+            swerve.setRobotOriented(robotOriented);
             Logger.recordOutput(SWERVE.LOG_PATH+"Console", robotOriented?"Robot-oriented enabled":"Robot-oriented disabled");
         });
     }
@@ -206,7 +206,7 @@ public class SwerveCommands extends SubsystemCommands{
     public Command zeroGyroscopeCommand() {
         // See slowModeCommand above for comment on the Commands.runOnce
         return Commands.runOnce(() -> {
-            swerve.swerve.zeroGyroscope();
+            swerve.zeroGyroscope();
             Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zeroed");
         });
     }
@@ -391,7 +391,7 @@ public class SwerveCommands extends SubsystemCommands{
             timer.start();
 
             // Stop the swerve
-            swerve.swerve.drive(new ChassisSpeeds());
+            swerve.drive(new ChassisSpeeds());
         }
         public void execute(){
             // Instances of State contain information about pose, velocity, accelleration, curvature, etc.
@@ -419,7 +419,7 @@ public class SwerveCommands extends SubsystemCommands{
                     driveSpeeds.vyMetersPerSecond = alternateTranslation.get().vyMetersPerSecond;
                 }
 
-                swerve.swerve.drive(driveSpeeds);
+                swerve.drive(driveSpeeds);
             }
             else{
                 //If simulated, set the robot's position on the simulated field

@@ -25,7 +25,8 @@ public class Testing5Note extends AutoCommand{
                 swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_4"), flipPathToRedSide),
                 new WaitCommand(1),
                 swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_5"), flipPathToRedSide)
-            ).alongWith(leds.commands.blinkCommand(LEDS.RED, 3))
+            ).deadlineWith(leds.commands.blinkCommand(LEDS.RED, 3))
+            .andThen(leds.commands.blinkCommand(LEDS.GREEN, 4).withTimeout(1))
         );
     }
 }

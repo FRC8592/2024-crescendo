@@ -14,6 +14,9 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
+
+import java.util.Set;
+
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
 
@@ -23,6 +26,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -164,35 +168,45 @@ public class RobotContainer {
              * trigger is released in the middle of the shot.
             */
 
-            elevator.isAmp()
-            ?( // This runs if the elevator is in the amp position
-                new ScheduleCommand(
-                    new AmpScoreCommand(shooter, elevator, intake, leds)
-                    .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                )
-            )
-            :( // This block runs if the elevator is NOT in the amp position
+            new DeferredCommand(
+                () -> { // <-- Notice that we're starting a lambda here. This will cast to a Supplier<Command>.
+                    if(elevator.isAmp()){
 
-                driverController.getHID().getXButton()
-                ?( //If X button (force-shoot) pressed,
+                        /*
+                         * The ScheduleCommand frees the AmpScoreCommand from the whileTrue(),
+                         * making the AmpScoreCommand able to run for as long as it wants without
+                         * being cancelled by the user releasing the trigger. 
+                         */
+                        return new ScheduleCommand(
+                            new AmpScoreCommand(shooter, elevator, intake, leds)
+                        );
+                    }
+                    else{ // The elevator isn't in amp position, meaning we need to shoot
+                        if(driverController.getHID().getXButton()){ // If we're force-shooting
 
-                    //Override any elevator positioning that might have been happening and shoot
-                    new OverrideEverythingCommand(
-                        new ShootCommand(shooter, elevator, intake, leds)
-                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                    )
-                )
-                :( // If the force-shoot button is NOT pressed,
+                            // Ignore whatever else might have been happening and just shoot
+                            return new OverrideEverythingCommand(
+                                new ShootCommand(shooter, elevator, intake, leds)
+                            );
+                        }
+                        else{
 
-                    // Refuse to shoot if we're not reasonably prepared
-                    new WaitForConditionCommand(
-                        () -> shooter.readyToShoot() && elevator.isAtTargetPosition(),
-                        new ShootCommand(shooter, elevator, intake, leds)
-                        .andThen(new StowCommand(shooter, elevator, intake))
-                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                    )
-                )
-            )
+                            /*
+                             * This WaitForConditionCommand will be cancelled if the user releases
+                             * the trigger. However, it schedules the passed-in command instead of
+                             * wrapping it, meaning the ShootCommand inside it will NOT be cancelled
+                             * if the WaitForConditionCommand has already scheduled it.
+                             */
+                            return new WaitForConditionCommand(
+                                () -> shooter.readyToShoot() && elevator.isAtTargetPosition(),
+                                new ShootCommand(shooter, elevator, intake, leds)
+                                .andThen(new StowCommand(shooter, elevator, intake))
+                            );
+                        }
+                    }
+                },
+                Set.of(shooter, elevator, intake, leds) // Requirements for the DeferredCommand above
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Party Mode (hold)
@@ -200,16 +214,20 @@ public class RobotContainer {
             leds.commands.partyCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
-        try{
-            // Pass-aim (hold)
-            driverController.y().whileTrue(
-                snapToCommand(
-                    Rotation2d.fromDegrees(
-                        DriverStation.getAlliance().get() == Alliance.Red ? 330 : 30
-                    )
-                ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-            );
-        }catch(Exception e){}
+        // Pass-aim (hold)
+        driverController.y().whileTrue(
+            new DeferredCommand(
+                () -> {
+                    if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red){
+                        return snapToCommand(Rotation2d.fromDegrees(330)).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+                    }
+                    else{
+                        return snapToCommand(Rotation2d.fromDegrees(30)).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+                    }
+                },
+                Set.of(swerve)
+            )
+        );
 
         // Stow (press)
         driverController.b().onTrue(
@@ -276,10 +294,9 @@ public class RobotContainer {
         // Intake (press)
         operatorController.leftTrigger(0.1).onTrue(
             new IntakeCommand(shooter, elevator, intake, leds)
-            .andThen(new ScheduleCommand(
+            .andThen(
                 shooter.commands.primeCommand(RangeTable.getSubwoofer())
-            ))
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Stow (press)

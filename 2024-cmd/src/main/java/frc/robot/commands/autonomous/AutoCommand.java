@@ -36,7 +36,7 @@ public class AutoCommand extends WrapperCommand {
      * be run in sequence (one after the other).
      */
     public AutoCommand(Command... commands) {
-        super(new SequentialCommandGroup(commands));
+        super(new SequentialCommandGroup(AutoManager.addAutoInitTo(commands)));
     }
 
     /**

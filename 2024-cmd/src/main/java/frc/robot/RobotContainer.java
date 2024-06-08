@@ -76,7 +76,8 @@ public class RobotContainer {
         configureDefaults();
         configureBindings();
 
-        AutoManager.loadAutos(swerve, intake, elevator, shooter, leds);
+        AutoManager.addSubsystems(swerve, intake, elevator, shooter, leds);
+        AutoManager.loadAutos();
         AutoManager.broadcastChooser();
     }
 
@@ -351,16 +352,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return AutoManager.getAutonomousCommand(swerve, intake, elevator, shooter, leds);
-    }
-
-    /**
-     * Regenerate the auto commands so the auto can be run again without causing a crash. Only run
-     * this when it doesn't matter if the robot hangs for a moment.
-     */
-    public void regenerateAutoCommands(){
-        AutoManager.loadAutos(swerve, intake, elevator, shooter, leds);
-        AutoManager.broadcastChooser();
+        return AutoManager.getAutonomousCommand();
     }
 
     /**

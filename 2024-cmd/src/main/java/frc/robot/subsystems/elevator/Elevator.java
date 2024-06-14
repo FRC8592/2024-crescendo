@@ -223,4 +223,14 @@ public class Elevator extends SubsystemBase {
         pivotMotor.setPositionSmartMotion(pivotRotations);
         pivotFollowMotor.setPositionSmartMotion(pivotRotations);
     }
+
+    /**
+     * Stop the elevator motors. Uses a positional setpoint to stop, meaning
+     * the elevator can reverse (as needed) to reach where it was when commanded
+     * to stop.
+     */
+    protected void freezeElevator(){
+        pivotMotor.setPositionSmartMotion(pivotMotor.getPosition());
+        extensionMotor.setPositionSmartMotion(extensionMotor.getPosition());
+    }
 }

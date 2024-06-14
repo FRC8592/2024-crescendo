@@ -6,13 +6,13 @@ package frc.robot.commands.autonomous;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.Robot;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LEDs;
@@ -83,13 +83,19 @@ public final class AutoManager {
     }
 
     /**
-     * Load (or reload) all autos. This is where programmers should add new autos.
+     * Load all autos. This is where programmers should add new autos.
      *
      * @param swerve
      * @param intake
      * @param elevator
      * @param shooter
      * @param leds
+     *
+     * @apiNote This should be called on {@link Robot#robotInit()} only;
+     * this function will have relatively long delays due to loading paths.
+     *
+     * @apiNote {@link AutoManager#broadcastChooser()} should be called
+     * after running this function.
      */
     public static void loadAutos(){
         autoCommands = new ArrayList<>();
@@ -99,9 +105,11 @@ public final class AutoManager {
     }
 
     /**
-     * Create (or re-create) the auto chooser, add all the autos to it
-     * ({@link AutoManager#loadAutos(Swerve, Intake, Elevator, Shooter, LEDs)}
-     * should ALWAYS be called directly before this), and put it on the dashboard
+     * Create the auto chooser, add all the autos to it, and put it on the dashboard
+     *
+     * @apiNote {@link AutoManager#loadAutos(Swerve, Intake, Elevator, Shooter, LEDs)}
+     * should ALWAYS be called directly before this. If it isn't, the chooser will be
+     * empty.
      */
     public static void broadcastChooser(){
         autoChooser = new SendableChooser<Command>();

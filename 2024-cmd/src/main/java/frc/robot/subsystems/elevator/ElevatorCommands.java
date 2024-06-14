@@ -25,10 +25,16 @@ public class ElevatorCommands extends SubsystemCommands{
      */
     public Command setStaticPositionCommand(double pivotDegrees, double extensionMeters){
         return elevator.run(() -> {
+            // Drive the elevator while overwriting the setpoints every frame so nothing can change them
             elevator.setTargetPivot(pivotDegrees);
             elevator.setTargetExtension(extensionMeters);
             elevator.runElevator();
-        }).until(() -> elevator.isAtTargetPosition());
+        }).until(() -> elevator.isAtTargetPosition()) // Run the elevator until it's at its target.
+        .finallyDo((interrupted) -> {
+            if(interrupted){ // If the command is interrupted, stop the elevator where it is
+                elevator.freezeElevator();
+            }
+        });
     }
 
     /**
@@ -41,11 +47,7 @@ public class ElevatorCommands extends SubsystemCommands{
      * @apiNote This command runs until {@link Elevator#isAtTargetPosition()} returns {@code true}
      */
     public Command setStaticPositionCommand(Positions position){
-        return elevator.run(() -> {
-            elevator.setTargetPivot(position.pivot);
-            elevator.setTargetExtension(position.extension);
-            elevator.runElevator();
-        }).until(() -> elevator.isAtTargetPosition());
+        return setStaticPositionCommand(position.pivot, position.extension);
     }
 
     /**
@@ -64,12 +66,17 @@ public class ElevatorCommands extends SubsystemCommands{
             elevator.setTargetPivot(pivotDegrees.getAsDouble());
             elevator.setTargetExtension(extensionMeters.getAsDouble());
             elevator.runElevator();
+        })
+        .finallyDo((interrupted) -> {
+            if(interrupted){ // If the command is interrupted, stop the elevator where it is
+                elevator.freezeElevator();
+            }
         });
     }
 
     /**
      * The same as {@link Elevator#setStaticPositionCommand(double, double)}, but allows the setpoint
-     * to be edited  on the fly and won't end on its own. This is meant to be used together with 
+     * to be edited on the fly and won't end on its own. This is meant to be used together with 
      * {@link Elevator#incrementElevatorPositionCommand(double, double)}.
      *
      * @param pivotDegrees {@code double}: the pivot setpoint to start with
@@ -84,6 +91,11 @@ public class ElevatorCommands extends SubsystemCommands{
         elevator.setTargetExtension(extensionMeters);
         return elevator.run(() -> {
             elevator.runElevator();
+        })
+        .finallyDo((interrupted) -> {
+            if(interrupted){ // If the command is interrupted, stop the elevator where it is
+                elevator.freezeElevator();
+            }
         });
     }
 
@@ -99,11 +111,7 @@ public class ElevatorCommands extends SubsystemCommands{
      * @apiNote This command never ends on its own; it must be interrupted to end
      */
     public Command setMalleablePositionCommand(Positions position){
-        elevator.setTargetPivot(position.pivot);
-        elevator.setTargetExtension(position.extension);
-        return elevator.run(() -> {
-            elevator.runElevator();
-        });
+        return setMalleablePositionCommand(position.pivot, position.extension);
     }
 
     /**

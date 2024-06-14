@@ -99,7 +99,7 @@ public class SparkFlexControl {
     }
 
     /**
-     * Returns the motor's position in rotation
+     * Returns the motor's position in rotations
      */
     public double getPosition(){
         return motorEncoder.getPosition();

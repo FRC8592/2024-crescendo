@@ -75,9 +75,9 @@ public class ElevatorCommands extends SubsystemCommands{
     }
 
     /**
-     * The same as {@link Elevator#setStaticPositionCommand(double, double)}, but allows the setpoint
+     * The same as {@link ElevatorCommands#setStaticPositionCommand(double, double)}, but allows the setpoint
      * to be edited on the fly and won't end on its own. This is meant to be used together with 
-     * {@link Elevator#incrementElevatorPositionCommand(double, double)}.
+     * {@link ElevatorCommands#incrementElevatorPositionCommand(double, double)}.
      *
      * @param pivotDegrees {@code double}: the pivot setpoint to start with
      * @param extensionMeters {@code double}: the extension setpoint to start with
@@ -100,9 +100,9 @@ public class ElevatorCommands extends SubsystemCommands{
     }
 
     /**
-     * The same as {@link Elevator#setStaticPositionCommand(Position)}, but allows the setpoint
+     * The same as {@link ElevatorCommands#setStaticPositionCommand(Position)}, but allows the setpoint
      * to be edited  on the fly and won't end on its own. This is meant to be used together with 
-     * {@link Elevator#incrementElevatorPositionCommand(double, double)}.
+     * {@link ElevatorCommands#incrementElevatorPositionCommand(double, double)}.
      *
      * @param position {@code Positions}: the position to go to
      *
@@ -115,7 +115,7 @@ public class ElevatorCommands extends SubsystemCommands{
     }
 
     /**
-     * If a {@link Elevator#setMalleablePositionCommand(double, double)} command is running, change
+     * If a {@link ElevatorCommands#setMalleablePositionCommand(double, double)} command is running, change
      * the pivot and extension setpoints for the elevator to target. Otherwise, does nothing functional.
      *
      * @param pivotDegrees {@code double}: the amount to change the pivot target by each frame

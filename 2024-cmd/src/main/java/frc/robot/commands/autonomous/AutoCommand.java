@@ -76,7 +76,8 @@ public class AutoCommand extends WrapperCommand {
                     pathPlannerState.velocityMps,
                     pathPlannerState.accelerationMpsSq,
                     pathPlannerState.getTargetHolonomicPose(),
-                    pathPlannerState.curvatureRadPerMeter);
+                    pathPlannerState.curvatureRadPerMeter
+            );
             wpilibStates.add(wpilibState);
         }
 

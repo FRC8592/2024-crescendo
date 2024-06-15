@@ -52,11 +52,7 @@ public final class AutoManager {
     }
     /**
      * Get the user-selected autonomous command as determined by {@link AutoManager#autoChooser}.
-     * @param swerve
-     * @param intake
-     * @param elevator
-     * @param shooter
-     * @param leds
+     *
      * @return the command
      */
     public static Command getAutonomousCommand(){
@@ -65,11 +61,7 @@ public final class AutoManager {
 
     /**
      * Parallel command group that runs all subsystems' autonomous init commands.
-     * @param swerve
-     * @param intake
-     * @param elevator
-     * @param shooter
-     * @param leds
+     *
      * @return the command
      */
     private static Command getAutonomousInitCommand(){
@@ -84,12 +76,6 @@ public final class AutoManager {
 
     /**
      * Load all autos. This is where programmers should add new autos.
-     *
-     * @param swerve
-     * @param intake
-     * @param elevator
-     * @param shooter
-     * @param leds
      *
      * @apiNote This should be called on {@link Robot#robotInit()} only;
      * this function will have relatively long delays due to loading paths.

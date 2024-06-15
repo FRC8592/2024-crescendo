@@ -294,7 +294,7 @@ public class SwerveCommands extends SubsystemCommands{
         private Timer timer = new Timer();
 
         // Alternate movement variables
-        private BooleanSupplier useAlternateRotation = () -> {return true;};
+        private BooleanSupplier useAlternateRotation = () -> {return false;};
         private Supplier<Rotation2d> alternateRotation = () -> {return new Rotation2d();};
         private BooleanSupplier useAlternateTranslation = () -> {return false;};
         private Supplier<ChassisSpeeds> alternateTranslation = () -> {return new ChassisSpeeds();};
@@ -429,9 +429,9 @@ public class SwerveCommands extends SubsystemCommands{
         public boolean isFinished(){
             return ( // Only return true if enough time has elapsed, we're at the target location, and we're not using alternate movement.
                 timer.hasElapsed(trajectory.getTotalTimeSeconds())
-                // && (drivePID.atReference() || !Robot.isReal())
-                // && !useAlternateRotation.getAsBoolean()
-                // && !useAlternateTranslation.getAsBoolean()
+                && (drivePID.atReference() || !Robot.isReal())
+                && !useAlternateRotation.getAsBoolean()
+                && !useAlternateTranslation.getAsBoolean()
             );
         }
 

@@ -5,7 +5,6 @@
 package frc.robot.commands.autonomous;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Robot;
+import frc.robot.commands.proxies.*;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LEDs;
@@ -56,7 +56,12 @@ public final class AutoManager {
      * @return the command
      */
     public static Command getAutonomousCommand(){
-        return autoChooser.getSelected();
+        return getAutonomousInitCommand().andThen(
+            // If we don't keep this command from registering as composed,
+            // the code will crash if we try to run an auto twice without
+            // restarting robot code.
+            new MultiComposableCommand(autoChooser.getSelected())
+        );
     }
 
     /**
@@ -104,12 +109,6 @@ public final class AutoManager {
             autoChooser.addOption(c.getClass().getSimpleName(), c);
         }
         SmartDashboard.putData("Auto Chooser", autoChooser);
-    }
-
-    public static Command[] addAutoInitTo(Command[] autoCommands){
-        ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(autoCommands));
-        commandList.add(0, getAutonomousInitCommand());
-        return commandList.toArray(new Command[0]);
     }
 
     private AutoManager() {

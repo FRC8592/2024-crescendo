@@ -149,7 +149,8 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Send a {@code ChassisSpeeds} to the drivetrain
-     * @param speeds {@code ChassisSpeeds}: the speeds to run the drivetrain at
+     *
+     * @param speeds the speeds to run the drivetrain at
      */
     protected void drive(ChassisSpeeds speeds){
         swerve.drive(speeds);
@@ -158,7 +159,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Set whether human-input-processed joystick input should be slowed
      *
-     * @param slowMode {@code boolean}: whether to slow the drivetrain
+     * @param slowMode whether to slow the drivetrain
      */
     protected void setSlowMode(boolean slowMode){
         this.isSlowMode = slowMode;
@@ -168,7 +169,7 @@ public class Swerve extends SubsystemBase {
      * Set whether human-input-processed joystick input should be robot-oriented
      * (as opposed to field-oriented)
      *
-     * @param robotOriented {@code boolean}: whether to run the drivetrain robot-oriented
+     * @param robotOriented whether to run the drivetrain robot-oriented
      */
     protected void setRobotOriented(boolean robotOriented){
         this.robotOriented = robotOriented;
@@ -230,7 +231,8 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Set the robot's known rotation.
-     * @param yaw {@code double}: the rotation to set in degrees
+     *
+     * @param yaw the rotation to set in degrees
      */
     public void setGyroscopeRotation(double yaw){
         swerve.gyro.setYaw(yaw);
@@ -247,7 +249,8 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Set the throttle motors' current limits.
-     * @param limit {@code double}: the limit to set in amps
+     *
+     * @param limit the limit to set in amps
      */
     protected void setThrottleCurrentLimit(double limit) {
         swerve.setThrottleCurrentLimit(limit);
@@ -256,7 +259,8 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Reset the robot's known position.
-     * @param pose {@code Pose2d}: the pose to set the robot's known position to.
+     *
+     * @param pose the pose to set the robot's known position to.
      */
     protected void resetPose(Pose2d pose) {
         swerve.resetPose(pose);
@@ -283,7 +287,8 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Use PID to snap the robot to the setpoint.
-     * @param setpoint {@code Rotation2d}: the setpoint to snap to
+     *
+     * @param setpoint the setpoint to snap to
      * @return the rotational velocity setpoint in radians/second
      */
     protected double snapToAngle(Rotation2d setpoint) {
@@ -304,11 +309,14 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Process joystick inputs for human control
-     * @param rawX {@code double}: the raw X input from a joystick. Should be -1 to 1
-     * @param rawY {@code double}: the raw Y input from a joystick. Should be -1 to 1
-     * @param rawRot {@code double}: the raw rotation input from a joystick. Should be -1 to 1
-     * @param fieldOrientedAllowed {@code boolean}: if this is true, switch between field- and
-     * robot-oriented based on {@link Swerve#robotOriented}. Otherwise, force robot-oriented.
+     *
+     * @param rawX the raw X input from a joystick. Should be -1 to 1
+     * @param rawY the raw Y input from a joystick. Should be -1 to 1
+     * @param rawRot the raw rotation input from a joystick. Should be -1 to 1
+     * @param fieldOrientedAllowed if this is true, switch between field- and
+     * robot-oriented based on {@link Swerve#robotOriented}. Otherwise, force
+     * robot-oriented.
+     *
      * @return a ChassisSpeeds ready to be sent to the swerve.
      */
     protected ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot, boolean fieldOrientedAllowed){

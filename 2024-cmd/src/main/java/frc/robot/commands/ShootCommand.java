@@ -22,13 +22,16 @@ public class ShootCommand extends WrapperCommand {
      */
     public ShootCommand(Shooter shooter, Elevator elevator, Intake intake, LEDs leds){
         super(
-            // Simply runs the shooter's feeder
+            // Runs the feeder motors
             shooter.commands.fireCommand()
 
             // singleColorCommand is instant for now, but the deadline ensures
             // that nothing will break if that changes.
             .deadlineWith(leds.commands.singleColorCommand(LEDS.OFF))
         );
+
+        // Don't allow the elevator and intake to be commanded to do anything funny
+        // while shooting
         addRequirements(elevator, intake);
     }
 }

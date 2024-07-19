@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.helpers.RangeTable.RangeEntry;
 import frc.robot.subsystems.SubsystemCommands;
 import frc.robot.Constants.*;
+import frc.robot.subsystems.intake.IntakeCommands;
 
 public class ShooterCommands extends SubsystemCommands{
     private Shooter shooter;
@@ -17,9 +18,9 @@ public class ShooterCommands extends SubsystemCommands{
     /**
      * Command to spin up the flywheels to the specified RPMs
      *
-     * @param leftRPM {@code int}: the target RPM of the left flywheel
-     * (should be faster than the right if there is spin).
-     * @param rightRPM {@code int}: the target RPM of the right flywheel
+     * @param leftRPM the target RPM of the left flywheel (should be faster
+     * than the right if there is spin).
+     * @param rightRPM the target RPM of the right flywheel
      *
      * @return the command
      *
@@ -35,11 +36,10 @@ public class ShooterCommands extends SubsystemCommands{
     /**
      * Command to spin up the flywheels to the specified RPMs
      *
-     * @param leftRPM {@code IntSupplier}: a lambda that returns the target
-     * RPM of the left flywheel (should be faster than the right if
-     * there is spin).
-     * @param rightRPM {@code IntSupplier}: a lambda that returns the target
-     * RPM of the right flywheel.
+     * @param leftRPM a lambda that returns an updating target RPM for the
+     * left flywheel (should be faster than the right if there is spin)
+     * @param rightRPM a lambda that returns the target RPM of the right
+     * flywheel
      *
      * @return the command
      *
@@ -53,11 +53,11 @@ public class ShooterCommands extends SubsystemCommands{
     }
 
     /**
-     * Command to spin up the flywheels to the RPMs stored in
-     * the specified {@code RangeEntry}
+     * Command to spin up the flywheels to the RPMs stored in the specified
+     * {@code RangeEntry}
      *
-     * @param entry {@code RangeEntry}: the {@code RangeEntry} object containing 
-     * the target flywheel speeds
+     * @param entry the {@code RangeEntry} object containing the target
+     * flywheel speeds
      *
      * @return the command
      *
@@ -70,10 +70,10 @@ public class ShooterCommands extends SubsystemCommands{
 
     /**
      * Command to spin up the flywheels to the RPMs in the supplied
-     * {@code RangeEntry}
+     * {@code Supplier<RangeEntry>}
      *
-     * @param entry {@code Supplier<RangeEntry>}: a lambda that returns a
-     * {@code RangeEntry} object containing the target flywheel speeds.
+     * @param entry a lambda that returns an updating {@code RangeEntry}
+     * object containing the target flywheel speeds.
      *
      * @return the command
      *
@@ -200,7 +200,8 @@ public class ShooterCommands extends SubsystemCommands{
 
     /**
      * Command that runs the feeder and flywheels backwards. Usually
-     * needs to be run with {@link Intake#outakeCommand()} as well.
+     * needs to be run with {@link IntakeCommands#outakeCommand()} as
+     * well.
      *
      * @return the command
      *
@@ -216,7 +217,7 @@ public class ShooterCommands extends SubsystemCommands{
 
     /**
      * Command to run the passthrough routine. Usually needs to be
-     * paired with the {@link Intake#intakeCommand()}.
+     * paired with {@link IntakeCommands#intakeCommand()}.
      *
      * @return the command
      *

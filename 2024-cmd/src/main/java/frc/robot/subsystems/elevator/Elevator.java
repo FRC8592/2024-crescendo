@@ -16,12 +16,18 @@ public class Elevator extends SubsystemBase {
 
     // Small enum for conveniently referencing elevator positions
     public enum Positions{
+        // The next three lines do the equivalent of the code
+        // public Positions NAME = new Positions(pivotAngle, extensionLength);
+        // (creating new instances of Positions using the constructor below).
         STOWED(ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_METERS_STOWED),
         AMP(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP),
         CLIMB(ELEVATOR.PIVOT_ANGLE_CLIMB, ELEVATOR.EXTENSION_METERS_CLIMB),;
 
+        // These are enum variables, which act just like variables of any class
         public double pivot;
         public double extension;
+
+        // Enum constructor
         Positions(double pivot, double extension){
             this.pivot = pivot;
             this.extension = extension;
@@ -117,7 +123,7 @@ public class Elevator extends SubsystemBase {
 
     /**
      * Set the target pivot angle used by {@link Elevator#runElevator()}
-     * @param pivotAngle {@code double} the angle setpoint in degrees
+     * @param pivotAngle the angle setpoint in degrees
      */
     protected void setTargetPivot(double pivotAngle){
         this.targetPivot = pivotAngle;
@@ -125,7 +131,7 @@ public class Elevator extends SubsystemBase {
 
     /**
      * Set the target extension length used by {@link Elevator#runElevator()}
-     * @param extensionLength {@code double} the extension setpoint in meters
+     * @param extensionLength the extension setpoint in meters
      */
     protected void setTargetExtension(double extensionLength){
         this.targetExtension = extensionLength;

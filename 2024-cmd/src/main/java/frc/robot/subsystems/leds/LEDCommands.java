@@ -20,8 +20,7 @@ public class LEDCommands extends SubsystemCommands{
      * Command that turns the light strip cyan or off depending on whether there is a
      * note loaded as determined by the passed-in lambda.
      *
-     * @param isLoaded {@code BooleanSupplier}: lambda that returns whether there
-     * is a note in the robot.
+     * @param isLoaded lambda that returns whether there is a note in the robot.
      *
      * @return the command
      *
@@ -38,7 +37,7 @@ public class LEDCommands extends SubsystemCommands{
     /**
      * Command to turn the whole light-strip a certain color
      *
-     * @param color {@code Color}: the color the strip should become
+     * @param color the color the strip should become
      *
      * @return the command
      *
@@ -54,8 +53,8 @@ public class LEDCommands extends SubsystemCommands{
     /**
      * Command to blink the lights at a certain color with the specified speed
      *
-     * @param color {@code Color}: the color the lights should be
-     * @param hertz {@code int}: the frequency in hertz that the lights should blink
+     * @param color the color the lights should be
+     * @param hertz the frequency in hertz that the lights should blink
      *
      * @return the command
      *
@@ -101,8 +100,8 @@ public class LEDCommands extends SubsystemCommands{
     /**
      * Command to run the honing lights (show drivers how far off they are)
      *
-     * @param offset {@code DoubleSupplier}: lambda that returns how far
-     * off-center the target is. Usually a call to PoseVision.offsetFromAprilTag()
+     * @param offset lambda that returns how far off-center the target is.
+     * Usually a call to PoseVision.offsetFromAprilTag()
      *
      * @return the command
      *

@@ -18,8 +18,10 @@ public class SparkFlexControl {
 
     /**
      * Create a Newton² controller for a NEO Vortex (with Spark Flex)
-     * @param motorCanID {@code int}: the motor's ID on the CAN bus
-     * @param coastMode {@code boolean}: if true, the motor coasts when asked to apply 0 power. Otherwise, it brakes.
+     *
+     * @param motorCanID the motor's ID on the CAN bus
+     * @param coastMode if true, the motor coasts when asked to apply 0 power.
+     * Otherwise, it brakes.
      */
     public SparkFlexControl(int motorCanID, boolean coastMode){
         motor = new CANSparkFlex(motorCanID, MotorType.kBrushless);
@@ -41,7 +43,8 @@ public class SparkFlexControl {
 
     /**
      * Run the motor at a set velocity using the default PID slot
-     * @param RPM {@code double}: the velocity in RPM
+     *
+     * @param RPM the velocity in RPM
      */
     public void setVelocity(double RPM){
         motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity);
@@ -49,8 +52,9 @@ public class SparkFlexControl {
 
     /**
      * Run the motor at a set velocity using a specific PID slot
-     * @param RPM {@code double}: the velocity in RPM
-     * @param slotID {@code int}: the PID slot to use
+     *
+     * @param RPM the velocity in RPM
+     * @param slotID the PID slot to use
      */
     public void setVelocity(double RPM, int slotID){
         motorControl.setReference(RPM, com.revrobotics.CANSparkBase.ControlType.kVelocity, slotID);
@@ -58,7 +62,8 @@ public class SparkFlexControl {
 
     /**
      * Drive the motor to a set position using the default PID slot
-     * @param rotations {@code double}: the target position in motor rotations
+     *
+     * @param rotations the target position in motor rotations
      */
     public void setPosition(double rotations){
         motorControl.setReference(rotations, com.revrobotics.CANSparkBase.ControlType.kPosition);
@@ -66,7 +71,8 @@ public class SparkFlexControl {
 
     /**
      * Drive the motor with a set amount of power
-     * @param power {@code double}: power to apply, where -1 is full negative
+     *
+     * @param power the amount ofpower to apply, where -1 is full negative
      * power, 0 will apply the set neutral mode (brake or coast), and 1 applies
      * full forward power
      */
@@ -121,7 +127,8 @@ public class SparkFlexControl {
     }
 
     /**
-     * Set a motor for this motor to mimmick the movements of
+     * Set a motor for this motor to mimmick the movements of.
+     *
      * @param motorToFollow the motor for this one to follow
      */
     public void setFollower(SparkFlexControl motorToFollow){
@@ -129,7 +136,8 @@ public class SparkFlexControl {
     }
 
     /**
-     * Set a motor for this motor to mimmick the movements of
+     * Set a motor for this motor to mimmick the movements of.
+     *
      * @param sfc the motor for this one to follow
      * @param inverted whether to invert this motor's movements
      * relative to the motor it's following
@@ -140,16 +148,20 @@ public class SparkFlexControl {
 
     /**
      * Set a soft limit for the motor.
-     * @param direction {@code SoftLimitDirection}: the direction the motor must be traveling to trigger the limit
-     * @param rotations {@code double}: the number of rotations to limit the motor to
+     *
+     * @param direction the direction the motor must be traveling to
+     * trigger the limit
+     * @param rotations the number of rotations to limit the motor to
      */
     public void setSoftLimit(SoftLimitDirection direction, double rotations){
         motor.setSoftLimit(direction, (float)rotations);
     }
 
     /**
-     * Set a target position for the motor to go to using a Smart Motion profile.
-     * @param rotations {@code double}: the target position in rotations
+     * Set a target position for the motor to go to using a Smart
+     * Motion profile.
+     *
+     * @param rotations the target position in rotations
      */
     public void setPositionSmartMotion(double rotations){
         motorControl.setReference(rotations, ControlType.kSmartMotion, 0);
@@ -157,8 +169,9 @@ public class SparkFlexControl {
 
     /**
      * Set the maximum Smart Motion velocity.
-     * @param maxVelocity {@code double}: max velocity in RPM
-     * @param slotID {@code int}: the Smart Motion PID slot
+     *
+     * @param maxVelocity max velocity in RPM
+     * @param slotID the Smart Motion PID slot
      */
     public void setMaxVelocity(double maxVelocity, int slotID){
         motorControl.setSmartMotionMaxVelocity(maxVelocity, slotID);
@@ -166,8 +179,9 @@ public class SparkFlexControl {
 
     /**
      * Set the maximum Smart Motion acceleration.
-     * @param maxVelocity {@code double}: max velocity in RPM/s
-     * @param slotID {@code int}: the Smart Motion PID slot
+     *
+     * @param maxVelocity max velocity in RPM/s
+     * @param slotID the Smart Motion PID slot
      */
     public void setMaxAcceleration(double maxAccel, int slotID){
         motorControl.setSmartMotionMaxAccel(maxAccel, slotID);
@@ -175,8 +189,9 @@ public class SparkFlexControl {
 
     /**
      * Set the current limit of the motor.
-     * @param stallLimit {@code int}: the current limit when the motor is stalled
-     * @param fullRPMLimit {@code int}: the current limit when at 5,700 RPM (the
+     *
+     * @param stallLimit the current limit when the motor is stalled
+     * @param fullRPMLimit the current limit when at 5,700 RPM (the
      * motor's free speed)
      */
     public void setCurrentLimit(int stallLimit, int fullRPMLimit){

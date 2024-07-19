@@ -6,7 +6,8 @@ import frc.robot.subsystems.shooter.Shooter;
 
 public class OutakeCommand extends WrapperCommand {
     /**
-     * Command to outake. Note that this command is independent of what the elevator might be doing
+     * Command to outake. Note that this command is independent of what the
+     * elevator might be doing.
      *
      * @param shooter
      * @param intake

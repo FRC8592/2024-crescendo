@@ -35,9 +35,9 @@ public class SwerveCommands extends SubsystemCommands{
      * optimize for human comfort and control, so joystick inputs will almost always be the only thing
      * that should be passed in.
      *
-     * @param suppliedX {@code DoubleSupplier}: a lambda for X translation input (will be optimized for human control)
-     * @param suppliedY {@code DoubleSupplier}: a lambda for Y translation input (will be optimized for human control)
-     * @param suppliedRot {@code DoubleSupplier}: a lambda for rotation input (will be optimized for human control)
+     * @param suppliedX a lambda for X translation input (will be optimized for human control)
+     * @param suppliedY a lambda for Y translation input (will be optimized for human control)
+     * @param suppliedRot a lambda for rotation input (will be optimized for human control)
      *
      * @return the command
      *
@@ -58,9 +58,9 @@ public class SwerveCommands extends SubsystemCommands{
      * Command to drive the swerve based on the inputted lambdas until interrupted. Does not apply any processing
      * to the inputs; don't use this for human input.
      *
-     * @param suppliedX {@code DoubleSupplier}: a lambda for X translation input
-     * @param suppliedY {@code DoubleSupplier}: a lambda for Y translation input
-     * @param suppliedRot {@code DoubleSupplier}: a lambda for rotation input
+     * @param suppliedX a lambda for X translation input
+     * @param suppliedY a lambda for Y translation input
+     * @param suppliedRot a lambda for rotation input
      *
      * @return the command
      *
@@ -82,13 +82,13 @@ public class SwerveCommands extends SubsystemCommands{
      * Command to snap to the specified angle while driving with human input. The translation inputs
      * are processed for human comfort and control, so these should almost always be joystick inputs.
      *
-     * @param translationXSupplier {@code DoubleSupplier}: a lambda for X translation input (will be
-     * optimized for human control)
-     * @param translationYSupplier {@code DoubleSupplier}: a lambda for Y translation input (will be
-     * optimized for human control)
+     * @param translationXSupplier a lambda for X translation input (will be optimized for human
+     * control)
+     * @param translationYSupplier a lambda for Y translation input (will be optimized for human
+     * control)
      *
-     * @param angle {@code Rotation2d}: the angle to snap to (doesn't have any corrections applied;
-     * this should be left-right inverted).
+     * @param angle the angle to snap to (doesn't have any corrections applied; this should be left-right
+     * inverted).
      *
      * @return the command
      *
@@ -116,9 +116,9 @@ public class SwerveCommands extends SubsystemCommands{
      * process the rotation for human input. Translation should come from joysticks while rotation usually
      * should be from a PID controller or other computer control.
      *
-     * @param translationXSupplier {@code DoubleSupplier}: a lambda for X translation input (will be optimized for human control)
-     * @param translationYSupplier {@code DoubleSupplier}: a lambda for Y translation input (will be optimized for human control)
-     * @param rotationSpeedSupplier {@code DoubleSupplier}: a lambda for rotation input (will NOT be optimized for human control)
+     * @param translationXSupplier a lambda for X translation input (will be optimized for human control)
+     * @param translationYSupplier a lambda for Y translation input (will be optimized for human control)
+     * @param rotationSpeedSupplier a lambda for rotation input (will NOT be optimized for human control)
      *
      * @return the command
      *
@@ -146,10 +146,7 @@ public class SwerveCommands extends SubsystemCommands{
     }
 
     /**
-     * Command to send the {@code ChassisSpeeds} object to the swerve. Mostly intended to be
-     * used to stop the drivetrain
-     *
-     * @param speeds {@code ChassisSpeeds}: speeds to apply to the swerve
+     * Command to stop the drivetrain.
      *
      * @return the command
      *
@@ -163,15 +160,16 @@ public class SwerveCommands extends SubsystemCommands{
      * Command to enable or disable slow mode for all inputs that are processed for
      * human comfort
      *
-     * @param slowMode {@code boolean}: whether to enable (true) or disable (false) slow mode
+     * @param slowMode whether to enable (true) or disable (false) slow mode
      *
      * @return the command
      *
      * @apiNote This command runs for one frame and ends immediately
      */
     public Command slowModeCommand(boolean slowMode){
-        // Notice the Commands.runOnce() here. This is so the slowModeCommand doesn't "require" the
-        // swerve subsystem, which means it can run while other commands (usually a driving command) run.
+        // * Notice the Commands.runOnce() here instead of Swerve.runOnce(). This is so the slowModeCommand
+        // * doesn't "require" the swerve subsystem, which means it can run while other commands (usually a
+        // * driving command) run.
         return Commands.runOnce(() -> {
             swerve.setSlowMode(slowMode);
             Logger.recordOutput(SWERVE.LOG_PATH+"Console", slowMode?"Slow mode enabled":"Slow mode disabled");
@@ -182,7 +180,7 @@ public class SwerveCommands extends SubsystemCommands{
      * Command to enable or disable robot-oriented control for all inputs that are processed for
      * human comfort
      *
-     * @param robotOriented {@code boolean}: whether to enable (true) or disable (false) robot-oriented control
+     * @param robotOriented whether to enable (true) or disable (false) robot-oriented control
      *
      * @return the command
      *
@@ -222,8 +220,8 @@ public class SwerveCommands extends SubsystemCommands{
     public Command autonomousInitCommand(){
         // We use Commands.runOnce here because swerve.stopCommand() requires the
         // swerve subsystem, meaning the alongWith() method would throw an exception
-        // if it were swerve.runOnce() (because we'd be trying to run two commands that)
-        // both require the same subsystem at once.
+        // if it were swerve.runOnce() (because we'd be trying to run two commands that
+        // both require the same subsystem at once).
 
         return Commands.runOnce(() -> {
             swerve.resetEncoders();
@@ -240,13 +238,13 @@ public class SwerveCommands extends SubsystemCommands{
     /**
      * Command to follow the given path.
      *
-     * @param trajectory {@code Trajectory}: the path to follow
-     * @param flip {@code BooleanSupplier}: lambda that returns whether the path should be flipped to
-     * the red side of the field.
+     * @param trajectory the path to follow
+     * @param flip lambda that returns whether the path should be flipped to the red side of the field.
+     *
      * @return the command
      *
-     * @apiNote this command ends when the entire path has been followed. See the FollowPathCommand
-     * class in {@link Swerve}
+     * @apiNote this command ends when the entire path has been followed. See FollowPathCommand in
+     * {@link SwerveCommands}
      */
     public Command followPathCommand(Trajectory trajectory, BooleanSupplier flip){
         return new FollowPathCommand(trajectory, flip);
@@ -255,25 +253,25 @@ public class SwerveCommands extends SubsystemCommands{
     /**
      * Command to follow a path with the option to deviate from it as configured by the parameters
      *
-     * @param trajectory {@code Trajectory}: the path to follow
+     * @param trajectory the path to follow
      *
-     * @param flip {@code BooleanSupplier}: lambda that returns whether the path should be mirrored
-     * to the red side of the field.
+     * @param flip lambda that returns whether the path should be mirrored to the red side of the
+     * field.
      *
-     * @param useAlternateRotation {@code BooleanSupplier}: a lambda that returns whether to use
-     * the alternate rotation provided by {@code rotationSupplier}
+     * @param useAlternateRotation a lambda that returns whether to use the alternate rotation
+     * provided by {@code rotationSupplier}
      *
-     * @param rotationSupplier {@code Supplier<Rotation2d>}: a lambda that returns the alternate
-     * rotation to be used when {@code useAlternateRotation} returns {@code true}. NOTE: The degree
-     * and radian values stored in the Rotation2d are used as a velocity setpoint, not a position
-     * setpoint, so you have to run your own control loop (as needed) for this to work.
+     * @param rotationSupplier a lambda that returns the alternate rotation to be used when
+     * {@code useAlternateRotation} returns {@code true}. NOTE: The degree and radian values stored
+     * in the Rotation2d are used as a velocity setpoint, not a position setpoint, so you have to run
+     * your own control loop (as needed) for this to work.
      *
-     * @param useAlternateTranslation {@code BooleanSupplier}: a lambda that returns whether to use
-     * the alternate translation provided by {@code translationSupplier}
+     * @param useAlternateTranslation a lambda that returns whether to use the alternate translation
+     * provided by {@code translationSupplier}
      *
-     * @param translationSupplier {@code Supplier<ChassisSpeeds}: a lambda that returns the alternate
-     * translation to be used when {@code useAlternatTranslation} returns {@code true}. The rotation
-     * component of the {@code ChassisSpeeds} is ignored.
+     * @param translationSupplier a lambda that returns the alternate translation to be used when
+     * {@code useAlternatTranslation} returns {@code true}. The rotation component of the
+     * {@code ChassisSpeeds} is ignored.
      */
     public Command followPathCommand(
         Trajectory trajectory, BooleanSupplier flip,
@@ -294,10 +292,10 @@ public class SwerveCommands extends SubsystemCommands{
         private Timer timer = new Timer();
 
         // Alternate movement variables
-        private BooleanSupplier useAlternateRotation = () -> {return false;};
-        private Supplier<Rotation2d> alternateRotation = () -> {return new Rotation2d();};
-        private BooleanSupplier useAlternateTranslation = () -> {return false;};
-        private Supplier<ChassisSpeeds> alternateTranslation = () -> {return new ChassisSpeeds();};
+        private BooleanSupplier useAlternateRotation = () -> false;
+        private Supplier<Rotation2d> alternateRotation = () -> new Rotation2d();
+        private BooleanSupplier useAlternateTranslation = () -> false;
+        private Supplier<ChassisSpeeds> alternateTranslation = () -> new ChassisSpeeds();
 
         // PID controllers
         private ProfiledPIDController turnController;
@@ -310,9 +308,10 @@ public class SwerveCommands extends SubsystemCommands{
 
         /**
          * Command to follow a trajectory
-         * @param trajectory {@code Trajectory}: the trajectory to follow
-         * @param flip {@code BooleanSupplier}: lambda that returns whether to
-         * mirror the path to the red side of the field.
+         *
+         * @param trajectory the trajectory to follow
+         * @param flip lambda that returns whether to mirror the path to the
+         * red side of the field.
          */
         public FollowPathCommand(Trajectory trajectory, BooleanSupplier flip){
             this.trajectory = trajectory;
@@ -361,18 +360,25 @@ public class SwerveCommands extends SubsystemCommands{
         /**
          * Command to follow a path with the option to deviate from it as configured by the parameters
          *
-         * @param trajectory {@code Trajectory}: the path to follow
-         * @param flip {@code BooleanSupplier}: lambda that returns whether the path should be mirrored
-         * to the red side of the field.
-         * @param useAlternateRotation {@code BooleanSupplier}: a lambda that returns whether to use
-         * the alternate rotation provided by {@code rotationSupplier}
-         * @param rotationSupplier {@code Supplier<Rotation2d>}: a lambda that returns the alternate
-         * rotation to be used when {@code useAlternateRotation} returns {@code true}.
-         * @param useAlternateTranslation {@code BooleanSupplier}: a lambda that returns whether to use
-         * the alternate translation provided by {@code translationSupplier}
-         * @param translationSupplier {@code Supplier<ChassisSpeeds}: a lambda that returns the alternate
-         * translation to be used when {@code useAlternatTranslation} returns {@code true}. The rotation
-         * component of the {@code ChassisSpeeds} is ignored.
+         * @param trajectory the path to follow
+         *
+         * @param flip lambda that returns whether the path should be mirrored to the red side of the
+         * field.
+         *
+         * @param useAlternateRotation a lambda that returns whether to use the alternate rotation
+         * provided by {@code rotationSupplier}
+         *
+         * @param rotationSupplier a lambda that returns the alternate rotation to be used when
+         * {@code useAlternateRotation} returns {@code true}. NOTE: The degree and radian values stored
+         * in the Rotation2d are used as a velocity setpoint, not a position setpoint, so you have to run
+         * your own control loop (as needed) for this to work.
+         *
+         * @param useAlternateTranslation a lambda that returns whether to use the alternate translation
+         * provided by {@code translationSupplier}
+         *
+         * @param translationSupplier a lambda that returns the alternate translation to be used when
+         * {@code useAlternatTranslation} returns {@code true}. The rotation component of the
+         * {@code ChassisSpeeds} is ignored.
          */
         public FollowPathCommand(
             Trajectory trajectory, BooleanSupplier flip,

@@ -16,8 +16,8 @@ public class ElevatorCommands extends SubsystemCommands{
     /**
      * Command to put the elevator at the given setpoint. Ends when the elevator is at the target.
      *
-     * @param pivotDegrees {@code double}: the pivot target in degrees
-     * @param extensionMeters {@code double}: the extension target in meters
+     * @param pivotDegrees the pivot target in degrees
+     * @param extensionMeters the extension target in meters
      *
      * @return the command
      *
@@ -40,7 +40,7 @@ public class ElevatorCommands extends SubsystemCommands{
     /**
      * Command to put the elevator at the given position. Ends when the elevator is at the target.
      *
-     * @param position {@code Positions}: the position to go to
+     * @param position the position to go to
      *
      * @return the command
      *
@@ -53,9 +53,8 @@ public class ElevatorCommands extends SubsystemCommands{
     /**
      * Command to constantly drive the elevator towards a setpoint that can change as desired.
      *
-     * @param pivotDegrees {@code DoubleSupplier}: a lambda that returns where the pivot should be
-     * @param extensionMeters {@code DoubleSupplier}: a lambda that returns how far the extension
-     * should go
+     * @param pivotDegrees a lambda that returns where the pivot should be
+     * @param extensionMeters a lambda that returns how far the extension should go
      *
      * @return the command
      *
@@ -79,8 +78,8 @@ public class ElevatorCommands extends SubsystemCommands{
      * to be edited on the fly and won't end on its own. This is meant to be used together with 
      * {@link ElevatorCommands#incrementElevatorPositionCommand(double, double)}.
      *
-     * @param pivotDegrees {@code double}: the pivot setpoint to start with
-     * @param extensionMeters {@code double}: the extension setpoint to start with
+     * @param pivotDegrees the pivot setpoint to start with
+     * @param extensionMeters the extension setpoint to start with
      *
      * @return the command
      *
@@ -104,7 +103,7 @@ public class ElevatorCommands extends SubsystemCommands{
      * to be edited  on the fly and won't end on its own. This is meant to be used together with 
      * {@link ElevatorCommands#incrementElevatorPositionCommand(double, double)}.
      *
-     * @param position {@code Positions}: the position to go to
+     * @param position the position to go to
      *
      * @return the command
      *
@@ -118,8 +117,8 @@ public class ElevatorCommands extends SubsystemCommands{
      * If a {@link ElevatorCommands#setMalleablePositionCommand(double, double)} command is running, change
      * the pivot and extension setpoints for the elevator to target. Otherwise, does nothing functional.
      *
-     * @param pivotDegrees {@code double}: the amount to change the pivot target by each frame
-     * @param extensionMeters {@code double}: the amount to change the extension setpoint by each frame
+     * @param pivotDegrees the amount to change the pivot target by each frame
+     * @param extensionMeters the amount to change the extension setpoint by each frame
      *
      * @return the command
      *

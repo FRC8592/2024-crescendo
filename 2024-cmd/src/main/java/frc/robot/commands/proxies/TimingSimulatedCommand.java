@@ -11,8 +11,8 @@ public class TimingSimulatedCommand extends WrapperCommand{
      * If running in simulation, replaces the passed-in command with a
      * WaitCommand that waits for a length of your choosing.
      *
-     * @param command {@code Command}: the command to run on a real robot
-     * @param time {@code double}: the time to wait (in seconds) if running
+     * @param command the command to run on a real robot
+     * @param time the time to wait (in seconds) if running
      * in simulation
      */
     public TimingSimulatedCommand(Command command, double time){
@@ -23,10 +23,9 @@ public class TimingSimulatedCommand extends WrapperCommand{
 
     /**
      * If running in simulation, replaces the passed-in command with
-     * Commands.none()
+     * {@code Commands.none()}
      *
-     * @param command {@code Command}: the command to run if on a real
-     * robot
+     * @param command the command to run if on a real robot
      */
     public TimingSimulatedCommand(Command command){
         super(

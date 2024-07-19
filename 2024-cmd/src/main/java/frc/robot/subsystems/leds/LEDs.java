@@ -29,7 +29,7 @@ public class LEDs extends SubsystemBase {
      * Set the entire LED strip to a color (doesn't write to the physical
      * strip; see {@link LEDs#write()})
      *
-     * @param color {@code Color}: the color to set the strip to
+     * @param color the color to set the strip to
      */
     protected void setSolidColor(Color color){
         for(int i = 0; i < LEDS.LED_LENGTH; i++){
@@ -44,8 +44,8 @@ public class LEDs extends SubsystemBase {
      * Set an individual LED to a specific color (doesn't write to the
      * strip; see {@link LEDs#write()})
      *
-     * @param index {@code int}: the index of the LED to set
-     * @param color {@code Color}: the color to set the LED to
+     * @param index the index of the LED to set
+     * @param color the color to set the LED to
      */
     protected void setLED(int index, Color color){
         ledBuffer.setLED(index, color);

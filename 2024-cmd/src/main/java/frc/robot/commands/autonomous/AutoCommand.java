@@ -32,7 +32,7 @@ public class AutoCommand extends WrapperCommand {
 
     /**
      * Create an auto routine from the passed-in commands.
-     * @param commands {@code Command}: as many commands as you want. Will
+     * @param commands as many commands as you want. Will
      * be run in sequence (one after the other).
      */
     public AutoCommand(Command... commands) {

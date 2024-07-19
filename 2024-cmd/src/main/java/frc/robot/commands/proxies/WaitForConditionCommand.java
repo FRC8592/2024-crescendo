@@ -16,10 +16,8 @@ public class WaitForConditionCommand extends Command{
      * the command. Note that the WaitForConditionCommand does NOT require the subsystems of
      * the passed-in command.
      *
-     * @param condition {@code BooleanSupplier}: a lambda that returns whether or not the
-     * command should be scheduled.
-     * @param command {@code Command}: the command to schedule when {@code condition} returns
-     * {@code true}.
+     * @param condition a lambda that returns whether or not the command should be scheduled
+     * @param command the command to schedule when {@code condition} returns {@code true}
      */
     public WaitForConditionCommand(BooleanSupplier condition, Command command){
         this.condition = condition;
@@ -29,8 +27,8 @@ public class WaitForConditionCommand extends Command{
 
     /**
      * Command that waits until a condition is true, then ends.
-     * @param condition {@code BooleanSupplier} a lambda that
-     * returns true when this command should end.
+     * @param condition a lambda that returns true when this
+     * command should end
      */
     public WaitForConditionCommand(BooleanSupplier condition){
         this.condition = condition;

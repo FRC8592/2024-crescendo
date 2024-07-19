@@ -11,7 +11,7 @@ public class ClimbCommand extends WrapperCommand {
      * Command to go to the climb position and hold. Runs a
      * {@link Elevator#setMalleablePositionCommand(double, double)}, so
      * {@link Elevator#incrementElevatorPositionCommand(double, double)}
-     * will make the elevator move.
+     * will move the elevator.
      *
      * @param elevator
      * @param intake

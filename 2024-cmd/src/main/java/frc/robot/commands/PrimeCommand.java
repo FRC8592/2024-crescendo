@@ -14,15 +14,14 @@ public class PrimeCommand extends WrapperCommand {
 
     /**
      * Command to do a static prime (see {@link PrimeCommand#PrimeCommand(Supplier, Shooter, Elevator, Intake, LEDs, DoubleSupplier)}
-     * for vision-prime). Command never ends on its own; the shoot command logic must cancel this command.
+     * for vision-prime).
      *
-     * @param entry {@code RangeEntry}: the {@code RangeEntry} to prime to
+     * @param entry the {@code RangeEntry} to prime to
      * @param shooter
      * @param elevator
      * @param intake
      * @param leds
-     * @param offsetSupplier {@code DoubleSupplier} lambda that returns the current offset from the target
-     * for the honing LEDs
+     * @param offsetSupplier lambda that returns the current offset from the target for the honing LEDs
      *
      * @apiNote This command does not end on its own; it must be interrupted to stop
      */
@@ -49,10 +48,9 @@ public class PrimeCommand extends WrapperCommand {
 
     /**
      * Command to do a vision prime (see {@link PrimeCommand#PrimeCommand(RangeEntry, Shooter, Elevator, Intake, LEDs, DoubleSupplier)}
-     * for static prime). Command never ends on its own; the shoot command logic must cancel this command.
+     * for static prime).
      *
-     * @param entry {@code Supplier<RangeEntry>}: lambda that returns the latest update of the {@code RangeEntry}
-     * to prime to
+     * @param entry lambda that returns the latest update of the {@code RangeEntry} to prime to
      * @param shooter
      * @param elevator
      * @param intake
@@ -74,7 +72,7 @@ public class PrimeCommand extends WrapperCommand {
             // itself with the supplier.
             .alongWith(elevator.commands.setUpdatingPositionCommand(() -> entry.get().pivotAngle, () -> entry.get().elevatorHeight))
 
-            // Commented above
+            // Runs the honing lights (which indicate to the drivers how far off their target they are)
             .alongWith(leds.commands.honeCommand(offsetSupplier))
         );
         addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime

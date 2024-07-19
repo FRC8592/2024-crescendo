@@ -36,7 +36,7 @@ public class Intake extends SubsystemBase{
 
     /**
      * Set the intake motor's velocity
-     * @param velocity {@code double} the target velocity in RPM
+     * @param velocity the target velocity in RPM
      */
     protected void setIntakeVelocity(double velocity){
         targetIntakeVelocity = velocity;

@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.WrapperCommand;
 public class StowCommand extends WrapperCommand {
     /**
      * Command to stow the robot. Does not automatically override other commands; use
-     * {@link OverrideEverythingCommand} for that
+     * {@link OverrideEverythingCommand} for that.
      *
      * @param shooter
      * @param elevator

@@ -22,7 +22,7 @@ public class IntakeCommand extends WrapperCommand {
             new StowCommand(shooter, elevator, intake)
 
             // Run the intake and feeders as if there is no contact with
-            // a note. This stopw when the intakeNoContactCommand ends,
+            // a note. ! This stops when the intakeNoContactCommand ends,
             // which is when the bottom beam-break sees a note.
             .andThen(
                 shooter.commands.intakeNoContactCommand()

@@ -10,7 +10,7 @@ import frc.robot.subsystems.shooter.Shooter;
 public class AmpScoreCommand extends WrapperCommand {
     /**
      * Command to score in the amp. Assumes the elevator is already in the amp
-     * position (must be checked elsewhere)
+     * position (must be checked elsewhere).
      *
      * @param shooter
      * @param elevator
@@ -25,8 +25,7 @@ public class AmpScoreCommand extends WrapperCommand {
             .alongWith(leds.commands.singleColorCommand(LEDS.OFF))
         );
 
-        // Keep the elevator and intake from doing anything funky
-        // while we score.
+        // Keep the elevator and intake from doing anything funky while we score.
         addRequirements(elevator, intake);
     }
 }

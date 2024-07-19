@@ -85,8 +85,9 @@ public class Shooter extends SubsystemBase {
 
     /**
      * Set the velocity of both flywheels. Runs {@link Shooter#setShooterVelocity(int, int)}
-     * with the passed-in int.
-     * @param both {@code int}: the speed in RPM to target for both flywheels
+     * with the passed-in {@code int}.
+     *
+     * @param both the speed in RPM to target for both flywheels
      */
     protected void setShooterVelocity(int both){
         setShooterVelocity(both, both);
@@ -94,8 +95,9 @@ public class Shooter extends SubsystemBase {
 
     /**
      * Set the velocity of each flywheel.
-     * @param left {@code int}: the velocity for the left flywheel
-     * @param right {@code int}: the velocity for the right flywheel
+     *
+     * @param left the velocity for the left flywheel
+     * @param right the velocity for the right flywheel
      */
     protected void setShooterVelocity(int left, int right){
         leftTargetSpeed = left;
@@ -106,7 +108,8 @@ public class Shooter extends SubsystemBase {
 
     /**
      * Run the feeder motor at a set power
-     * @param power {@code double}: the power to apply, (-1 to 1)
+     *
+     * @param power the power to apply, (-1 to 1)
      */
     protected void setFeederPower(double power){
         feederMotor.setPercentOutput(power);
@@ -114,7 +117,8 @@ public class Shooter extends SubsystemBase {
 
     /**
      * Run the feeder motor at a set velocity using the default PID constants
-     * @param velocity {@code int}: the velocity to run the motor at in RPM
+     *
+     * @param velocity the velocity to run the motor at in RPM
      */
     protected void setFeederVelocity(double velocity){
         feederMotor.setVelocity(velocity);
@@ -122,7 +126,8 @@ public class Shooter extends SubsystemBase {
 
     /**
      * Run the feeder motor at a set velocity using specific PID constants
-     * @param velocity {@code int}: the velocity to run the motor at in RPM
+     *
+     * @param velocity the velocity to run the motor at in RPM
      */
     protected void setFeederVelocity(double velocity, int pidSlot){
         feederMotor.setVelocity(velocity, pidSlot);

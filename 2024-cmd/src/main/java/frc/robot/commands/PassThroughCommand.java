@@ -9,7 +9,8 @@ import frc.robot.subsystems.shooter.Shooter;
 
 public class PassThroughCommand extends WrapperCommand {
     /**
-     * Command to stow, then run pass-through indefinitely
+     * Command to run pass-through indefinitely. Note that the robot will stow before
+     * starting to pass-through.
      *
      * @param shooter
      * @param elevator

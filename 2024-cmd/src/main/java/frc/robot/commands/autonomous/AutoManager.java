@@ -98,9 +98,8 @@ public final class AutoManager {
     /**
      * Create the auto chooser, add all the autos to it, and put it on the dashboard
      *
-     * @apiNote {@link AutoManager#loadAutos(Swerve, Intake, Elevator, Shooter, LEDs)}
-     * should ALWAYS be called directly before this. If it isn't, the chooser will be
-     * empty.
+     * @apiNote {@link AutoManager#loadAutos()} should be called directly before
+     * this. If it isn't, the chooser will be empty.
      */
     public static void broadcastChooser(){
         autoChooser = new SendableChooser<Command>();

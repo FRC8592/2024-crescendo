@@ -1,9 +1,10 @@
-package frc.robot.commands.autonomous;
+package frc.robot.commands.autonomous.autons;
 
 import frc.robot.Constants.*;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.PrimeCommand;
 import frc.robot.commands.ShootCommand;
+import frc.robot.commands.autonomous.AutoCommand;
 import frc.robot.commands.proxies.TimingSimulatedCommand;
 import frc.robot.helpers.RangeTable;
 import frc.robot.subsystems.elevator.Elevator;

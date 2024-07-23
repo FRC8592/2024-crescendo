@@ -1,9 +1,10 @@
-package frc.robot.commands.autonomous;
+package frc.robot.commands.autonomous.autons;
 
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.LEDS;
 import frc.robot.commands.*;
+import frc.robot.commands.autonomous.AutoCommand;
 import frc.robot.commands.proxies.*;
 import frc.robot.helpers.*;
 import frc.robot.subsystems.elevator.Elevator;

@@ -1,8 +1,9 @@
-package frc.robot.commands.autonomous;
+package frc.robot.commands.autonomous.autons;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.LEDS;
+import frc.robot.commands.autonomous.AutoCommand;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LEDs;

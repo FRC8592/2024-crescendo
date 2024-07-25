@@ -66,7 +66,6 @@ public class Swerve extends SubsystemBase {
         // For the snap-to-angle functionality
         snapToController = new PIDController(SWERVE.SNAP_TO_kP, SWERVE.SNAP_TO_kI, SWERVE.SNAP_TO_kD);
 
-        //TODO: Check the swerve module type and comment/uncomment the next 44 lines to account for it
         SwerveModule m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(config,
             Mk4iSwerveModuleHelper.GearRatio.L2,
             CAN.SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID,
@@ -99,34 +98,11 @@ public class Swerve extends SubsystemBase {
             SWERVE.WHITE_BACK_RIGHT_STEER_OFFSET
         );
 
-        // SwerveModule m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,
-        //         Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.BLACK_FRONT_LEFT_DRIVE_CAN,
-        //         SWERVE.BLACK_FRONT_LEFT_STEER_CAN,
-        //         SWERVE.BLACK_FRONT_LEFT_ENCODER_CAN,
-        //         SWERVE.BLACK_FRONT_LEFT_STEER_OFFSET);
-        // SwerveModule m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,
-        //         Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.TEAL_FRONT_LEFT_DRIVE_CAN,
-        //         SWERVE.TEAL_FRONT_LEFT_STEER_CAN,
-        //         SWERVE.TEAL_FRONT_LEFT_ENCODER_CAN,
-        //         SWERVE.FRONT_LEFT_STEER_OFFSET);
-
-        // SwerveModule m_frontRightModule = Mk4SwerveModuleHelper.createFalcon500(config,
-        //         Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.ORANGE_FRONT_RIGHT_DRIVE_CAN,
-        //         SWERVE.ORANGE_FRONT_RIGHT_STEER_CAN,
-        //         SWERVE.ORANGE_FRONT_RIGHT_ENCODER_CAN,
-        //         SWERVE.FRONT_RIGHT_STEER_OFFSET);
-
-        // SwerveModule m_backLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,
-        //         Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.BLACK_BACK_LEFT_DRIVE_CAN,
-        //         SWERVE.BLACK_BACK_LEFT_STEER_CAN,
-        //         SWERVE.BLACK_BACK_LEFT_ENCODER_CAN,
-        //         SWERVE.BACK_LEFT_STEER_OFFSET);
-
-        // SwerveModule m_backRightModule = Mk4SwerveModuleHelper.createFalcon500(config,
-        //         Mk4SwerveModuleHelper.GearRatio.L2, SWERVE.WHITE_BACK_RIGHT_DRIVE_CAN,
-        //         SWERVE.WHITE_BACK_RIGHT_STEER_CAN,
-        //         SWERVE.WHITE_BACK_RIGHT_ENCODER_CAN,
-        //         SWERVE.BACK_RIGHT_STEER_OFFSET);
+        // * If reusing this code on a robot with Mk4 modules, delete the module creation above and replace it with these lines
+        // SwerveModule m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID,CAN.SWERVE_BLACK_FRONT_LEFT_STEER_CAN_ID,CAN.SWERVE_BLACK_FRONT_LEFT_ENCODER_CAN_ID,SWERVE.BLACK_FRONT_LEFT_STEER_OFFSET);
+        // SwerveModule m_frontRightModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_ORANGE_FRONT_RIGHT_DRIVE_CAN_ID,CAN.SWERVE_ORANGE_FRONT_RIGHT_STEER_CAN_ID,CAN.SWERVE_ORANGE_FRONT_RIGHT_ENCODER_CAN_ID,SWERVE.ORANGE_FRONT_RIGHT_STEER_OFFSET);
+        // SwerveModule m_backLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_TEAL_BACK_LEFT_DRIVE_CAN_ID,CAN.SWERVE_TEAL_BACK_LEFT_STEER_CAN_ID,CAN.SWERVE_TEAL_BACK_LEFT_ENCODER_CAN_ID,SWERVE.TEAL_BACK_LEFT_STEER_OFFSET);
+        // SwerveModule m_backRightModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_WHITE_BACK_RIGHT_DRIVE_CAN_ID,CAN.SWERVE_WHITE_BACK_RIGHT_STEER_CAN_ID,CAN.SWERVE_WHITE_BACK_RIGHT_ENCODER_CAN_ID,SWERVE.WHITE_BACK_RIGHT_STEER_OFFSET);
 
         this.swerveConfig = config;
 

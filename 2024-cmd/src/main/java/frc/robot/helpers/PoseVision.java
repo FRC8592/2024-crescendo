@@ -41,7 +41,7 @@ public class PoseVision {
     public PoseVision(double kP, double kI, double kD, double setpoint) {
         // instantate PID controller given constants in constructor        
         visual_servo_pid = new PIDController(kP, kI, kD);
-        visual_servo_pid.setIZone(APRILTAG_VISION.iZone);
+        visual_servo_pid.setIZone(APRILTAG_VISION.iZONE);
     }
 
     public boolean getVisionActive() {

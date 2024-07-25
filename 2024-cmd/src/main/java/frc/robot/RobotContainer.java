@@ -50,9 +50,9 @@ public class RobotContainer {
         NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR,0,0,0,0
     );
     private final PIDController drivePID = new PIDController(
-        APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kP,
-        APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kI,
-        APRILTAG_LIMELIGHT.SPEAKER_DRIVE_kD
+        NOTELOCK.DRIVE_TO_DRIVE_kP,
+        NOTELOCK.DRIVE_TO_DRIVE_kI,
+        NOTELOCK.DRIVE_TO_DRIVE_kD
     );
     private final PIDController turnPID = new PIDController(
         NOTELOCK.DRIVE_TO_TURN_kP,

@@ -74,7 +74,7 @@ public class Shooter extends SubsystemBase {
      * @return whether the flywheels have spun up to within tolerance of their targets.
      */
     public boolean readyToShoot() {
-        if (Math.abs(leftShooterMotor.getVelocity() - leftTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE
+        if (Math.abs(leftShooterMotor.getVelocity() - leftTargetSpeed) < SHOOTER.FLYWHEEL_SPEED_ACCEPTABLE_RANGE
                 // && Math.abs(rightShooterMotor.getVelocity() - rightTargetSpeed) < SHOOTER.FHYWHEEL_SPEED_ACCEPTABLE_RANGE
                 && leftTargetSpeed > 1000
                 && rightTargetSpeed > 1000) {

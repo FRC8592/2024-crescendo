@@ -26,7 +26,7 @@ public class AutoCommand extends WrapperCommand {
      * {@code false} when on the blue side. Defaults to {@code false} if the alliance color is
      * inaccessible.
      */
-    protected static BooleanSupplier flipPathToRedSide = (
+    protected static final BooleanSupplier flipPathToRedSide = (
         () -> DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red
     );
 
@@ -51,7 +51,7 @@ public class AutoCommand extends WrapperCommand {
      * {@code FileNotFoundException} if the name doesn't represent a .traj file
      * located in the {@code choreo} folder in the {@code deploy} folder.
      */
-    protected static Trajectory getChoreoTrajectory(String name) {
+    protected static final Trajectory getChoreoTrajectory(String name) {
         // It isn't efficient to import the trajectory again just for a single starting pose,
         // but there's no other easy way to get it. See a few lines down for why that's needed.
         ChoreoTrajectoryState startState = Choreo.getTrajectory(name).getInitialState();

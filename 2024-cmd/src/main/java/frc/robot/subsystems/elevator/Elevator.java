@@ -177,6 +177,32 @@ public class Elevator extends SubsystemBase {
     }
 
     /**
+     * Check the elevator's targets
+     *
+     * @param pivot the pivot angle to check that the elevator is targeting
+     * @param extension the extension length to check that the elevator is
+     * targeting
+     *
+     * @return whether the elevator's target angle and extension exactly match
+     * the passed-in values.
+     */
+    public boolean isTargeting(double pivot, double extension){
+        return getTargetPivot() == pivot && getTargetExtension() == extension;
+    }
+
+    /**
+     * Check the elevator's targets
+     *
+     * @param position the position to check that the elevator is targeting
+     *
+     * @return whether the elevator's target angle and extension exactly
+     * match the values in the {@code Position} object.
+     */
+    public boolean isTargeting(Positions position){
+        return isTargeting(position.pivot, position.extension);
+    }
+
+    /**
      * Method to run the elevator with safety features. DO NOT COMMAND THE ELEVATOR
      * MOTORS OTHER THAN THROUGH THIS METHOD unless you are stopping them.
      */

@@ -25,6 +25,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -80,9 +81,6 @@ public class RobotContainer {
         AutoManager.loadAutos();
         AutoManager.broadcastChooser();
     }
-
-    //Please use this.setDefaultCommand() instead of SubsystemBase.setDefaultCommand() here.
-    //The method from this class includes a check for interruption behavior.
 
     /**
      * Configure default commands for the subsystems
@@ -158,56 +156,8 @@ public class RobotContainer {
         );
 
         // Amp-score or shoot (press) + force-shoot (hold)
-        driverController.rightTrigger(0.1).whileTrue( // <-- The 0.1 is the threshold
-
-            /*
-             * This is a bit of a weird trigger. We want it to handle amp scoring, static shots, and vision shots.
-             * To do that, we use a whileTrue trigger and override it where necessary. On the amp score, we always
-             * override it with the ScheduleCommand. On the speaker score, we apply the whileTrue to a
-             * WaitForCondition command, but then don't apply it to the the ShootCommand inside. This means that
-             * it won't keep trying to shoot after the trigger is released, but it will finish shooting if the
-             * trigger is released in the middle of the shot.
-            */
-
-            new DeferredCommand(
-                () -> { // <-- Notice that we're starting a lambda here. This will cast to a Supplier<Command>.
-                    if(elevator.isAmp()){
-
-                        /*
-                         * The ScheduleCommand frees the AmpScoreCommand from the whileTrue(),
-                         * making the AmpScoreCommand able to run for as long as it wants without
-                         * being cancelled by the user releasing the trigger. 
-                         */
-                        return new ScheduleCommand(
-                            new AmpScoreCommand(shooter, elevator, intake, leds)
-                        );
-                    }
-                    else{ // The elevator isn't in amp position, meaning we need to shoot
-                        if(driverController.getHID().getXButton()){ // If we're force-shooting
-
-                            // Ignore whatever else might have been happening and just shoot
-                            return new OverrideEverythingCommand(
-                                new ShootCommand(shooter, elevator, intake, leds)
-                            );
-                        }
-                        else{
-
-                            /*
-                             * This WaitForConditionCommand will be cancelled if the user releases
-                             * the trigger. However, it schedules the passed-in command instead of
-                             * wrapping it, meaning the ShootCommand inside it will NOT be cancelled
-                             * if the WaitForConditionCommand has already scheduled it.
-                             */
-                            return new WaitForConditionCommand(
-                                () -> shooter.readyToShoot() && elevator.isAtTargetPosition(),
-                                new ShootCommand(shooter, elevator, intake, leds)
-                                .andThen(new StowCommand(shooter, elevator, intake))
-                            );
-                        }
-                    }
-                },
-                Set.of(shooter, elevator, intake, leds) // Requirements for the DeferredCommand above
-            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        driverController.rightTrigger(0.1).whileTrue(
+            new ScoreCommand(shooter, elevator, intake, leds, () -> driverController.getHID().getXButton())
         );
 
         // Party Mode (hold)

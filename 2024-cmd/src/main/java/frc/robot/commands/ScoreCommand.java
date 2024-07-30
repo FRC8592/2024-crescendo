@@ -40,9 +40,10 @@ public class ScoreCommand extends DeferredCommand{
         super(
             () -> { // <-- Notice that we're starting a lambda here. This will cast to a Supplier<Command>.
                 if(elevator.isTargeting(Elevator.Positions.AMP)){
+
                     // This is the first instance of the logic described above
                     return new WaitForConditionCommand(
-                        () -> elevator.isAmp(),
+                        () -> elevator.isAtPosition(Elevator.Positions.AMP),
                         new AmpScoreCommand(shooter, elevator, intake, leds)
                     );
                 }

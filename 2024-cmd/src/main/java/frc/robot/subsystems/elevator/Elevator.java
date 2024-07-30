@@ -75,35 +75,47 @@ public class Elevator extends SubsystemBase {
     }
 
     /**
-     * Return whether the elevator is within tolerance of the amp position
+     * Check whether the elevator is within tolerance of the specified position
+     *
+     * @param pivot the angle to check for the pivot being within tolerance of
+     * @param extension the length to check for the extension being within
+     * tolerance of
+     *
+     * @return whether both the pivot and extension are within tolerance of the
+     * passed-in values
+     *
+     * @apiNote This is a positional check only. If the elevator is at the
+     * specified position but is moving towards a different target, this method
+     * will still return {@code true}. To require that the elevator be targeting
+     * the same position, logical-AND this function with
+     * {@link Elevator#isTargeting(double, double)}
      */
-    public boolean isAmp(){
+    public boolean isAtPosition(double pivot, double extension){
         return (
-            isAtTargetPosition()
-            && targetExtension == ELEVATOR.EXTENSION_METERS_AMP
-            && targetPivot == ELEVATOR.PIVOT_ANGLE_AMP
+            Math.abs(getPivotAngle() - pivot) < ELEVATOR.ANGLE_TOLERANCE
+            && Math.abs(getExtensionLength() - extension) < ELEVATOR.LENGTH_TOLERANCE
         );
     }
 
     /**
-     * Return whether the elevator is within tolerance of the climb position
+     * Check whether the elevator is within tolerance of the specified position
+     *
+     * @param position the position to check for the elevator being within
+     * tolerance of
+     *
+     * @return whether both the pivot and extension are within tolerance of the
+     * passed-in {@code Position}
+     *
+     * @apiNote This is a positional check only. If the elevator is at the
+     * specified position but is moving towards a different target, this method
+     * will still return {@code true}. To require that the elevator be targeting
+     * the same position, logical-AND this function with
+     * {@link Elevator#isTargeting(Positions)}
      */
-    public boolean isClimb(){
+    public boolean isAtPosition(Positions position){
         return (
-            isAtTargetPosition()
-            && targetExtension == ELEVATOR.EXTENSION_METERS_CLIMB
-            && targetPivot == ELEVATOR.PIVOT_ANGLE_CLIMB
-        );
-    }
-
-    /**
-     * Return whether the elevator is within tolerance of the stowed position
-     */
-    public boolean isStowed(){
-        return (
-            isAtTargetPosition()
-            && targetExtension == ELEVATOR.EXTENSION_METERS_STOWED
-            && targetPivot == ELEVATOR.PIVOT_ANGLE_STOWED
+            Math.abs(getPivotAngle() - position.pivot) < ELEVATOR.ANGLE_TOLERANCE
+            && Math.abs(getExtensionLength() - position.extension) < ELEVATOR.LENGTH_TOLERANCE
         );
     }
 

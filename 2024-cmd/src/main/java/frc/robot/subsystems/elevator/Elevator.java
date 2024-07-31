@@ -16,8 +16,8 @@ public class Elevator extends SubsystemBase {
 
     // Small enum for conveniently referencing elevator positions
     public enum Positions{
-        // The next three lines do the equivalent of the code
-        // public Positions NAME = new Positions(pivotAngle, extensionLength);
+        // The next three lines each do the equivalent of the code
+        // "public static Positions NAME = new Positions(pivotAngle, extensionLength);"
         // (creating new instances of Positions using the constructor below).
         STOWED(ELEVATOR.PIVOT_ANGLE_STOWED, ELEVATOR.EXTENSION_METERS_STOWED),
         AMP(ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP),
@@ -66,8 +66,17 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Target", targetPivot);
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Read", getPivotAngle());
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/IsAtTarget", isTargetAngle());
+
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Target", targetExtension);
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Read", getExtensionLength());
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/IsAtTarget", isTargetLength());
+
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"IsTargetPosition", isAtTargetPosition());
+
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Setpoints/IsTargetingStowed", isTargeting(Positions.STOWED));
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Setpoints/IsTargetingAmp", isTargeting(Positions.AMP));
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Setpoints/IsTargetingClimb", isTargeting(Positions.CLIMB));
     }
 
     public void simulationPeriodic() {
@@ -208,7 +217,7 @@ public class Elevator extends SubsystemBase {
      * @param position the position to check that the elevator is targeting
      *
      * @return whether the elevator's target angle and extension exactly
-     * match the values in the {@code Position} object.
+     * match the values in the {@code Positions} object.
      */
     public boolean isTargeting(Positions position){
         return isTargeting(position.pivot, position.extension);

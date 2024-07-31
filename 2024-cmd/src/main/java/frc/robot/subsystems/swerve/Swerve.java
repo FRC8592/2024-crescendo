@@ -37,6 +37,9 @@ public class Swerve extends SubsystemBase {
 
     private SmoothingFilter smoothingFilter;
 
+    // Only used for logging
+    private ChassisSpeeds targetChassisSpeeds;
+
     /**
      * @param gyro a com.NewtonSwerve.Gyro.Gryo object instantiated with the hardware gyroscope
      */
@@ -98,7 +101,7 @@ public class Swerve extends SubsystemBase {
             SWERVE.WHITE_BACK_RIGHT_STEER_OFFSET
         );
 
-        // * If reusing this code on a robot with Mk4 modules, delete the module creation above and replace it with these lines
+        // * If reusing this code on a robot with Mk4 modules, comment the module creation above and replace it with these lines
         // SwerveModule m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID,CAN.SWERVE_BLACK_FRONT_LEFT_STEER_CAN_ID,CAN.SWERVE_BLACK_FRONT_LEFT_ENCODER_CAN_ID,SWERVE.BLACK_FRONT_LEFT_STEER_OFFSET);
         // SwerveModule m_frontRightModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_ORANGE_FRONT_RIGHT_DRIVE_CAN_ID,CAN.SWERVE_ORANGE_FRONT_RIGHT_STEER_CAN_ID,CAN.SWERVE_ORANGE_FRONT_RIGHT_ENCODER_CAN_ID,SWERVE.ORANGE_FRONT_RIGHT_STEER_OFFSET);
         // SwerveModule m_backLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_TEAL_BACK_LEFT_DRIVE_CAN_ID,CAN.SWERVE_TEAL_BACK_LEFT_STEER_CAN_ID,CAN.SWERVE_TEAL_BACK_LEFT_ENCODER_CAN_ID,SWERVE.TEAL_BACK_LEFT_STEER_OFFSET);
@@ -118,6 +121,8 @@ public class Swerve extends SubsystemBase {
 
     public void periodic() {
         Logger.recordOutput(SWERVE.LOG_PATH+"OdometryPosition", getCurrentPos());
+        Logger.recordOutput(SWERVE.LOG_PATH+"TargetChassisSpeeds", targetChassisSpeeds);
+        Logger.recordOutput(SWERVE.LOG_PATH+"ActualChassisSpeeds", this.swerve.getCurrentSpeeds());
     }
 
     public void simulationPeriodic() {
@@ -129,6 +134,7 @@ public class Swerve extends SubsystemBase {
      * @param speeds the speeds to run the drivetrain at
      */
     protected void drive(ChassisSpeeds speeds){
+        targetChassisSpeeds = speeds;
         swerve.drive(speeds);
     }
 

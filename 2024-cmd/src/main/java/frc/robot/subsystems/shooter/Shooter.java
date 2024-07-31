@@ -25,12 +25,13 @@ public class Shooter extends SubsystemBase {
     // Only used for logging
     private int leftTargetSpeed = 0;
     private int rightTargetSpeed = 0;
+    private int feederTargetSpeed = 0;
 
     public Shooter() {
         leftShooterMotor = new SparkFlexControl(CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
-        leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP,  SHOOTER.LEFT_SHOOTER_MOTOR_kI,  SHOOTER.LEFT_SHOOTER_MOTOR_kD,  SHOOTER.LEFT_SHOOTER_MOTOR_kF,  0);
+        leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP, SHOOTER.LEFT_SHOOTER_MOTOR_kI, SHOOTER.LEFT_SHOOTER_MOTOR_kD, SHOOTER.LEFT_SHOOTER_MOTOR_kF, 0);
         leftShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
-        leftShooterMotor.setCurrentLimit (POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT,  POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT);
+        leftShooterMotor.setCurrentLimit (POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT, POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT);
         leftShooterMotor.setInverted();
         leftShooterMotor.setPercentOutput(0);
 
@@ -56,12 +57,17 @@ public class Shooter extends SubsystemBase {
     }
 
     public void periodic() {
-        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftTargetSpeed", leftTargetSpeed);
-        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightTargetSpeed", rightTargetSpeed);
-        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/RightShooterSpeed", rightShooterMotor.getVelocity());
-        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/LeftShooterSpeed", leftShooterMotor.getVelocity());
-        Logger.recordOutput(SHOOTER.LOG_PATH+"MotorRPMs/FeederSpeed", feederMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/TargetSpeed", leftTargetSpeed);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/ActualSpeed", leftShooterMotor.getVelocity());
+
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Right/TargetSpeed", rightTargetSpeed);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Right/ActualSpeed", rightShooterMotor.getVelocity());
+
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Feeder/TargetSpeed", feederTargetSpeed);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Feeder/ActualSpeed", feederMotor.getVelocity());
+
         Logger.recordOutput(SHOOTER.LOG_PATH+"ReadyToShoot", readyToShoot());
+
         Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Bottom", bottomBeamBreak.get());
         Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Middle", middleBeamBreak.get());
         Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Top", topBeamBreak.get());
@@ -112,15 +118,17 @@ public class Shooter extends SubsystemBase {
      * @param power the power to apply, (-1 to 1)
      */
     protected void setFeederPower(double power){
+        feederTargetSpeed = -1;
         feederMotor.setPercentOutput(power);
     }
 
     /**
-     * Run the feeder motor at a set velocity using the default PID constants
+     * Run the feeder motor at a set velocity using PID slot 0
      *
      * @param velocity the velocity to run the motor at in RPM
      */
-    protected void setFeederVelocity(double velocity){
+    protected void setFeederVelocity(int velocity){
+        feederTargetSpeed = velocity;
         feederMotor.setVelocity(velocity);
     }
 
@@ -128,8 +136,10 @@ public class Shooter extends SubsystemBase {
      * Run the feeder motor at a set velocity using specific PID constants
      *
      * @param velocity the velocity to run the motor at in RPM
+     * @param pidSlot the PID slot to use
      */
-    protected void setFeederVelocity(double velocity, int pidSlot){
+    protected void setFeederVelocity(int velocity, int pidSlot){
+        feederTargetSpeed = velocity;
         feederMotor.setVelocity(velocity, pidSlot);
     }
 

@@ -173,13 +173,13 @@ public final class Constants {
         public static final double SHOOTING_FEEDER_POWER = 1d;
 
         public static final int OUTAKE_FLYWHEEL_SPEED = -500;
-        public static final double OUTAKE_FEEDER_SPEED = -2000;
+        public static final int OUTAKE_FEEDER_SPEED = -2000;
 
         public static final double SHOOT_SCORE_TIME = 0.5;
         public static final double AMP_SCORE_TIME = 2;
 
-        public static final double STAGE_FEEDER_SPEED = 250;
-        public static final double ALIGN_FEEDER_SPEED = -150;
+        public static final int STAGE_FEEDER_SPEED = 250;
+        public static final int ALIGN_FEEDER_SPEED = -150;
         public static final int ALIGN_FLYWHEEL_SPEED = -150;
     }
 

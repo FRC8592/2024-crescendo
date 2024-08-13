@@ -3,72 +3,62 @@ package frc.robot.helpers;
 import org.littletonrobotics.junction.Logger;
 
 import frc.robot.Constants;
-import frc.robot.Constants.*;
 
 public class RangeTable {
     public final static RangeEntry[] RANGE_TABLE = {
-            // new RangeEntry(3000, 5), //Speaker
-            // new RangeEntry(4500, 30.5) //Podium
-            new RangeEntry(3500, 3500, 0.0),    // 0.0m
-            new RangeEntry(3500, 3500, 0.0),    // 0.2m
-            new RangeEntry(3500, 3500, 0.0),    // 0.4m
-            new RangeEntry(3500, 3500, 0.0),    // 0.6m
-            new RangeEntry(3500, 3500, 0.0),    // 0.8m
-            new RangeEntry(3500, 3500, 0.0),    // 1.0m
-            new RangeEntry(3500, 3500, 0.0),    // 1.2m
-            new RangeEntry(3500, 3500, 0.0),    // 1.4m
-            new RangeEntry(3750, 3500, 5.5),    // 1.6m 
-            new RangeEntry(4500, 3500, 12.5),   // 1.8m 
-            new RangeEntry(5000, 3500, 18.5),   // 2.0m 
-            new RangeEntry(5250, 3500, 21.5),   // 2.2m 
-            new RangeEntry(5500, 3500, 25.0),   // 2.4m 
-            new RangeEntry(5500, 3500, 28.0),   // 2.6m 
-            new RangeEntry(5500, 3500, 29.5),   // 2.8m 
-            new RangeEntry(5500, 3500, 30.0),   // 3.0m 
-            new RangeEntry(5500, 3500, 30.5),   // 3.2m 
-            new RangeEntry(5500, 3500, 31.25),  // 3.4m 
-            new RangeEntry(5750, 3750, 32.0),   // 3.6m 
-            new RangeEntry(6000, 4000, 34.625), // 3.8m 
-            new RangeEntry(6000, 4000, 35.25),   // 4.0m
-            new RangeEntry(6000, 4000, 36), //4.2 *
-            new RangeEntry(6000, 4000, 37.50), //4.4
-            new RangeEntry(6000, 4000, 38.00), //4.6 
-            new RangeEntry(6000, 4500, 39.00), //4.8
-            new RangeEntry(6000, 4500, 40.00), //5.0 
-            new RangeEntry(6000, 4500, 39.70), //5.2
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
-            new RangeEntry(6000, 4500, 39.70), //Untuned
+        new RangeEntry(3500, 3500, 0.0),    // 0.0m
+        new RangeEntry(3500, 3500, 0.0),    // 0.2m
+        new RangeEntry(3500, 3500, 0.0),    // 0.4m
+        new RangeEntry(3500, 3500, 0.0),    // 0.6m
+        new RangeEntry(3500, 3500, 0.0),    // 0.8m
+        new RangeEntry(3500, 3500, 0.0),    // 1.0m
+        new RangeEntry(3500, 3500, 0.0),    // 1.2m
+        new RangeEntry(3500, 3500, 0.0),    // 1.4m
+        new RangeEntry(3750, 3500, 5.5),    // 1.6m
+        new RangeEntry(4500, 3500, 12.5),   // 1.8m
+        new RangeEntry(5000, 3500, 18.5),   // 2.0m
+        new RangeEntry(5250, 3500, 21.5),   // 2.2m
+        new RangeEntry(5500, 3500, 25.0),   // 2.4m
+        new RangeEntry(5500, 3500, 28.0),   // 2.6m
+        new RangeEntry(5500, 3500, 29.5),   // 2.8m
+        new RangeEntry(5500, 3500, 30.0),   // 3.0m
+        new RangeEntry(5500, 3500, 30.5),   // 3.2m
+        new RangeEntry(5500, 3500, 31.25),  // 3.4m
+        new RangeEntry(5750, 3750, 32.0),   // 3.6m
+        new RangeEntry(6000, 4000, 34.625), // 3.8m
+        new RangeEntry(6000, 4000, 35.25),  // 4.0m
+        new RangeEntry(6000, 4000, 36),     // 4.2
+        new RangeEntry(6000, 4000, 37.50),  // 4.4
+        new RangeEntry(6000, 4000, 38.00),  // 4.6
+        new RangeEntry(6000, 4500, 39.00),  // 4.8
+        new RangeEntry(6000, 4500, 40.00),  // 5.0
+        new RangeEntry(6000, 4500, 39.70),  // 5.2
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
+        new RangeEntry(6000, 4500, 39.70),  // Untuned
     };
     public static boolean valid;
 
-    public RangeTable() {
-    }
+    public RangeTable() {}
 
     /**
-     * @param distance TEMPORARY: index in the range table to return.
-     * @return the RangeEntry at index {@code distance} in the range table
+     * Get the best RangeEntry for a given distance to the speaker
+     *
+     * @param distance the distance in meters to the speaker april tag
+     * @return the RangeEntry (interpolated between the two closest entries)
      */
-    // /**
-    // * Returns a RangeEntry representing the flywheel speed and pivot angle that
-    // * should be used for the inputted distance
-    // * @param distance the distance to the target IN INCHES
-    // * @return a RangeEntry with flywheel speed in RPM and pivot angle in degrees.
-    // * If the distance is too far, returns {@code null}; MAKE SURE TO CHECK FOR THIS
-    // */
     public static RangeEntry get(double distance) {
         distance*=5;
         Logger.recordOutput("CustomLogs/RangeTable/InputDistance", distance);
-        //TODO: Uncomment when we get a real range table
         valid = true;
         int wholeMeters = (int)(distance);
         if(distance <= 0){
@@ -139,16 +129,17 @@ public class RangeTable {
         }
 
         /**
-         * Interpolates between this RangeEntry and another one. Assumes that this is the smaller of the two.
+         * Linearly interpolates between this RangeEntry and another one. Assumes that this is
+         * the smaller of the two.
+         *
          * @param rEntry the range table entry to interpolate between
-         * @param value
-         * @return
+         * @param value where the result should be; 0 = this entry, 1 = the passed-in entry
+         *
+         * @return the interpolated entry
          */
         public RangeEntry interpolate(RangeEntry rEntry, double value) {
-            double leftSpeedUnit = rEntry.leftFlywheelSpeed - this.leftFlywheelSpeed;
-            double rightSpeedUnit = rEntry.leftFlywheelSpeed - this.leftFlywheelSpeed;
             double angleUnit = rEntry.pivotAngle - this.pivotAngle;
-    
+
             RangeEntry generated = new RangeEntry(
                 (int) (rEntry.leftFlywheelSpeed),
                 (int) (rEntry.rightFlywheelSpeed),
@@ -168,20 +159,25 @@ public class RangeTable {
         }
     }
 
-    public static RangeEntry getKiddyPool() {
-        return new RangeEntry(4500, 3500, 32, ELEVATOR.EXTENSION_METERS_MAX);
-    }
-
+    /**
+     * @return the best entry for when we're pushed up against the subwoofer base
+     */
     public static RangeEntry getSubwoofer() {
         return get(1.4);
     }
 
-    public static RangeEntry getPodium() { // TODO:  Return this to a normal podium shot.  It has a temporary power boost.
+    /**
+     * @return the best entry for when we're touching the podium and aiming at the speaker
+     */
+    public static RangeEntry getPodium() {
         // return get(2.83);
         return new RangeEntry(5250, 3250, 27.5, 0.0);
     }
 
-    public static RangeEntry getTrap() { // TODO:  Return this to a normal podium shot.  It has a temporary power boost.
+    /**
+     * @return the best entry to shoot into the trap
+     */
+    public static RangeEntry getTrap() {
         // return get(2.83);
         return new RangeEntry(3000, 3000, 5, 0.0);
     }

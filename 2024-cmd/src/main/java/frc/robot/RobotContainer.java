@@ -121,6 +121,7 @@ public class RobotContainer {
      * Configure all button bindings
      */
     private void configureBindings() {
+
         // Slow Mode (hold)
         driverController.rightBumper().onTrue(
             swerve.commands.slowModeCommand(true) // Enable slow mode
@@ -134,17 +135,19 @@ public class RobotContainer {
         );
 
         //Autocollect (hold)
-        driverController.a().whileTrue(swerve.commands.rawRotationCommand(
-            () -> driverController.getLeftX(), // Drive forward and back freely
-            () -> 0, // No side-to-side
+        driverController.a().whileTrue(
+            swerve.commands.rawRotationCommand(
+                () -> 0, // No side-to-side
+                () -> driverController.getLeftY(), // Drive forward and back freely
 
-            // Rotation speed of the autocollect function (turn towards the note)
-            () -> noteLock.driveToTarget(
-                turnPID,
-                drivePID,
-                NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE
-            ).omegaRadiansPerSecond
-        ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+                // Rotation speed of the autocollect function (turn towards the note)
+                () -> noteLock.driveToTarget(
+                    turnPID,
+                    drivePID,
+                    NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE
+                ).omegaRadiansPerSecond
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        );
 
         // Robot-oriented (hold)
         driverController.leftBumper().onTrue(

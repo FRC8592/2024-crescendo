@@ -231,7 +231,7 @@ public class PoseVision {
             curr_value = getTagTx();
         }
         else {
-            return 0.0; // TODO: better edge case behaviour
+            return 0.0;
         }
 
         double out = visual_servo_pid.calculate(curr_value, setpoint);
@@ -317,7 +317,7 @@ public class PoseVision {
             curr_value = getTagTx();
         }
         else {
-            return 0.0; // TODO: better edge case behaviour
+            return 0.0;
         }
 
         double out = visual_servo_pid.calculate(curr_value, setpoint);

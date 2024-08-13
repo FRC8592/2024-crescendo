@@ -35,8 +35,8 @@ public class SwerveCommands extends SubsystemCommands{
      * optimize for human comfort and control, so joystick inputs will almost always be the only thing
      * that should be passed in.
      *
-     * @param suppliedX a lambda for X translation input (will be optimized for human control)
-     * @param suppliedY a lambda for Y translation input (will be optimized for human control)
+     * @param suppliedX a lambda for forward-back translation input (will be optimized for human control)
+     * @param suppliedY a lambda for left-right translation input (will be optimized for human control)
      * @param suppliedRot a lambda for rotation input (will be optimized for human control)
      *
      * @return the command
@@ -58,13 +58,14 @@ public class SwerveCommands extends SubsystemCommands{
      * Command to drive the swerve based on the inputted lambdas until interrupted. Does not apply any processing
      * to the inputs; don't use this for human input.
      *
-     * @param suppliedX a lambda for X translation input
-     * @param suppliedY a lambda for Y translation input
+     * @param suppliedX a lambda for forward-back translation input
+     * @param suppliedY a lambda for left-right translation input
      * @param suppliedRot a lambda for rotation input
      *
      * @return the command
      *
      * @apiNote This command never ends on its own; it must be interrupted to end
+     * @apiNote Note that this command has X and Y inverted compared to the commands with human input optimization.
      */
     public Command rawDriveCommand(DoubleSupplier suppliedX, DoubleSupplier suppliedY, DoubleSupplier suppliedRot) {
         return swerve.run(() -> {
@@ -82,9 +83,9 @@ public class SwerveCommands extends SubsystemCommands{
      * Command to snap to the specified angle while driving with human input. The translation inputs
      * are processed for human comfort and control, so these should almost always be joystick inputs.
      *
-     * @param translationXSupplier a lambda for X translation input (will be optimized for human
+     * @param translationXSupplier a lambda for left-right translation input (will be optimized for human
      * control)
-     * @param translationYSupplier a lambda for Y translation input (will be optimized for human
+     * @param translationYSupplier a lambda for forward-back translation input (will be optimized for human
      * control)
      *
      * @param angle the angle to snap to (doesn't have any corrections applied; this should be left-right
@@ -94,10 +95,7 @@ public class SwerveCommands extends SubsystemCommands{
      *
      * @apiNote This command never ends on its own; it must be interrupted to end
      */
-    public Command snapToCommand(
-        DoubleSupplier translationXSupplier,
-        DoubleSupplier translationYSupplier,
-        Rotation2d angle){
+    public Command snapToCommand(DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier, Rotation2d angle){
         return swerve.run(() -> {
             ChassisSpeeds processed = swerve.processJoystickInputs(
                 translationXSupplier.getAsDouble(),
@@ -114,10 +112,10 @@ public class SwerveCommands extends SubsystemCommands{
     /**
      * Same as {@link Swerve#driveCommand(DoubleSupplier, DoubleSupplier, DoubleSupplier)}, but doesn't
      * process the rotation for human input. Translation should come from joysticks while rotation usually
-     * should be from a PID controller or other computer control.
+     * should be from a PID controller or other software control.
      *
-     * @param translationXSupplier a lambda for X translation input (will be optimized for human control)
-     * @param translationYSupplier a lambda for Y translation input (will be optimized for human control)
+     * @param translationXSupplier a lambda for left-right translation input (will be optimized for human control)
+     * @param translationYSupplier a lambda for forward-back translation input (will be optimized for human control)
      * @param rotationSpeedSupplier a lambda for rotation input (will NOT be optimized for human control)
      *
      * @return the command
@@ -173,7 +171,7 @@ public class SwerveCommands extends SubsystemCommands{
         return Commands.runOnce(() -> {
             swerve.setSlowMode(slowMode);
             Logger.recordOutput(SWERVE.LOG_PATH+"Console", slowMode?"Slow mode enabled":"Slow mode disabled");
-        }).ignoringDisable(true); // <-- this ensures the robot doesn't get stuck in SM if disabled while the button is pressed
+        }).ignoringDisable(true); // <-- this ensures the robot doesn't get stuck in SM if disabled while the button is held
     }
 
     /**
@@ -229,8 +227,7 @@ public class SwerveCommands extends SubsystemCommands{
             swerve.resetToAbsEncoders();
             swerve.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
         }).alongWith(
-            this.stopCommand()
-        ).alongWith(
+            this.stopCommand(),
             this.zeroGyroscopeCommand()
         );
     }

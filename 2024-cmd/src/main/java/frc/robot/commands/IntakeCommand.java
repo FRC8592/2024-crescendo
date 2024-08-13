@@ -1,25 +1,16 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.robot.Constants.*;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.leds.LEDs;
-import frc.robot.subsystems.shooter.Shooter;
 
-public class IntakeCommand extends WrapperCommand {
+public class IntakeCommand extends NewtonCommand {
     /**
      * Command to stow, then run the full intake routine
      *
-     * @param shooter
-     * @param elevator
-     * @param intake
-     * @param leds
      */
-    public IntakeCommand(Shooter shooter, Elevator elevator, Intake intake, LEDs leds){
+    public IntakeCommand(){
         super(
             // Make sure we're stowed
-            new StowCommand(shooter, elevator, intake)
+            new StowCommand()
 
             // Run the intake and feeders as if there is no contact with
             // a note. ! This stops when the intakeNoContactCommand ends,

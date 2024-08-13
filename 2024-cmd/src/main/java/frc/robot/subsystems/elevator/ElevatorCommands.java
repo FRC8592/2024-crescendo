@@ -91,11 +91,7 @@ public class ElevatorCommands extends SubsystemCommands{
         return elevator.run(() -> {
             elevator.runElevator();
         })
-        .finallyDo((interrupted) -> {
-            if(interrupted){ // If the command is interrupted, stop the elevator where it is
-                elevator.freezeElevator();
-            }
-        });
+        .handleInterrupt(() -> elevator.freezeElevator());
     }
 
     /**

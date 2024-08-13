@@ -3,14 +3,13 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.robot.helpers.RangeTable.RangeEntry;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.shooter.Shooter;
 
-public class PrimeCommand extends WrapperCommand {
+public class PrimeCommand extends NewtonCommand {
 
     /**
      * Command to do a static prime (see {@link PrimeCommand#PrimeCommand(Supplier, Shooter, Elevator, Intake, LEDs, DoubleSupplier)}
@@ -25,14 +24,7 @@ public class PrimeCommand extends WrapperCommand {
      *
      * @apiNote This command does not end on its own; it must be interrupted to stop
      */
-    public PrimeCommand(
-        RangeEntry entry,
-        Shooter shooter,
-        Elevator elevator,
-        Intake intake,
-        LEDs leds,
-        DoubleSupplier offsetSupplier
-    ){
+    public PrimeCommand(RangeEntry entry, DoubleSupplier offsetSupplier){
         super(
             // Spins up the shooter flywheels
             shooter.commands.primeCommand(entry)
@@ -51,16 +43,12 @@ public class PrimeCommand extends WrapperCommand {
      * for static prime).
      *
      * @param entry lambda that returns the latest update of the {@code RangeEntry} to prime to
-     * @param shooter
-     * @param elevator
-     * @param intake
-     * @param leds
      * @param offsetSupplier {@code DoubleSupplier} lambda that returns the current offset from the target
      * for the honing LEDs
      *
      * @apiNote This command does not end on its own; it must be interrupted to stop
      */
-    public PrimeCommand(Supplier<RangeEntry> entry, Shooter shooter, Elevator elevator, Intake intake, LEDs leds, DoubleSupplier offsetSupplier){
+    public PrimeCommand(Supplier<RangeEntry> entry, DoubleSupplier offsetSupplier){
         super(
             // The shooter's primeCommand is overloaded; the version that
             // takes in a Supplier will automatically update the flywheel

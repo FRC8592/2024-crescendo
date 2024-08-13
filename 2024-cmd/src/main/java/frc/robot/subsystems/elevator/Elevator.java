@@ -12,6 +12,21 @@ import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
 public class Elevator extends SubsystemBase {
+    private static Elevator instance = null;
+    public static Elevator getInstance(){
+        if(instance == null){
+            throw new IllegalStateException("The Elevator subsystem must be instantiated before attempting to use it");
+        }
+        return instance;
+    }
+    public static Elevator instantiate(){
+        if(instance != null){
+            throw new IllegalStateException("The Elevator subsystem can't be instantiated twice");
+        }
+        instance = new Elevator();
+        return instance;
+    }
+
     public ElevatorCommands commands = new ElevatorCommands(this);
 
     // Small enum for conveniently referencing elevator positions
@@ -43,7 +58,7 @@ public class Elevator extends SubsystemBase {
     private double targetExtension;
     private double targetPivot;
 
-    public Elevator(){
+    private Elevator(){
         extensionMotor = new SparkFlexControl(CAN.ELEVATOR_MOTOR_CAN_ID, false);
         extensionMotor.setPIDF(ELEVATOR.EXTENSION_kP, ELEVATOR.EXTENSION_kI, ELEVATOR.EXTENSION_kD, ELEVATOR.EXTENSION_kFF, 0);
         extensionMotor.setMaxVelocity(5000, 0);

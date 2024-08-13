@@ -12,6 +12,21 @@ import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
 public class Intake extends SubsystemBase{
+    private static Intake instance = null;
+    public static Intake getInstance(){
+        if(instance == null){
+            throw new IllegalStateException("The Intake subsystem must be instantiated before attempting to use it");
+        }
+        return instance;
+    }
+    public static Intake instantiate(){
+        if(instance != null){
+            throw new IllegalStateException("The Intake subsystem can't be instantiated twice");
+        }
+        instance = new Intake();
+        return instance;
+    }
+
     public IntakeCommands commands = new IntakeCommands(this);
 
     private SparkFlexControl intakeMotor;
@@ -19,7 +34,7 @@ public class Intake extends SubsystemBase{
     // Used for logging
     private double targetIntakeVelocity = 0;
 
-    public Intake() {
+    private Intake() {
         intakeMotor = new SparkFlexControl(CAN.INTAKE_MOTOR_CAN_ID, true);
         intakeMotor.setPIDF(INTAKE.MOTOR_kP, INTAKE.MOTOR_kI, INTAKE.MOTOR_kD, INTAKE.MOTOR_kFF, 0);
         intakeMotor.setCurrentLimit(POWER.INTAKE_MOTOR_CURRENT_LIMIT, POWER.INTAKE_MOTOR_CURRENT_LIMIT);

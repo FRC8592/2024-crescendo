@@ -22,6 +22,21 @@ import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
 public class Swerve extends SubsystemBase {
+    private static Swerve instance = null;
+    public static Swerve getInstance(){
+        if(instance == null){
+            throw new IllegalStateException("The Swerve subsystem must be instantiated before attempting to use it");
+        }
+        return instance;
+    }
+    public static Swerve instantiate(Gyro gyro){
+        if(instance != null){
+            throw new IllegalStateException("The Swerve subsystem can't be instantiated twice");
+        }
+        instance = new Swerve(gyro);
+        return instance;
+    }
+
     public SwerveCommands commands = new SwerveCommands(this);
 
     private Mk4ModuleConfiguration swerveConfig;
@@ -43,7 +58,7 @@ public class Swerve extends SubsystemBase {
     /**
      * @param gyro a com.NewtonSwerve.Gyro.Gryo object instantiated with the hardware gyroscope
      */
-    public Swerve(Gyro gyro) {
+    private Swerve(Gyro gyro) {
         smoothingFilter = new SmoothingFilter(
             SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
             SWERVE.TRANSLATION_SMOOTHING_AMOUNT,

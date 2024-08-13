@@ -25,32 +25,15 @@ import frc.robot.subsystems.swerve.Swerve;
  * user-selected auto command, etc).
  */
 public final class AutoManager {
-    private static Swerve swerve;
-    private static Intake intake;
-    private static Elevator elevator;
-    private static Shooter shooter;
-    private static LEDs leds;
+    private static Swerve swerve = Swerve.getInstance();
+    private static Intake intake = Intake.getInstance();
+    private static Elevator elevator = Elevator.getInstance();
+    private static Shooter shooter = Shooter.getInstance();
+    private static LEDs leds = LEDs.getInstance();
 
     private static SendableChooser<Command> autoChooser;
     private static ArrayList<AutoCommand> autoCommands = new ArrayList<>();
 
-    /**
-     * Add all the subsystems to the Auto Manager to avoid the inconvenience of passing
-     * them around.
-     *
-     * @param swerve
-     * @param intake
-     * @param elevator
-     * @param shooter
-     * @param leds
-     */
-    public static void addSubsystems(Swerve swerve, Intake intake, Elevator elevator, Shooter shooter, LEDs leds){
-        AutoManager.swerve = swerve;
-        AutoManager.shooter = shooter;
-        AutoManager.intake = intake;
-        AutoManager.elevator = elevator;
-        AutoManager.leds = leds;
-    }
     /**
      * Get the user-selected autonomous command as determined by {@link AutoManager#autoChooser}.
      *
@@ -91,9 +74,9 @@ public final class AutoManager {
      */
     public static void loadAutos(){
         autoCommands = new ArrayList<>();
-        autoCommands.add(new PreloadThreeWingNoteAuto(swerve, intake, elevator, shooter, leds));
-        autoCommands.add(new Testing5Note(swerve, intake, elevator, shooter, leds));
-        autoCommands.add(new SystemsCheckAuto(swerve, intake, elevator, shooter, leds));
+        autoCommands.add(new PreloadThreeWingNoteAuto());
+        autoCommands.add(new Testing5Note());
+        autoCommands.add(new SystemsCheckAuto());
     }
 
     /**

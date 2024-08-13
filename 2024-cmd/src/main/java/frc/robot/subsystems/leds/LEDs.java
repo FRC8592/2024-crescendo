@@ -8,6 +8,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.*;
 
 public class LEDs extends SubsystemBase {
+    private static LEDs instance = null;
+    public static LEDs getInstance(){
+        if(instance == null){
+            throw new IllegalStateException("The LEDs subsystem must be instantiated before attempting to use it");
+        }
+        return instance;
+    }
+    public static LEDs instantiate(){
+        if(instance != null){
+            throw new IllegalStateException("The LEDs subsystem can't be instantiated twice");
+        }
+        instance = new LEDs();
+        return instance;
+    }
+
     public LEDCommands commands = new LEDCommands(this);
 
     // Represents the real strip. Should only be written to once per frame.
@@ -18,7 +33,7 @@ public class LEDs extends SubsystemBase {
     // for the LEDs to display anything.
     private AddressableLEDBuffer ledBuffer;
 
-    public LEDs() {
+    private LEDs() {
         ledStrip = new AddressableLED(LEDS.LED_STRIP_PWM_PORT);
         ledStrip.setLength(LEDS.LED_LENGTH);
         ledBuffer = new AddressableLEDBuffer(LEDS.LED_LENGTH);

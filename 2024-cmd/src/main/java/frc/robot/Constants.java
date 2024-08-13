@@ -259,7 +259,7 @@ public final class Constants {
         public static final Color WHITE = new Color(255, 255, 255);
 
         public static final double NOT_AIMED_OFFSET = 2;
-        public static final double FULLY_AIMED_OFFSET = APRILTAG_VISION.X_ROT_LOCK_ERROR;
+        public static final double FULLY_AIMED_OFFSET = APRILTAG_VISION.X_ROT_LOCK_TOLERANCE;
     }
 
     public final class SWERVE {
@@ -338,7 +338,7 @@ public final class Constants {
         public static final ArrayList<Integer> SOURCE_AIM_TAGS = new ArrayList<>(Arrays.asList(1,2,9,10));
         public static final ArrayList<Integer> STAGE_AIM_TAGS = new ArrayList<>(Arrays.asList(11, 12, 13, 14, 15, 16));
 
-        public static final double X_ROT_LOCK_ERROR = 0.075;
+        public static final double X_ROT_LOCK_TOLERANCE = 0.075;
     }
 
     public class RANGE_TABLE{

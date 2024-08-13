@@ -2,7 +2,6 @@ package frc.robot.commands.autonomous;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectoryState;
@@ -11,31 +10,20 @@ import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WrapperCommand;
+import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.commands.NewtonCommand;
 
 /**
- * Class to provide methods, variables, and a convenient constructor to autonomous commands
+ * Class to provide subsystems, convenient methods, and a constructor to autonomous commands
  */
-public class AutoCommand extends WrapperCommand {
-    /**
-     * {@code getAsBoolean()} returns {@code true} when the robot it running on the red side and
-     * {@code false} when on the blue side. Defaults to {@code false} if the alliance color is
-     * inaccessible.
-     */
-    protected static final BooleanSupplier flipPathToRedSide = (
-        () -> DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red
-    );
-
+public class AutoCommand extends NewtonCommand {
     /**
      * Create an auto routine from the passed-in commands.
+     *
      * @param commands as many commands as you want. Will
      * be run in sequence (one after the other).
      */
-    public AutoCommand(Command... commands) {
+    protected AutoCommand(Command... commands) {
         super(new SequentialCommandGroup(commands));
     }
 
@@ -72,11 +60,11 @@ public class AutoCommand extends WrapperCommand {
         // them to the wpilibStates ArrayList
         for (PathPlannerTrajectory.State pathPlannerState : pathPlannerStates) {
             State wpilibState = new State(
-                    pathPlannerState.timeSeconds,
-                    pathPlannerState.velocityMps,
-                    pathPlannerState.accelerationMpsSq,
-                    pathPlannerState.getTargetHolonomicPose(),
-                    pathPlannerState.curvatureRadPerMeter
+                pathPlannerState.timeSeconds,
+                pathPlannerState.velocityMps,
+                pathPlannerState.accelerationMpsSq,
+                pathPlannerState.getTargetHolonomicPose(),
+                pathPlannerState.curvatureRadPerMeter
             );
             wpilibStates.add(wpilibState);
         }

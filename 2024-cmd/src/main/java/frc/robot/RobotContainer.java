@@ -15,38 +15,27 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 
-import java.util.Set;
-
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
     // The robot's subsystems
-    private final Swerve swerve = new Swerve(new NewtonPigeon2(new Pigeon2(CAN.PIGEON_CAN_ID)));
-    private final Shooter shooter = new Shooter();
-    private final Intake intake = new Intake();
-    private final Elevator elevator = new Elevator();
-    private final LEDs leds = new LEDs();
+    private final Swerve swerve;
+    private final Shooter shooter;
+    private final Intake intake;
+    private final Elevator elevator;
+    private final LEDs leds;
 
-    //Any helpers that need to be instantiated go here:
-    private final PoseVision poseVision = new PoseVision(
-        APRILTAG_VISION.kP,
-        APRILTAG_VISION.kI,
-        APRILTAG_VISION.kD,
-        0
-    );
+    //Helpers
+    private final PoseVision poseVision;
     private final LimelightTargeting noteLock = new LimelightTargeting(
         NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR,0,0,0,0
     );
@@ -74,10 +63,21 @@ public class RobotContainer {
      * up button bindings, and prepares for autonomous.
      */
     public RobotContainer() {
+        swerve = Swerve.instantiate(new NewtonPigeon2(new Pigeon2(CAN.PIGEON_CAN_ID)));
+        intake = Intake.instantiate();
+        elevator = Elevator.instantiate();
+        shooter = Shooter.instantiate();
+        leds = LEDs.instantiate();
+        poseVision = PoseVision.instantiate(
+            APRILTAG_VISION.kP,
+            APRILTAG_VISION.kI,
+            APRILTAG_VISION.kD,
+            0
+        );
+
         configureDefaults();
         configureBindings();
 
-        AutoManager.addSubsystems(swerve, intake, elevator, shooter, leds);
         AutoManager.loadAutos();
         AutoManager.broadcastChooser();
     }
@@ -94,9 +94,8 @@ public class RobotContainer {
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         // Set the LED strip's default command to showing whether or not the robot is loaded
-        setDefaultCommand(leds, leds.commands.indicateLoadedCommand(
-            () -> shooter.isMiddleBeamBreakTripped()
-        ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        setDefaultCommand(leds, leds.commands.indicateLoadedCommand(Suppliers.robotHasNote)
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
 
 
@@ -123,8 +122,7 @@ public class RobotContainer {
      */
     private void configureBindings() {
         // Slow Mode (hold)
-        driverController.rightBumper()
-        .onTrue(
+        driverController.rightBumper().onTrue(
             swerve.commands.slowModeCommand(true) // Enable slow mode
         ).onFalse(
             swerve.commands.slowModeCommand(false) // Disable slow mode
@@ -157,7 +155,7 @@ public class RobotContainer {
 
         // Amp-score or shoot (press) + force-shoot (hold)
         driverController.rightTrigger(0.1).whileTrue(
-            new ScoreCommand(shooter, elevator, intake, leds, () -> driverController.getHID().getXButton())
+            new ScoreCommand(() -> driverController.getHID().getXButton())
         );
 
         // Party Mode (hold)
@@ -167,17 +165,11 @@ public class RobotContainer {
 
         // Pass-aim (hold)
         driverController.y().whileTrue(
-            new DeferredCommand(
-                () -> {
-                    if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red){
-                        return snapToCommand(Rotation2d.fromDegrees(330)).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
-                    }
-                    else{
-                        return snapToCommand(Rotation2d.fromDegrees(30)).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
-                    }
-                },
-                Set.of(swerve)
-            )
+            new ConditionalCommand(
+                snapToCommand(Rotation2d.fromDegrees(330)),
+                snapToCommand(Rotation2d.fromDegrees(30)),
+                Suppliers.robotRunningOnRed
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Stow (press)
@@ -185,8 +177,7 @@ public class RobotContainer {
             // This clears all scheduled commands and stows, meaning the robot
             // will stow without reference to what it was previously doing.
             new OverrideEverythingCommand(
-                new StowCommand(shooter, elevator, intake)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf) //Cancel self so we don't have to wait for a full stow before moving on
+                new StowCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf) //Cancel self so we don't have to wait for a full stow before moving on
             )
         );
 
@@ -212,40 +203,29 @@ public class RobotContainer {
 
         //Passthrough (hold)
         operatorController.rightTrigger(0.1).whileTrue(
-            new PassThroughCommand(shooter, elevator, intake, leds)
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            new PassThroughCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         //Vision Prime (press)
         operatorController.rightBumper().onTrue(
-            new PrimeCommand(
-                // Lambda that returns the table entry corresponding to distance to the tag
-                () -> RangeTable.get(poseVision.distanceToAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)),
-                shooter, elevator, intake, leds,
-                // For the honing lights
-                () -> poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+            new PrimeCommand(Suppliers.bestRangeEntry, Suppliers.offsetFromSpeakerTag)
+            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
 
         //Podium Prime (press)
         operatorController.b().onTrue(
-            new PrimeCommand(
-                RangeTable.getPodium(), shooter, elevator, intake, leds,
-                // For the honing lights
-                () -> poseVision.offsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+            new PrimeCommand(RangeTable.getPodium(), Suppliers.offsetFromSpeakerTag)
+            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
 
         // Outake (hold)
         operatorController.leftBumper().whileTrue(
-            new OutakeCommand(shooter, intake)
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            new OutakeCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Intake (press)
         operatorController.leftTrigger(0.1).onTrue(
-            new IntakeCommand(shooter, elevator, intake, leds)
-            .andThen(
+            new IntakeCommand().andThen(
                 shooter.commands.primeCommand(RangeTable.getSubwoofer())
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
@@ -253,8 +233,7 @@ public class RobotContainer {
         // Stow (press)
         operatorController.a().onTrue(
             new OverrideEverythingCommand(
-                new StowCommand(shooter, elevator, intake)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf) //Cancel self so we don't have to wait for a full stow before moving on
+                new StowCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf) // Cancel self so we don't have to wait for a full stow before moving on
             )
         );
 
@@ -267,8 +246,7 @@ public class RobotContainer {
 
         // Climb position (press)
         operatorController.y().onTrue(
-            new ClimbCommand(elevator, intake, shooter)
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            new ClimbCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Extend (hold)
@@ -291,7 +269,7 @@ public class RobotContainer {
 
         // Trap Prime (press)
         operatorController.start().onTrue(
-            new PrimeCommand(RangeTable.getTrap(), shooter, elevator, intake, leds, () -> 0)
+            new PrimeCommand(RangeTable.getTrap(), () -> 0)
             .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
     }

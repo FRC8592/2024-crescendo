@@ -1,23 +1,19 @@
 package frc.robot.commands.autonomous.autons;
 
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.LEDS;
 import frc.robot.commands.*;
 import frc.robot.commands.autonomous.AutoCommand;
-import frc.robot.commands.proxies.*;
 import frc.robot.helpers.*;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.leds.LEDs;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.swerve.Swerve;
 
 public class SystemsCheckAuto extends AutoCommand {
     /**
      * Run an automated systems-check as an autonomous routine
      */
-    public SystemsCheckAuto(Swerve swerve, Intake intake, Elevator elevator, Shooter shooter, LEDs leds){
+    public SystemsCheckAuto(){
         super(
             // Drive the swerve in all four directions at low speed to confirm that it works
             swerve.commands.rawDriveCommand(() -> 0.2, () -> 0, () -> 0).withTimeout(0.75),
@@ -32,24 +28,24 @@ public class SystemsCheckAuto extends AutoCommand {
             swerve.commands.stopCommand(),
 
             // Routine to test the intake and shooter
-            new IntakeCommand(shooter, elevator, intake, leds),
+            new IntakeCommand(),
             new WaitCommand(2), // Give humans time to get in position to catch the note
-            new PrimeCommand(RangeTable.getSubwoofer(), shooter, elevator, intake, leds, () -> 0).until(() -> shooter.readyToShoot()),
-            new ShootCommand(shooter, elevator, intake, leds),
+            new PrimeCommand(RangeTable.getSubwoofer(), () -> 0).until(() -> shooter.readyToShoot()),
+            new ShootCommand(),
             new WaitCommand(3), // Let whoever caught the note get the note and themselves out of the way
 
             //Test the elevator by raising it, lowering the extension as it would in a climb, and stowing
             elevator.commands.setMalleablePositionCommand(Elevator.Positions.AMP).alongWith(
-                new WaitForConditionCommand(() -> elevator.isAtTargetPosition()).andThen(
+                new WaitUntilCommand(() -> elevator.isAtTargetPosition()).andThen(
                     new WaitCommand(0.5),
                     elevator.commands.incrementElevatorPositionCommand(0, -ELEVATOR.MANUAL_EXTENSION_SPEED)
-                    .until(
-                        () -> elevator.getTargetExtension() == ELEVATOR.EXTENSION_METERS_STOWED
+                    .until(() -> (
+                        elevator.getTargetExtension() == ELEVATOR.EXTENSION_METERS_STOWED
                         && elevator.isAtTargetPosition()
-                    )
+                    ))
                 )
             ),
-            new StowCommand(shooter, elevator, intake),
+            new StowCommand(),
 
             // Test the LEDs, then blink them green to indicate that the systems check is over
             leds.commands.blinkCommand(LEDS.YELLOW, 3).withTimeout(1),

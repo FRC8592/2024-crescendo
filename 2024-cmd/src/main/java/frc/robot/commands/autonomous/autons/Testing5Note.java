@@ -2,30 +2,26 @@ package frc.robot.commands.autonomous.autons;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Suppliers;
 import frc.robot.Constants.LEDS;
 import frc.robot.commands.autonomous.AutoCommand;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.leds.LEDs;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.swerve.Swerve;
 
 public class Testing5Note extends AutoCommand{
     /**
      * 5-mid-note auto for testing in simulation. This won't fit on the quarter-field and doesn't run in 15s
      */
-    public Testing5Note(Swerve swerve, Intake intake, Elevator elevator, Shooter shooter, LEDs leds){
+    public Testing5Note(){
         super(
             new SequentialCommandGroup(
-                swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_1"), flipPathToRedSide),
+                swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_1"), Suppliers.robotRunningOnRed),
                 new WaitCommand(1),
-                swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_2"), flipPathToRedSide),
+                swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_2"), Suppliers.robotRunningOnRed),
                 new WaitCommand(1),
-                swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_3"), flipPathToRedSide),
+                swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_3"), Suppliers.robotRunningOnRed),
                 new WaitCommand(1),
-                swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_4"), flipPathToRedSide),
+                swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_4"), Suppliers.robotRunningOnRed),
                 new WaitCommand(1),
-                swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_5"), flipPathToRedSide)
+                swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_5"), Suppliers.robotRunningOnRed)
             ).deadlineWith(leds.commands.blinkCommand(LEDS.RED, 3))
             .andThen(leds.commands.blinkCommand(LEDS.GREEN, 4).withTimeout(1))
         );

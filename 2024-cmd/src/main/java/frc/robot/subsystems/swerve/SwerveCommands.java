@@ -173,7 +173,7 @@ public class SwerveCommands extends SubsystemCommands{
         return Commands.runOnce(() -> {
             swerve.setSlowMode(slowMode);
             Logger.recordOutput(SWERVE.LOG_PATH+"Console", slowMode?"Slow mode enabled":"Slow mode disabled");
-        });
+        }).ignoringDisable(true); // <-- this ensures the robot doesn't get stuck in SM if disabled while the button is pressed
     }
 
     /**
@@ -191,7 +191,7 @@ public class SwerveCommands extends SubsystemCommands{
         return Commands.runOnce(() -> {
             swerve.setRobotOriented(robotOriented);
             Logger.recordOutput(SWERVE.LOG_PATH+"Console", robotOriented?"Robot-oriented enabled":"Robot-oriented disabled");
-        });
+        }).ignoringDisable(true);
     }
 
     /**

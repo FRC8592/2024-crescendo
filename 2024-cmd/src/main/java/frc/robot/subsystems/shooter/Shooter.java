@@ -12,6 +12,21 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.helpers.*;
 
 public class Shooter extends SubsystemBase {
+    private static Shooter instance = null;
+    public static Shooter getInstance(){
+        if(instance == null){
+            throw new IllegalStateException("The Shooter subsystem must be instantiated before attempting to use it");
+        }
+        return instance;
+    }
+    public static Shooter instantiate(){
+        if(instance != null){
+            throw new IllegalStateException("The Shooter subsystem can't be instantiated twice");
+        }
+        instance = new Shooter();
+        return instance;
+    }
+
     public ShooterCommands commands = new ShooterCommands(this);
 
     private SparkFlexControl leftShooterMotor;
@@ -27,7 +42,7 @@ public class Shooter extends SubsystemBase {
     private int rightTargetSpeed = 0;
     private int feederTargetSpeed = 0;
 
-    public Shooter() {
+    private Shooter() {
         leftShooterMotor = new SparkFlexControl(CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
         leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP, SHOOTER.LEFT_SHOOTER_MOTOR_kI, SHOOTER.LEFT_SHOOTER_MOTOR_kD, SHOOTER.LEFT_SHOOTER_MOTOR_kF, 0);
         leftShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
@@ -110,6 +125,20 @@ public class Shooter extends SubsystemBase {
         rightTargetSpeed = right;
         leftShooterMotor.setVelocity(leftTargetSpeed);
         rightShooterMotor.setVelocity(rightTargetSpeed);
+    }
+
+    /**
+     * @return the left motor's velocity in RPM
+     */
+    protected double getLeftVelocity(){
+        return leftShooterMotor.getVelocity();
+    }
+
+    /**
+     * @return the right motor's velocity in RPM
+     */
+    protected double getRightVelocity(){
+        return rightShooterMotor.getVelocity();
     }
 
     /**

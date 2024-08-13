@@ -12,6 +12,21 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class PoseVision {
+    private static PoseVision instance = null;
+    public static PoseVision getInstance(){
+        if(instance == null){
+            throw new IllegalStateException("PoseVision must be instantiated before attempting to use it");
+        }
+        return instance;
+    }
+    public static PoseVision instantiate(double kP, double kI, double kD, double setpoint){
+        if(instance != null){
+            throw new IllegalStateException("PoseVision can't be instantiated twice");
+        }
+        instance = new PoseVision(kP, kI, kD, setpoint);
+        return instance;
+    }
+
     private double tag_x;
     private double tag_y;
     private double tag_z;
@@ -38,7 +53,7 @@ public class PoseVision {
         "RELATIVE_YAW" // e.g. even if mis-aligned, robot is pointing in same direction as apriltag
     };
 
-    public PoseVision(double kP, double kI, double kD, double setpoint) {
+    private PoseVision(double kP, double kI, double kD, double setpoint) {
         // instantate PID controller given constants in constructor        
         visual_servo_pid = new PIDController(kP, kI, kD);
         visual_servo_pid.setIZone(APRILTAG_VISION.iZONE);

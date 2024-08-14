@@ -4,22 +4,14 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import frc.robot.helpers.RangeTable.RangeEntry;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.leds.LEDs;
-import frc.robot.subsystems.shooter.Shooter;
 
 public class PrimeCommand extends NewtonCommand {
 
     /**
-     * Command to do a static prime (see {@link PrimeCommand#PrimeCommand(Supplier, Shooter, Elevator, Intake, LEDs, DoubleSupplier)}
+     * Command to do a static prime (see {@link PrimeCommand#PrimeCommand(Supplier, DoubleSupplier)}
      * for vision-prime).
      *
      * @param entry the {@code RangeEntry} to prime to
-     * @param shooter
-     * @param elevator
-     * @param intake
-     * @param leds
      * @param offsetSupplier lambda that returns the current offset from the target for the honing LEDs
      *
      * @apiNote This command does not end on its own; it must be interrupted to stop
@@ -39,12 +31,12 @@ public class PrimeCommand extends NewtonCommand {
     }
 
     /**
-     * Command to do a vision prime (see {@link PrimeCommand#PrimeCommand(RangeEntry, Shooter, Elevator, Intake, LEDs, DoubleSupplier)}
+     * Command to do a vision prime (see {@link PrimeCommand#PrimeCommand(RangeEntry, DoubleSupplier)}
      * for static prime).
      *
      * @param entry lambda that returns the latest update of the {@code RangeEntry} to prime to
-     * @param offsetSupplier {@code DoubleSupplier} lambda that returns the current offset from the target
-     * for the honing LEDs
+     * @param offsetSupplier a lambda that returns the current offset from the target for the
+     * honing LEDs
      *
      * @apiNote This command does not end on its own; it must be interrupted to stop
      */
@@ -56,8 +48,8 @@ public class PrimeCommand extends NewtonCommand {
             // changes.
             shooter.commands.primeCommand(entry)
 
-            // This is similar to the primeCommand; the elevator will update
-            // itself with the supplier.
+            // This is similar to the shooter primeCommand; the elevator
+            // will update itself with the supplier.
             .alongWith(elevator.commands.setUpdatingPositionCommand(() -> entry.get().pivotAngle, () -> entry.get().elevatorHeight))
 
             // Runs the honing lights (which indicate to the drivers how far off their target they are)

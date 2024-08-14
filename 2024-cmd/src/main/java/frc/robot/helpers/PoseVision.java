@@ -43,7 +43,7 @@ public class PoseVision {
     private double kI;
     private double kD;
     private double setpoint;
-    
+
     private PIDController visual_servo_pid;
 
     public String[] VISUAL_SERVO_TARGETS = {

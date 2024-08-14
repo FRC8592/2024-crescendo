@@ -35,6 +35,22 @@ public final class AutoManager {
     private static ArrayList<AutoCommand> autoCommands = new ArrayList<>();
 
     /**
+     * * Load all autos. This is where programmers should add new autos.
+     *
+     * @apiNote This should be called on {@link Robot#robotInit()} only;
+     * this function will have relatively long delays due to loading paths.
+     *
+     * @apiNote {@link AutoManager#broadcastChooser()} should be called
+     * after running this function.
+     */
+    public static void loadAutos(){
+        autoCommands = new ArrayList<>();
+        autoCommands.add(new PreloadThreeWingNoteAuto());
+        autoCommands.add(new Testing5Note());
+        autoCommands.add(new SystemsCheckAuto());
+    }
+
+    /**
      * Get the user-selected autonomous command as determined by {@link AutoManager#autoChooser}.
      *
      * @return the command
@@ -61,22 +77,6 @@ public final class AutoManager {
             shooter.commands.autonomousInitCommand(),
             leds.commands.autonomousInitCommand()
         );
-    }
-
-    /**
-     * Load all autos. This is where programmers should add new autos.
-     *
-     * @apiNote This should be called on {@link Robot#robotInit()} only;
-     * this function will have relatively long delays due to loading paths.
-     *
-     * @apiNote {@link AutoManager#broadcastChooser()} should be called
-     * after running this function.
-     */
-    public static void loadAutos(){
-        autoCommands = new ArrayList<>();
-        autoCommands.add(new PreloadThreeWingNoteAuto());
-        autoCommands.add(new Testing5Note());
-        autoCommands.add(new SystemsCheckAuto());
     }
 
     /**

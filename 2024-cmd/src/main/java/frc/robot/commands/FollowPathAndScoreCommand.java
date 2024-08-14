@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.trajectory.Trajectory;
 import frc.robot.Suppliers;
-import frc.robot.Constants.*;
 import frc.robot.commands.proxies.*;
 import frc.robot.helpers.RangeTable;
 
@@ -29,21 +28,21 @@ public class FollowPathAndScoreCommand extends NewtonCommand{
                 ))
             )
             .andThen(
-                ( // This block of commands runs the (optional) extra vision prim-and-aim and shoots
+                ( // This block of commands runs the (optional) extra vision prime-and-aim and shoots
                     (
                         new PrimeCommand(Suppliers.bestRangeEntry, () -> 0).alongWith(
+                            // This rawDriveCommand aims the robot at the speaker
                             swerve.commands.rawDriveCommand(
                                 () -> 0, () -> 0, Suppliers.aimToSpeakerPidLoopNegativeSearch
                             )
                         ).until(() -> (
                             shooter.readyToShoot()
                             && elevator.isAtTargetPosition()
-                            && Suppliers.offsetFromSpeakerTag.getAsDouble() < APRILTAG_VISION.X_ROT_LOCK_TOLERANCE
+                            && Suppliers.leftRightSpeakerLocked.getAsBoolean()
                         ))
                     ).onlyIf(
                         () -> useVision
-                    )
-                    .andThen(
+                    ).andThen(
                         new ShootCommand()
                     )
                 ).onlyIf(Suppliers.robotHasNote) // <-- This disables the optional vision prime/aim and the shot if there isn't a note,

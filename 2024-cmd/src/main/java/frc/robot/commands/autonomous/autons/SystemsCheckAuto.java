@@ -2,8 +2,7 @@ package frc.robot.commands.autonomous.autons;
 
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.LEDS;
+import frc.robot.Constants.*;
 import frc.robot.commands.*;
 import frc.robot.commands.autonomous.AutoCommand;
 import frc.robot.helpers.*;

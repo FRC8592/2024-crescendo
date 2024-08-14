@@ -4,8 +4,8 @@ import frc.robot.Constants.*;
 
 public class PassThroughCommand extends NewtonCommand {
     /**
-     * Command to run pass-through indefinitely. Note that the robot will stow before
-     * starting to pass-through.
+     * Command to run pass-through. Note that the robot will stow before starting
+     * to pass-through.
      *
      * @apiNote This command never ends on its own; it must be interrupted to end
      */

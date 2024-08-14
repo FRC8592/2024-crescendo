@@ -73,4 +73,12 @@ public final class Suppliers {
     public static final BooleanSupplier robotHasNote = (
         () -> shooter.isMiddleBeamBreakTripped()
     );
+
+    /**
+     * {@code getAsBoolean} returns whether the robot is within tolerance of being
+     * left-right locked to the center speaker tag
+     */
+    public static final BooleanSupplier leftRightSpeakerLocked = (
+        () -> offsetFromSpeakerTag.getAsDouble() < APRILTAG_VISION.X_ROT_LOCK_TOLERANCE
+    );
 }

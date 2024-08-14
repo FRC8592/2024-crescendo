@@ -4,9 +4,8 @@ import frc.robot.Constants.*;
 
 public class ShootCommand extends NewtonCommand {
     /**
-     * Command that, assuming the robot is primed (this is NOT checked), shoots
-     * the currently loaded note (the command also doesn't check that there is
-     * a note)
+     * Command that shoots the currently loaded note, assuming the robot is both
+     * loaded and primed (neither of these are checked).
      *
      * @apiNote This command runs for {@link SHOOTER#SHOOT_SCORE_TIME} seconds.
      */

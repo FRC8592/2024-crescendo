@@ -78,8 +78,7 @@ public class RobotContainer {
         configureDefaults();
         configureBindings();
 
-        AutoManager.loadAutos();
-        AutoManager.broadcastChooser();
+        AutoManager.prepare();
     }
 
     /**

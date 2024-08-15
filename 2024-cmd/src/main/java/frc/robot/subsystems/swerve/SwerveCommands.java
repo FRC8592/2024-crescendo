@@ -208,8 +208,58 @@ public class SwerveCommands extends SubsystemCommands{
     }
 
     /**
-     * Command to run all the necessary setup for autonomous. Please don't run this
-     * any other time.
+     * Command to set the odometry's known pose
+     *
+     * @param pose the pose to reset the odometry to
+     *
+     * @return The command
+     *
+     * @apiNote This command runs for one frame and
+     * ends immediately
+     */
+    public Command setOdometryPoseCommand(Pose2d pose){
+        return swerve.runOnce(() -> {
+            swerve.resetPose(pose);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Console", (
+                "Odometry pose reset to X: "
+                +pose.getX()
+                +", Y: "
+                +pose.getY()
+                +", and rotation (degrees): "
+                +pose.getRotation().getDegrees()
+            ));
+            if(!Robot.isReal()){Robot.FIELD.setRobotPose(pose);}
+        });
+    }
+
+    /**
+     * Command to set the odometry's known pose with a pose from a blue
+     * side path and dymanic mirroring to red.
+     *
+     * @param pose the pose to set (should be on the blue side)
+     * @param flip lambda that returns whether to flip the path to red
+     *
+     * @return the command
+     *
+     * @apiNote This command runs for one frame and ends immediately
+     */
+    public Command setOdometryPoseCommand(Pose2d pose, BooleanSupplier flip){
+        if(flip.getAsBoolean()){
+            return setOdometryPoseCommand(
+                new Pose2d(
+                    MEASUREMENTS.FIELD_LENGTH_METERS - pose.getX(),
+                    pose.getY(),
+                    Rotation2d.fromRadians(Math.PI).minus(pose.getRotation())
+                )
+            );
+        }
+        else{
+            return setOdometryPoseCommand(pose);
+        }
+    }
+
+    /**
+     * Command to run all the necessary setup for autonomous.
      *
      * @return the command
      *

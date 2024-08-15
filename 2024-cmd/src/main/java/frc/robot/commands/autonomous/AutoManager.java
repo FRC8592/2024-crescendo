@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Robot;
+import frc.robot.Suppliers;
 import frc.robot.commands.autonomous.autons.*;
 import frc.robot.commands.proxies.*;
 import frc.robot.subsystems.elevator.Elevator;
@@ -31,23 +31,33 @@ public final class AutoManager {
     private static Shooter shooter = Shooter.getInstance();
     private static LEDs leds = LEDs.getInstance();
 
-    private static SendableChooser<Command> autoChooser;
+    private static SendableChooser<AutoCommand> autoChooser;
     private static ArrayList<AutoCommand> autoCommands = new ArrayList<>();
 
     /**
-     * * Load all autos. This is where programmers should add new autos.
+     * Load all autos and broadcast the chooser.
+     *<p>
+     * * This is where programmers should add new autos.
      *
      * @apiNote This should be called on {@link Robot#robotInit()} only;
      * this function will have relatively long delays due to loading paths.
-     *
-     * @apiNote {@link AutoManager#broadcastChooser()} should be called
-     * after running this function.
      */
-    public static void loadAutos(){
+    public static void prepare(){
         autoCommands = new ArrayList<>();
         autoCommands.add(new PreloadThreeWingNoteAuto());
         autoCommands.add(new Testing5Note());
         autoCommands.add(new SystemsCheckAuto());
+
+        autoChooser = new SendableChooser<>();
+        autoChooser.setDefaultOption("DEFAULT - No auto", new AutoCommand());
+        for(AutoCommand c : autoCommands){
+            autoChooser.addOption(
+                c.getClass().getSimpleName()+(
+                    c.startPose == null ? " (WARNING: NO START POSE)" : ""
+                ), c
+            );
+        }
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     /**
@@ -56,12 +66,23 @@ public final class AutoManager {
      * @return the command
      */
     public static Command getAutonomousCommand(){
-        return getAutonomousInitCommand().andThen(
-            // If we don't keep this command from registering as composed,
-            // the code will crash if we try to run an auto twice without
-            // restarting robot code.
-            new MultiComposableCommand(autoChooser.getSelected())
-        );
+        AutoCommand autoCommand = autoChooser.getSelected();
+
+        if(autoCommand.startPose == null){ // If we have no start pose, just run the auto
+            return getAutonomousInitCommand().andThen(
+                // If we don't keep this command from registering as composed,
+                // the code will crash if we try to run an auto twice without
+                // restarting robot code.
+                new MultiComposableCommand(autoCommand)
+            );
+        }
+        else{ // If we do have a starting pose, reset the odometry to that first
+            return getAutonomousInitCommand().andThen(
+                swerve.commands.setOdometryPoseCommand(autoCommand.startPose, Suppliers.robotRunningOnRed)
+            ).andThen(
+                new MultiComposableCommand(autoCommand)
+            );
+        }
     }
 
     /**
@@ -77,21 +98,6 @@ public final class AutoManager {
             shooter.commands.autonomousInitCommand(),
             leds.commands.autonomousInitCommand()
         );
-    }
-
-    /**
-     * Create the auto chooser, add all the autos to it, and put it on the dashboard
-     *
-     * @apiNote {@link AutoManager#loadAutos()} should be called directly before
-     * this. If it isn't, the chooser will be empty.
-     */
-    public static void broadcastChooser(){
-        autoChooser = new SendableChooser<Command>();
-        autoChooser.setDefaultOption("DEFAULT - No auto", Commands.none());
-        for(Command c : autoCommands){
-            autoChooser.addOption(c.getClass().getSimpleName(), c);
-        }
-        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     private AutoManager() {

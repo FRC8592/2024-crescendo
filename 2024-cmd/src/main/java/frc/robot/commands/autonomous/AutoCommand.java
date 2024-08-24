@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectoryState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj2.command.*;
@@ -27,7 +26,8 @@ public class AutoCommand extends NewtonCommand {
     /**
      * Startup time saving if/when multiple copies of the same path are requested
      */
-    private static HashMap<String, Trajectory> cachedTrajectories = new HashMap<String,Trajectory>();
+    private static HashMap<String, Trajectory> cachedChoreoTrajectories = new HashMap<String,Trajectory>();
+    private static HashMap<String, Trajectory> cachedPathPlannerTrajectories = new HashMap<String,Trajectory>();
 
     /**
      * Create an auto routine from the passed-in commands.
@@ -56,44 +56,36 @@ public class AutoCommand extends NewtonCommand {
      *
      * @return The trajectory converted to WPILib's {@link Trajectory}. Throws a
      * {@code FileNotFoundException} if the name doesn't represent a .traj file
-     * located in the {@code choreo} folder in the {@code deploy} folder.
+     * located in the {@code choreo} folder in the {@code deploy} folder
      */
-    protected static final Trajectory getChoreoTrajectory(String name) {
-        if(cachedTrajectories.containsKey(name)){
-            return cachedTrajectories.get(name);
+    protected static final Trajectory getChoreoTrajectory(String name){
+        if(cachedChoreoTrajectories.containsKey(name)){
+            return cachedChoreoTrajectories.get(name);
         }
         else{
-            // It isn't efficient to import the trajectory twice just for a single starting state,
-            // but there's no other easy way to get it. See a few lines down for why that's needed.
-            ChoreoTrajectoryState startState = Choreo.getTrajectory(name).getInitialState();
+            Trajectory wpilibTrajectory = fromPathPlannerPath(PathPlannerPath.fromChoreoTrajectory(name));
+            cachedChoreoTrajectories.put(name, wpilibTrajectory);
+            return wpilibTrajectory;
+        }
+    }
 
-            // Create the PathPlanner trajectory
-            PathPlannerTrajectory pathPlannerTraj = (
-                PathPlannerPath.fromChoreoTrajectory(name)
-                // For some reason, PathPlanner requires a starting ChassisSpeeds and rotation. This
-                // is what that Choreo trajectory import above is for.
-                .getTrajectory(startState.getChassisSpeeds(), startState.getPose().getRotation())
-            );
-
-            List<PathPlannerTrajectory.State> pathPlannerStates = pathPlannerTraj.getStates();
-            ArrayList<State> wpilibStates = new ArrayList<>();
-            Trajectory wpilibTrajectory;
-
-            // Convert all the PathPlanner states to WPILib trajectory states and add
-            // them to the wpilibStates ArrayList
-            for (PathPlannerTrajectory.State pathPlannerState : pathPlannerStates) {
-                State wpilibState = new State(
-                    pathPlannerState.timeSeconds,
-                    pathPlannerState.velocityMps,
-                    pathPlannerState.accelerationMpsSq,
-                    pathPlannerState.getTargetHolonomicPose(),
-                    pathPlannerState.curvatureRadPerMeter
-                );
-                wpilibStates.add(wpilibState);
-            }
-
-            wpilibTrajectory = new Trajectory(wpilibStates);
-            cachedTrajectories.put(name, wpilibTrajectory);
+    /**
+     * Get a PathPlanner path by name as a WPILib trajectory.
+     *
+     * @param name the name of the path in PathPlanner file. This shouldn't contain
+     * the file path or the filename extension
+     *
+     * @return The path converted to WPILib's {@link Trajectory}. Throws a
+     * {@code FileNotFoundException} if the name doesn't represent a .path file
+     * located in {@code /src/main/deploy/pathplanner/paths}
+     */
+    protected static final Trajectory getPathPlannerTrajectory(String name){
+        if(cachedPathPlannerTrajectories.containsKey(name)){
+            return cachedPathPlannerTrajectories.get(name);
+        }
+        else{
+            Trajectory wpilibTrajectory = fromPathPlannerPath(PathPlannerPath.fromPathFile(name));
+            cachedPathPlannerTrajectories.put(name, wpilibTrajectory);
             return wpilibTrajectory;
         }
     }
@@ -103,13 +95,51 @@ public class AutoCommand extends NewtonCommand {
      *
      * @param name the name of the Choreo path to get the start pose from
      */
-    protected void setStartStateFromChoreoPathName(String name){
-        if(cachedTrajectories.containsKey(name)){
-            this.startPose = cachedTrajectories.get(name).getInitialPose();
+    protected void setStartStateFromChoreoTrajectory(String name){
+        if(!cachedChoreoTrajectories.containsKey(name)){
+            getChoreoTrajectory(name); // Adds the path to the cached trajectory map
         }
-        else{
-            getChoreoTrajectory(name);
-            this.startPose = cachedTrajectories.get(name).getInitialPose();
+        this.startPose = cachedChoreoTrajectories.get(name).getInitialPose();
+    }
+
+    /**
+     * Set the start pose of this auto to the first pose of a PathPlanner path.
+     *
+     * @param name the name of the PathPlanner path to get the start pose from
+     */
+    protected void setStartStateFromPathPlannerTrajectory(String name){
+        if(cachedPathPlannerTrajectories.containsKey(name)){
+            getPathPlannerTrajectory(name);
         }
+        this.startPose = cachedPathPlannerTrajectories.get(name).getInitialPose();
+    }
+
+    /**
+     * Convert a PathPlanner path into a WPILib trajectory
+     *
+     * @param path the PathPlannerPath to convert
+     * @return the path converted to a WPILib trajectory
+     */
+    private static Trajectory fromPathPlannerPath(PathPlannerPath path){
+        PathPlannerTrajectory pathPlannerTraj = (
+            path.getTrajectory(new ChassisSpeeds(), path.getPreviewStartingHolonomicPose().getRotation())
+        );
+
+        List<PathPlannerTrajectory.State> pathPlannerStates = pathPlannerTraj.getStates();
+        ArrayList<State> wpilibStates = new ArrayList<>();
+
+        // Convert all the PathPlanner states to WPILib trajectory states and add
+        // them to the wpilibStates ArrayList
+        for (PathPlannerTrajectory.State pathPlannerState : pathPlannerStates) {
+            State wpilibState = new State(
+                pathPlannerState.timeSeconds,
+                pathPlannerState.velocityMps,
+                pathPlannerState.accelerationMpsSq,
+                pathPlannerState.getTargetHolonomicPose(),
+                pathPlannerState.curvatureRadPerMeter
+            );
+            wpilibStates.add(wpilibState);
+        }
+        return new Trajectory(wpilibStates);
     }
 }

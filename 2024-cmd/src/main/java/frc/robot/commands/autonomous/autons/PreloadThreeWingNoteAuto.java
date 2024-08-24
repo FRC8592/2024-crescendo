@@ -17,6 +17,6 @@ public class PreloadThreeWingNoteAuto extends AutoCommand {
             new FollowPathAndScoreCommand(getChoreoTrajectory("PreloadThreeWingNoteAuto_2"), 3, 2.4, false),
             new FollowPathAndScoreCommand(getChoreoTrajectory("PreloadThreeWingNoteAuto_3"), 3, 2.6, false)
         );
-        setStartStateFromChoreoPathName("PreloadThreeWingNoteAuto_1");
+        setStartStateFromChoreoTrajectory("PreloadThreeWingNoteAuto_1");
     }
 }

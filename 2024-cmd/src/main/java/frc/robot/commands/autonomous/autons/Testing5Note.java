@@ -25,6 +25,6 @@ public class Testing5Note extends AutoCommand{
             ).deadlineWith(leds.commands.blinkCommand(LEDS.RED, 3))
             .andThen(leds.commands.blinkCommand(LEDS.GREEN, 4).withTimeout(1))
         );
-        setStartStateFromChoreoPathName("Testing5Note_1");
+        setStartStateFromChoreoTrajectory("Testing5Note_1");
     }
 }

@@ -23,7 +23,7 @@ public class Testing5Note extends AutoCommand{
                 new WaitCommand(1),
                 swerve.commands.followPathCommand(getChoreoTrajectory("Testing5Note_5"), Suppliers.robotRunningOnRed)
             ).deadlineWith(leds.commands.blinkCommand(LEDS.RED, 3))
-            .andThen(leds.commands.blinkCommand(LEDS.GREEN, 4).withTimeout(1))
+            .andThen(leds.commands.blinkCommand(LEDS.GREEN, 4).withTimeout(0.5))
         );
         setStartStateFromChoreoTrajectory("Testing5Note_1");
     }

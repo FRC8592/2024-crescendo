@@ -53,7 +53,7 @@ public class ScoreCommand extends NewtonCommand{
                             );
                         }
                         else{
-                            // This WaitForConditionCommand has similar logic to the one above
+                            // This WaitUntilCommand has similar logic to the one above
                             return new WaitUntilCommand(
                                 () -> shooter.readyToShoot() && elevator.isAtTargetPosition()
                             ).andThen(new ScheduleCommand(

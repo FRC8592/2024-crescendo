@@ -49,10 +49,8 @@ public class AutoCommand extends NewtonCommand {
     /**
      * Get a choreo trajectory by name as a WPILib trajectory.
      *
-     * @param name the name of the .traj file. This shouldn't contain the path or
-     * the filename extension (for example, if the file is
-     * {@code /home/user/robotcode/src/main/deploy/choreo/MyTrajectory.traj}, the
-     * correct {@code String} to put here is {@code "MyTrajectory"})
+     * @param name the name of the .traj file; this shouldn't contain the path or
+     * the filename extension
      *
      * @return The trajectory converted to WPILib's {@link Trajectory}. Throws a
      * {@code FileNotFoundException} if the name doesn't represent a .traj file
@@ -72,7 +70,7 @@ public class AutoCommand extends NewtonCommand {
     /**
      * Get a PathPlanner path by name as a WPILib trajectory.
      *
-     * @param name the name of the path in PathPlanner file. This shouldn't contain
+     * @param name the name of the path in PathPlanner file; this shouldn't contain
      * the file path or the filename extension
      *
      * @return The path converted to WPILib's {@link Trajectory}. Throws a

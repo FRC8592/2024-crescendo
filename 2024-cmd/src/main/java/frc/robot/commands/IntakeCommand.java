@@ -6,6 +6,8 @@ public class IntakeCommand extends NewtonCommand {
     /**
      * Command to stow, then run the full intake routine
      *
+     * @apiNote This command doesn't take a predetermined
+     * amount of time. See the source code for details
      */
     public IntakeCommand(){
         super(

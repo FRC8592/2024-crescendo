@@ -9,7 +9,7 @@ import frc.robot.helpers.RangeTable;
 public class PreloadThreeWingNoteAuto extends AutoCommand {
     public PreloadThreeWingNoteAuto(){
         super(
-            // Preloaded note
+            // Prime and shoot the preloaded note
             new TimingSimulatedCommand(new PrimeCommand(RangeTable.getSubwoofer(), () -> 0), 1.5),
             new TimingSimulatedCommand(new ShootCommand(), SHOOTER.SHOOT_SCORE_TIME),
 

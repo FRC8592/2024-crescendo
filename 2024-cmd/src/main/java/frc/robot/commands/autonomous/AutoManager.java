@@ -44,9 +44,11 @@ public final class AutoManager {
      */
     public static void prepare(){
         autoCommands = new ArrayList<>();
+
         autoCommands.add(new PreloadThreeWingNoteAuto());
         autoCommands.add(new Testing5Note());
         autoCommands.add(new SystemsCheckAuto());
+
 
         autoChooser = new SendableChooser<>();
         autoChooser.setDefaultOption("DEFAULT - No auto", new AutoCommand());
@@ -61,7 +63,7 @@ public final class AutoManager {
     }
 
     /**
-     * Get the user-selected autonomous command as determined by {@link AutoManager#autoChooser}.
+     * Get the user-selected autonomous command as determined by {@link AutoManager#autoChooser}
      *
      * @return the command
      */

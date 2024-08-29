@@ -54,9 +54,11 @@ public class Elevator extends SubsystemBase {
     private SparkFlexControl pivotFollowMotor;
 
     // Unlike the similarly named variables in Shooter, these are used for
-    // subsystem control and aren't just logging
-    private double targetExtension;
-    private double targetPivot;
+    // subsystem control and aren't just logging. They aren't confined in
+    // any way and are used as guidelines for guaranteed-safe variables in
+    // runElevator().
+    private double userDesiredExtension;
+    private double userDesiredPivot;
 
     private Elevator(){
         extensionMotor = new SparkFlexControl(CAN.ELEVATOR_MOTOR_CAN_ID, false);
@@ -79,11 +81,11 @@ public class Elevator extends SubsystemBase {
     }
 
     public void periodic() {
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Target", targetPivot);
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Target", userDesiredPivot);
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Read", getPivotAngle());
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/IsAtTarget", isTargetAngle());
 
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Target", targetExtension);
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Target", userDesiredExtension);
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Read", getExtensionLength());
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/IsAtTarget", isTargetLength());
 
@@ -146,31 +148,31 @@ public class Elevator extends SubsystemBase {
     /**
      * Return the elevator's target extension length
      */
-    public double getTargetExtension(){
-        return this.targetExtension;
+    public double getUserDesiredExtension(){
+        return this.userDesiredExtension;
     }
 
     /**
      * Return the elevator's target pivot angle
      */
-    public double getTargetPivot(){
-        return this.targetPivot;
+    public double getUserDesiredPivot(){
+        return this.userDesiredPivot;
     }
 
     /**
      * Set the target pivot angle used by {@link Elevator#runElevator()}
      * @param pivotAngle the angle setpoint in degrees
      */
-    protected void setTargetPivot(double pivotAngle){
-        this.targetPivot = pivotAngle;
+    protected void setUserDesiredPivot(double pivotAngle){
+        this.userDesiredPivot = pivotAngle;
     }
 
     /**
      * Set the target extension length used by {@link Elevator#runElevator()}
      * @param extensionLength the extension setpoint in meters
      */
-    protected void setTargetExtension(double extensionLength){
-        this.targetExtension = extensionLength;
+    protected void setUserDesiredExtension(double extensionLength){
+        this.userDesiredExtension = extensionLength;
     }
 
     /**
@@ -195,14 +197,14 @@ public class Elevator extends SubsystemBase {
      * Return whether the elevator is at its target angle
      */
     private boolean isTargetAngle() {
-        return Math.abs(getPivotAngle() - targetPivot) < ELEVATOR.ANGLE_TOLERANCE;
+        return Math.abs(getPivotAngle() - userDesiredPivot) < ELEVATOR.ANGLE_TOLERANCE;
     }
 
     /**
      * Return whether the elevator is at its target length
      */
     private boolean isTargetLength() {
-        return Math.abs(getExtensionLength() - targetExtension) < ELEVATOR.LENGTH_TOLERANCE;
+        return Math.abs(getExtensionLength() - userDesiredExtension) < ELEVATOR.LENGTH_TOLERANCE;
     }
 
     /**
@@ -223,7 +225,7 @@ public class Elevator extends SubsystemBase {
      * the passed-in values.
      */
     public boolean isTargeting(double pivot, double extension){
-        return getTargetPivot() == pivot && getTargetExtension() == extension;
+        return getUserDesiredPivot() == pivot && getUserDesiredExtension() == extension;
     }
 
     /**
@@ -246,22 +248,25 @@ public class Elevator extends SubsystemBase {
         double actualPivot = getPivotAngle();
         double actualExtension = getExtensionLength();
 
+        // These are guaranteed-safe (only set to physically possible values)
+        double targetPivot;
+        double targetExtension;
+
         // If the target pivot angle is above maximum or below minimum,
-        // force it back to a value within its physical capabilities
+        // set it to a value within its physical capabilities
         targetPivot = Math.max(
             Math.min(
-                targetPivot,
+                userDesiredPivot,
                 ELEVATOR.PIVOT_ANGLE_MAX
             ),
             ELEVATOR.PIVOT_ANGLE_MIN
         );
 
         // If the target extension length is above maximum or below
-        // minimum, force it back to a value within its physical
-        // capabilities
+        // minimum, set it to a value within its physical capabilities
         targetExtension = Math.max(
             Math.min(
-                targetExtension,
+                userDesiredExtension,
                 ELEVATOR.EXTENSION_METERS_MAX
             ),
             ELEVATOR.EXTENSION_METERS_MIN

@@ -39,7 +39,7 @@ public class SystemsCheckAuto extends AutoCommand {
                     new WaitCommand(0.5),
                     elevator.commands.incrementElevatorPositionCommand(0, -ELEVATOR.MANUAL_EXTENSION_SPEED)
                     .until(() -> (
-                        elevator.getTargetExtension() == ELEVATOR.EXTENSION_METERS_STOWED
+                        elevator.getUserDesiredExtension() == ELEVATOR.EXTENSION_METERS_STOWED
                         && elevator.isAtTargetPosition()
                     ))
                 )

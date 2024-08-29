@@ -1,7 +1,6 @@
 package frc.robot.subsystems.elevator;
 
 import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.SubsystemCommands;
@@ -26,15 +25,11 @@ public class ElevatorCommands extends SubsystemCommands{
     public Command setStaticPositionCommand(double pivotDegrees, double extensionMeters){
         return elevator.run(() -> {
             // Drive the elevator while overwriting the setpoints every frame so nothing can change them
-            elevator.setTargetPivot(pivotDegrees);
-            elevator.setTargetExtension(extensionMeters);
+            elevator.setUserDesiredPivot(pivotDegrees);
+            elevator.setUserDesiredExtension(extensionMeters);
             elevator.runElevator();
         }).until(() -> elevator.isAtTargetPosition()) // Run the elevator until it's at its target.
-        .finallyDo((interrupted) -> {
-            if(interrupted){ // If the command is interrupted, stop the elevator where it is
-                elevator.freezeElevator();
-            }
-        });
+        .finallyDo(() -> elevator.freezeElevator()); // When the command ends, stop the elevator
     }
 
     /**
@@ -62,15 +57,10 @@ public class ElevatorCommands extends SubsystemCommands{
      */
     public Command setUpdatingPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters){
         return elevator.run(() -> {
-            elevator.setTargetPivot(pivotDegrees.getAsDouble());
-            elevator.setTargetExtension(extensionMeters.getAsDouble());
+            elevator.setUserDesiredPivot(pivotDegrees.getAsDouble());
+            elevator.setUserDesiredExtension(extensionMeters.getAsDouble());
             elevator.runElevator();
-        })
-        .finallyDo((interrupted) -> {
-            if(interrupted){ // If the command is interrupted, stop the elevator where it is
-                elevator.freezeElevator();
-            }
-        });
+        }).finallyDo(() -> elevator.freezeElevator());
     }
 
     /**
@@ -86,12 +76,11 @@ public class ElevatorCommands extends SubsystemCommands{
      * @apiNote This command never ends on its own; it must be interrupted to end
      */
     public Command setMalleablePositionCommand(double pivotDegrees, double extensionMeters){
-        elevator.setTargetPivot(pivotDegrees);
-        elevator.setTargetExtension(extensionMeters);
+        elevator.setUserDesiredPivot(pivotDegrees);
+        elevator.setUserDesiredExtension(extensionMeters);
         return elevator.run(() -> {
             elevator.runElevator();
-        })
-        .handleInterrupt(() -> elevator.freezeElevator());
+        }).finallyDo(() -> elevator.freezeElevator());
     }
 
     /**
@@ -123,8 +112,8 @@ public class ElevatorCommands extends SubsystemCommands{
      */
     public Command incrementElevatorPositionCommand(double pivotDegrees, double extensionMeters){
         return Commands.run(() -> {
-            elevator.setTargetPivot(elevator.getTargetPivot()+pivotDegrees);
-            elevator.setTargetExtension(elevator.getTargetExtension()+extensionMeters);
+            elevator.setUserDesiredPivot(elevator.getUserDesiredPivot()+pivotDegrees);
+            elevator.setUserDesiredExtension(elevator.getUserDesiredExtension()+extensionMeters);
         });
     }
 }

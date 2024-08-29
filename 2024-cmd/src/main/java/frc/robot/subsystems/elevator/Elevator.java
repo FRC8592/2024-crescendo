@@ -55,10 +55,14 @@ public class Elevator extends SubsystemBase {
 
     // Unlike the similarly named variables in Shooter, these are used for
     // subsystem control and aren't just logging. They aren't confined in
-    // any way and are used as guidelines for guaranteed-safe variables in
-    // runElevator().
-    private double userDesiredExtension;
-    private double userDesiredPivot;
+    // any way and are used as guidelines for the guaranteed-safe variables
+    // below.
+    private double userDesiredTargetExtension;
+    private double userDesiredTargetPivot;
+
+    // These are guaranteed-safe (only set to physically possible values)
+    private double actualTargetPivot;
+    private double actualTargetExtension;
 
     private Elevator(){
         extensionMotor = new SparkFlexControl(CAN.ELEVATOR_MOTOR_CAN_ID, false);
@@ -81,15 +85,17 @@ public class Elevator extends SubsystemBase {
     }
 
     public void periodic() {
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Target", userDesiredPivot);
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/Read", getPivotAngle());
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/IsAtTarget", isTargetAngle());
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/UserTarget", userDesiredTargetPivot);
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/ActualTarget", actualTargetPivot);
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/ReadPosition", getPivotAngle());
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/IsAtUserTarget", isTargetAngle());
 
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Target", userDesiredExtension);
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/Read", getExtensionLength());
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/IsAtTarget", isTargetLength());
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/UserTarget", userDesiredTargetExtension);
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Pivot/ActualTarget", actualTargetExtension);
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/ReadPosition", getExtensionLength());
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Extension/IsAtUserTarget", isTargetLength());
 
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"IsTargetPosition", isAtTargetPosition());
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"IsUserTargetPosition", isAtTargetPosition());
 
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Setpoints/IsTargetingStowed", isTargeting(Positions.STOWED));
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Setpoints/IsTargetingAmp", isTargeting(Positions.AMP));
@@ -148,31 +154,31 @@ public class Elevator extends SubsystemBase {
     /**
      * Return the elevator's target extension length
      */
-    public double getUserDesiredExtension(){
-        return this.userDesiredExtension;
+    public double getUserDesiredTargetExtension(){
+        return this.userDesiredTargetExtension;
     }
 
     /**
      * Return the elevator's target pivot angle
      */
-    public double getUserDesiredPivot(){
-        return this.userDesiredPivot;
+    public double getUserDesiredTargetPivot(){
+        return this.userDesiredTargetPivot;
     }
 
     /**
      * Set the target pivot angle used by {@link Elevator#runElevator()}
      * @param pivotAngle the angle setpoint in degrees
      */
-    protected void setUserDesiredPivot(double pivotAngle){
-        this.userDesiredPivot = pivotAngle;
+    protected void setUserDesiredTargetPivot(double pivotAngle){
+        this.userDesiredTargetPivot = pivotAngle;
     }
 
     /**
      * Set the target extension length used by {@link Elevator#runElevator()}
      * @param extensionLength the extension setpoint in meters
      */
-    protected void setUserDesiredExtension(double extensionLength){
-        this.userDesiredExtension = extensionLength;
+    protected void setUserDesiredTargetExtension(double extensionLength){
+        this.userDesiredTargetExtension = extensionLength;
     }
 
     /**
@@ -197,14 +203,14 @@ public class Elevator extends SubsystemBase {
      * Return whether the elevator is at its target angle
      */
     private boolean isTargetAngle() {
-        return Math.abs(getPivotAngle() - userDesiredPivot) < ELEVATOR.ANGLE_TOLERANCE;
+        return Math.abs(getPivotAngle() - userDesiredTargetPivot) < ELEVATOR.ANGLE_TOLERANCE;
     }
 
     /**
      * Return whether the elevator is at its target length
      */
     private boolean isTargetLength() {
-        return Math.abs(getExtensionLength() - userDesiredExtension) < ELEVATOR.LENGTH_TOLERANCE;
+        return Math.abs(getExtensionLength() - userDesiredTargetExtension) < ELEVATOR.LENGTH_TOLERANCE;
     }
 
     /**
@@ -225,7 +231,7 @@ public class Elevator extends SubsystemBase {
      * the passed-in values.
      */
     public boolean isTargeting(double pivot, double extension){
-        return getUserDesiredPivot() == pivot && getUserDesiredExtension() == extension;
+        return getUserDesiredTargetPivot() == pivot && getUserDesiredTargetExtension() == extension;
     }
 
     /**
@@ -248,15 +254,11 @@ public class Elevator extends SubsystemBase {
         double actualPivot = getPivotAngle();
         double actualExtension = getExtensionLength();
 
-        // These are guaranteed-safe (only set to physically possible values)
-        double targetPivot;
-        double targetExtension;
-
         // If the target pivot angle is above maximum or below minimum,
         // set it to a value within its physical capabilities
-        targetPivot = Math.max(
+        actualTargetPivot = Math.max(
             Math.min(
-                userDesiredPivot,
+                userDesiredTargetPivot,
                 ELEVATOR.PIVOT_ANGLE_MAX
             ),
             ELEVATOR.PIVOT_ANGLE_MIN
@@ -264,9 +266,9 @@ public class Elevator extends SubsystemBase {
 
         // If the target extension length is above maximum or below
         // minimum, set it to a value within its physical capabilities
-        targetExtension = Math.max(
+        actualTargetExtension = Math.max(
             Math.min(
-                userDesiredExtension,
+                userDesiredTargetExtension,
                 ELEVATOR.EXTENSION_METERS_MAX
             ),
             ELEVATOR.EXTENSION_METERS_MIN
@@ -275,13 +277,13 @@ public class Elevator extends SubsystemBase {
         // If the read pivot angle is outside of tolerance of the lowest the pivot can go with the extension
         // out, stop the extension (used to keep the extension in when going up from stowed)
         if (actualPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD - ELEVATOR.RETRACT_THRESHOLD_TOLERANCE){
-            targetExtension = actualExtension;
+            actualTargetExtension = actualExtension;
         }
 
         // If the extension is out and the pivot is lower than it can go with the extension out, force the pivot
         // back up
-        if (actualExtension > ELEVATOR.EXTENSION_FULLY_RETRACTED && targetPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD) {
-            targetPivot = ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD;
+        if (actualExtension > ELEVATOR.EXTENSION_FULLY_RETRACTED && actualTargetPivot < ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD) {
+            actualTargetPivot = ELEVATOR.EXTENSION_FORCE_RETRACT_THRESHOLD;
         }
 
         // NOTE: the above two if-statements combined mean that the extension can't extend itself when the hooks
@@ -289,10 +291,10 @@ public class Elevator extends SubsystemBase {
         // down before the extension is fully in), the pivot will stay at a safe height until the extension is
         // fully retracted.
 
-        double extensionRotations = targetExtension / ELEVATOR.ELEVATOR_GEAR_RATIO;
+        double extensionRotations = actualTargetExtension / ELEVATOR.ELEVATOR_GEAR_RATIO;
         extensionMotor.setPositionSmartMotion(extensionRotations);
 
-        double pivotRotations = (ELEVATOR.PIVOT_GEAR_RATIO * targetPivot) / 360;
+        double pivotRotations = (ELEVATOR.PIVOT_GEAR_RATIO * actualTargetPivot) / 360;
         pivotMotor.setPositionSmartMotion(pivotRotations);
         pivotFollowMotor.setPositionSmartMotion(pivotRotations);
     }

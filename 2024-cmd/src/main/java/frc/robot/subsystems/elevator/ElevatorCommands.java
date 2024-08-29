@@ -25,8 +25,8 @@ public class ElevatorCommands extends SubsystemCommands{
     public Command setStaticPositionCommand(double pivotDegrees, double extensionMeters){
         return elevator.run(() -> {
             // Drive the elevator while overwriting the setpoints every frame so nothing can change them
-            elevator.setUserDesiredPivot(pivotDegrees);
-            elevator.setUserDesiredExtension(extensionMeters);
+            elevator.setUserDesiredTargetPivot(pivotDegrees);
+            elevator.setUserDesiredTargetExtension(extensionMeters);
             elevator.runElevator();
         }).until(() -> elevator.isAtTargetPosition()) // Run the elevator until it's at its target.
         .finallyDo(() -> elevator.freezeElevator()); // When the command ends, stop the elevator
@@ -57,8 +57,8 @@ public class ElevatorCommands extends SubsystemCommands{
      */
     public Command setUpdatingPositionCommand(DoubleSupplier pivotDegrees, DoubleSupplier extensionMeters){
         return elevator.run(() -> {
-            elevator.setUserDesiredPivot(pivotDegrees.getAsDouble());
-            elevator.setUserDesiredExtension(extensionMeters.getAsDouble());
+            elevator.setUserDesiredTargetPivot(pivotDegrees.getAsDouble());
+            elevator.setUserDesiredTargetExtension(extensionMeters.getAsDouble());
             elevator.runElevator();
         }).finallyDo(() -> elevator.freezeElevator());
     }
@@ -76,8 +76,8 @@ public class ElevatorCommands extends SubsystemCommands{
      * @apiNote This command never ends on its own; it must be interrupted to end
      */
     public Command setMalleablePositionCommand(double pivotDegrees, double extensionMeters){
-        elevator.setUserDesiredPivot(pivotDegrees);
-        elevator.setUserDesiredExtension(extensionMeters);
+        elevator.setUserDesiredTargetPivot(pivotDegrees);
+        elevator.setUserDesiredTargetExtension(extensionMeters);
         return elevator.run(() -> {
             elevator.runElevator();
         }).finallyDo(() -> elevator.freezeElevator());
@@ -112,8 +112,8 @@ public class ElevatorCommands extends SubsystemCommands{
      */
     public Command incrementElevatorPositionCommand(double pivotDegrees, double extensionMeters){
         return Commands.run(() -> {
-            elevator.setUserDesiredPivot(elevator.getUserDesiredPivot()+pivotDegrees);
-            elevator.setUserDesiredExtension(elevator.getUserDesiredExtension()+extensionMeters);
+            elevator.setUserDesiredTargetPivot(elevator.getUserDesiredTargetPivot()+pivotDegrees);
+            elevator.setUserDesiredTargetExtension(elevator.getUserDesiredTargetExtension()+extensionMeters);
         });
     }
 }

@@ -12,7 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.commands.NewtonCommand;
+import frc.robot.commands.proxies.NewtonCommand;
 
 /**
  * Class to provide subsystems, convenient methods, and a constructor to autonomous commands

@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.Constants.*;
+import frc.robot.commands.proxies.NewtonCommand;
 import frc.robot.subsystems.elevator.ElevatorCommands;
 
 public class ClimbCommand extends NewtonCommand {

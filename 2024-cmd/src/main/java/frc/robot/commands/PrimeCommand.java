@@ -3,6 +3,7 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import frc.robot.commands.proxies.NewtonCommand;
 import frc.robot.helpers.RangeTable.RangeEntry;
 
 public class PrimeCommand extends NewtonCommand {

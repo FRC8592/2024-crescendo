@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import frc.robot.commands.proxies.NewtonCommand;
 import frc.robot.commands.proxies.OverrideEverythingCommand;
 import frc.robot.subsystems.elevator.Elevator;
 

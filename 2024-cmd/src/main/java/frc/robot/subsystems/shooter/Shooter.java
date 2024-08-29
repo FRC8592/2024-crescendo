@@ -172,6 +172,14 @@ public class Shooter extends SubsystemBase {
         feederMotor.setVelocity(velocity, pidSlot);
     }
 
+    /**
+     * Stop all shooter motors
+     */
+    protected void stopAll(){
+        setFeederVelocity(0);
+        setShooterVelocity(0);
+    }
+
     protected double getFeederVelocity(){
         return feederMotor.getVelocity();
     }

@@ -87,9 +87,9 @@ public class RobotContainer {
     private void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
         setDefaultCommand(swerve, swerve.commands.driveCommand(
-            () -> driverController.getLeftX(),
-            () -> driverController.getLeftY(),
-            () -> driverController.getRightX()
+            () -> -driverController.getLeftX(),
+            () -> -driverController.getLeftY(),
+            () -> -driverController.getRightX()
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         // Set the LED strip's default command to showing whether or not the robot is loaded
@@ -229,7 +229,7 @@ public class RobotContainer {
         operatorController.leftTrigger(0.1).onTrue(
             new IntakeCommand().andThen(
                 shooter.commands.primeCommand(RangeTable.getSubwoofer())
-            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
 
         // Stow (press)
@@ -243,7 +243,7 @@ public class RobotContainer {
         operatorController.x().onTrue(
             elevator.commands.setStaticPositionCommand(
                 ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP
-            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
 
         // Climb position (press)

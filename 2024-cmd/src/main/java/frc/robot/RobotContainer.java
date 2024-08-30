@@ -248,7 +248,7 @@ public class RobotContainer {
 
         // Climb position (press)
         operatorController.y().onTrue(
-            new ClimbCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+            new ClimbCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
 
         // Extend (hold)

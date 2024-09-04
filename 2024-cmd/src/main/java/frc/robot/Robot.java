@@ -102,13 +102,7 @@ public class Robot extends LoggedRobot {
      * {@link RobotContainer} class.
      */
     @Override
-    public void autonomousInit() {
-        autonomousCommand = robotContainer.getAutonomousCommand();
-
-        if (autonomousCommand != null) {
-            autonomousCommand.schedule();
-        }
-    }
+    public void autonomousInit() {}
 
     /** This function is called periodically during autonomous. */
     @Override

@@ -9,8 +9,10 @@ import frc.robot.commands.proxies.OverrideEverythingCommand;
 import frc.robot.subsystems.singlemotor.SingleMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 public class RobotContainer {
     // The robot's subsystems
@@ -56,7 +58,12 @@ public class RobotContainer {
             )
         ));
 
-        // TODO: add buttons to run the SysID routines
+        controller.x().onTrue(
+            singleMotor.commands.sysIdQuasistatic(Direction.kForward)
+            .andThen(new WaitCommand(2)).andThen(singleMotor.commands.sysIdQuasistatic(Direction.kReverse))
+            .andThen(new WaitCommand(2)).andThen(singleMotor.commands.sysIdDynamic(Direction.kForward))
+            .andThen(new WaitCommand(2)).andThen(singleMotor.commands.sysIdDynamic(Direction.kReverse))
+        );
     }
 
     /**

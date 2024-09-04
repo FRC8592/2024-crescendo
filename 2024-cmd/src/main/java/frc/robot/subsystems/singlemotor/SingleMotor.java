@@ -6,7 +6,10 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SINGLEMOTOR;
 
@@ -27,7 +30,10 @@ public class SingleMotor extends SubsystemBase{
     }
     public SingleMotorCommands commands = new SingleMotorCommands(this);
 
-
+    private SysIdRoutine routine = new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism((voltage) -> {runMotorAtVoltage(voltage);}, (y)->{}, this)
+        );
 
     private TalonFX motor;
     private VelocityDutyCycle motorVelocity = new VelocityDutyCycle(0);
@@ -45,6 +51,8 @@ public class SingleMotor extends SubsystemBase{
 
         motor.getConfigurator().apply(config);
         motor.set(0);
+
+        
     }
 
     /**
@@ -53,8 +61,9 @@ public class SingleMotor extends SubsystemBase{
      *
      * @param volts the voltage
      */
-    protected void runMotorAtVoltage(double volts){
-        motor.setVoltage(volts);
+    protected void runMotorAtVoltage(Measure<Voltage> volts){
+        
+        motor.setVoltage(volts.baseUnitMagnitude());
     }
 
     /**
@@ -80,5 +89,9 @@ public class SingleMotor extends SubsystemBase{
     public void periodic(){
         Logger.recordOutput(SINGLEMOTOR.LOG_PATH+"ActualVelocityRPS", motor.getVelocity().getValueAsDouble());
         Logger.recordOutput(SINGLEMOTOR.LOG_PATH+"TargetVelocityRPS", motorVelocity.Velocity);
+    }
+
+    public SysIdRoutine getRoutine(){
+        return routine;
     }
 }

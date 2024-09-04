@@ -10,6 +10,8 @@ public class SingleMotorCommands extends SubsystemCommands{
     private SingleMotor singleMotor;
     public SingleMotorCommands(SingleMotor singleMotor){
         this.singleMotor = singleMotor;
+
+        
     }
 
     /**
@@ -55,5 +57,13 @@ public class SingleMotorCommands extends SubsystemCommands{
         return singleMotor.runOnce(() -> singleMotor.stopMotor());
     }
 
-    // TODO: Add SysID identification commands here
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        
+        return singleMotor.getRoutine().quasistatic(direction);
+    }
+      
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return singleMotor.getRoutine().dynamic(direction);
+    }
+
 }

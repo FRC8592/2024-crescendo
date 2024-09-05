@@ -7,11 +7,15 @@ import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SINGLEMOTOR;
+import static edu.wpi.first.units.MutableMeasure.mutable;
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.*;
 
 public class SingleMotor extends SubsystemBase{
     private static SingleMotor instance = null;
@@ -30,13 +34,23 @@ public class SingleMotor extends SubsystemBase{
     }
     public SingleMotorCommands commands = new SingleMotorCommands(this);
 
-    private SysIdRoutine routine = new SysIdRoutine(
-            new SysIdRoutine.Config(),
-            new SysIdRoutine.Mechanism((voltage) -> {runMotorAtVoltage(voltage);}, null, this, "singleMotorLogs")
-        );
+    
 
     private TalonFX motor;
     private VelocityDutyCycle motorVelocity = new VelocityDutyCycle(0);
+
+    private SysIdRoutine routine = new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> {runMotorAtVoltage(voltage);}, 
+                (log)->{log.motor("testMotor")
+                    .voltage(getVoltageDoubleToVoltageUnits())
+                    .angularPosition(getPositionDoubleToPositionUnits())
+                    .angularVelocity(getVelocityDoubleToVelocityUnits());
+                    }, 
+                this
+            )
+        );
 
     private SingleMotor(){
         motor = new TalonFX(CAN.MOTOR_CAN_ID);
@@ -69,6 +83,8 @@ public class SingleMotor extends SubsystemBase{
         motor.setVoltage(volts.baseUnitMagnitude());
     }
 
+    
+
     /**
      * Run the motor at a set velocity in RPS.
      *
@@ -89,12 +105,44 @@ public class SingleMotor extends SubsystemBase{
         motor.stopMotor();
     }
 
+    
     public void periodic(){
         Logger.recordOutput(SINGLEMOTOR.LOG_PATH+"ActualVelocityRPS", motor.getVelocity().getValueAsDouble());
         Logger.recordOutput(SINGLEMOTOR.LOG_PATH+"TargetVelocityRPS", motorVelocity.Velocity);
     }
 
+
+    //TODO: if it works, write docs for all of the SYS ID functions
     public SysIdRoutine getRoutine(){
         return routine;
     }
+
+    public Measure<Voltage> getVoltageDoubleToVoltageUnits(){
+
+        MutableMeasure<Voltage> volt = mutable(Volts.of(motor.getMotorVoltage().getValueAsDouble()));
+
+        return volt.mut_replace(motor.getMotorVoltage().getValueAsDouble(), Volts);
+        
+        
+    }
+
+    public Measure<Angle> getPositionDoubleToPositionUnits(){
+
+        MutableMeasure<Angle> angle = mutable(Rotations.of(0));
+
+        return angle.mut_replace(motor.getPosition().getValueAsDouble(), Rotations);
+        
+        
+    }
+
+    public Measure<Velocity<Angle>> getVelocityDoubleToVelocityUnits(){
+
+        MutableMeasure<Velocity<Angle>> velocity = mutable(RotationsPerSecond.of(0));
+
+        return velocity.mut_replace(motor.getVelocity().getValueAsDouble(), RotationsPerSecond);
+        
+        
+    }
+
+    
 }

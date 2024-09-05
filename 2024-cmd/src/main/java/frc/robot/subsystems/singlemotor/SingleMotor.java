@@ -32,7 +32,7 @@ public class SingleMotor extends SubsystemBase{
 
     private SysIdRoutine routine = new SysIdRoutine(
             new SysIdRoutine.Config(),
-            new SysIdRoutine.Mechanism((voltage) -> {runMotorAtVoltage(voltage);}, (y)->{}, this)
+            new SysIdRoutine.Mechanism((voltage) -> {runMotorAtVoltage(voltage);}, null, this, "singleMotorLogs")
         );
 
     private TalonFX motor;
@@ -62,6 +62,9 @@ public class SingleMotor extends SubsystemBase{
      * @param volts the voltage
      */
     protected void runMotorAtVoltage(Measure<Voltage> volts){
+        Logger.recordOutput("SysID/Voltage", volts.baseUnitMagnitude());
+        Logger.recordOutput("SysID/Position", motor.getPosition().getValueAsDouble());
+        Logger.recordOutput("SysID/Velocity", motor.getVelocity().getValueAsDouble());
         
         motor.setVoltage(volts.baseUnitMagnitude());
     }

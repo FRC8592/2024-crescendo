@@ -10,8 +10,7 @@ public final class Constants {
     }
 
     public final class CAN {
-        // TODO: set this CAN ID
-        public static final int MOTOR_CAN_ID = -1;
+        public static final int MOTOR_CAN_ID = 30;
         public static final int PDH_CAN_ID = 1;
     }
 

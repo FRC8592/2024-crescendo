@@ -18,12 +18,12 @@ public final class Constants {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"SingleMotor";
 
         // TODO: set these PID and sim constants once SysID has done its thing
-        public static final double PID_P = 0;
+        public static final double PID_P = 0.079922;
         public static final double PID_I = 0;
         public static final double PID_D = 0;
 
         public static final double FF_S = 0;
-        public static final double FF_V = 0;
-        public static final double FF_A = 0;
+        public static final double FF_V = 0.10844;
+        public static final double FF_A = 0.0039994;
     }
 }

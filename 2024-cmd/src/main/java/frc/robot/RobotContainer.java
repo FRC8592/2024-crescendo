@@ -64,6 +64,10 @@ public class RobotContainer {
             .andThen(new WaitCommand(2)).andThen(singleMotor.commands.sysIdDynamic(Direction.kForward))
             .andThen(new WaitCommand(2)).andThen(singleMotor.commands.sysIdDynamic(Direction.kReverse))
         );
+
+        controller.y().whileTrue(
+            singleMotor.commands.driveMotorWithVelocityCommand(100)
+        );
     }
 
     /**

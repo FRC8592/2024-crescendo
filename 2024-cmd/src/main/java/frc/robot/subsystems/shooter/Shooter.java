@@ -4,12 +4,22 @@
 
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.*;
 
 import org.littletonrobotics.junction.Logger;
 import frc.robot.helpers.*;
+
+import static edu.wpi.first.units.MutableMeasure.mutable;
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.*;
 
 public class Shooter extends SubsystemBase {
     private static Shooter instance = null;
@@ -42,6 +52,9 @@ public class Shooter extends SubsystemBase {
     private int rightTargetSpeed = 0;
     private int feederTargetSpeed = 0;
 
+    private double leftShooterMotorVoltage = 0;
+    
+
     private Shooter() {
         leftShooterMotor = new SparkFlexControl(CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
         leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP, SHOOTER.LEFT_SHOOTER_MOTOR_kI, SHOOTER.LEFT_SHOOTER_MOTOR_kD, SHOOTER.LEFT_SHOOTER_MOTOR_kF, 0);
@@ -70,6 +83,19 @@ public class Shooter extends SubsystemBase {
         topBeamBreak = new DigitalInput   (SHOOTER.TOP_BEAM_BREAK_DIO_PORT);
         middleBeamBreak = new DigitalInput(SHOOTER.MIDDLE_BEAM_BREAK_DIO_PORT);
     }
+
+    private SysIdRoutine routine = new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> {runShooterAtVoltage(voltage);}, 
+                (log)->{log.motor("testMotor")
+                    .voltage(getVoltageDoubleToVoltageUnits())
+                    .angularPosition(getPositionDoubleToPositionUnits())
+                    .angularVelocity(getVelocityDoubleToVelocityUnits());
+                    }, 
+                this
+            )
+        );
 
     public void periodic() {
         Logger.recordOutput(SHOOTER.LOG_PATH+"Left/TargetSpeed", leftTargetSpeed);
@@ -196,4 +222,46 @@ public class Shooter extends SubsystemBase {
     public boolean isMiddleBeamBreakTripped(){
         return !middleBeamBreak.get(); //The beam break pulls low when triggered (notice exclamation point)
     }
+
+    // SysID stuffs 
+    protected void runShooterAtVoltage(Measure<Voltage> volts){
+        Logger.recordOutput("SysID/Voltage", volts.baseUnitMagnitude());
+        Logger.recordOutput("SysID/Position", leftShooterMotor.getPosition());
+        Logger.recordOutput("SysID/Velocity", getLeftVelocity());
+
+        leftShooterMotor.motor.setVoltage(volts.baseUnitMagnitude());
+        leftShooterMotorVoltage = volts.baseUnitMagnitude();
+    }
+
+    public SysIdRoutine getRoutine(){
+        return routine;
+    }
+
+    public Measure<Voltage> getVoltageDoubleToVoltageUnits(){
+
+        MutableMeasure<Voltage> volt = mutable(Volts.of(leftShooterMotor.motor.getBusVoltage()));
+
+        return volt.mut_replace(leftShooterMotorVoltage, Volts);
+
+
+    }
+
+    public Measure<Angle> getPositionDoubleToPositionUnits(){
+
+        MutableMeasure<Angle> angle = mutable(Rotations.of(0));
+
+        return angle.mut_replace(leftShooterMotor.getPosition(), Rotations);
+
+
+    }
+
+    public Measure<Velocity<Angle>> getVelocityDoubleToVelocityUnits(){
+
+        MutableMeasure<Velocity<Angle>> velocity = mutable(RotationsPerSecond.of(0));
+
+        return velocity.mut_replace(getLeftVelocity(), RotationsPerSecond);
+
+
+    }
+
 }

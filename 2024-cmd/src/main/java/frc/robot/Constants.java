@@ -151,6 +151,13 @@ public final class Constants {
         public static final double LEFT_SHOOTER_MOTOR_kD = 0.01;
         public static final double LEFT_SHOOTER_MOTOR_kF = 0.000155;
 
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 0.00051245;
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kI = 0;
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 0;
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kS = 0.17346;
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kV = 0.0017779;
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kA = 0.00035365;
+
         public static final double RIGHT_SHOOTER_MOTOR_kP = LEFT_SHOOTER_MOTOR_kP;
         public static final double RIGHT_SHOOTER_MOTOR_kI = LEFT_SHOOTER_MOTOR_kI;
         public static final double RIGHT_SHOOTER_MOTOR_kD = LEFT_SHOOTER_MOTOR_kD;

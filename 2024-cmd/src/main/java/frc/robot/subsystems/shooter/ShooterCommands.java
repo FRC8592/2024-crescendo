@@ -4,7 +4,7 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.helpers.RangeTable.RangeEntry;
 import frc.robot.subsystems.SubsystemCommands;
 import frc.robot.Constants.*;
@@ -234,5 +234,14 @@ public class ShooterCommands extends SubsystemCommands{
             }
             shooter.setShooterVelocity(5000);
         });
+    }
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        
+        return shooter.getRoutine().quasistatic(direction);
+    }
+      
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return shooter.getRoutine().dynamic(direction);
     }
 }

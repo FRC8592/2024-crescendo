@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -35,6 +36,7 @@ public class Robot extends LoggedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   XboxController controller = new XboxController(0);
   TalonFX motor = new TalonFX(30);
+  
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -56,10 +58,13 @@ public class Robot extends LoggedRobot {
     Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
     Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
 
-    motor.config_kP(0, 4.3788e-6);
-    motor.config_kI(0, 0);
-    motor.config_kD(0, 0);
-    motor.config_kF(0, 0.10848);
+    // motor.config_kP(0, 4.3788e-06);
+    // motor.config_kI(0, 0);
+    // motor.config_kD(0, 0);
+    
+    // // SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.012804, 0.10848, 0.0013048);
+    // // motor.config_kF(0, feedforward.calculate(100));
+    // motor.config_kF(0, 0.10848);
 }
 
 // Logger.disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
@@ -115,7 +120,8 @@ Logger.start();
   @Override
   public void teleopPeriodic() {
     if(controller.getAButton()){
-      motor.set(ControlMode.Velocity, 100);
+      // motor.set(ControlMode.Velocity, 500);
+      motor.set(ControlMode.PercentOutput, 1);
       Logger.recordOutput("Target", 100);
       Logger.recordOutput("Actual", motor.getSelectedSensorVelocity());
     }

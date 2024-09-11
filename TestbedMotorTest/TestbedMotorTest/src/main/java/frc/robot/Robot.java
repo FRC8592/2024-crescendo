@@ -119,11 +119,12 @@ Logger.start();
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    final double conversionFactor = (1d/2048)*600;
     if(controller.getAButton()){
-      // motor.set(ControlMode.Velocity, 500);
-      motor.set(ControlMode.PercentOutput, 1);
+      // motor.set(ControlMode.Velocity, 4000);
+      motor.set(ControlMode.PercentOutput, 0.5);
       Logger.recordOutput("Target", 100);
-      Logger.recordOutput("Actual", motor.getSelectedSensorVelocity());
+      Logger.recordOutput("Actual", motor.getSelectedSensorVelocity()*conversionFactor);
     }
     else{
       motor.set(ControlMode.PercentOutput, 0);

@@ -292,6 +292,10 @@ public class RobotContainer {
             .andThen(shooter.commands.sysIdDynamic(Direction.kReverse))
         );
 
+        operatorController.b().onTrue(
+            shooter.commands.setLeftShooterVelocity(100)
+            );
+
         
     }
 

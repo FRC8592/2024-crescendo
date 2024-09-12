@@ -244,4 +244,9 @@ public class ShooterCommands extends SubsystemCommands{
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return shooter.getRoutine().dynamic(direction);
     }
+
+    public Command setLeftShooterVelocity(int left){
+
+        return shooter.run(()->{shooter.setShooterVelocity(100, 0);});
+    }
 }

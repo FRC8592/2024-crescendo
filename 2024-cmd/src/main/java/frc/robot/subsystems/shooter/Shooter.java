@@ -224,6 +224,8 @@ public class Shooter extends SubsystemBase {
     }
 
     // SysID stuffs 
+
+
     protected void runShooterAtVoltage(Measure<Voltage> volts){
         Logger.recordOutput("SysID/Voltage", volts.baseUnitMagnitude());
         Logger.recordOutput("SysID/Position", leftShooterMotor.getPosition());

@@ -80,11 +80,14 @@ public class ElevatorCommands extends SubsystemCommands{
      * @apiNote This command never ends on its own; it must be interrupted to end
      */
     public Command setMalleablePositionCommand(double pivotDegrees, double extensionMeters){
-        elevator.setUserDesiredTargetPivot(pivotDegrees);
-        elevator.setUserDesiredTargetExtension(extensionMeters);
-        return elevator.run(() -> {
+        
+        return elevator.runOnce(() -> {
+            elevator.setUserDesiredTargetPivot(pivotDegrees);
+            elevator.setUserDesiredTargetExtension(extensionMeters);
+        }).andThen(elevator.run(() -> {
+            
             elevator.runElevator();
-        }).finallyDo(() -> elevator.freezeElevator());
+        })).finallyDo(() -> elevator.freezeElevator());
     }
 
     /**

@@ -170,7 +170,6 @@ public class Elevator extends SubsystemBase {
      * @param pivotAngle the angle setpoint in degrees
      */
     protected void setUserDesiredTargetPivot(double pivotAngle){
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Console", "User desired pivot set to "+pivotAngle);
         this.userDesiredTargetPivot = pivotAngle;
     }
 
@@ -179,7 +178,6 @@ public class Elevator extends SubsystemBase {
      * @param extensionLength the extension setpoint in meters
      */
     protected void setUserDesiredTargetExtension(double extensionLength){
-        Logger.recordOutput(ELEVATOR.LOG_PATH+"Console", "User desired pivot set to "+extensionLength);
         this.userDesiredTargetExtension = extensionLength;
     }
 

@@ -52,6 +52,8 @@ public class Shooter extends SubsystemBase {
 
     // Only used for logging
     private int leftTargetSpeed = 0;
+    private double leftTargetVoltage = 0;
+
     private int rightTargetSpeed = 0;
     private int feederTargetSpeed = 0;
 
@@ -116,21 +118,15 @@ public class Shooter extends SubsystemBase {
         );
 
     public void periodic() {
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/TargetSpeed", leftTargetSpeed);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/TargetVelocity", leftTargetSpeed);
         Logger.recordOutput(SHOOTER.LOG_PATH+"Left/ActualSpeed", leftShooterMotor.getVelocity());
 
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Right/TargetSpeed", rightTargetSpeed);
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Right/ActualSpeed", rightShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/TargetVoltage", leftTargetVoltage);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/ActualVoltage (Supposedly)", leftShooterMotor.motor.getAppliedOutput()*leftShooterMotor.motor.getBusVoltage());
 
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Feeder/TargetSpeed", feederTargetSpeed);
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Feeder/ActualSpeed", feederMotor.getVelocity());
-
-        Logger.recordOutput(SHOOTER.LOG_PATH+"ReadyToShoot", readyToShoot());
-
-        Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Bottom", bottomBeamBreak.get());
-        Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Middle", middleBeamBreak.get());
-        Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Top", topBeamBreak.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/CalculatedFF", leftShooterMotorCalculatedFF);
     }
+    
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
     }
@@ -170,8 +166,9 @@ public class Shooter extends SubsystemBase {
         leftShooterMotorCalculatedFF = leftShooterMotorFeedforward.calculate(leftTargetSpeed);
         leftShooterMotorCalculatedPID = leftShooterMotorPID.calculate(leftShooterMotor.getVelocity(), leftTargetSpeed);
 
+        leftTargetVoltage = leftShooterMotorCalculatedFF + leftShooterMotorCalculatedPID;
         // leftShooterMotor.setVelocity(leftTargetSpeed);
-        leftShooterMotor.motor.setVoltage(leftShooterMotorCalculatedFF + leftShooterMotorCalculatedPID);
+        leftShooterMotor.motor.setVoltage(leftTargetVoltage);
         rightShooterMotor.setVelocity(rightTargetSpeed);
     }
 

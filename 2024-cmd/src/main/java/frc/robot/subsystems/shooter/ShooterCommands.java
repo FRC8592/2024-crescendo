@@ -247,6 +247,6 @@ public class ShooterCommands extends SubsystemCommands{
 
     public Command setLeftShooterVelocity(int left){
 
-        return shooter.run(()->{shooter.setShooterVelocity(100, 0);});
+        return shooter.run(()->{shooter.setShooterVelocity(left, 0);});
     }
 }

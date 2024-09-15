@@ -157,10 +157,10 @@ public class RobotContainer {
         //     swerve.commands.robotOrientedCommand(false) // Disable robot-oriented driving
         // );
 
-        // // Amp-score or shoot (press) + force-shoot (hold)
-        // driverController.rightTrigger(0.1).whileTrue(
-        //     new ScoreCommand(() -> driverController.getHID().getXButton())
-        // );
+        // Amp-score or shoot (press) + force-shoot (hold)
+        driverController.rightTrigger(0.1).whileTrue(
+            new ScoreCommand(() -> driverController.getHID().getXButton())
+        );
 
         // // Party Mode (hold)
         // driverController.start().whileTrue(
@@ -292,9 +292,9 @@ public class RobotContainer {
             .andThen(shooter.commands.sysIdDynamic(Direction.kReverse))
         );
 
-        operatorController.b().onTrue(
+        operatorController.b().whileTrue(
             shooter.commands.setLeftShooterVelocity(100)
-            );
+        );
 
         
     }

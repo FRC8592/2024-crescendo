@@ -19,6 +19,9 @@ import frc.robot.helpers.*;
 
 import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.*;
 
 public class Shooter extends SubsystemBase {
@@ -53,11 +56,26 @@ public class Shooter extends SubsystemBase {
     private int feederTargetSpeed = 0;
 
     private double leftShooterMotorVoltage = 0;
+
+    private SimpleMotorFeedforward leftShooterMotorFeedforward;
+    private PIDController leftShooterMotorPID;
+
+    private double leftShooterMotorCalculatedFF;
+    private double leftShooterMotorCalculatedPID;
     
 
     private Shooter() {
+
         leftShooterMotor = new SparkFlexControl(CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
-        leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP, SHOOTER.LEFT_SHOOTER_MOTOR_kI, SHOOTER.LEFT_SHOOTER_MOTOR_kD, SHOOTER.LEFT_SHOOTER_MOTOR_kF, 0);
+
+        
+        leftShooterMotorFeedforward = new SimpleMotorFeedforward(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kS, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kV, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kA);
+        leftShooterMotorCalculatedFF = leftShooterMotorFeedforward.calculate(leftTargetSpeed);
+
+        leftShooterMotorPID.setPID(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kP, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kI, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kD);
+
+
+        leftShooterMotor.setPIDF(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kP, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kI, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kD, leftShooterMotorCalculatedFF, 0);
         leftShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         leftShooterMotor.setCurrentLimit (POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT, POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT);
         leftShooterMotor.setInverted();
@@ -149,7 +167,11 @@ public class Shooter extends SubsystemBase {
     protected void setShooterVelocity(int left, int right){
         leftTargetSpeed = left;
         rightTargetSpeed = right;
-        leftShooterMotor.setVelocity(leftTargetSpeed);
+        leftShooterMotorCalculatedFF = leftShooterMotorFeedforward.calculate(leftTargetSpeed);
+        leftShooterMotorCalculatedPID = leftShooterMotorPID.calculate(leftShooterMotor.getVelocity(), leftTargetSpeed);
+
+        // leftShooterMotor.setVelocity(leftTargetSpeed);
+        leftShooterMotor.motor.setVoltage(leftShooterMotorCalculatedFF + leftShooterMotorCalculatedPID);
         rightShooterMotor.setVelocity(rightTargetSpeed);
     }
 

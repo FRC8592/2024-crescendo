@@ -110,8 +110,8 @@ public class RobotContainer {
      */
     private Command snapToCommand(Rotation2d angle){
         return swerve.commands.snapToCommand(
-            () -> driverController.getLeftX(),
-            () -> driverController.getLeftY(),
+            () -> -driverController.getLeftX(),
+            () -> -driverController.getLeftY(),
             Rotation2d.fromDegrees((360-angle.getDegrees())%360)
         );
     }

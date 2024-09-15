@@ -57,8 +57,8 @@ public class Elevator extends SubsystemBase {
     // subsystem control and aren't just logging. They aren't confined in
     // any way and are used as guidelines for the guaranteed-safe variables
     // below.
-    private double userDesiredTargetExtension;
-    private double userDesiredTargetPivot;
+    private double userDesiredTargetExtension = 0;
+    private double userDesiredTargetPivot = 0;
 
     // These are guaranteed-safe (only set to physically possible values)
     private double actualTargetPivot;
@@ -170,6 +170,7 @@ public class Elevator extends SubsystemBase {
      * @param pivotAngle the angle setpoint in degrees
      */
     protected void setUserDesiredTargetPivot(double pivotAngle){
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Console", "User desired pivot set to "+pivotAngle);
         this.userDesiredTargetPivot = pivotAngle;
     }
 
@@ -178,6 +179,7 @@ public class Elevator extends SubsystemBase {
      * @param extensionLength the extension setpoint in meters
      */
     protected void setUserDesiredTargetExtension(double extensionLength){
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"Console", "User desired pivot set to "+extensionLength);
         this.userDesiredTargetExtension = extensionLength;
     }
 

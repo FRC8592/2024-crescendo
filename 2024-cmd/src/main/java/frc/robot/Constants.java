@@ -303,7 +303,7 @@ public final class Constants {
         public static final double TRANSLATE_POWER_FAST = 1.0;
         public static final double ROTATE_POWER_FAST = 0.75;
         public static final double TRANSLATE_POWER_SLOW = 0.25;
-        public static final double ROTATE_POWER_SLOW = 0.2;
+        public static final double ROTATE_POWER_SLOW = 0.15;
 
         // TODO: Work out our swerve speed mysteries
         // public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.95; // 4.5 + 0.1(4.5) to go from 5700 --> 6300

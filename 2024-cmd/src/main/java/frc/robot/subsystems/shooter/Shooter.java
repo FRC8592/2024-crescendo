@@ -119,7 +119,7 @@ public class Shooter extends SubsystemBase {
 
     public void periodic() {
         Logger.recordOutput(SHOOTER.LOG_PATH+"Left/TargetVelocity", leftTargetSpeed);
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/ActualSpeed", leftShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/ActualVelocity", leftShooterMotor.getVelocity());
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"Left/TargetVoltage", leftTargetVoltage);
         Logger.recordOutput(SHOOTER.LOG_PATH+"Left/ActualVoltage (Supposedly)", leftShooterMotor.motor.getAppliedOutput()*leftShooterMotor.motor.getBusVoltage());

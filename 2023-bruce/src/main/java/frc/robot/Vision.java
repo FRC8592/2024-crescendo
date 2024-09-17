@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.LinkedList;
 
 import org.ejml.dense.row.decomposition.hessenberg.TridiagonalDecompositionHouseholderOrig_DDRM;
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 
@@ -29,10 +30,10 @@ public class Vision {
   private double closeRotationKI;
   private double closeRotationKD;
   // Network Table entries
-  private NetworkTableEntry tx;   // Angle error (x) from LimeLight camera
-  private NetworkTableEntry ty;   // Angle error (y) from LimeLight camera
-  private NetworkTableEntry ta;   // Target area measurement from LimeLight camera
-  private NetworkTableEntry tv;   // Target valid indicator from Limelight camera
+  public NetworkTableEntry tx;   // Angle error (x) from LimeLight camera
+  public NetworkTableEntry ty;   // Angle error (y) from LimeLight camera
+  public NetworkTableEntry ta;   // Target area measurement from LimeLight camera
+  public NetworkTableEntry tv;   // Target valid indicator from Limelight camera
   // Shared variables
   public boolean targetValid;     // Indicate when the Limelight camera has found a target
   public boolean targetLocked;    // Indicate when the turret is centered on the target
@@ -133,7 +134,7 @@ public class Vision {
     xError      = tx.getDouble(0.0);
     yError      = ty.getDouble(0.0);
     area        = ta.getDouble(0.0);
-    targetValid = (tv.getDouble(0.0) != 0); // Convert the double output to boolean
+    targetValid = (ty.getDouble(0.0) != 0); // Convert the double output to boolean (changed to ty, not sure if tv applies to apriltags)
 
     logger.log(this, "NewestTargetValid", targetValid); //Logging up here instead of down
     //below because targetValid gets modified with the processed value in a few lines
@@ -260,6 +261,7 @@ public class Vision {
       else if(lockToVariable == "ty") turnSpeed = targetPID.calculate(ty.getDouble(0.0), offset);  // Setpoint is always 0 degrees (dead center)
       turnSpeed = Math.max(turnSpeed, -limit);
       turnSpeed = Math.min(turnSpeed, limit);
+      Logger.recordOutput("CustomLogs/Vision/TurnSpeed", turnSpeed);
     }
 
     // If no targetValid, spin in a circle to search

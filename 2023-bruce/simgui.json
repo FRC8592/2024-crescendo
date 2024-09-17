@@ -1,0 +1,50 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    },
+    "Timing": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auton Configuration/Choose Autonomous": "String Chooser",
+      "/Shuffleboard/Drive Configuration/Choose Drive Scaling": "String Chooser",
+      "/SmartDashboard/Field": "Field2d"
+    },
+    "windows": {
+      "/Shuffleboard/Auton Configuration/Choose Autonomous": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "image": "C:\\Users\\Hisha\\Documents\\Robotix\\2024-field.png",
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "retained": {
+      "Shuffleboard": {
+        "open": true
+      }
+    },
+    "transitory": {
+      "SmartDashboard": {
+        "open": true
+      }
+    }
+  },
+  "NetworkTables View": {
+    "visible": false
+  }
+}

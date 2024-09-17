@@ -74,21 +74,21 @@ public class FRCLogger {
 
             // Check for the "data" object being one of the supported datatypes and log it.
             if (data.getClass().getSimpleName().equals("boolean"))
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name, (boolean) data);
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name, (boolean) data);
             if (data.getClass().getSimpleName().equals("int"))
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name, (int) data);
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name, (int) data);
             if (data.getClass().getSimpleName().equals("double"))
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name, (double) data);
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name, (double) data);
             if (data.getClass().getSimpleName().equals("String"))
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name, (String) data);
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name, (String) data);
             if (data.getClass().getSimpleName().equals("boolean[]"))
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name, (boolean[]) data);
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name, (boolean[]) data);
             if (data.getClass().getSimpleName().equals("int[]"))
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name, (double[]) data); // double[] here because int[] isn't suposrted by AK in 2023
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name, (double[]) data); // double[] here because int[] isn't suposrted by AK in 2023
             if (data.getClass().getSimpleName().equals("double[]"))
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name, (double[]) data);
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name, (double[]) data);
             if (data.getClass().getSimpleName().equals("String[]"))
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name, (String[]) data);
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name, (String[]) data);
 
             // Now the if-statements that convert datatypes that Advantage* doesn't
             // support into something it does.
@@ -101,9 +101,9 @@ public class FRCLogger {
                 double[] resultRadians = new double[2];
                 resultRadians[0] = swerveModule.getSteerAngle();
                 resultRadians[1] = swerveModule.getDriveVelocity();
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name + "/Degrees",
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name + "/Degrees",
                         resultDegrees);
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name + "/Radians",
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name + "/Radians",
                         resultRadians);
             }
             if (data instanceof SwerveModule[]) {
@@ -116,9 +116,9 @@ public class FRCLogger {
                     resultRadians[i * 2] = swerveModules[i].getSteerAngle();
                     resultRadians[i * 2 + 1] = swerveModules[i].getDriveVelocity();
                 }
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name + "/Degrees",
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name + "/Degrees",
                         resultDegrees);
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name + "/Radians",
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name + "/Radians",
                         resultRadians);
             }
             if (data instanceof Pose2d) {
@@ -139,23 +139,22 @@ public class FRCLogger {
                 resultInchesRadians[0] = pose.getX() * 39.3701;
                 resultInchesRadians[1] = pose.getY() * 39.3701;
                 resultInchesRadians[2] = pose.getRotation().getRadians();
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name + "/Meters-Degrees",
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name + "/Meters-Degrees",
                         resultMetersDegrees);
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name + "/Meters-Radians",
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name + "/Meters-Radians",
                         resultMetersRadians);
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name + "/Inches-Degrees",
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name + "/Inches-Degrees",
                         resultInchesDegrees);
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name + "/Inches-Radians",
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name + "/Inches-Radians",
                         resultInchesRadians);
             }
             if (data instanceof Rotation2d) {
                 Rotation2d rotation = (Rotation2d) data;
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name + "Degrees",
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name + "Degrees",
                         rotation.getDegrees());
-                Logger.getInstance().recordOutput(logFolder + "/" + (String) path + "/" + name + "Radians",
+                Logger.recordOutput(logFolder + "/" + (String) path + "/" + name + "Radians",
                         rotation.getRadians());
             }
         }
     }
 }
-/*********************************/

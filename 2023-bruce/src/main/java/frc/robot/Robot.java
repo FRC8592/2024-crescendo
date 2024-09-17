@@ -145,7 +145,7 @@ public class Robot extends LoggedRobot {
 
     smoothingFilter = new SmoothingFilter(1, 1, 1); //5, 5, 1
 
-    // SmartDashboard.putData(FIELD);
+    SmartDashboard.putData(FIELD);
     selector = new AutonomousSelector();
     voltages = new ArrayList<Double>();
 
@@ -655,7 +655,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {
-    NetworkTableInstance.getDefault().getTable("limelight-vision").getEntry("pipeline").setNumber(Constants.CUBE_PIPELINE);
+    // NetworkTableInstance.getDefault().getTable("limelight-vision").getEntry("pipeline").setNumber(Constants.CUBE_PIPELINE);
 
   }
 
@@ -675,7 +675,7 @@ public class Robot extends LoggedRobot {
     ChassisSpeeds driveSpeeds = new ChassisSpeeds();
 
     drive.getCurrentPos();
-    gameObjectVision.updateVision();
+    substationVision.updateVision();
 
     double translateXScaled = driveScaler.scale(-joystickDeadband(driverController.getLeftY()));
     double translateYScaled = driveScaler.scale(-joystickDeadband(driverController.getLeftX()));
@@ -687,13 +687,12 @@ public class Robot extends LoggedRobot {
     translateY = translateYScaled * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND * translatePower;
     if (driverController.getBButton()) {
 
-      double rotateSpeed = gameObjectVision.lockTargetSpeed(0, turnPID, "tx", Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
-      rotate = -rotateSpeed;
+      double rotateSpeed = -substationVision.lockTargetSpeed(0, turnPID, "tx", Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
+      rotate = rotateSpeed;
 
-      double driveToSpeed = gameObjectVision.lockTargetSpeed(0, strafePID, "ty", 4.5, -24.0); // -20 means its sorta close and the decimal being added is the FeedForward
-      translateX = driveToSpeed; // go forwards at driveToSpeed towards the target
-      SmartDashboard.putNumber("pid based forward vel", driveToSpeed);
-      driveSpeeds=new ChassisSpeeds(translateX, 0, rotate);
+    //   double driveToSpeed = gameObjectVision.lockTargetSpeed(0, strafePID, "ty", 1.0, 20); // 20 means its sorta close
+    //   translateY = driveToSpeed; // go forwards at driveToSpeed towards the target
+    //   SmartDashboard.putNumber("pid based forward vel", driveToSpeed);
     }
     else{
       ChassisSpeeds smoothedRobotRelative = smoothingFilter.smooth(new ChassisSpeeds(translateX, translateY, 0));

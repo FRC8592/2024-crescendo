@@ -4,12 +4,25 @@
 
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.*;
 
 import org.littletonrobotics.junction.Logger;
 import frc.robot.helpers.*;
+
+import static edu.wpi.first.units.MutableMeasure.mutable;
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.units.*;
 
 public class Shooter extends SubsystemBase {
     private static Shooter instance = null;
@@ -39,12 +52,32 @@ public class Shooter extends SubsystemBase {
 
     // Only used for logging
     private int leftTargetSpeed = 0;
+    private double leftTargetVoltage = 0;
+
     private int rightTargetSpeed = 0;
     private int feederTargetSpeed = 0;
 
+    private double leftShooterMotorVoltage = 0;
+
+    private SimpleMotorFeedforward leftShooterMotorFeedforward;
+    private PIDController leftShooterMotorPID;
+
+    private double leftShooterMotorCalculatedFF;
+    private double leftShooterMotorCalculatedPID;
+    
+
     private Shooter() {
+
         leftShooterMotor = new SparkFlexControl(CAN.TOP_SHOOTER_MOTOR_CAN_ID, false);
-        leftShooterMotor.setPIDF(SHOOTER.LEFT_SHOOTER_MOTOR_kP, SHOOTER.LEFT_SHOOTER_MOTOR_kI, SHOOTER.LEFT_SHOOTER_MOTOR_kD, SHOOTER.LEFT_SHOOTER_MOTOR_kF, 0);
+
+        
+        leftShooterMotorFeedforward = new SimpleMotorFeedforward(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kS, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kV, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kA);
+        leftShooterMotorCalculatedFF = leftShooterMotorFeedforward.calculate(leftTargetSpeed);
+
+        leftShooterMotorPID = new PIDController(SHOOTER.LEFT_SHOOTER_MOTOR_kP, SHOOTER.LEFT_SHOOTER_MOTOR_kI, SHOOTER.LEFT_SHOOTER_MOTOR_kD);
+
+
+        leftShooterMotor.setPIDF(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kP, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kI, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kD, leftShooterMotorCalculatedFF, 0);
         leftShooterMotor.motorControl.setIZone(SHOOTER.SHOOTER_MOTOR_IZONE);
         leftShooterMotor.setCurrentLimit (POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT, POWER.LEFT_SHOOTER_MOTOR_CURRENT_LIMIT);
         leftShooterMotor.setInverted();
@@ -71,22 +104,29 @@ public class Shooter extends SubsystemBase {
         middleBeamBreak = new DigitalInput(SHOOTER.MIDDLE_BEAM_BREAK_DIO_PORT);
     }
 
+    private SysIdRoutine routine = new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> {runShooterAtVoltage(voltage);}, 
+                (log)->{log.motor("testMotor")
+                    .voltage(getVoltageDoubleToVoltageUnits())
+                    .angularPosition(getPositionDoubleToPositionUnits())
+                    .angularVelocity(getVelocityDoubleToVelocityUnits());
+                    }, 
+                this
+            )
+        );
+
     public void periodic() {
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/TargetSpeed", leftTargetSpeed);
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/ActualSpeed", leftShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/TargetVelocity", leftTargetSpeed);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/ActualVelocity", leftShooterMotor.getVelocity());
 
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Right/TargetSpeed", rightTargetSpeed);
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Right/ActualSpeed", rightShooterMotor.getVelocity());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/TargetVoltage", leftTargetVoltage);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/ActualVoltage (Supposedly)", leftShooterMotor.motor.getAppliedOutput()*leftShooterMotor.motor.getBusVoltage());
 
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Feeder/TargetSpeed", feederTargetSpeed);
-        Logger.recordOutput(SHOOTER.LOG_PATH+"Feeder/ActualSpeed", feederMotor.getVelocity());
-
-        Logger.recordOutput(SHOOTER.LOG_PATH+"ReadyToShoot", readyToShoot());
-
-        Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Bottom", bottomBeamBreak.get());
-        Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Middle", middleBeamBreak.get());
-        Logger.recordOutput(SHOOTER.LOG_PATH+"BeamBreaks/Top", topBeamBreak.get());
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/CalculatedFF", leftShooterMotorCalculatedFF);
     }
+    
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
     }
@@ -123,7 +163,12 @@ public class Shooter extends SubsystemBase {
     protected void setShooterVelocity(int left, int right){
         leftTargetSpeed = left;
         rightTargetSpeed = right;
-        leftShooterMotor.setVelocity(leftTargetSpeed);
+        leftShooterMotorCalculatedFF = leftShooterMotorFeedforward.calculate(leftTargetSpeed);
+        leftShooterMotorCalculatedPID = leftShooterMotorPID.calculate(leftShooterMotor.getVelocity(), leftTargetSpeed);
+
+        leftTargetVoltage = leftShooterMotorCalculatedFF + leftShooterMotorCalculatedPID;
+        // leftShooterMotor.setVelocity(leftTargetSpeed);
+        leftShooterMotor.motor.setVoltage(leftTargetVoltage);
         rightShooterMotor.setVelocity(rightTargetSpeed);
     }
 
@@ -204,4 +249,48 @@ public class Shooter extends SubsystemBase {
     public boolean isMiddleBeamBreakTripped(){
         return !middleBeamBreak.get(); //The beam break pulls low when triggered (notice exclamation point)
     }
+
+    // SysID stuffs 
+
+
+    protected void runShooterAtVoltage(Measure<Voltage> volts){
+        Logger.recordOutput("SysID/Voltage", volts.baseUnitMagnitude());
+        Logger.recordOutput("SysID/Position", leftShooterMotor.getPosition());
+        Logger.recordOutput("SysID/Velocity", getLeftVelocity());
+
+        leftShooterMotor.motor.setVoltage(volts.baseUnitMagnitude());
+        leftShooterMotorVoltage = volts.baseUnitMagnitude();
+    }
+
+    public SysIdRoutine getRoutine(){
+        return routine;
+    }
+
+    public Measure<Voltage> getVoltageDoubleToVoltageUnits(){
+
+        MutableMeasure<Voltage> volt = mutable(Volts.of(leftShooterMotor.motor.getBusVoltage()));
+
+        return volt.mut_replace(leftShooterMotorVoltage, Volts);
+
+
+    }
+
+    public Measure<Angle> getPositionDoubleToPositionUnits(){
+
+        MutableMeasure<Angle> angle = mutable(Rotations.of(0));
+
+        return angle.mut_replace(leftShooterMotor.getPosition(), Rotations);
+
+
+    }
+
+    public Measure<Velocity<Angle>> getVelocityDoubleToVelocityUnits(){
+
+        MutableMeasure<Velocity<Angle>> velocity = mutable(RotationsPerSecond.of(0));
+
+        return velocity.mut_replace(getLeftVelocity(), RotationsPerSecond);
+
+
+    }
+
 }

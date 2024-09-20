@@ -23,8 +23,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 public class RobotContainer {
     // The robot's subsystems
@@ -121,159 +123,180 @@ public class RobotContainer {
      */
     private void configureBindings() {
 
-        // Slow Mode (hold)
-        driverController.rightBumper().onTrue(
-            swerve.commands.slowModeCommand(true) // Enable slow mode
-        ).onFalse(
-            swerve.commands.slowModeCommand(false) // Disable slow mode
-        );
+        // // Slow Mode (hold)
+        // driverController.rightBumper().onTrue(
+        //     swerve.commands.slowModeCommand(true) // Enable slow mode
+        // ).onFalse(
+        //     swerve.commands.slowModeCommand(false) // Disable slow mode
+        // );
 
-        // Reset Gyroscope (press)
-        driverController.back().onTrue(
-            swerve.commands.zeroGyroscopeCommand()
-        );
+        // // Reset Gyroscope (press)
+        // driverController.back().onTrue(
+        //     swerve.commands.zeroGyroscopeCommand()
+        // );
 
-        //Autocollect (hold)
-        driverController.a().whileTrue(
-            swerve.commands.rawRotationCommand(
-                () -> 0, // No side-to-side
-                () -> driverController.getLeftY(), // Drive forward and back freely
+        // //Autocollect (hold)
+        // driverController.a().whileTrue(
+        //     swerve.commands.rawRotationCommand(
+        //         () -> 0, // No side-to-side
+        //         () -> driverController.getLeftY(), // Drive forward and back freely
 
-                // Rotation speed of the autocollect function (turn towards the note)
-                () -> noteLock.driveToTarget(
-                    turnPID,
-                    drivePID,
-                    NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE
-                ).omegaRadiansPerSecond
-            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
+        //         // Rotation speed of the autocollect function (turn towards the note)
+        //         () -> noteLock.driveToTarget(
+        //             turnPID,
+        //             drivePID,
+        //             NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE
+        //         ).omegaRadiansPerSecond
+        //     ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
 
-        // Robot-oriented (hold)
-        driverController.leftBumper().onTrue(
-            swerve.commands.robotOrientedCommand(true) // Enable robot-oriented driving
-        ).onFalse(
-            swerve.commands.robotOrientedCommand(false) // Disable robot-oriented driving
-        );
+        // // Robot-oriented (hold)
+        // driverController.leftBumper().onTrue(
+        //     swerve.commands.robotOrientedCommand(true) // Enable robot-oriented driving
+        // ).onFalse(
+        //     swerve.commands.robotOrientedCommand(false) // Disable robot-oriented driving
+        // );
 
         // Amp-score or shoot (press) + force-shoot (hold)
-        driverController.rightTrigger(0.1).whileTrue(
-            new ScoreCommand(() -> driverController.getHID().getXButton())
-        );
+        // driverController.rightTrigger(0.1).whileTrue(
+        //     new ScoreCommand(() -> driverController.getHID().getXButton())
+        // );
 
-        // Party Mode (hold)
-        driverController.start().whileTrue(
-            leds.commands.partyCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
+        // // Party Mode (hold)
+        // driverController.start().whileTrue(
+        //     leds.commands.partyCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
 
-        // Pass-aim (hold)
-        driverController.y().whileTrue(
-            new ConditionalCommand(
-                snapToCommand(Rotation2d.fromDegrees(330)),
-                snapToCommand(Rotation2d.fromDegrees(30)),
-                Suppliers.robotRunningOnRed
-            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
+        // // Pass-aim (hold)
+        // driverController.y().whileTrue(
+        //     new ConditionalCommand(
+        //         snapToCommand(Rotation2d.fromDegrees(330)),
+        //         snapToCommand(Rotation2d.fromDegrees(30)),
+        //         Suppliers.robotRunningOnRed
+        //     ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
 
-        // Stow (press)
-        driverController.b().onTrue(
-            // This clears all scheduled commands and stows, meaning the robot
-            // will stow without reference to what it was previously doing.
-            new OverrideEverythingCommand(
-                new StowCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf) //Cancel self so we don't have to wait for a full stow before moving on
-            )
-        );
+        // // Stow (press)
+        // driverController.b().onTrue(
+        //     // This clears all scheduled commands and stows, meaning the robot
+        //     // will stow without reference to what it was previously doing.
+        //     new OverrideEverythingCommand(
+        //         new StowCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf) //Cancel self so we don't have to wait for a full stow before moving on
+        //     )
+        // );
 
-        // Snap-to (hold)
-        driverController.pov(0).whileTrue(
-            snapToCommand(Rotation2d.fromDegrees(0))
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
-        driverController.pov(90).whileTrue(
-            snapToCommand(Rotation2d.fromDegrees(90))
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
-        driverController.pov(180).whileTrue(
-            snapToCommand(Rotation2d.fromDegrees(180))
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
-        driverController.pov(270).whileTrue(
-            snapToCommand(Rotation2d.fromDegrees(270))
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
+        // // Snap-to (hold)
+        // driverController.pov(0).whileTrue(
+        //     snapToCommand(Rotation2d.fromDegrees(0))
+        //     .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
+        // driverController.pov(90).whileTrue(
+        //     snapToCommand(Rotation2d.fromDegrees(90))
+        //     .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
+        // driverController.pov(180).whileTrue(
+        //     snapToCommand(Rotation2d.fromDegrees(180))
+        //     .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
+        // driverController.pov(270).whileTrue(
+        //     snapToCommand(Rotation2d.fromDegrees(270))
+        //     .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
 
 
 
-        //Passthrough (hold)
-        operatorController.rightTrigger(0.1).whileTrue(
-            new PassThroughCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
+        // //Passthrough (hold)
+        // operatorController.rightTrigger(0.1).whileTrue(
+        //     new PassThroughCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
 
-        //Vision Prime (press)
-        operatorController.rightBumper().onTrue(
-            new PrimeCommand(Suppliers.bestRangeEntry, Suppliers.offsetFromSpeakerTag)
-            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-        );
+        // //Vision Prime (press)
+        // operatorController.rightBumper().onTrue(
+        //     new PrimeCommand(Suppliers.bestRangeEntry, Suppliers.offsetFromSpeakerTag)
+        //     .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        // );
 
-        //Podium Prime (press)
-        operatorController.b().onTrue(
-            new PrimeCommand(RangeTable.getPodium(), Suppliers.offsetFromSpeakerTag)
-            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-        );
+        // //Podium Prime (press)
+        // operatorController.b().onTrue(
+        //     new PrimeCommand(RangeTable.getPodium(), Suppliers.offsetFromSpeakerTag)
+        //     .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        // );
 
-        // Outake (hold)
-        operatorController.leftBumper().whileTrue(
-            new OutakeCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
+        // // Outake (hold)
+        // operatorController.leftBumper().whileTrue(
+        //     new OutakeCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
 
-        // Intake (press)
-        operatorController.leftTrigger(0.1).onTrue(
-            new IntakeCommand().andThen(
-                shooter.commands.primeCommand(RangeTable.getSubwoofer())
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-        );
+        // // Intake (press)
+        // operatorController.leftTrigger(0.1).onTrue(
+        //     new IntakeCommand().andThen(
+        //         shooter.commands.primeCommand(RangeTable.getSubwoofer())
+        //     ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
 
-        // Stow (press)
+        // // Stow (press)
+        // operatorController.a().onTrue(
+        //     new OverrideEverythingCommand(
+        //         new StowCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf) // Cancel self so we don't have to wait for a full stow before moving on
+        //     )
+        // );
+
+        // // Amp prime (press)
+        // operatorController.x().onTrue(
+        //     elevator.commands.setStaticPositionCommand(
+        //         ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP
+        //     ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
+
+        // // Climb position (press)
+        // operatorController.y().onTrue(
+        //     new ClimbCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
+
+        // // Extend (hold)
+        // operatorController.pov(0).whileTrue(
+        //     elevator.commands.incrementElevatorPositionCommand(0, ELEVATOR.MANUAL_EXTENSION_SPEED)
+        //     .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
+
+        // // Retract (hold)
+        // operatorController.pov(180).whileTrue(
+        //     elevator.commands.incrementElevatorPositionCommand(0, -ELEVATOR.MANUAL_EXTENSION_SPEED)
+        //     .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
+
+        // // Note Request (hold)
+        // operatorController.back().whileTrue(
+        //     leds.commands.blinkCommand(LEDS.YELLOW, 2)
+        //     .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // );
+
+        // // Trap Prime (press)
+        // operatorController.start().onTrue(
+        //     new PrimeCommand(RangeTable.getTrap(), () -> 0)
+        //     .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        // );
+
+
+
+
+        //---------------------------------------------------------------------------------------------------------------------//
+
         operatorController.a().onTrue(
-            new OverrideEverythingCommand(
-                new StowCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf) // Cancel self so we don't have to wait for a full stow before moving on
-            )
+            shooter.commands.sysIdQuasistatic(Direction.kForward)
+            .andThen(new WaitCommand(2))
+            .andThen(shooter.commands.sysIdQuasistatic(Direction.kReverse))
+            .andThen(new WaitCommand(2))
+            .andThen(shooter.commands.sysIdDynamic(Direction.kForward))
+            .andThen(new WaitCommand(2))
+            .andThen(shooter.commands.sysIdDynamic(Direction.kReverse))
         );
 
-        // Amp prime (press)
-        operatorController.x().onTrue(
-            elevator.commands.setStaticPositionCommand(
-                ELEVATOR.PIVOT_ANGLE_AMP, ELEVATOR.EXTENSION_METERS_AMP
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        operatorController.b().whileTrue(
+            shooter.commands.setLeftShooterVelocity(100)
         );
 
-        // Climb position (press)
-        operatorController.y().onTrue(
-            new ClimbCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-        );
-
-        // Extend (hold)
-        operatorController.pov(0).whileTrue(
-            elevator.commands.incrementElevatorPositionCommand(0, ELEVATOR.MANUAL_EXTENSION_SPEED)
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
-
-        // Retract (hold)
-        operatorController.pov(180).whileTrue(
-            elevator.commands.incrementElevatorPositionCommand(0, -ELEVATOR.MANUAL_EXTENSION_SPEED)
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
-
-        // Note Request (hold)
-        operatorController.back().whileTrue(
-            leds.commands.blinkCommand(LEDS.YELLOW, 2)
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
-
-        // Trap Prime (press)
-        operatorController.start().onTrue(
-            new PrimeCommand(RangeTable.getTrap(), () -> 0)
-            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-        );
+        
     }
 
     /**

@@ -273,7 +273,6 @@ public class SwerveCommands extends SubsystemCommands{
 
         return Commands.runOnce(() -> {
             swerve.resetEncoders();
-            swerve.resetPose(new Pose2d());
             swerve.resetToAbsEncoders();
             swerve.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
         }).alongWith(

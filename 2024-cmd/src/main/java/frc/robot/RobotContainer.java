@@ -15,6 +15,8 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 
+import java.util.function.DoubleSupplier;
+
 import com.NewtonSwerve.Gyro.NewtonPigeon2;
 import com.ctre.phoenix.sensors.Pigeon2;
 
@@ -58,6 +60,11 @@ public class RobotContainer {
         CONTROLLERS.OPERATOR_PORT
     );
 
+    // Useful suppliers that are private to RobotContainer (can't go in Suppliers)
+    private DoubleSupplier translateX = () -> -driverController.getLeftX();
+    private DoubleSupplier translateY = () -> -driverController.getLeftY();
+    private DoubleSupplier rotate = () -> -driverController.getRightX();
+
     /**
      * Create the robot container. This creates and configures subsystems, sets
      * up button bindings, and prepares for autonomous.
@@ -87,9 +94,7 @@ public class RobotContainer {
     private void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
         setDefaultCommand(swerve, swerve.commands.driveCommand(
-            () -> -driverController.getLeftX(),
-            () -> -driverController.getLeftY(),
-            () -> -driverController.getRightX()
+            translateX, translateY, rotate
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         // Set the LED strip's default command to showing whether or not the robot is loaded
@@ -110,8 +115,7 @@ public class RobotContainer {
      */
     private Command snapToCommand(Rotation2d angle){
         return swerve.commands.snapToCommand(
-            () -> -driverController.getLeftX(),
-            () -> -driverController.getLeftY(),
+            translateX, translateY,
             Rotation2d.fromDegrees((360-angle.getDegrees())%360)
         );
     }
@@ -137,7 +141,7 @@ public class RobotContainer {
         driverController.a().whileTrue(
             swerve.commands.rawRotationCommand(
                 () -> 0, // No side-to-side
-                () -> driverController.getLeftY(), // Drive forward and back freely
+                translateY, // Drive forward and back freely
 
                 // Rotation speed of the autocollect function (turn towards the note)
                 () -> noteLock.driveToTarget(
@@ -179,8 +183,15 @@ public class RobotContainer {
             // This clears all scheduled commands and stows, meaning the robot
             // will stow without reference to what it was previously doing.
             new OverrideEverythingCommand(
-                new StowCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf) //Cancel self so we don't have to wait for a full stow before moving on
+                new StowCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf) // Cancel self so we don't have to wait for a full stow before moving on
             )
+        );
+
+        // Autoaim (hold)
+        driverController.leftTrigger(0.1).whileTrue(
+            swerve.commands.rawRotationCommand(
+                this.translateX, this.translateY, Suppliers.aimToSpeakerPidLoopPositiveSearch
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         // Snap-to (hold)

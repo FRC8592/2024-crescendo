@@ -15,22 +15,21 @@ public class SystemsCheckAuto extends AutoCommand {
     public SystemsCheckAuto(){
         super(
             // Drive the swerve in all four directions at low speed to confirm that it works
-            swerve.commands.rawDriveCommand(() -> 0.2, () -> 0, () -> 0).withTimeout(0.75),
-            swerve.commands.rawDriveCommand(() -> -0.2, () -> 0, () -> 0).withTimeout(0.75),
-            swerve.commands.rawDriveCommand(() -> 0, () -> 0.2, () -> 0).withTimeout(0.75),
-            swerve.commands.rawDriveCommand(() -> 0, () -> -0.2, () -> 0).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> 1, () -> 0, () -> 0).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> -1, () -> 0, () -> 0).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> 0, () -> 1, () -> 0).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> 0, () -> -1, () -> 0).withTimeout(0.75),
 
             // Rotate in both directions as well
-            swerve.commands.rawDriveCommand(() -> 0, () -> 0, () -> 0.2).withTimeout(0.75),
-            swerve.commands.rawDriveCommand(() -> 0, () -> 0, () -> -0.2).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> 0, () -> 0, () -> 1).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> 0, () -> 0, () -> -1).withTimeout(0.75),
 
             swerve.commands.stopCommand(),
 
             // Routine to test the intake and shooter
             new IntakeCommand(),
             new WaitCommand(2), // Give humans time to get in position to catch the note
-            new PrimeCommand(RangeTable.getSubwoofer(), () -> 0).until(() -> shooter.readyToShoot()),
-            new ShootCommand(),
+            new ShootCommand(RangeTable.getSubwoofer()),
             new WaitCommand(3), // Let whoever caught the note get the note and themselves out of the way
 
             //Test the elevator by raising it, lowering the extension as it would in a climb, and stowing

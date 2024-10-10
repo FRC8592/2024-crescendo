@@ -10,8 +10,9 @@ public class PreloadThreeWingNoteAuto extends AutoCommand {
     public PreloadThreeWingNoteAuto(){
         super(
             // Prime and shoot the preloaded note
-            new TimingSimulatedCommand(new PrimeCommand(RangeTable.getSubwoofer(), () -> 0), 1.5),
-            new TimingSimulatedCommand(new ShootCommand(), SHOOTER.SHOOT_SCORE_TIME),
+            new TimingSimulatedCommand(
+                new ShootCommand(RangeTable.getSubwoofer()), 2+SHOOTER.SHOOT_SCORE_TIME
+            ),
 
             new FollowPathAndScoreCommand(getChoreoTrajectory("PreloadThreeWingNoteAuto_1"), 3, 1.8, false),
             new FollowPathAndScoreCommand(getChoreoTrajectory("PreloadThreeWingNoteAuto_2"), 3, 2.4, false),

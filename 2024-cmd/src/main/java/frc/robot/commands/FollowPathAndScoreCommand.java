@@ -4,6 +4,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import frc.robot.Suppliers;
 import frc.robot.commands.proxies.*;
 import frc.robot.helpers.RangeTable;
+import frc.robot.subsystems.swerve.Swerve.DriveModes;
 
 public class FollowPathAndScoreCommand extends NewtonCommand{
     /**
@@ -35,7 +36,7 @@ public class FollowPathAndScoreCommand extends NewtonCommand{
                         ).alongWith(
                             // This rawDriveCommand aims the robot at the speaker
                             swerve.commands.rawDriveCommand(
-                                () -> 0, () -> 0, Suppliers.aimToSpeakerPidLoopNegativeSearch
+                                () -> 0, () -> 0, Suppliers.aimToSpeakerPidLoopNegativeSearch, DriveModes.ROBOT_RELATIVE
                             )
                         )
                     ).onlyIf(() -> useVision)

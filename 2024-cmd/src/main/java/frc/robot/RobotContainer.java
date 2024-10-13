@@ -16,11 +16,9 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.Swerve.DriveModes;
 
 import java.util.function.DoubleSupplier;
-
-import com.NewtonSwerve.Gyro.NewtonPigeon2;
-import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -73,7 +71,7 @@ public class RobotContainer {
      * up button bindings, and prepares for autonomous.
      */
     public RobotContainer() {
-        swerve = Swerve.instantiate(new NewtonPigeon2(new Pigeon2(CAN.PIGEON_CAN_ID)));
+        swerve = Swerve.instantiate();
         intake = Intake.instantiate();
         elevator = Elevator.instantiate();
         shooter = Shooter.instantiate();
@@ -99,7 +97,7 @@ public class RobotContainer {
     private void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
         setDefaultCommand(swerve, swerve.commands.driveCommand(
-            translateX, translateY, rotate
+            translateX, translateY, rotate, DriveModes.AUTOMATIC
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         // Set the LED strip's default command to showing whether or not the robot is loaded
@@ -121,7 +119,8 @@ public class RobotContainer {
     private Command snapToCommand(Rotation2d angle){
         return swerve.commands.snapToCommand(
             translateX, translateY,
-            Rotation2d.fromDegrees((360-angle.getDegrees())%360)
+            Rotation2d.fromDegrees((360-angle.getDegrees())%360),
+            DriveModes.AUTOMATIC
         );
     }
 
@@ -154,14 +153,15 @@ public class RobotContainer {
                     turnPID,
                     drivePID,
                     NOTELOCK.TELEOP_DRIVE_TO_TARGET_ANGLE
-                ).omegaRadiansPerSecond
+                ).omegaRadiansPerSecond,
+                DriveModes.ROBOT_RELATIVE
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
-        Controls.robotOriented.onTrue(
-            swerve.commands.robotOrientedCommand(true) // Enable robot-oriented driving
+        Controls.robotRelative.onTrue(
+            swerve.commands.robotRelativeCommand(true) // Enable robot-oriented driving
         ).onFalse(
-            swerve.commands.robotOrientedCommand(false) // Disable robot-oriented driving
+            swerve.commands.robotRelativeCommand(false) // Disable robot-oriented driving
         );
 
         Controls.score.onTrue(
@@ -194,7 +194,7 @@ public class RobotContainer {
 
         Controls.autoAim.whileTrue(
             swerve.commands.rawRotationCommand(
-                this.translateX, this.translateY, Suppliers.aimToSpeakerPidLoopPositiveSearch
+                this.translateX, this.translateY, Suppliers.aimToSpeakerPidLoopPositiveSearch, DriveModes.AUTOMATIC
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 

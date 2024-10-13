@@ -7,6 +7,7 @@ import frc.robot.commands.*;
 import frc.robot.commands.autonomous.AutoCommand;
 import frc.robot.helpers.*;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.swerve.Swerve.DriveModes;
 
 public class SystemsCheckAuto extends AutoCommand {
     /**
@@ -15,14 +16,14 @@ public class SystemsCheckAuto extends AutoCommand {
     public SystemsCheckAuto(){
         super(
             // Drive the swerve in all four directions at low speed to confirm that it works
-            swerve.commands.rawDriveCommand(() -> 1, () -> 0, () -> 0).withTimeout(0.75),
-            swerve.commands.rawDriveCommand(() -> -1, () -> 0, () -> 0).withTimeout(0.75),
-            swerve.commands.rawDriveCommand(() -> 0, () -> 1, () -> 0).withTimeout(0.75),
-            swerve.commands.rawDriveCommand(() -> 0, () -> -1, () -> 0).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> 1, () -> 0, () -> 0, DriveModes.FIELD_RELATIVE).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> -1, () -> 0, () -> 0, DriveModes.FIELD_RELATIVE).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> 0, () -> 1, () -> 0, DriveModes.FIELD_RELATIVE).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> 0, () -> -1, () -> 0, DriveModes.FIELD_RELATIVE).withTimeout(0.75),
 
             // Rotate in both directions as well
-            swerve.commands.rawDriveCommand(() -> 0, () -> 0, () -> 1).withTimeout(0.75),
-            swerve.commands.rawDriveCommand(() -> 0, () -> 0, () -> -1).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> 0, () -> 0, () -> 1, DriveModes.FIELD_RELATIVE).withTimeout(0.75),
+            swerve.commands.rawDriveCommand(() -> 0, () -> 0, () -> -1, DriveModes.FIELD_RELATIVE).withTimeout(0.75),
 
             swerve.commands.stopCommand(),
 

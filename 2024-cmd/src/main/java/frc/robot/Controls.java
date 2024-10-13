@@ -17,7 +17,7 @@ public final class Controls {
     private static CommandXboxController operatorController;
 
     protected static Trigger slowMode = new Trigger(() -> false);
-    protected static Trigger robotOriented = new Trigger(() -> false);
+    protected static Trigger robotRelative = new Trigger(() -> false);
     protected static Trigger zeroGryoscope = new Trigger(() -> false);
 
     protected static Trigger autocollect = new Trigger(() -> false);
@@ -69,7 +69,7 @@ public final class Controls {
         switch (set) {
             default: case DISABLED:
                 slowMode = new Trigger(() -> false);
-                robotOriented = new Trigger(() -> false);
+                robotRelative = new Trigger(() -> false);
                 zeroGryoscope = new Trigger(() -> false);
 
                 autocollect = new Trigger(() -> false);
@@ -102,7 +102,7 @@ public final class Controls {
 
             case MAIN_TELEOP:
                 slowMode = driverController.rightBumper();
-                robotOriented = driverController.leftBumper();
+                robotRelative = driverController.leftBumper();
                 zeroGryoscope = driverController.back();
 
                 autocollect = driverController.a();

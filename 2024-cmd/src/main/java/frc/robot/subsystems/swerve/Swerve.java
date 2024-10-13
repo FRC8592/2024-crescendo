@@ -6,14 +6,22 @@ package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.NewtonSwerve.*;
-import com.NewtonSwerve.Mk4.*;
-import com.NewtonSwerve.Gyro.Gyro;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.ClosedLoopOutputType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -29,128 +37,208 @@ public class Swerve extends SubsystemBase {
         }
         return instance;
     }
-    public static Swerve instantiate(Gyro gyro){
+    public static Swerve instantiate(){
         if(instance != null){
             throw new IllegalStateException("The Swerve subsystem can't be instantiated twice");
         }
-        instance = new Swerve(gyro);
+        instance = new Swerve();
         return instance;
     }
 
     public SwerveCommands commands = new SwerveCommands(this);
 
-    private Mk4ModuleConfiguration swerveConfig;
-    private NewtonSwerve swerve;
+    /**
+     * Small enum to control whether to drive robot- or field-
+     * relative for {@link Swerve#drive(ChassisSpeeds, DriveModes)}
+     */
+    public enum DriveModes{
+        /** Drive robot-relative */
+        ROBOT_RELATIVE,
+        /** Switch between robot- and field-relative depending on driver input */
+        AUTOMATIC,
+        /** Drive field-relative */
+        FIELD_RELATIVE
+    }
+
     private PIDController snapToController;
 
     private boolean isSlowMode;
-    private boolean robotOriented;
-
-    // Yaw lock is not currently implemented
-    private boolean yawLock;
-    private double yawLockValue;
+    private boolean robotRelative;
 
     private SmoothingFilter smoothingFilter;
 
-    // Only used for logging
-    private ChassisSpeeds targetChassisSpeeds;
+    private CTRESwerve swerve;
 
-    /**
-     * @param gyro a com.NewtonSwerve.Gyro.Gryo object instantiated with the hardware gyroscope
-     */
-    private Swerve(Gyro gyro) {
+    private Swerve() {
         smoothingFilter = new SmoothingFilter(
             SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
             SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
             SWERVE.ROTATION_SMOOTHING_AMOUNT
         );
 
-        // Stores physical information about the swerve and info about user config
-        Mk4ModuleConfiguration config = new Mk4ModuleConfiguration();
+        // PID constants for the swerve's drive and steer controllers
+        Slot0Configs driveGains = (
+            new Slot0Configs()
+            .withKP(SWERVE.DRIVE_P).withKI(SWERVE.DRIVE_I).withKD(SWERVE.DRIVE_D)
+            .withKS(SWERVE.DRIVE_S).withKV(SWERVE.DRIVE_V).withKA(SWERVE.DRIVE_A)
+        );
+        Slot0Configs steerGains = (
+            new Slot0Configs()
+            .withKP(SWERVE.STEER_P).withKI(SWERVE.STEER_I).withKD(SWERVE.STEER_D)
+            .withKS(SWERVE.STEER_S).withKV(SWERVE.STEER_V).withKA(SWERVE.STEER_A)
+        );
 
-        // Drivetrain dimensions
-        config.setDriveTrainWidthMeters(SWERVE.DRIVE_TRAIN_WIDTH);
-        config.setDriveTrainLengthMeters(SWERVE.DRIVE_TRAIN_LENGTH);
-        config.setWheelCircumference(SWERVE.WHEEL_CIRCUMFERENCE);
+        // Drivetrain configuration that doesn't involve the modules
+        SwerveDrivetrainConstants drivetrainConstants = (
+            new SwerveDrivetrainConstants()
+            .withPigeon2Id(CAN.PIGEON_CAN_ID)
+            .withPigeon2Configs(new Pigeon2Configuration())
+        );
 
-        // Max Values
-        config.setNominalVoltage(POWER.SWERVE_MAX_VOLTAGE);
-        config.setMaxVelocityMetersPerSecond(SWERVE.MAX_VELOCITY_METERS_PER_SECOND);
+        // This configuration object will apply to all of the swerve's drive motors
+        TalonFXConfiguration driveMotorsConfig = new TalonFXConfiguration();
 
-        // Set PID constants
-        config.setThrottlePID(SWERVE.THROTTLE_kP, SWERVE.THROTTLE_kI, SWERVE.THROTTLE_kD);
-        config.setSteerPID(SWERVE.STEER_kP, SWERVE.STEER_kI, SWERVE.STEER_kD);
+        // This configuration object will apply to all of the swerve's steer motors
+        TalonFXConfiguration steerMotorsConfig = (
+            new TalonFXConfiguration().withCurrentLimits(
+                new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(60)
+                .withStatorCurrentLimitEnable(true)
+            )
+        );
 
-        // For the snap-to-angle functionality
-        snapToController = new PIDController(SWERVE.SNAP_TO_kP, SWERVE.SNAP_TO_kI, SWERVE.SNAP_TO_kD);
+        // This configuration object will apply to all of the swerve's CANCoders
+        CANcoderConfiguration cancoderInitialConfigs = new CANcoderConfiguration();
 
-        SwerveModule m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(config,
-            Mk4iSwerveModuleHelper.GearRatio.L2,
-            CAN.SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID,
+        // All swerve module configuration that isn't module-specific
+        SwerveModuleConstantsFactory commonSwerveConstants = new SwerveModuleConstantsFactory()
+                .withDriveMotorGearRatio(SWERVE.DRIVE_GEAR_RATIO)
+                .withSteerMotorGearRatio(SWERVE.STEER_GEAR_RATIO)
+                .withWheelRadius(SWERVE.WHEEL_RADIUS_INCHES)
+                .withSlipCurrent(SWERVE.CALCULATED_SLIP_CURRENT)
+                .withSteerMotorGains(steerGains)
+                .withDriveMotorGains(driveGains)
+                .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
+                .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
+                .withSpeedAt12VoltsMps(SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND)
+                .withDriveInertia(SWERVE.SIMULATED_DRIVE_INERTIA)
+                .withSteerInertia(SWERVE.SIMULATED_STEER_INERTIA)
+                .withDriveFrictionVoltage(SWERVE.DRIVE_FRICTION_VOLTAGE)
+                .withSteerFrictionVoltage(SWERVE.STEER_FRICTION_VOLTAGE)
+                .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
+                .withCouplingGearRatio(SWERVE.COUPLING_GEAR_RATIO)
+                .withDriveMotorInitialConfigs(driveMotorsConfig)
+                .withSteerMotorInitialConfigs(steerMotorsConfig)
+                .withCANcoderInitialConfigs(cancoderInitialConfigs);
+
+        // Generate swerve-module constant objects by combing the common constants with module-specific ones
+        SwerveModuleConstants frontLeft = commonSwerveConstants.createModuleConstants(
             CAN.SWERVE_BLACK_FRONT_LEFT_STEER_CAN_ID,
+            CAN.SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID,
             CAN.SWERVE_BLACK_FRONT_LEFT_ENCODER_CAN_ID,
-            SWERVE.BLACK_FRONT_LEFT_STEER_OFFSET
-        );
-
-        SwerveModule m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(config,
-            Mk4iSwerveModuleHelper.GearRatio.L2,
-            CAN.SWERVE_ORANGE_FRONT_RIGHT_DRIVE_CAN_ID,
+            SWERVE.BLACK_FRONT_LEFT_STEER_OFFSET,
+            Units.inchesToMeters(SWERVE.BLACK_FRONT_LEFT_X_POSITION),
+            Units.inchesToMeters(SWERVE.BLACK_FRONT_LEFT_Y_POSITION),
+            SWERVE.INVERT_LEFT_SIDE
+        ).withSteerMotorInverted(SWERVE.BLACK_FRONT_LEFT_STEER_INVERT);
+        SwerveModuleConstants frontRight = commonSwerveConstants.createModuleConstants(
             CAN.SWERVE_ORANGE_FRONT_RIGHT_STEER_CAN_ID,
+            CAN.SWERVE_ORANGE_FRONT_RIGHT_DRIVE_CAN_ID,
             CAN.SWERVE_ORANGE_FRONT_RIGHT_ENCODER_CAN_ID,
-            SWERVE.ORANGE_FRONT_RIGHT_STEER_OFFSET
-        );
-
-        SwerveModule m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(config,
-            Mk4iSwerveModuleHelper.GearRatio.L2,
-            CAN.SWERVE_TEAL_BACK_LEFT_DRIVE_CAN_ID,
+            SWERVE.ORANGE_FRONT_RIGHT_STEER_OFFSET,
+            Units.inchesToMeters(SWERVE.ORANGE_FRONT_RIGHT_X_POSITION),
+            Units.inchesToMeters(SWERVE.ORANGE_FRONT_RIGHT_Y_POSITION),
+            SWERVE.INVERT_RIGHT_SIDE
+        ).withSteerMotorInverted(SWERVE.ORANGE_FRONT_RIGHT_STEER_INVERT);
+        SwerveModuleConstants backLeft = commonSwerveConstants.createModuleConstants(
             CAN.SWERVE_TEAL_BACK_LEFT_STEER_CAN_ID,
+            CAN.SWERVE_TEAL_BACK_LEFT_DRIVE_CAN_ID,
             CAN.SWERVE_TEAL_BACK_LEFT_ENCODER_CAN_ID,
-            SWERVE.TEAL_BACK_LEFT_STEER_OFFSET
-        );
-
-        SwerveModule m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(config,
-            Mk4iSwerveModuleHelper.GearRatio.L2,
-            CAN.SWERVE_WHITE_BACK_RIGHT_DRIVE_CAN_ID,
+            SWERVE.TEAL_BACK_LEFT_STEER_OFFSET,
+            Units.inchesToMeters(SWERVE.TEAL_BACK_LEFT_X_POSITION),
+            Units.inchesToMeters(SWERVE.TEAL_BACK_LEFT_Y_POSITION),
+            SWERVE.INVERT_LEFT_SIDE
+        ).withSteerMotorInverted(SWERVE.TEAL_BACK_LEFT_STEER_INVERT);
+        SwerveModuleConstants backRight = commonSwerveConstants.createModuleConstants(
             CAN.SWERVE_WHITE_BACK_RIGHT_STEER_CAN_ID,
+            CAN.SWERVE_WHITE_BACK_RIGHT_DRIVE_CAN_ID,
             CAN.SWERVE_WHITE_BACK_RIGHT_ENCODER_CAN_ID,
-            SWERVE.WHITE_BACK_RIGHT_STEER_OFFSET
-        );
+            SWERVE.WHITE_BACK_RIGHT_STEER_OFFSET,
+            Units.inchesToMeters(SWERVE.WHITE_BACK_RIGHT_X_POSITION),
+            Units.inchesToMeters(SWERVE.WHITE_BACK_RIGHT_Y_POSITION),
+            SWERVE.INVERT_RIGHT_SIDE
+        ).withSteerMotorInverted(SWERVE.WHITE_BACK_RIGHT_STEER_INVERT);
 
-        // * If reusing this code on a robot with Mk4 modules, comment the module creation above and replace it with these lines
-        // SwerveModule m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_BLACK_FRONT_LEFT_DRIVE_CAN_ID,CAN.SWERVE_BLACK_FRONT_LEFT_STEER_CAN_ID,CAN.SWERVE_BLACK_FRONT_LEFT_ENCODER_CAN_ID,SWERVE.BLACK_FRONT_LEFT_STEER_OFFSET);
-        // SwerveModule m_frontRightModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_ORANGE_FRONT_RIGHT_DRIVE_CAN_ID,CAN.SWERVE_ORANGE_FRONT_RIGHT_STEER_CAN_ID,CAN.SWERVE_ORANGE_FRONT_RIGHT_ENCODER_CAN_ID,SWERVE.ORANGE_FRONT_RIGHT_STEER_OFFSET);
-        // SwerveModule m_backLeftModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_TEAL_BACK_LEFT_DRIVE_CAN_ID,CAN.SWERVE_TEAL_BACK_LEFT_STEER_CAN_ID,CAN.SWERVE_TEAL_BACK_LEFT_ENCODER_CAN_ID,SWERVE.TEAL_BACK_LEFT_STEER_OFFSET);
-        // SwerveModule m_backRightModule = Mk4SwerveModuleHelper.createFalcon500(config,Mk4SwerveModuleHelper.GearRatio.L2,CAN.SWERVE_WHITE_BACK_RIGHT_DRIVE_CAN_ID,CAN.SWERVE_WHITE_BACK_RIGHT_STEER_CAN_ID,CAN.SWERVE_WHITE_BACK_RIGHT_ENCODER_CAN_ID,SWERVE.WHITE_BACK_RIGHT_STEER_OFFSET);
+        swerve = new CTRESwerve(drivetrainConstants, commonSwerveConstants, frontLeft, frontRight, backLeft, backRight);
 
-        this.swerveConfig = config;
+        // This lambda is run every time the odometry is updated (100hz for classic CAN or 250hz for CAN FD)
+        swerve.registerTelemetry((drivetrainState, kinematics, modules) -> {
+            Logger.recordOutput(SWERVE.LOG_PATH+"TargetSwerveStates", drivetrainState.ModuleTargets);
+            Logger.recordOutput(SWERVE.LOG_PATH+"ReadSwerveStates", drivetrainState.ModuleStates);
+            Logger.recordOutput(SWERVE.LOG_PATH+"OdometryPosition", drivetrainState.Pose);
+            Logger.recordOutput(SWERVE.LOG_PATH+"ActualChassisSpeeds", drivetrainState.speeds);
+            Logger.recordOutput(SWERVE.LOG_PATH+"TargetChassisSpeeds", kinematics.toChassisSpeeds(
+                modules[0].getTargetState(), modules[1].getTargetState(), modules[2].getTargetState(), modules[3].getTargetState()
+            ));
 
-        this.swerve = new NewtonSwerve(
-            config,
-            gyro,
-            m_frontLeftModule,
-            m_frontRightModule,
-            m_backLeftModule,
-            m_backRightModule
-        );
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/DriveReadVelocityMPS", modules[0].getCurrentState().speedMetersPerSecond);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/DriveTargetVelocityMPS", modules[0].getTargetState().speedMetersPerSecond);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/SteerReadAngle", modules[0].getCurrentState().angle);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/SteerTargetAngle", modules[0].getTargetState().angle);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/SteerReadVelocityRPM", modules[0].getSteerMotor().getVelocity().getValueAsDouble());
+
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/DriveReadVelocityMPS", modules[1].getCurrentState().speedMetersPerSecond);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/DriveTargetVelocityMPS", modules[1].getTargetState().speedMetersPerSecond);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/SteerReadAngle", modules[1].getCurrentState().angle);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/SteerTargetAngle", modules[1].getTargetState().angle);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/SteerReadVelocityRPM", modules[1].getSteerMotor().getVelocity().getValueAsDouble());
+
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/DriveReadVelocityMPS", modules[2].getCurrentState().speedMetersPerSecond);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/DriveTargetVelocityMPS", modules[2].getTargetState().speedMetersPerSecond);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/SteerReadAngle", modules[2].getCurrentState().angle);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/SteerTargetAngle", modules[2].getTargetState().angle);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/SteerReadVelocityRPM", modules[2].getSteerMotor().getVelocity().getValueAsDouble());
+
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/DriveReadVelocityMPS", modules[3].getCurrentState().speedMetersPerSecond);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/DriveTargetVelocityMPS", modules[3].getTargetState().speedMetersPerSecond);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerReadAngle", modules[3].getCurrentState().angle);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerTargetAngle", modules[3].getTargetState().angle);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerReadVelocityRPM", modules[3].getSteerMotor().getVelocity().getValueAsDouble());
+        });
     }
 
-    public void periodic() {
-        Logger.recordOutput(SWERVE.LOG_PATH+"OdometryPosition", getCurrentPos());
-        Logger.recordOutput(SWERVE.LOG_PATH+"TargetChassisSpeeds", targetChassisSpeeds);
-        Logger.recordOutput(SWERVE.LOG_PATH+"ActualChassisSpeeds", this.swerve.getCurrentSpeeds());
-    }
+    public void periodic() {}
 
     public void simulationPeriodic() {
+        Robot.FIELD.setRobotPose(getCurrentPosition());
     }
 
     /**
-     * Send a {@code ChassisSpeeds} to the drivetrain
+     * Send a {@code ChassisSpeeds} to the drivetrain, robot-relative
      *
      * @param speeds the speeds to run the drivetrain at
      */
     protected void drive(ChassisSpeeds speeds){
-        targetChassisSpeeds = speeds;
-        swerve.drive(speeds);
+        swerve.drive(speeds, false);
+    }
+
+    /**
+     * Send a {@code ChassisSpeeds} to the drivetrain, robot-relative
+     *
+     * @param speeds the speeds to run the drivetrain at
+     */
+    protected void drive(ChassisSpeeds speeds, DriveModes mode){
+        swerve.drive(
+            speeds,
+            switch(mode){
+                case FIELD_RELATIVE:
+                    yield true;
+                case AUTOMATIC:
+                    yield !robotRelative;
+                case ROBOT_RELATIVE:
+                    yield false;
+            }
+        );
     }
 
     /**
@@ -163,95 +251,43 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Set whether human-input-processed joystick input should be robot-oriented
-     * (as opposed to field-oriented)
+     * Set whether human-input-processed joystick input should be robot-relative
+     * (as opposed to field-relative)
      *
-     * @param robotOriented whether to run the drivetrain robot-oriented
+     * @param robotRelative whether to run the drivetrain robot-relative
      */
-    protected void setRobotOriented(boolean robotOriented){
-        this.robotOriented = robotOriented;
+    protected void setRobotRelative(boolean robotRelative){
+        this.robotRelative = robotRelative;
     }
 
     /**
      * Set the gyroscope heading to 0
      */
     protected void zeroGyroscope(){
-        swerve.zeroGyroscope();
+        swerve.resetGyroscope();
     }
 
     /**
-     * Get the current robot yaw in degrees. This method is somewhat
-     * deprecated and is replaced by {@link Swerve#getGyroscopeRotation()},
-     * which returns a Rotation2d instead.
+     * Get the current robot yaw as a Rotation2d
      */
-    public double getYaw() {
+    public Rotation2d getYaw() {
         return swerve.getYaw();
     }
 
     /**
-     * Get the current robot yaw rate in degrees per second.
-     * Note that this assumes a loop time of 0.02 seconds exactly,
-     * so don't depend on it for anything requiring accuracy.
+     * Get the current position of the swerve as judged by odometry.
      */
-    public double getYawRate() {
-        return swerve.gyro.getYawRate();
-    }
-
-    public double getMaxTranslateVelocity() {
-        return swerve.getMaxTranslateVelocity();
-    }
-
-    public double getMaxAngularVelocity() {
-        return swerve.getMaxAngularVelocity();
-    }
-
-    /**
-     * Get the current position of the swerve as judged by odometry. If
-     * in simulation, returns the robot's position on the simulated field
-     */
-    public Pose2d getCurrentPos() {
-        if(Robot.isReal()){
-            return swerve.getCurrentPos();
-        }
-        else{
-            return Robot.FIELD.getRobotPose();
-        }
-    }
-
-    /**
-     * Get the robot's rotation as a Rotation2d. Preferable
-     * to {@link Swerve#getYaw()}.
-     */
-    public Rotation2d getGyroscopeRotation() {
-        return swerve.getGyroscopeRotation();
+    public Pose2d getCurrentPosition() {
+        return swerve.getCurrentOdometryPosition();
     }
 
     /**
      * Set the robot's known rotation.
      *
-     * @param yaw the rotation to set in degrees
+     * @param yaw the rotation to set as a Rotation2d
      */
-    public void setGyroscopeRotation(double yaw){
-        swerve.gyro.setYaw(yaw);
-    }
-
-    /**
-     * Reset the swerve modules' known rotations to the readings from the abolute
-     * encoders.
-     */
-    protected void resetToAbsEncoders() {
-        swerve.resetSteerAngles();
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve steer angles reset.");
-    }
-
-    /**
-     * Set the throttle motors' current limits.
-     *
-     * @param limit the limit to set in amps
-     */
-    protected void setThrottleCurrentLimit(double limit) {
-        swerve.setThrottleCurrentLimit(limit);
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle current limit set.");
+    public void setGyroscopeRotation(Rotation2d yaw){
+        swerve.setYaw(yaw);
     }
 
     /**
@@ -260,7 +296,7 @@ public class Swerve extends SubsystemBase {
      * @param pose the pose to set the robot's known position to.
      */
     protected void resetPose(Pose2d pose) {
-        swerve.resetPose(pose);
+        swerve.setKnownOdometryPose(pose);
         Logger.recordOutput(
             SWERVE.LOG_PATH+"Console", (
                 "Current pose reset to X: "+
@@ -275,21 +311,13 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Reset all throttle encoders to 0.
-     */
-    protected void resetEncoders() {
-        swerve.resetEncoders();
-        Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve throttle encoders reset.");
-    }
-
-    /**
-     * Use PID to snap the robot to the setpoint.
+     * Use PID to snap the robot to a rotational setpoint
      *
      * @param setpoint the setpoint to snap to
-     * @return the rotational velocity setpoint in radians/second
+     * @return the rotational velocity setpoint as a Rotation2d
      */
     protected double snapToAngle(Rotation2d setpoint) {
-        double currYaw = getGyroscopeRotation().getRadians();
+        double currYaw = getYaw().getRadians();
         double errorAngle = setpoint.getRadians() - currYaw;
 
         if(errorAngle > Math.PI){
@@ -310,13 +338,13 @@ public class Swerve extends SubsystemBase {
      * @param rawX the raw X input from a joystick. Should be -1 to 1
      * @param rawY the raw Y input from a joystick. Should be -1 to 1
      * @param rawRot the raw rotation input from a joystick. Should be -1 to 1
-     * @param fieldOrientedAllowed if this is true, switch between field- and
-     * robot-oriented based on {@link Swerve#robotOriented}. Otherwise, force
-     * robot-oriented.
+     * @param fieldRelativeAllowed if this is true, switch between field- and
+     * robot-relative based on {@link Swerve#robotRelative}. Otherwise, force
+     * robot-relative.
      *
      * @return a ChassisSpeeds ready to be sent to the swerve.
      */
-    protected ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot, boolean fieldOrientedAllowed){
+    protected ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
         double driveTranslateY = (
             rawY >= 0
             ? (Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT))
@@ -324,7 +352,7 @@ public class Swerve extends SubsystemBase {
         );
 
         double driveTranslateX = (
-            rawX >= 0 
+            rawX >= 0
             ? (Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT))
             : -(Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT))
         );
@@ -335,51 +363,22 @@ public class Swerve extends SubsystemBase {
             : -(Math.pow(rawRot, SWERVE.JOYSTICK_EXPONENT))
         );
 
-        //
-        // Lock the robot yaw if the rotation rate is low and the yaw joystick is released
-        // Only unlock the robot yaw if the joystick provides a yaw command
-        //
-        // if ((Math.abs(getYawRate()) < 5) && (Math.abs(rawRot) < 0.05)) {
-        //     if (!yawLock) {
-        //         yawLockValue = getYaw();
-        //     }
-        //     yawLock = true;
-        // }
-
-        // if (Math.abs(rawRot) > 0.05) {
-        //     yawLock = false;
-        // }
-
-        // Logger.recordOutput(SWERVE.LOG_PATH+"YawLock", yawLock);
-        // Logger.recordOutput(SWERVE.LOG_PATH+"YawLast", yawLockValue);
-        // Logger.recordOutput(SWERVE.LOG_PATH+"YawRate", getYawRate());
-        // Logger.recordOutput(SWERVE.LOG_PATH+"rawRot", rawRot);
-
-        //Create a new ChassisSpeeds object with X, Y, and angular velocity from controller input
         ChassisSpeeds currentSpeeds;
 
-        if (isSlowMode) { //Slow Mode slows down the robot for better precision & control
+        if (isSlowMode) {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelocity(),
-                driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * getMaxTranslateVelocity(),
-                driveRotate * SWERVE.ROTATE_POWER_SLOW * getMaxAngularVelocity()
+                driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveRotate * SWERVE.ROTATE_POWER_SLOW * SWERVE.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
             ));
         }
         else {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelocity(),
-                driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * getMaxTranslateVelocity(),
-                driveRotate * SWERVE.ROTATE_POWER_FAST * getMaxAngularVelocity()
+                driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveRotate * SWERVE.ROTATE_POWER_FAST * SWERVE.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
             ));
         }
-
-        currentSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            currentSpeeds, (
-                robotOriented || !fieldOrientedAllowed
-                ? new Rotation2d()
-                : swerve.getGyroscopeRotation()
-            )
-        );
 
         return currentSpeeds;
     }

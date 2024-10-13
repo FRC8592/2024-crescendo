@@ -44,10 +44,6 @@ public class Robot extends LoggedRobot {
     public void robotInit() {
         robotContainer = new RobotContainer();
 
-        if(!isReal()){
-            SmartDashboard.putData(FIELD);
-        }
-
         Logger.recordMetadata("Game", "Crescendo");
         Logger.recordMetadata("Year", "2024");
         Logger.recordMetadata("Robot", "Zenith");

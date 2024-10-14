@@ -293,7 +293,7 @@ public class RobotContainer {
         );
 
         operatorController.b().whileTrue(
-            shooter.commands.setLeftShooterVelocity(100)
+            shooter.commands.setLeftShooterVelocity(1000)
         );
 
         

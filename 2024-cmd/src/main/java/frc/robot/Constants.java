@@ -346,7 +346,7 @@ public final class Constants {
         public static final double WHITE_BACK_RIGHT_X_POSITION = -10.25;
         public static final double WHITE_BACK_RIGHT_Y_POSITION = -9.25;
 
-        public static final double PATH_FOLLOW_TRANSLATE_kP = 1d;
+        public static final double PATH_FOLLOW_TRANSLATE_kP = 6d;
         public static final double PATH_FOLLOW_TRANSLATE_kI = 0d;
         public static final double PATH_FOLLOW_TRANSLATE_kD = 0d;
 

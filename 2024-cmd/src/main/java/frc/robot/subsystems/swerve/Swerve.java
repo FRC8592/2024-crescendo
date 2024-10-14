@@ -76,6 +76,8 @@ public class Swerve extends SubsystemBase {
             SWERVE.ROTATION_SMOOTHING_AMOUNT
         );
 
+        snapToController = new PIDController(SWERVE.SNAP_TO_kP, SWERVE.SNAP_TO_kI, SWERVE.SNAP_TO_kD);
+
         // PID constants for the swerve's drive and steer controllers
         Slot0Configs driveGains = (
             new Slot0Configs()
@@ -125,7 +127,7 @@ public class Swerve extends SubsystemBase {
                 .withSteerInertia(SWERVE.SIMULATED_STEER_INERTIA)
                 .withDriveFrictionVoltage(SWERVE.DRIVE_FRICTION_VOLTAGE)
                 .withSteerFrictionVoltage(SWERVE.STEER_FRICTION_VOLTAGE)
-                .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
+                .withFeedbackSource(SteerFeedbackType.RemoteCANcoder)
                 .withCouplingGearRatio(SWERVE.COUPLING_GEAR_RATIO)
                 .withDriveMotorInitialConfigs(driveMotorsConfig)
                 .withSteerMotorInitialConfigs(steerMotorsConfig)
@@ -207,7 +209,10 @@ public class Swerve extends SubsystemBase {
         });
     }
 
-    public void periodic() {}
+    public void periodic() {
+        Logger.recordOutput(SWERVE.LOG_PATH+"Odometryvalid", swerve.odometryIsValid());
+        // swerve.periodic();
+    }
 
     public void simulationPeriodic() {
         Robot.FIELD.setRobotPose(getCurrentPosition());
@@ -317,7 +322,7 @@ public class Swerve extends SubsystemBase {
      * @return the rotational velocity setpoint as a Rotation2d
      */
     protected double snapToAngle(Rotation2d setpoint) {
-        double currYaw = getYaw().getRadians();
+        double currYaw = Math.toRadians(getYaw().getDegrees()%360);
         double errorAngle = setpoint.getRadians() - currYaw;
 
         if(errorAngle > Math.PI){

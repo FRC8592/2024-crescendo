@@ -42,8 +42,6 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotInit() {
-        robotContainer = new RobotContainer();
-
         Logger.recordMetadata("Game", "Crescendo");
         Logger.recordMetadata("Year", "2024");
         Logger.recordMetadata("Robot", "Zenith");
@@ -60,6 +58,7 @@ public class Robot extends LoggedRobot {
         else { // If simulated
             SmartDashboard.putData(FIELD);
         }
+        robotContainer = new RobotContainer();
     }
 
     /**

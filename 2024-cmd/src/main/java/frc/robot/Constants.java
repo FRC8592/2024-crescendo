@@ -280,12 +280,16 @@ public final class Constants {
         public static final double DRIVE_V = 0;
         public static final double DRIVE_A = 0;
 
+        public static final double SNAP_TO_kP = 3.7;
+        public static final double SNAP_TO_kI = 0.0;
+        public static final double SNAP_TO_kD = 0.1;
+
         public static final int STEER_STATOR_CURRENT_LIMIT = 60;
 
         public static final int CALCULATED_SLIP_CURRENT = 150;
 
         public static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = 4.73;
-        public static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(270);
+        public static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(720);
         public static final double COUPLING_GEAR_RATIO = 3.5714285714285716;
         public static final double DRIVE_GEAR_RATIO = 6.746031746031747;
         public static final double STEER_GEAR_RATIO = 21.428571428571427;
@@ -314,10 +318,15 @@ public final class Constants {
         public static final Rotation2d BLUE_PERSPECTIVE_ROTATION = Rotation2d.fromDegrees(0);
         public static final Rotation2d RED_PERSPECTIVE_ROTATION = Rotation2d.fromDegrees(180);
 
-        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -0.388427734375;
-        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -0.462646484375;
-        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -0.18017578125;
-        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -0.4853515625;
+        // public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -0.388427734375;
+        // public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -0.462646484375;
+        // public static final double TEAL_BACK_LEFT_STEER_OFFSET = -0.18017578125;
+        // public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -0.4853515625;
+
+        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -0.389648;
+        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -0.441162;
+        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -0.198730;
+        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -0.498291;
 
         public static final boolean BLACK_FRONT_LEFT_STEER_INVERT = true;
         public static final boolean ORANGE_FRONT_RIGHT_STEER_INVERT = true;

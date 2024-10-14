@@ -109,22 +109,6 @@ public class RobotContainer {
     //Any commands that are reused a lot but can't go in a separate class go here
 
     /**
-     * Snap the swerve to the set angle. Does NOT need to be left-right corrected
-     *
-     * @param angle Rotation2d containing the angle setpoint
-     * @return the swerve.snapToCommand
-     *
-     * @apiNote this command never ends on its own; it must be interrupted to end
-     */
-    private Command snapToCommand(Rotation2d angle){
-        return swerve.commands.snapToCommand(
-            translateX, translateY,
-            Rotation2d.fromDegrees((360-angle.getDegrees())%360),
-            DriveModes.AUTOMATIC
-        );
-    }
-
-    /**
      * Configure all button bindings
      *
      * @param controlSet the set of controls to use
@@ -178,8 +162,8 @@ public class RobotContainer {
 
         Controls.passAim.whileTrue(
             new ConditionalCommand(
-                snapToCommand(Rotation2d.fromDegrees(330)),
-                snapToCommand(Rotation2d.fromDegrees(30)),
+                swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(330), DriveModes.AUTOMATIC),
+                swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(30), DriveModes.AUTOMATIC),
                 Suppliers.robotRunningOnRed
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
@@ -199,19 +183,19 @@ public class RobotContainer {
         );
 
         Controls.snapForward.whileTrue(
-            snapToCommand(Rotation2d.fromDegrees(0))
+            swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(0), DriveModes.AUTOMATIC)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
         Controls.snapBack.whileTrue(
-            snapToCommand(Rotation2d.fromDegrees(180))
+            swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(180), DriveModes.AUTOMATIC)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
         Controls.snapLeft.whileTrue(
-            snapToCommand(Rotation2d.fromDegrees(270))
+            swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(270), DriveModes.AUTOMATIC)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
         Controls.snapRight.whileTrue(
-            snapToCommand(Rotation2d.fromDegrees(90))
+            swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(90), DriveModes.AUTOMATIC)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 

@@ -247,7 +247,7 @@ public class LimelightTargeting {
 
     
     public ChassisSpeeds driveToTarget(PIDController turnPID, PIDController drivePID, double targetAngle) {
-        double rotateSpeed = this.turnRobot(0, turnPID, "tx", SWERVE.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0);
+        double rotateSpeed = this.turnRobot(0, turnPID, "tx", SWERVE.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND, 0);
         double driveToSpeed = -this.turnRobot(0, drivePID, "ty", 4.5, targetAngle);
 
         //

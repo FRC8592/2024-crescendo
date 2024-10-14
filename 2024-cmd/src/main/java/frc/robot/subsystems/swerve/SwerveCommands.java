@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
 import frc.robot.subsystems.SubsystemCommands;
+import frc.robot.subsystems.swerve.Swerve.DriveModes;
 
 public class SwerveCommands extends SubsystemCommands{
     private Swerve swerve;
@@ -38,19 +40,19 @@ public class SwerveCommands extends SubsystemCommands{
      * @param suppliedX a lambda for forward-back translation input (will be optimized for human control)
      * @param suppliedY a lambda for left-right translation input (will be optimized for human control)
      * @param suppliedRot a lambda for rotation input (will be optimized for human control)
+     * @param driveMode the drive mode to use (robot-relative, field-relative, or based on driver request)
      *
      * @return the command
      *
      * @apiNote This command never ends on its own; it must be interrupted to end
      */
-    public Command driveCommand(DoubleSupplier suppliedX, DoubleSupplier suppliedY, DoubleSupplier suppliedRot) {
+    public Command driveCommand(DoubleSupplier suppliedX, DoubleSupplier suppliedY, DoubleSupplier suppliedRot, DriveModes driveMode) {
         return swerve.run(() -> {
             swerve.drive(swerve.processJoystickInputs(
                 suppliedX.getAsDouble(),
                 suppliedY.getAsDouble(),
-                suppliedRot.getAsDouble(),
-                true
-            ));
+                suppliedRot.getAsDouble()
+            ), driveMode);
         });
     }
 
@@ -61,21 +63,58 @@ public class SwerveCommands extends SubsystemCommands{
      * @param suppliedX a lambda for forward-back translation input
      * @param suppliedY a lambda for left-right translation input
      * @param suppliedRot a lambda for rotation input
+     * @param driveMode the drive mode to use (robot-relative, field-relative, or based on driver request)
      *
      * @return the command
      *
      * @apiNote This command never ends on its own; it must be interrupted to end
      * @apiNote Note that this command has X and Y inverted compared to the commands with human input optimization.
      */
-    public Command rawDriveCommand(DoubleSupplier suppliedX, DoubleSupplier suppliedY, DoubleSupplier suppliedRot) {
+    public Command rawDriveCommand(DoubleSupplier suppliedX, DoubleSupplier suppliedY, DoubleSupplier suppliedRot, DriveModes driveMode){
         return swerve.run(() -> {
             swerve.drive(
                 new ChassisSpeeds(
                     suppliedX.getAsDouble(),
                     suppliedY.getAsDouble(),
                     suppliedRot.getAsDouble()
-                )
+                ),
+                driveMode
             );
+        });
+    }
+
+    /**
+     * Same as {@link SwerveCommands#driveCommand(DoubleSupplier, DoubleSupplier, DoubleSupplier)}, but doesn't
+     * process the rotation for human input. Translation should come from joysticks while rotation usually
+     * should be from a PID controller or other software control.
+     *
+     * @param translationXSupplier a lambda for left-right translation input (will be optimized for human control)
+     * @param translationYSupplier a lambda for forward-back translation input (will be optimized for human control)
+     * @param rotationSpeedSupplier a lambda for rotation input (will NOT be optimized for human control)
+     * @param driveMode the drive mode to use (robot-relative, field-relative, or based on driver request)
+     *
+     * @return the command
+     *
+     * @apiNote This command never ends on its own; it must be interrupted to end
+     */
+    public Command rawRotationCommand(
+        DoubleSupplier translationXSupplier,
+        DoubleSupplier translationYSupplier,
+        DoubleSupplier rotationSpeedSupplier,
+        DriveModes driveMode){
+
+        return swerve.run(() -> {
+            // Process translation for human input
+            ChassisSpeeds processed = swerve.processJoystickInputs(
+                translationXSupplier.getAsDouble(),
+                translationYSupplier.getAsDouble(),
+                0
+            );
+
+            // Override whatever the human input processing spat out for rotation
+            // with the output of the passed-in lambda.
+            processed.omegaRadiansPerSecond = rotationSpeedSupplier.getAsDouble();
+            swerve.drive(processed, driveMode);
         });
     }
 
@@ -87,60 +126,21 @@ public class SwerveCommands extends SubsystemCommands{
      * control)
      * @param translationYSupplier a lambda for forward-back translation input (will be optimized for human
      * control)
-     *
      * @param angle the angle to snap to (doesn't have any corrections applied; this should be left-right
      * inverted).
+     * @param driveMode the drive mode to use (robot-relative, field-relative, or based on driver request)
      *
      * @return the command
      *
      * @apiNote This command never ends on its own; it must be interrupted to end
      */
-    public Command snapToCommand(DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier, Rotation2d angle){
-        return swerve.run(() -> {
-            ChassisSpeeds processed = swerve.processJoystickInputs(
-                translationXSupplier.getAsDouble(),
-                translationYSupplier.getAsDouble(),
-                0,
-                true
-            );
-
-            processed.omegaRadiansPerSecond = swerve.snapToAngle(angle);
-            swerve.drive(processed);
-        });
-    }
-
-    /**
-     * Same as {@link Swerve#driveCommand(DoubleSupplier, DoubleSupplier, DoubleSupplier)}, but doesn't
-     * process the rotation for human input. Translation should come from joysticks while rotation usually
-     * should be from a PID controller or other software control.
-     *
-     * @param translationXSupplier a lambda for left-right translation input (will be optimized for human control)
-     * @param translationYSupplier a lambda for forward-back translation input (will be optimized for human control)
-     * @param rotationSpeedSupplier a lambda for rotation input (will NOT be optimized for human control)
-     *
-     * @return the command
-     *
-     * @apiNote This command never ends on its own; it must be interrupted to end
-     */
-    public Command rawRotationCommand(
-        DoubleSupplier translationXSupplier,
-        DoubleSupplier translationYSupplier,
-        DoubleSupplier rotationSpeedSupplier){
-
-        return swerve.run(() -> {
-            // Process translation for human input
-            ChassisSpeeds processed = swerve.processJoystickInputs(
-                translationXSupplier.getAsDouble(),
-                translationYSupplier.getAsDouble(),
-                0,
-                false
-            );
-
-            // Override whatever the human input processing spat out for rotation
-            // with the output of the passed-in lambda.
-            processed.omegaRadiansPerSecond = rotationSpeedSupplier.getAsDouble();
-            swerve.drive(processed);
-        });
+    public Command snapToCommand(
+        DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier,
+        Rotation2d angle, DriveModes driveMode
+    ){
+        return this.rawRotationCommand(
+            translationXSupplier, translationYSupplier, () -> swerve.snapToAngle(angle), driveMode
+        );
     }
 
     /**
@@ -175,20 +175,20 @@ public class SwerveCommands extends SubsystemCommands{
     }
 
     /**
-     * Command to enable or disable robot-oriented control for all inputs that are processed for
+     * Command to enable or disable robot-relative control for all inputs that are processed for
      * human comfort
      *
-     * @param robotOriented whether to enable (true) or disable (false) robot-oriented control
+     * @param robotRelative whether to enable (true) or disable (false) robot-relative control
      *
      * @return the command
      *
      * @apiNote This command runs for one frame and ends immediately
      */
-    public Command robotOrientedCommand(boolean robotOriented){
+    public Command robotRelativeCommand(boolean robotRelative){
         // See slowModeCommand above for comment on the Commands.runOnce
         return Commands.runOnce(() -> {
-            swerve.setRobotOriented(robotOriented);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Console", robotOriented?"Robot-oriented enabled":"Robot-oriented disabled");
+            swerve.setRobotRelative(robotRelative);
+            Logger.recordOutput(SWERVE.LOG_PATH+"Console", robotRelative?"Robot-relative enabled":"Robot-relative disabled");
         }).ignoringDisable(true);
     }
 
@@ -266,20 +266,7 @@ public class SwerveCommands extends SubsystemCommands{
      * @apiNote This command runs for one frame and ends immediately
      */
     public Command autonomousInitCommand(){
-        // We use Commands.runOnce here because swerve.stopCommand() requires the
-        // swerve subsystem, meaning the alongWith() method would throw an exception
-        // if it were swerve.runOnce() (because we'd be trying to run two commands that
-        // both require the same subsystem at once).
-
-        return Commands.runOnce(() -> {
-            swerve.resetEncoders();
-            swerve.resetPose(new Pose2d());
-            swerve.resetToAbsEncoders();
-            swerve.setThrottleCurrentLimit(POWER.SWERVE_AUTO_THROTTLE_CURRENT_LIMIT);
-        }).alongWith(
-            this.stopCommand(),
-            this.zeroGyroscopeCommand()
-        );
+        return this.stopCommand().alongWith(this.zeroGyroscopeCommand());
     }
 
     /**
@@ -364,9 +351,9 @@ public class SwerveCommands extends SubsystemCommands{
             this.trajectory = trajectory;
 
             this.xController = new PIDController(
-                SWERVE.PATH_FOLLOW_DRIVE_kP,
-                SWERVE.PATH_FOLLOW_DRIVE_kI,
-                SWERVE.PATH_FOLLOW_DRIVE_kD
+                SWERVE.PATH_FOLLOW_TRANSLATE_kP,
+                SWERVE.PATH_FOLLOW_TRANSLATE_kI,
+                SWERVE.PATH_FOLLOW_TRANSLATE_kD
             );
             this.xController.setTolerance(
                 SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
@@ -374,9 +361,9 @@ public class SwerveCommands extends SubsystemCommands{
             );
 
             this.yController = new PIDController(
-                SWERVE.PATH_FOLLOW_DRIVE_kP,
-                SWERVE.PATH_FOLLOW_DRIVE_kI,
-                SWERVE.PATH_FOLLOW_DRIVE_kD
+                SWERVE.PATH_FOLLOW_TRANSLATE_kP,
+                SWERVE.PATH_FOLLOW_TRANSLATE_kI,
+                SWERVE.PATH_FOLLOW_TRANSLATE_kD
             );
             this.yController.setTolerance(
                 SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
@@ -384,15 +371,14 @@ public class SwerveCommands extends SubsystemCommands{
             );
 
             this.turnController = new ProfiledPIDController(
-                SWERVE.PATH_FOLLOW_STEER_kP,
-                SWERVE.PATH_FOLLOW_STEER_kI,
-                SWERVE.PATH_FOLLOW_STEER_kD,
+                SWERVE.PATH_FOLLOW_ROTATE_kP,
+                SWERVE.PATH_FOLLOW_ROTATE_kI,
+                SWERVE.PATH_FOLLOW_ROTATE_kD,
                 new Constraints(
-                    SWERVE.PATH_FOLLOW_STEER_MAX_VELOCITY,
-                    SWERVE.PATH_FOLLOW_STEER_MAX_ACCELLERATION
+                    SWERVE.PATH_FOLLOW_ROTATE_MAX_VELOCITY,
+                    SWERVE.PATH_FOLLOW_ROTATE_MAX_ACCELLERATION
                 )
             );
-
             this.turnController.setTolerance(
                 SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
                 SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
@@ -400,6 +386,12 @@ public class SwerveCommands extends SubsystemCommands{
             this.turnController.enableContinuousInput(-Math.PI, Math.PI);
 
             this.drivePID = new HolonomicDriveController(xController, yController, turnController);
+            this.drivePID.setTolerance(
+                new Pose2d(
+                    new Translation2d(xController.getPositionTolerance(), yController.getPositionTolerance()),
+                    new Rotation2d(turnController.getPositionTolerance())
+                )
+            );
 
             this.flip = flip;
         }
@@ -455,8 +447,10 @@ public class SwerveCommands extends SubsystemCommands{
             }
 
             if(Robot.isReal()){
+                Logger.recordOutput(SWERVE.LOG_PATH+"TargetPose", desiredState.poseMeters);
+
                 ChassisSpeeds driveSpeeds = drivePID.calculate(
-                    swerve.getCurrentPos(),
+                    swerve.getCurrentPosition(),
                     desiredState,
                     desiredState.poseMeters.getRotation()
                 );
@@ -467,6 +461,7 @@ public class SwerveCommands extends SubsystemCommands{
                     driveSpeeds.omegaRadiansPerSecond = alternateRotation.get().getRadians();
                 }
 
+                // Same, except overriding translation only
                 if(useAlternateTranslation.getAsBoolean()){
                     driveSpeeds.vxMetersPerSecond = alternateTranslation.get().vxMetersPerSecond;
                     driveSpeeds.vyMetersPerSecond = alternateTranslation.get().vyMetersPerSecond;
@@ -475,9 +470,13 @@ public class SwerveCommands extends SubsystemCommands{
                 swerve.drive(driveSpeeds);
             }
             else{
-                //If simulated, set the robot's position on the simulated field
-                Robot.FIELD.setRobotPose(desiredState.poseMeters);
+                // The swerve automatically sets the visible position on the simulated
+                // field, so all we have to do is set its known position
+                swerve.resetPose(desiredState.poseMeters);
             }
+        }
+        public void end(boolean interrupted){
+            swerve.drive(new ChassisSpeeds());
         }
         public boolean isFinished(){
             return ( // Only return true if enough time has elapsed, we're at the target location, and we're not using alternate movement.

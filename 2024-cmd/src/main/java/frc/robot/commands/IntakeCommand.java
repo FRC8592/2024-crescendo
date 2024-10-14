@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.Constants.*;
+import frc.robot.commands.proxies.NewtonCommand;
 
 public class IntakeCommand extends NewtonCommand {
     /**

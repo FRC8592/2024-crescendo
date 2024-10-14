@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import frc.robot.commands.proxies.NewtonCommand;
+
 public class OutakeCommand extends NewtonCommand {
     /**
      * Command to outake. Note that this command is independent of what the

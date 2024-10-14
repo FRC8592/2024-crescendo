@@ -4,8 +4,16 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.LoggedRobot;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,7 +44,20 @@ public class Robot extends LoggedRobot {
     public void robotInit() {
         robotContainer = new RobotContainer();
 
-        if(!isReal()){
+        Logger.recordMetadata("Game", "Crescendo");
+        Logger.recordMetadata("Year", "2024");
+        Logger.recordMetadata("Robot", "Zenith");
+        Logger.recordMetadata("Team", "8592");
+
+        if (isReal()) { // If running on a real robot
+            String time = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss").format(LocalDateTime.now());
+            String path = "/U/"+time+".wpilog";
+            Logger.addDataReceiver(new WPILOGWriter(path)); // Log to a USB stick
+            Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+            Logger.start();
+        }
+        else { // If simulated
             SmartDashboard.putData(FIELD);
         }
     }

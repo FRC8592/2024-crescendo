@@ -124,7 +124,7 @@ public class RobotContainer {
         );
 
         Controls.zeroGryoscope.onTrue(
-            swerve.commands.zeroGyroscopeCommand()
+            swerve.commands.resetHeadingCommand()
         );
 
         Controls.autocollect.whileTrue(

@@ -199,11 +199,11 @@ public class SwerveCommands extends SubsystemCommands{
      *
      * @apiNote This command runs for one frame and ends immediately
      */
-    public Command zeroGyroscopeCommand() {
+    public Command resetHeadingCommand() {
         // See slowModeCommand above for comment on the Commands.runOnce
         return Commands.runOnce(() -> {
-            swerve.zeroGyroscope();
-            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zeroed");
+            swerve.resetHeading();
+            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve heading reset");
         });
     }
 
@@ -266,7 +266,7 @@ public class SwerveCommands extends SubsystemCommands{
      * @apiNote This command runs for one frame and ends immediately
      */
     public Command autonomousInitCommand(){
-        return this.stopCommand().alongWith(this.zeroGyroscopeCommand());
+        return this.stopCommand().alongWith(this.resetHeadingCommand());
     }
 
     /**

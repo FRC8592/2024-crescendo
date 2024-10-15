@@ -14,10 +14,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Robot;
+import frc.robot.Suppliers;
 import frc.robot.Constants.SWERVE;
 
 public class CTRESwerve extends SwerveDrivetrain{
@@ -98,10 +98,11 @@ public class CTRESwerve extends SwerveDrivetrain{
     }
 
     /**
-     * Set the gyroscope heading to 0° (for field-relative)
+     * Define whatever direction the robot is facing as forward
      */
-    public void resetGyroscope(){
-        setYaw(new Rotation2d());
+    public void resetHeading(){
+        this.setGyroscopeYaw(Suppliers.currentRotationOffset.get());
+        this.seedFieldRelative();
     }
 
     /**
@@ -126,7 +127,7 @@ public class CTRESwerve extends SwerveDrivetrain{
      * @param yaw a {@code Rotation2d} containing the yaw to
      * set the gyroscope to
      */
-    public void setYaw(Rotation2d yaw){
+    public void setGyroscopeYaw(Rotation2d yaw){
         this.getPigeon2().setYaw(yaw.getDegrees());
     }
 
@@ -159,11 +160,7 @@ public class CTRESwerve extends SwerveDrivetrain{
         // the alliance perspective.
         if (!hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent((allianceColor) -> {
-                this.setOperatorPerspectiveForward(
-                    allianceColor == Alliance.Red
-                    ? SWERVE.RED_PERSPECTIVE_ROTATION
-                    : SWERVE.BLUE_PERSPECTIVE_ROTATION
-                );
+                this.setOperatorPerspectiveForward(Suppliers.currentRotationOffset.get());
                 hasAppliedOperatorPerspective = true;
             });
         }

@@ -266,10 +266,10 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Set the gyroscope heading to 0
+     * Define whatever direction the robot is facing as forward
      */
-    protected void zeroGyroscope(){
-        swerve.resetGyroscope();
+    protected void resetHeading(){
+        swerve.resetHeading();
     }
 
     /**
@@ -292,7 +292,7 @@ public class Swerve extends SubsystemBase {
      * @param yaw the rotation to set as a Rotation2d
      */
     public void setGyroscopeRotation(Rotation2d yaw){
-        swerve.setYaw(yaw);
+        swerve.setGyroscopeYaw(yaw);
     }
 
     /**

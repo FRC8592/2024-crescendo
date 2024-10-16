@@ -125,8 +125,7 @@ public class SwerveCommands extends SubsystemCommands{
      * control)
      * @param translationYSupplier a lambda for forward-back translation input (will be optimized for human
      * control)
-     * @param angle the angle to snap to (doesn't have any corrections applied; this should be left-right
-     * inverted).
+     * @param angle the angle to snap to 
      * @param driveMode the drive mode to use (robot-relative, field-relative, or based on driver request)
      *
      * @return the command

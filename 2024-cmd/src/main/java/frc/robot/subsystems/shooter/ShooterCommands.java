@@ -228,12 +228,12 @@ public class ShooterCommands extends SubsystemCommands{
     public Command passThroughCommand(){
         return shooter.run(() -> {
             if(shooter.isBottomBeamBreakTripped()){
-                shooter.setFeederVelocity(1);
+                shooter.setFeederPower(SHOOTER.PASSTHROUGH_FEEDER_POWER);
             }
             else{
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
             }
-            shooter.setShooterVelocity(5000);
+            shooter.setShooterVelocity(SHOOTER.PASSTHROUGH_SHOOTER_SPEED);
         }).finallyDo(() -> shooter.stopAll());
     }
 }

@@ -98,13 +98,20 @@ public class Swerve extends SubsystemBase {
         );
 
         // This configuration object will apply to all of the swerve's drive motors
-        TalonFXConfiguration driveMotorsConfig = new TalonFXConfiguration();
+        TalonFXConfiguration driveMotorsConfig = (
+            new TalonFXConfiguration()
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(POWER.SWERVE_DRIVE_CURRENT_LIMIT)
+            )
+        );
 
         // This configuration object will apply to all of the swerve's steer motors
         TalonFXConfiguration steerMotorsConfig = (
             new TalonFXConfiguration().withCurrentLimits(
                 new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(60)
+                .withStatorCurrentLimit(POWER.SWERVE_STEER_CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true)
             )
         );

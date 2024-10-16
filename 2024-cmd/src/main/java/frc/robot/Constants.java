@@ -79,9 +79,8 @@ public final class Constants {
         public static final int PIVOT_FOLLOW_MOTOR_CURRENT_LIMIT = 40;
 
         public static final int SWERVE_MAX_VOLTAGE = 12;
-        public static final int SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 80;
-        public static final int SWERVE_AUTO_THROTTLE_CURRENT_LIMIT = 60;
-        public static final int SWERVE_AZIMUTH_CURRENT_LIMIT = 40;
+        public static final int SWERVE_DRIVE_CURRENT_LIMIT = 80;
+        public static final int SWERVE_STEER_CURRENT_LIMIT = 40;
     }
 
     public final class NOTELOCK {
@@ -176,6 +175,9 @@ public final class Constants {
         public static final int OUTAKE_FLYWHEEL_SPEED = -500;
         public static final int OUTAKE_FEEDER_SPEED = -2000;
 
+        public static final int PASSTHROUGH_SHOOTER_SPEED = 5000;
+        public static final double PASSTHROUGH_FEEDER_POWER = 1;
+
         public static final double SHOOT_SCORE_TIME = 0.5;
         public static final double AMP_SCORE_TIME = 2;
 
@@ -198,6 +200,11 @@ public final class Constants {
         public static final double EXTENSION_kI = 0.0;
         public static final double EXTENSION_kD = 0.0;
         public static final double EXTENSION_kFF = 0.00025;
+
+        public static final int EXTENSION_MAX_VELOCITY = 5000;
+        public static final int EXTENSION_MAX_ACCELERATION = 10000;
+        public static final int PIVOT_MAX_VELOCITY = 6500;
+        public static final int PIVOT_MAX_ACCELERATION = 7000;
 
         // When the extension is retracted below this many meters, we can safetly lower the pivot to the home position
         public static final double EXTENSION_FULLY_RETRACTED = 0.01;

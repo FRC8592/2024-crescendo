@@ -18,16 +18,15 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.Swerve.DriveModes;
 
-import java.util.function.DoubleSupplier;
+import java.util.Set;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
     // The robot's subsystems
@@ -37,7 +36,7 @@ public class RobotContainer {
     private final Elevator elevator;
     private final LEDs leds;
 
-    //Helpers
+    // Helpers
     private final PoseVision poseVision;
     private final LimelightTargeting noteLock = new LimelightTargeting(
         NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR,0,0,0,0
@@ -52,19 +51,6 @@ public class RobotContainer {
         NOTELOCK.DRIVE_TO_TURN_kI,
         NOTELOCK.DRIVE_TO_TURN_kD
     );
-
-    // Controllers
-    private final CommandXboxController driverController = new CommandXboxController(
-        CONTROLLERS.DRIVER_PORT
-    );
-    private final CommandXboxController operatorController = new CommandXboxController(
-        CONTROLLERS.OPERATOR_PORT
-    );
-
-    // Useful suppliers that are private to RobotContainer (can't go in Suppliers)
-    private DoubleSupplier translateX = () -> -driverController.getLeftX();
-    private DoubleSupplier translateY = () -> -driverController.getLeftY();
-    private DoubleSupplier rotate = () -> -driverController.getRightX();
 
     /**
      * Create the robot container. This creates and configures subsystems, sets
@@ -85,7 +71,6 @@ public class RobotContainer {
 
         configureDefaults();
 
-        Controls.addControllers(driverController, operatorController);
         configureBindings(ControlSets.MAIN_TELEOP);
 
         AutoManager.prepare();
@@ -97,7 +82,7 @@ public class RobotContainer {
     private void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
         setDefaultCommand(swerve, swerve.commands.driveCommand(
-            translateX, translateY, rotate, DriveModes.AUTOMATIC
+            Controls.driveTranslateX, Controls.driveTranslateY, Controls.driveRotate, DriveModes.AUTOMATIC
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         // Set the LED strip's default command to showing whether or not the robot is loaded
@@ -130,7 +115,7 @@ public class RobotContainer {
         Controls.autocollect.whileTrue(
             swerve.commands.rawRotationCommand(
                 () -> 0, // No side-to-side
-                translateY, // Drive forward and back freely
+                Controls.driveTranslateY, // Drive forward and back freely
 
                 // Rotation speed of the autocollect function (turn towards the note)
                 () -> noteLock.driveToTarget(
@@ -161,10 +146,18 @@ public class RobotContainer {
         );
 
         Controls.passAim.whileTrue(
-            new ConditionalCommand(
-                swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(330), DriveModes.AUTOMATIC),
-                swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(30), DriveModes.AUTOMATIC),
-                Suppliers.robotRunningOnRed
+            // This command is deferred to make the call to Suppliers.robotRunningOnRed
+            // happen when we try to pass-aim, rather than when the robot boots
+            new DeferredCommand(
+                () -> swerve.commands.snapToCommand(
+                    Controls.driveTranslateX,
+                    Controls.driveTranslateY,
+                    Rotation2d.fromDegrees(
+                        Suppliers.robotRunningOnRed.getAsBoolean() ? 330 : 30
+                    ),
+                    DriveModes.AUTOMATIC
+                ),
+                Set.of(swerve)
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
@@ -178,24 +171,24 @@ public class RobotContainer {
 
         Controls.autoAim.whileTrue(
             swerve.commands.rawRotationCommand(
-                this.translateX, this.translateY, Suppliers.aimToSpeakerPidLoopPositiveSearch, DriveModes.AUTOMATIC
+                Controls.driveTranslateX, Controls.driveTranslateY, Suppliers.aimToSpeakerPidLoopPositiveSearch, DriveModes.AUTOMATIC
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         Controls.snapForward.whileTrue(
-            swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(0), DriveModes.AUTOMATIC)
+            swerve.commands.snapToCommand(Controls.driveTranslateX, Controls.driveTranslateY, Rotation2d.fromDegrees(0), DriveModes.AUTOMATIC)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
         Controls.snapBack.whileTrue(
-            swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(180), DriveModes.AUTOMATIC)
+            swerve.commands.snapToCommand(Controls.driveTranslateX, Controls.driveTranslateY, Rotation2d.fromDegrees(180), DriveModes.AUTOMATIC)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
         Controls.snapLeft.whileTrue(
-            swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(270), DriveModes.AUTOMATIC)
+            swerve.commands.snapToCommand(Controls.driveTranslateX, Controls.driveTranslateY, Rotation2d.fromDegrees(270), DriveModes.AUTOMATIC)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
         Controls.snapRight.whileTrue(
-            swerve.commands.snapToCommand(translateX, translateY, Rotation2d.fromDegrees(90), DriveModes.AUTOMATIC)
+            swerve.commands.snapToCommand(Controls.driveTranslateX, Controls.driveTranslateY, Rotation2d.fromDegrees(90), DriveModes.AUTOMATIC)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 

@@ -26,21 +26,19 @@ public class ShootCommand extends NewtonCommand {
      */
     public ShootCommand(Supplier<RangeEntry> entrySupplier, BooleanSupplier readyToShoot, DoubleSupplier offsetSupplier){
         super(
-            // Start by priming the robot
-            new PrimeCommand(entrySupplier, offsetSupplier).until(() -> (
-                readyToShoot.getAsBoolean()
-                && shooter.readyToShoot()
-                && elevator.isAtTargetPosition()
-            )).andThen(
-                // Runs the feeder motors
-                shooter.commands.fireCommand()
-                .alongWith(leds.commands.singleColorCommand(LEDS.OFF))
+            stopSubsystems(shooter.commands, elevator.commands, intake.commands).andThen(
+                // Start by priming the robot
+                new PrimeCommand(entrySupplier, offsetSupplier).until(() -> (
+                    readyToShoot.getAsBoolean()
+                    && shooter.readyToShoot()
+                    && elevator.isAtTargetPosition()
+                )).andThen(
+                    // Runs the feeder motors
+                    shooter.commands.fireCommand()
+                    .alongWith(leds.commands.singleColorCommand(LEDS.OFF))
+                )
             )
         );
-
-        // Don't allow the intake to be commanded to do anything funny
-        // while shooting
-        addRequirements(intake);
     }
     /**
      * Command that dymanically primes to a {@code Supplier<RangeEntry>} and shoots

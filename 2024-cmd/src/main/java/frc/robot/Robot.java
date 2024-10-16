@@ -9,10 +9,10 @@ import java.time.format.DateTimeFormatter;
 
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -52,7 +52,7 @@ public class Robot extends LoggedRobot {
             String path = "/U/"+time+".wpilog";
             Logger.addDataReceiver(new WPILOGWriter(path)); // Log to a USB stick
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+            LoggedPowerDistribution.getInstance(1, ModuleType.kRev);// Enables power distribution logging
             Logger.start();
         }
         else { // If simulated

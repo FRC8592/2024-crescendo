@@ -1,9 +1,19 @@
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.CONTROLLERS;
 
 public final class Controls {
+    private static final CommandXboxController driverController = new CommandXboxController(
+        CONTROLLERS.DRIVER_PORT
+    );
+    private static final CommandXboxController operatorController = new CommandXboxController(
+        CONTROLLERS.OPERATOR_PORT
+    );
+
     /**
      * Enum for the different sets of controls (different drivers,
      * different DS configurations, etc)
@@ -13,8 +23,9 @@ public final class Controls {
         DISABLED,
     }
 
-    private static CommandXboxController driverController;
-    private static CommandXboxController operatorController;
+    protected static DoubleSupplier driveTranslateX = () -> 0;
+    protected static DoubleSupplier driveTranslateY = () -> 0;
+    protected static DoubleSupplier driveRotate = () -> 0;
 
     protected static Trigger slowMode = new Trigger(() -> false);
     protected static Trigger robotRelative = new Trigger(() -> false);
@@ -48,18 +59,6 @@ public final class Controls {
     protected static Trigger retractElevator = new Trigger(() -> false);
 
     /**
-     * Add the controller objects to the Controls class. This MUST be called before
-     * applying a control set.
-     *
-     * @param driverController
-     * @param operatorController
-     */
-    protected static void addControllers(CommandXboxController driverController, CommandXboxController operatorController){
-        Controls.driverController = driverController;
-        Controls.operatorController = operatorController;
-    }
-
-    /**
      * Change the variables in the Controls class to match the specified
      * control set. Note that this doesn't edit or remove bindings.
      *
@@ -68,6 +67,10 @@ public final class Controls {
     protected static void applyControlSet(ControlSets set){
         switch (set) {
             default: case DISABLED:
+                driveTranslateX = () -> 0;
+                driveTranslateY = () -> 0;
+                driveRotate = () -> 0;
+
                 slowMode = new Trigger(() -> false);
                 robotRelative = new Trigger(() -> false);
                 zeroGryoscope = new Trigger(() -> false);
@@ -101,6 +104,10 @@ public final class Controls {
                 break;
 
             case MAIN_TELEOP:
+                driveTranslateX = () -> -driverController.getLeftX();
+                driveTranslateY = () -> -driverController.getLeftY();
+                driveRotate = () -> -driverController.getRightX();
+
                 slowMode = driverController.rightBumper();
                 robotRelative = driverController.leftBumper();
                 zeroGryoscope = driverController.back();

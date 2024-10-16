@@ -21,17 +21,16 @@ public class AmpScoreCommand extends NewtonCommand {
      */
     public AmpScoreCommand(BooleanSupplier readyToScore){
         super(
-            elevator.commands.setStaticPositionCommand(Positions.AMP)
-            .andThen(
-                new WaitUntilCommand(readyToScore)
-            )
-            .andThen(
-                shooter.commands.ampScoreCommand()
-                .alongWith(leds.commands.singleColorCommand(LEDS.OFF))
+            stopSubsystems(shooter.commands, intake.commands).andThen(
+                elevator.commands.setStaticPositionCommand(Positions.AMP)
+                .andThen(
+                    new WaitUntilCommand(readyToScore)
+                )
+                .andThen(
+                    shooter.commands.ampScoreCommand()
+                    .alongWith(leds.commands.singleColorCommand(LEDS.OFF))
+                )
             )
         );
-
-        // Keep the intake from doing anything funny while we score.
-        addRequirements(intake);
     }
 }

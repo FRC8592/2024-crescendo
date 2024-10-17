@@ -112,7 +112,7 @@ public final class Controls {
 
 
                 partyMode = operatorController.start();
-                passThrough = operatorController.back();
+                passThrough = operatorController.leftBumper();
                 visionShoot = operatorController.rightBumper();
                 score = operatorController.rightTrigger(0.1);
 

@@ -20,6 +20,8 @@ public final class Controls {
      */
     protected enum ControlSets{
         MAIN_TELEOP,
+        SINGLE_CONTROLLER,
+        SINGLE_CONTROLLER_OTHER_DRIVER,
         DISABLED,
     }
 
@@ -28,12 +30,10 @@ public final class Controls {
     protected static DoubleSupplier driveRotate = () -> 0;
 
     protected static Trigger slowMode = new Trigger(() -> false);
-    protected static Trigger robotRelative = new Trigger(() -> false);
     protected static Trigger zeroGryoscope = new Trigger(() -> false);
 
     protected static Trigger autocollect = new Trigger(() -> false);
-    protected static Trigger passAim = new Trigger(() -> false);
-    protected static Trigger autoAim = new Trigger(() -> false);
+    protected static Trigger visionDemo = new Trigger(() -> false);
 
     protected static Trigger snapForward = new Trigger(() -> false);
     protected static Trigger snapBack = new Trigger(() -> false);
@@ -41,11 +41,8 @@ public final class Controls {
     protected static Trigger snapRight = new Trigger(() -> false);
 
     protected static Trigger partyMode = new Trigger(() -> false);
-    protected static Trigger noteRequest = new Trigger(() -> false);
 
     protected static Trigger visionShoot = new Trigger(() -> false);
-    protected static Trigger podiumShoot = new Trigger(() -> false);
-    protected static Trigger trapShoot = new Trigger(() -> false);
     protected static Trigger score = new Trigger(() -> false); // The score button is also used for a subwoofer shoot
     protected static Trigger passThrough = new Trigger(() -> false);
 
@@ -72,12 +69,10 @@ public final class Controls {
                 driveRotate = () -> 0;
 
                 slowMode = new Trigger(() -> false);
-                robotRelative = new Trigger(() -> false);
                 zeroGryoscope = new Trigger(() -> false);
 
                 autocollect = new Trigger(() -> false);
-                passAim = new Trigger(() -> false);
-                autoAim = new Trigger(() -> false);
+                visionDemo = new Trigger(() -> false);
 
                 snapForward = new Trigger(() -> false);
                 snapBack = new Trigger(() -> false);
@@ -85,11 +80,8 @@ public final class Controls {
                 snapRight = new Trigger(() -> false);
 
                 partyMode = new Trigger(() -> false);
-                noteRequest = new Trigger(() -> false);
 
                 visionShoot = new Trigger(() -> false);
-                podiumShoot = new Trigger(() -> false);
-                trapShoot = new Trigger(() -> false);
                 score = new Trigger(() -> false);
                 passThrough = new Trigger(() -> false);
 
@@ -109,12 +101,40 @@ public final class Controls {
                 driveRotate = () -> -driverController.getRightX();
 
                 slowMode = driverController.rightBumper();
-                robotRelative = driverController.leftBumper();
                 zeroGryoscope = driverController.back();
 
                 autocollect = driverController.a();
-                passAim =  driverController.y();
-                autoAim = driverController.leftTrigger(0.1);
+
+                snapForward = driverController.pov(0);
+                snapBack = driverController.pov(180);
+                snapLeft = driverController.pov(90);
+                snapRight = driverController.pov(270);
+
+
+                partyMode = operatorController.start();
+                passThrough = operatorController.back();
+                visionShoot = operatorController.rightBumper();
+                score = operatorController.rightTrigger(0.1);
+
+                ampScore = operatorController.x();
+
+                stow = operatorController.a();
+                intake = operatorController.leftTrigger(0.1);
+                climb = operatorController.y();
+                extendElevator = operatorController.pov(0);
+                retractElevator = operatorController.pov(180);
+                break;
+
+            case SINGLE_CONTROLLER:
+                driveTranslateX = () -> -driverController.getLeftX();
+                driveTranslateY = () -> -driverController.getLeftY();
+                driveRotate = () -> -driverController.getRightX();
+
+                slowMode = driverController.rightBumper();
+                zeroGryoscope = driverController.back();
+
+                autocollect = driverController.a();
+                visionDemo = driverController.leftTrigger(0.1);
 
                 snapForward = driverController.pov(0);
                 snapBack = driverController.pov(180);
@@ -122,11 +142,8 @@ public final class Controls {
                 snapRight = driverController.pov(270);
 
                 partyMode = driverController.start();
-                noteRequest = operatorController.back();
 
                 visionShoot = operatorController.rightBumper();
-                podiumShoot = operatorController.b();
-                trapShoot = operatorController.start();
                 score = driverController.rightTrigger(0.1);
                 passThrough = operatorController.rightTrigger(0.1);
 
@@ -138,6 +155,40 @@ public final class Controls {
                 climb = operatorController.y();
                 extendElevator = operatorController.pov(0);
                 retractElevator = operatorController.pov(180);
+
+                break;
+
+            case SINGLE_CONTROLLER_OTHER_DRIVER: // Same controls as single controller, but with the other controllers used to "allow" certain controls
+                driveTranslateX = () -> -driverController.getLeftX();
+                driveTranslateY = () -> -driverController.getLeftY();
+                driveRotate = () -> -driverController.getRightX();
+
+                slowMode = driverController.rightBumper();
+                zeroGryoscope = driverController.back();
+
+                autocollect = driverController.a();
+                visionDemo = driverController.leftTrigger(0.1);
+
+                snapForward = driverController.pov(0);
+                snapBack = driverController.pov(180);
+                snapLeft = driverController.pov(90);
+                snapRight = driverController.pov(270);
+
+                partyMode = driverController.start();
+
+                visionShoot = operatorController.rightBumper();
+                score = driverController.rightTrigger(0.1);
+                passThrough = operatorController.rightTrigger(0.1);
+
+                ampScore = operatorController.x();
+
+                stow = driverController.b().or(operatorController.a());
+                intake = operatorController.leftTrigger(0.1);
+                outake = operatorController.leftBumper();
+                climb = operatorController.y();
+                extendElevator = operatorController.pov(0);
+                retractElevator = operatorController.pov(180);
+
                 break;
         }
     }

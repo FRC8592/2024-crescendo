@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import frc.robot.Constants.*;
 import frc.robot.commands.proxies.NewtonCommand;
+import frc.robot.subsystems.elevator.Elevator.Positions;
 
 public class PassThroughCommand extends NewtonCommand {
     /**
@@ -12,13 +13,9 @@ public class PassThroughCommand extends NewtonCommand {
      */
     public PassThroughCommand(){
         super(
-            // Make sure we're stowed before we run anything
-            new StowCommand()
-
-            // Reusing the intake's intakeCommand may or may not be permanent
+            elevator.commands.setStaticPositionCommand(Positions.AMP)
             .andThen(
-                intake.commands.intakeCommand()
-                .alongWith(shooter.commands.passThroughCommand())
+                shooter.commands.passThroughCommand()
                 .alongWith(leds.commands.blinkCommand(LEDS.ORANGE, 4))
             )
         );

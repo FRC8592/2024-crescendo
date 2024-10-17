@@ -67,21 +67,24 @@ public class Elevator extends SubsystemBase {
     private Elevator(){
         extensionMotor = new SparkFlexControl(CAN.ELEVATOR_MOTOR_CAN_ID, false);
         extensionMotor.setPIDF(ELEVATOR.EXTENSION_kP, ELEVATOR.EXTENSION_kI, ELEVATOR.EXTENSION_kD, ELEVATOR.EXTENSION_kFF, 0);
-        extensionMotor.setMaxVelocity(5000, 0);
-        extensionMotor.setMaxAcceleration(10000, 0);
+        extensionMotor.setMaxVelocity(5000, 0); // TODO: the extension motor's max velocity might need to be reduced
+        extensionMotor.setMaxAcceleration(10000, 0); // TODO: the extension motor's max acceleration might need to be reduced
 
         pivotMotor = new SparkFlexControl(CAN.PIVOT_MOTOR_CAN_ID, false);
         pivotMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
-        pivotMotor.setMaxVelocity(6500, 0);
-        pivotMotor.setMaxAcceleration(7000, 0); //Going higher than this caused slamming
         pivotMotor.motorControl.setIZone(ELEVATOR.PIVOT_IZONE * ELEVATOR.PIVOT_GEAR_RATIO);
         pivotMotor.motorControl.setReference(0, ControlType.kVoltage);
         pivotMotor.setInverted();
 
         pivotFollowMotor = new SparkFlexControl(CAN.PIVOT_FOLLOW_MOTOR_CAN_ID, false);
         pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
-        pivotFollowMotor.setMaxVelocity(6500, 0);
-        pivotFollowMotor.setMaxAcceleration(7000, 0);
+
+
+        pivotMotor.setMaxVelocity(3000, 0); // TODO: BOTH pivot motors' max velocities might need to be reduced
+        pivotFollowMotor.setMaxVelocity(3000, 0);
+
+        pivotMotor.setMaxAcceleration(3000, 0); // TODO: BOTH pivot motors' max accelerations might need to be reduced
+        pivotFollowMotor.setMaxAcceleration(3000, 0);
     }
 
     public void periodic() {

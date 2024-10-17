@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swerve;
 
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -139,6 +140,36 @@ public class SwerveCommands extends SubsystemCommands{
     ){
         return this.rawRotationCommand(
             translationXSupplier, translationYSupplier, () -> swerve.snapToAngle(angle), driveMode
+        );
+    }
+
+    /**
+     * Command to snap to an updating angle while driving with human input. The translation inputs
+     * are processed for human comfort and control, so these should almost always be joystick inputs.
+     *
+     * @param translationXSupplier a lambda for left-right translation input (will be optimized for human
+     * control)
+     * @param translationYSupplier a lambda for forward-back translation input (will be optimized for human
+     * control)
+     * @param angleSupplier a lambda that returns the angle to snap to
+     *
+     * @param driveMode the drive mode to use (robot-relative, field-relative, or based on driver request)
+     *
+     * @return the command
+     *
+     * @apiNote This command never ends on its own; it must be interrupted to end
+     */
+    public Command snapToCommand(
+        DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier,
+        Supplier<Rotation2d> angleSupplier, DriveModes driveMode
+    ){
+        return this.rawRotationCommand(
+            translationXSupplier,
+            translationYSupplier,
+            () -> swerve.snapToAngle(swerve.getYaw().plus(angleSupplier.get())),
+            driveMode
+        ).alongWith(
+            Commands.run(() -> Logger.recordOutput(SHOOTER.LOG_PATH+"OffsetSupplierValue", angleSupplier.get().getDegrees()))
         );
     }
 

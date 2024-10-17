@@ -23,9 +23,6 @@ public class PrimeCommand extends NewtonCommand {
                 // Spins up the shooter flywheels
                 shooter.commands.primeCommand(entry)
 
-                // Gets the elevator in position
-                .alongWith(elevator.commands.setStaticPositionCommand(entry.pivotAngle, entry.elevatorHeight))
-
                 // Runs the honing lights (which indicate to the drivers how far off their target they are)
                 .alongWith(leds.commands.honeCommand(offsetSupplier))
             )

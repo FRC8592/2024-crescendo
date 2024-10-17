@@ -55,6 +55,6 @@ public class Intake extends SubsystemBase{
      */
     protected void setIntakeVelocity(double velocity){
         targetIntakeVelocity = velocity;
-        intakeMotor.setVelocity(velocity);
+        intakeMotor.setPercentOutput(0);
     }
 }

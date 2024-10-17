@@ -90,4 +90,14 @@ public final class Suppliers {
     public static final Supplier<Rotation2d> currentRotationOffset = (
         () -> robotRunningOnRed.getAsBoolean() ? SWERVE.RED_PERSPECTIVE_ROTATION : SWERVE.BLUE_PERSPECTIVE_ROTATION
     );
+
+    /**
+     * {@code get()} returns the rotational offset from the currently visible speaker
+     * tag, or 0 if there is no tag.
+     */
+    public static final Supplier<Rotation2d> speakerOffset = (
+        () -> Rotation2d.fromRadians( // TODO: Check that this is actually radians
+            poseVision.rotationalOffsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
+        )
+    );
 }

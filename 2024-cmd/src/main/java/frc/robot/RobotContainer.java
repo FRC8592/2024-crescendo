@@ -10,6 +10,7 @@ import frc.robot.commands.*;
 import frc.robot.commands.autonomous.*;
 import frc.robot.commands.proxies.*;
 import frc.robot.helpers.*;
+import frc.robot.helpers.RangeTable.RangeEntry;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.Positions;
 import frc.robot.subsystems.intake.Intake;
@@ -25,6 +26,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
@@ -69,9 +71,8 @@ public class RobotContainer {
             0
         );
 
-        configureDefaults();
-
         configureBindings(ControlSets.MAIN_TELEOP);
+        configureDefaults();
 
         AutoManager.prepare();
     }
@@ -127,38 +128,8 @@ public class RobotContainer {
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
-        Controls.robotRelative.onTrue(
-            swerve.commands.robotRelativeCommand(true) // Enable robot-oriented driving
-        ).onFalse(
-            swerve.commands.robotRelativeCommand(false) // Disable robot-oriented driving
-        );
-
-        Controls.score.onTrue(
-            new ShootCommand(
-                RangeTable.getSubwoofer(),
-                () -> Controls.score.getAsBoolean(),
-                Suppliers.offsetFromSpeakerTag
-            ).unless(() -> elevator.isTargeting(Positions.AMP))
-        );
-
         Controls.partyMode.whileTrue(
             leds.commands.partyCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
-
-        Controls.passAim.whileTrue(
-            // This command is deferred to make the call to Suppliers.robotRunningOnRed
-            // happen when we try to pass-aim, rather than when the robot boots
-            new DeferredCommand(
-                () -> swerve.commands.snapToCommand(
-                    Controls.driveTranslateX,
-                    Controls.driveTranslateY,
-                    Rotation2d.fromDegrees(
-                        Suppliers.robotRunningOnRed.getAsBoolean() ? 330 : 30
-                    ),
-                    DriveModes.AUTOMATIC
-                ),
-                Set.of(swerve)
-            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         Controls.stow.onTrue(
@@ -169,9 +140,19 @@ public class RobotContainer {
             )
         );
 
-        Controls.autoAim.whileTrue(
-            swerve.commands.rawRotationCommand(
-                Controls.driveTranslateX, Controls.driveTranslateY, Suppliers.aimToSpeakerPidLoopPositiveSearch, DriveModes.AUTOMATIC
+        Controls.visionShoot.onTrue(
+            new ShootCommand(
+                new RangeEntry(
+                    SHOOTER.SHOOTING_LEFT_FLYWHEEL_SPEED,
+                    SHOOTER.SHOOTING_RIGHT_FLYWHEEL_SPEED,
+                    ELEVATOR.PIVOT_ANGLE_AMP,
+                    ELEVATOR.EXTENSION_METERS_AMP
+                ), () -> Controls.score.getAsBoolean()
+            ).deadlineWith(
+                swerve.commands.snapToCommand(
+                    Controls.driveTranslateX, Controls.driveTranslateY,
+                    Suppliers.speakerOffset, DriveModes.AUTOMATIC
+                )
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
@@ -194,24 +175,8 @@ public class RobotContainer {
 
 
 
-        Controls.passThrough.whileTrue(
-            new PassThroughCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
-
-        Controls.visionShoot.onTrue(
-            new ShootCommand(
-                Suppliers.bestRangeEntry,
-                () -> Controls.score.getAsBoolean(),
-                Suppliers.offsetFromSpeakerTag
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-        );
-
-        Controls.podiumShoot.onTrue(
-            new ShootCommand(
-                RangeTable.getPodium(),
-                () -> Controls.score.getAsBoolean(),
-                Suppliers.offsetFromSpeakerTag
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        Controls.passThrough.onTrue(
+            new PassThroughCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
 
         Controls.outake.whileTrue(
@@ -219,9 +184,7 @@ public class RobotContainer {
         );
 
         Controls.intake.onTrue(
-            new IntakeCommand().andThen(
-                shooter.commands.primeCommand(RangeTable.getSubwoofer())
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+            new IntakeCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
 
         Controls.ampScore.onTrue(
@@ -241,16 +204,6 @@ public class RobotContainer {
         Controls.retractElevator.whileTrue(
             elevator.commands.incrementElevatorPositionCommand(0, -ELEVATOR.MANUAL_EXTENSION_SPEED)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
-
-        Controls.noteRequest.whileTrue(
-            leds.commands.blinkCommand(LEDS.YELLOW, 2)
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        );
-
-        Controls.trapShoot.onTrue(
-            new PrimeCommand(RangeTable.getTrap(), () -> 0)
-            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
     }
 

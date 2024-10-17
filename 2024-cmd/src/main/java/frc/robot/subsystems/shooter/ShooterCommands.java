@@ -152,27 +152,16 @@ public class ShooterCommands extends SubsystemCommands{
      * @apiNote This command runs until {@link Shooter#isBottomBeamBreakTripped()}
      * returns {@code true}
      */
-    public Command intakeNoContactCommand(){
+    public Command intakeNoteCommand(){
         return shooter.run(() -> {
             shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
             shooter.setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
-        }).until(() -> shooter.isBottomBeamBreakTripped());
-    }
-
-    /**
-     * Command to run the part of the intake routine that gets the note
-     * from the of the feeder to the flywheels.
-     *
-     * @return the command
-     *
-     * @apiNote This command runs until {@link Shooter#isBottomBeamBreakTripped()}
-     * returns {@code false}
-     */
-    public Command intakeWithContactCommand(){
-        return shooter.run(() -> {
-            shooter.setFeederPower(SHOOTER.INTAKE_FEEDER_POWER);
-            shooter.setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
-        }).until(() -> !shooter.isBottomBeamBreakTripped());
+        }).until(() -> shooter.isMiddleBeamBreakTripped()).andThen(
+            shooter.run(() -> {
+                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
+                shooter.setShooterVelocity(SHOOTER.INTAKE_FLYWHEEL_SPEED);
+            }).withTimeout(1)
+        ); // TODO: The shooter's timeout to get the note all the way to the top might need adjusting
     }
 
     /**
@@ -217,8 +206,7 @@ public class ShooterCommands extends SubsystemCommands{
     }
 
     /**
-     * Command to run the passthrough routine. Usually needs to be
-     * paired with {@link IntakeCommands#intakeCommand()}.
+     * Command to run the passthrough routine.
      *
      * @return the command
      *
@@ -227,13 +215,8 @@ public class ShooterCommands extends SubsystemCommands{
      */
     public Command passThroughCommand(){
         return shooter.run(() -> {
-            if(shooter.isBottomBeamBreakTripped()){
-                shooter.setFeederVelocity(1);
-            }
-            else{
-                shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
-            }
-            shooter.setShooterVelocity(5000);
+            shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
+            shooter.setShooterVelocity(SHOOTER.SHOOTING_LEFT_FLYWHEEL_SPEED, SHOOTER.SHOOTING_RIGHT_FLYWHEEL_SPEED);
         }).finallyDo(() -> shooter.stopAll());
     }
 }

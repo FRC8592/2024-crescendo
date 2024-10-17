@@ -96,7 +96,7 @@ public final class Suppliers {
      * tag, or 0 if there is no tag.
      */
     public static final Supplier<Rotation2d> speakerOffset = (
-        () -> Rotation2d.fromRadians( // TODO: Check that this is actually radians
+        () -> Rotation2d.fromRadians(
             poseVision.rotationalOffsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
         )
     );

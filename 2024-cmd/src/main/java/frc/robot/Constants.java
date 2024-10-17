@@ -71,14 +71,14 @@ public final class Constants {
 
         public static final int LEFT_SHOOTER_MOTOR_CURRENT_LIMIT = 60;
         public static final int RIGHT_SHOOTER_MOTOR_CURRENT_LIMIT = 60;
-        public static final int FEEDER_MOTOR_CURRENT_LIMIT = 50; // TODO: FEEDER_MOTOR_CURRENT_LIMIT might need tuning
+        public static final int FEEDER_MOTOR_CURRENT_LIMIT = 50;
 
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 60;
         public static final int PIVOT_MOTOR_CURRENT_LIMIT = 40;
         public static final int PIVOT_FOLLOW_MOTOR_CURRENT_LIMIT = 40;
 
         public static final int SWERVE_MAX_VOLTAGE = 12;
-        public static final double SWERVE_DRIVE_CURRENT_LIMIT = 1; // TODO: SWERVE_DRIVE_CURRENT_LIMIT might need tuning
+        public static final double SWERVE_DRIVE_CURRENT_LIMIT = 1;
         public static final int SWERVE_STEER_CURRENT_LIMIT = 60;
     }
 
@@ -162,13 +162,13 @@ public final class Constants {
         public static final int FLYWHEEL_SPEED_ACCEPTABLE_RANGE = 50;
 
         public static final int AMP_FLYWHEEL_SPEED = -1000;
-        public static final int AMP_FEEDER_SPEED = -1500; // TODO: AMP_FEEDER_SPEED might need tuning
+        public static final int AMP_FEEDER_SPEED = -1500;
 
         public static final int INTAKE_FLYWHEEL_SPEED = 0;
         public static final int INTAKE_FEEDER_SPEED = 500; // TODO: INTAKE_FEEDER_SPEED might need tuning
 
-        // public static final int SHOOTING_FEEDER_SPEED = 1500; // TODO: SHOOTING_FEEDER_SPEED might need tuning
-        public static final double SHOOTING_FEEDER_POWER = 1d;
+        // public static final int SHOOTING_FEEDER_SPEED = 1500;
+        public static final double SHOOTING_FEEDER_POWER = 1;
         public static final int SHOOTING_LEFT_FLYWHEEL_SPEED = 2750; // TODO: SHOOTING_LEFT_FLYWHEEL_SPEED might need tuning
         public static final int SHOOTING_RIGHT_FLYWHEEL_SPEED = 2250; // TODO: SHOOTING_RIGHT_FLYWHEEL_SPEED might need tuning
 
@@ -279,13 +279,13 @@ public final class Constants {
         public static final double DRIVE_V = 0;
         public static final double DRIVE_A = 0;
 
-        public static final double SNAP_TO_kP = 4.5; // TODO: SNAP_TO_kP might need tuning
+        public static final double SNAP_TO_kP = 4.5; // TODO: SNAP_TO_kP needs tuning
         public static final double SNAP_TO_kI = 0.0;
         public static final double SNAP_TO_kD = 0.1;
 
         public static final int CALCULATED_SLIP_CURRENT = 150;
 
-        public static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = 4.73; // TODO: MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND might need tuning
+        public static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = 4.73;
         public static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(720);
         public static final double COUPLING_GEAR_RATIO = 3.5714285714285716;
         public static final double DRIVE_GEAR_RATIO = 6.746031746031747;
@@ -302,10 +302,10 @@ public final class Constants {
         public static final double DRIVE_FRICTION_VOLTAGE = 0.25;
 
         // Scaling for teleop driving. 1.0 is maximum.
-        public static final double TRANSLATE_POWER_FAST = 0.25; // TODO: TRANSLATE_POWER_FAST might need tuning
-        public static final double ROTATE_POWER_FAST = 0.25; // TODO: ROTATE_POWER_FAST might need tuning
-        public static final double TRANSLATE_POWER_SLOW = 0.1; // TODO: TRANSLATE_POWER_SLOW might need tuning
-        public static final double ROTATE_POWER_SLOW = 0.1; // TODO: ROTATE_POWER_SLOW might need tuning
+        public static final double TRANSLATE_POWER_FAST = 0.25;
+        public static final double ROTATE_POWER_FAST = 0.25;
+        public static final double TRANSLATE_POWER_SLOW = 0.1;
+        public static final double ROTATE_POWER_SLOW = 0.1;
 
         public static final int TRANSLATION_SMOOTHING_AMOUNT = 3;
         public static final int ROTATION_SMOOTHING_AMOUNT = 1;

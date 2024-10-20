@@ -305,10 +305,10 @@ public final class Constants {
         public static final double DRIVE_FRICTION_VOLTAGE = 0.25;
 
         // Scaling for teleop driving. 1.0 is maximum.
-        public static final double TRANSLATE_POWER_FAST = 1.0;
-        public static final double ROTATE_POWER_FAST = 0.75;
-        public static final double TRANSLATE_POWER_SLOW = 0.25;
-        public static final double ROTATE_POWER_SLOW = 0.15;
+        public static final double TRANSLATE_POWER_FAST = 0.4;
+        public static final double ROTATE_POWER_FAST = 0.25;
+        public static final double TRANSLATE_POWER_SLOW = 0.1;
+        public static final double ROTATE_POWER_SLOW = 0.1;
 
         public static final int TRANSLATION_SMOOTHING_AMOUNT = 3;
         public static final int ROTATION_SMOOTHING_AMOUNT = 1;

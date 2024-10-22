@@ -154,7 +154,7 @@ public final class Constants {
 
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 3.2051e-07;
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kI = 0;
-        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 0;
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 6.4102e-06; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kS = 0.24185;
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kV = 0.0017864;
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kA = 0.00020715;

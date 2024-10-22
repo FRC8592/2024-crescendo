@@ -74,7 +74,7 @@ public class Shooter extends SubsystemBase {
         leftShooterMotorFeedforward = new SimpleMotorFeedforward(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kS, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kV, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kA);
         leftShooterMotorCalculatedFF = leftShooterMotorFeedforward.calculate(leftTargetSpeed);
 
-        leftShooterMotorPID.setPID(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kP, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kI, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kD);
+        leftShooterMotorPID = new PIDController(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kP, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kI, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kD);
 
 
         leftShooterMotor.setPIDF(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kP, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kI, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kD, leftShooterMotorCalculatedFF, 0);

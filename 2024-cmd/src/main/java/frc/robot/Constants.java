@@ -170,7 +170,7 @@ public final class Constants {
         public static final double INTAKE_FEEDER_POWER = 1d; // Used between when the note contacts the feeder and when it reaches the flywheels
 
         // public static final int SHOOTING_FEEDER_SPEED = 2500;
-        public static final double SHOOTING_FEEDER_POWER = 1d;
+        public static final double SHOOTING_FEEDER_POWER = 1;
 
         public static final int OUTAKE_FLYWHEEL_SPEED = -500;
         public static final int OUTAKE_FEEDER_SPEED = -2000;
@@ -314,7 +314,7 @@ public final class Constants {
         // Scaling for teleop driving. 1.0 is maximum.
         public static final double TRANSLATE_POWER_FAST = 1.0;
         public static final double ROTATE_POWER_FAST = 0.75;
-        public static final double TRANSLATE_POWER_SLOW = 0.25;
+        public static final double TRANSLATE_POWER_SLOW = 0.15;
         public static final double ROTATE_POWER_SLOW = 0.15;
 
         public static final int TRANSLATION_SMOOTHING_AMOUNT = 3;

@@ -1,9 +1,14 @@
 package frc.robot.commands;
 
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.*;
 import frc.robot.commands.proxies.NewtonCommand;
 import frc.robot.helpers.RangeTable.RangeEntry;
@@ -26,13 +31,18 @@ public class ShootCommand extends NewtonCommand {
      */
     public ShootCommand(Supplier<RangeEntry> entrySupplier, BooleanSupplier readyToShoot, DoubleSupplier offsetSupplier){
         super(
-            stopSubsystems(shooter.commands, elevator.commands, intake.commands).andThen(
+            stopSubsystems(elevator.commands, intake.commands).andThen(
                 // Start by priming the robot
                 new PrimeCommand(entrySupplier, offsetSupplier).until(() -> (
                     readyToShoot.getAsBoolean()
                     && shooter.readyToShoot()
                     && elevator.isAtTargetPosition()
-                )).andThen(
+                )).deadlineWith(
+                    Commands.run(
+                        () -> Logger.recordOutput(SHOOTER.LOG_PATH+"IsShootButtonPressed", readyToShoot.getAsBoolean()),
+                        new Subsystem[0]
+                    )
+                ).andThen(
                     // Runs the feeder motors
                     shooter.commands.fireCommand()
                     .alongWith(leds.commands.singleColorCommand(LEDS.OFF))

@@ -69,9 +69,9 @@ public class RobotContainer {
             0
         );
 
+        configureBindings(ControlSets.MAIN_TELEOP);
         configureDefaults();
 
-        configureBindings(ControlSets.MAIN_TELEOP);
 
         AutoManager.prepare();
     }
@@ -138,10 +138,10 @@ public class RobotContainer {
                 RangeTable.getSubwoofer(),
                 () -> Controls.score.getAsBoolean(),
                 Suppliers.offsetFromSpeakerTag
-            ).unless(() -> elevator.isTargeting(Positions.AMP))
+            ).onlyIf(() -> elevator.isTargeting(Positions.STOWED))
         );
 
-        Controls.partyMode.whileTrue(
+        Controls.partyMode.toggleOnTrue(
             leds.commands.partyCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
@@ -203,7 +203,7 @@ public class RobotContainer {
                 Suppliers.bestRangeEntry,
                 () -> Controls.score.getAsBoolean(),
                 Suppliers.offsetFromSpeakerTag
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         Controls.podiumShoot.onTrue(
@@ -211,7 +211,7 @@ public class RobotContainer {
                 RangeTable.getPodium(),
                 () -> Controls.score.getAsBoolean(),
                 Suppliers.offsetFromSpeakerTag
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         Controls.outake.whileTrue(
@@ -226,7 +226,7 @@ public class RobotContainer {
 
         Controls.ampScore.onTrue(
             new AmpScoreCommand(() -> Controls.score.getAsBoolean())
-            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         Controls.climb.onTrue(

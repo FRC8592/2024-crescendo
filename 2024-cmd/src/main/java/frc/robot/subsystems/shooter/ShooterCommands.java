@@ -249,7 +249,7 @@ public class ShooterCommands extends SubsystemCommands{
     }
 
     public Command sysIdTests(){
-        return sysIdDynamic(Direction.kForward)
+        return sysIdQuasistatic(Direction.kForward)
             .andThen(new WaitCommand(2))
             .andThen(shooter.commands.sysIdQuasistatic(Direction.kReverse))
             .andThen(new WaitCommand(2))

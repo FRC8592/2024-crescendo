@@ -32,16 +32,4 @@ public abstract class NewtonCommand extends WrapperCommand {
         }
         return result;
     }
-
-    public void initialize(){
-        Logger.recordOutput(SHARED.LOG_FOLDER+"/Commands/"+getName()+"/IsRunning", true);
-        Logger.recordOutput(SHARED.LOG_FOLDER+"/Commands/"+getName()+"/WasInterruptedLastEnd", false);
-        super.initialize();
-    }
-
-    public void end(boolean interrupted){
-        Logger.recordOutput(SHARED.LOG_FOLDER+"/Commands/"+getName()+"/IsRunning", false);
-        Logger.recordOutput(SHARED.LOG_FOLDER+"/Commands/"+getName()+"/WasInterruptedLastEnd", interrupted);
-        super.end(interrupted);
-    }
 }

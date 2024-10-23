@@ -20,7 +20,7 @@ public final class Controls {
     protected static Trigger robotRelative = new Trigger(() -> false);
     protected static Trigger zeroGryoscope = new Trigger(() -> false);
 
-    protected static Trigger autocollect = new Trigger(() -> false);
+    protected static Trigger runVoltageMode = new Trigger(() -> false);
     protected static Trigger passAim = new Trigger(() -> false);
     protected static Trigger autoAim = new Trigger(() -> false);
 
@@ -29,7 +29,7 @@ public final class Controls {
     protected static Trigger snapLeft = new Trigger(() -> false);
     protected static Trigger snapRight = new Trigger(() -> false);
 
-    protected static Trigger partyMode = new Trigger(() -> false);
+    protected static Trigger sysIdTests = new Trigger(() -> false);
     protected static Trigger noteRequest = new Trigger(() -> false);
 
     protected static Trigger visionShoot = new Trigger(() -> false);
@@ -72,7 +72,7 @@ public final class Controls {
                 robotRelative = new Trigger(() -> false);
                 zeroGryoscope = new Trigger(() -> false);
 
-                autocollect = new Trigger(() -> false);
+                runVoltageMode = new Trigger(() -> false);
                 passAim = new Trigger(() -> false);
                 autoAim = new Trigger(() -> false);
 
@@ -81,7 +81,7 @@ public final class Controls {
                 snapLeft = new Trigger(() -> false);
                 snapRight = new Trigger(() -> false);
 
-                partyMode = new Trigger(() -> false);
+                sysIdTests = new Trigger(() -> false);
                 noteRequest = new Trigger(() -> false);
 
                 visionShoot = new Trigger(() -> false);
@@ -105,7 +105,7 @@ public final class Controls {
                 robotRelative = driverController.leftBumper();
                 zeroGryoscope = driverController.back();
 
-                autocollect = driverController.a();
+                runVoltageMode = driverController.a();
                 passAim =  driverController.y();
                 autoAim = driverController.leftTrigger(0.1);
 
@@ -114,7 +114,7 @@ public final class Controls {
                 snapLeft = driverController.pov(90);
                 snapRight = driverController.pov(270);
 
-                partyMode = driverController.start();
+                sysIdTests = driverController.start();
                 noteRequest = operatorController.back();
 
                 visionShoot = operatorController.rightBumper();

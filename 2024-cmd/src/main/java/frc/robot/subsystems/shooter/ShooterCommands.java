@@ -4,7 +4,9 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.helpers.RangeTable.RangeEntry;
 import frc.robot.subsystems.SubsystemCommands;
 import frc.robot.Constants.*;
@@ -239,15 +241,34 @@ public class ShooterCommands extends SubsystemCommands{
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         
-        return shooter.getRoutine().quasistatic(direction);
+        return shooter.getLeftShooterRoutine().quasistatic(direction).andThen(shooter.getRightShooterRoutine().quasistatic(direction)).andThen(shooter.getFeederRoutine().quasistatic(direction));
     }
       
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return shooter.getRoutine().dynamic(direction);
+        return shooter.getLeftShooterRoutine().dynamic(direction).andThen(shooter.getRightShooterRoutine().dynamic(direction)).andThen(shooter.getFeederRoutine().dynamic(direction));
+    }
+
+    public Command sysIdTests(){
+        return sysIdDynamic(Direction.kForward)
+            .andThen(new WaitCommand(2))
+            .andThen(shooter.commands.sysIdQuasistatic(Direction.kReverse))
+            .andThen(new WaitCommand(2))
+            .andThen(shooter.commands.sysIdDynamic(Direction.kForward))
+            .andThen(new WaitCommand(2))
+            .andThen(shooter.commands.sysIdDynamic(Direction.kReverse));
     }
 
     public Command setLeftShooterVelocity(int left){
 
         return shooter.run(()->{shooter.setShooterVelocity(left, 0);});
+    }
+
+    public Command setVoltage(int left, int right, int feeder, int feederSlotID){
+
+        return shooter.run(()->{
+            shooter.setFeederVoltage(feeder, feederSlotID);})
+            .andThen(
+            shooter.run(()->{
+            shooter.setShooterVoltage(left, right);}));
     }
 }

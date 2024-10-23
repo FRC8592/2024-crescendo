@@ -159,17 +159,24 @@ public final class Constants {
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kV = 0.0017864;
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kA = 0.00020715;
 
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 0.0003;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kI = 0.0000012;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 0.01;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kS = 0.24185;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kV = 0.0017864;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kA = 0.00020715;
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kP = 0;
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kI = 0;
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kS = 0;
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kV = 0;
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kA = 0;
 
-        public static final double RIGHT_SHOOTER_MOTOR_kP = LEFT_SHOOTER_MOTOR_kP;
-        public static final double RIGHT_SHOOTER_MOTOR_kI = LEFT_SHOOTER_MOTOR_kI;
-        public static final double RIGHT_SHOOTER_MOTOR_kD = LEFT_SHOOTER_MOTOR_kD;
-        public static final double RIGHT_SHOOTER_MOTOR_kF = LEFT_SHOOTER_MOTOR_kF;
+        public static final double SYS_ID_FEEDER_MOTOR_kP = 0;
+        public static final double SYS_ID_FEEDER_MOTOR_kI = 0;
+        public static final double SYS_ID_FEEDER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
+        public static final double SYS_ID_FEEDER_MOTOR_kS = 0;
+        public static final double SYS_ID_FEEDER_MOTOR_kV = 0;
+        public static final double SYS_ID_FEEDER_MOTOR_kA = 0;
+
+        // public static final double RIGHT_SHOOTER_MOTOR_kP = LEFT_SHOOTER_MOTOR_kP;
+        // public static final double RIGHT_SHOOTER_MOTOR_kI = LEFT_SHOOTER_MOTOR_kI;
+        // public static final double RIGHT_SHOOTER_MOTOR_kD = LEFT_SHOOTER_MOTOR_kD;
+        // public static final double RIGHT_SHOOTER_MOTOR_kF = LEFT_SHOOTER_MOTOR_kF;
 
         // Tolerance of the target RPM within which the I term accumulate and affect the output
         public static final double SHOOTER_MOTOR_IZONE = 200;

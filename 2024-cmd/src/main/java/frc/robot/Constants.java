@@ -357,9 +357,9 @@ public final class Constants {
         public static final double PATH_FOLLOW_TRANSLATE_kI = 0d;
         public static final double PATH_FOLLOW_TRANSLATE_kD = 0d;
 
-        public static final double PATH_FOLLOW_ROTATE_kP = 0.5;
+        public static final double PATH_FOLLOW_ROTATE_kP = 3.7;
         public static final double PATH_FOLLOW_ROTATE_kI = 0d;
-        public static final double PATH_FOLLOW_ROTATE_kD = 0d;
+        public static final double PATH_FOLLOW_ROTATE_kD = 0.1;
 
         public static final double PATH_FOLLOW_ROTATE_MAX_VELOCITY = 4 * Math.PI;
         public static final double PATH_FOLLOW_ROTATE_MAX_ACCELLERATION = 2 * Math.PI;

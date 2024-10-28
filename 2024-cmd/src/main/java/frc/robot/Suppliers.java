@@ -4,6 +4,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -90,4 +92,19 @@ public final class Suppliers {
     public static final Supplier<Rotation2d> currentRotationOffset = (
         () -> robotRunningOnRed.getAsBoolean() ? SWERVE.RED_PERSPECTIVE_ROTATION : SWERVE.BLUE_PERSPECTIVE_ROTATION
     );
+
+    /**
+     * {@code get()} returns the rotational offset from the currently visible speaker
+     * tag, or 0 if there is no tag.
+     */
+    public static final Supplier<Rotation2d> speakerOffset = (
+        () -> Rotation2d.fromRadians(
+            poseVision.rotationalOffsetFromAprilTag(APRILTAG_VISION.SPEAKER_AIM_TAGS)
+        )
+    );
+
+    public static void log(){
+        Logger.recordOutput(SHARED.LOG_FOLDER+"/Suppliers/RobotHasNote", robotHasNote.getAsBoolean());
+        Logger.recordOutput(SHARED.LOG_FOLDER+"/Suppliers/LeftRightSpeakerLocked", leftRightSpeakerLocked.getAsBoolean());
+    }
 }

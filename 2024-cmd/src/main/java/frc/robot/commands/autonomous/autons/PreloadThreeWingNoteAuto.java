@@ -14,9 +14,9 @@ public class PreloadThreeWingNoteAuto extends AutoCommand {
                 new ShootCommand(RangeTable.getSubwoofer()), 2+SHOOTER.SHOOT_SCORE_TIME
             ),
 
-            new FollowPathAndScoreCommand(getChoreoTrajectory("PreloadThreeWingNoteAuto_1"), 3, 1.8, false),
-            new FollowPathAndScoreCommand(getChoreoTrajectory("PreloadThreeWingNoteAuto_2"), 3, 2.4, false),
-            new FollowPathAndScoreCommand(getChoreoTrajectory("PreloadThreeWingNoteAuto_3"), 3, 2.6, false)
+            new FollowPathAndScoreCommand(getChoreoTrajectory("PreloadThreeWingNoteAuto_1"), 4, 1.8, false),
+            new FollowPathAndScoreCommand(getChoreoTrajectory("PreloadThreeWingNoteAuto_2"), 4, 2.4, false),
+            new FollowPathAndScoreCommand(getChoreoTrajectory("PreloadThreeWingNoteAuto_3"), 4, 2.6, false)
         );
         setStartStateFromChoreoTrajectory("PreloadThreeWingNoteAuto_1");
     }

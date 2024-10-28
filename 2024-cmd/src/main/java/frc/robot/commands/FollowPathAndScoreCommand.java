@@ -1,6 +1,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Suppliers;
 import frc.robot.commands.proxies.*;
 import frc.robot.helpers.RangeTable;
@@ -22,22 +24,22 @@ public class FollowPathAndScoreCommand extends NewtonCommand{
      */
     public FollowPathAndScoreCommand(Trajectory trajectory, double intakeTimeout, double primePosition, boolean useVision){
         super(
-            swerve.commands.followPathCommand(trajectory, Suppliers.robotRunningOnRed).alongWith(
-                new IntakeCommand().withTimeout(intakeTimeout)
-                .andThen(new TimingSimulatedCommand(
-                    new PrimeCommand(RangeTable.get(primePosition), () -> 0).onlyIf(Suppliers.robotHasNote), 2
-                ))
+            (
+                swerve.commands.followPathCommand(trajectory, Suppliers.robotRunningOnRed).deadlineWith(
+                    new IntakeCommand().withTimeout(intakeTimeout)
+                    .andThen(new TimingSimulatedCommand(
+                        new PrimeCommand(RangeTable.get(primePosition), () -> 0).onlyIf(Suppliers.robotHasNote), 2
+                    ))
+                )
             )
             .andThen(
                 ( // This block of commands runs the (optional) extra vision prime-and-aim and shoots
                     new ShootCommand(
                         useVision ? Suppliers.bestRangeEntry : () -> RangeTable.get(primePosition),
                         Suppliers.leftRightSpeakerLocked
-                    ).alongWith(
+                    ).deadlineWith(
                         // This rawDriveCommand aims the robot at the speaker
-                        swerve.commands.rawDriveCommand(
-                            () -> 0, () -> 0, Suppliers.aimToSpeakerPidLoopNegativeSearch, DriveModes.ROBOT_RELATIVE
-                        )
+                        swerve.commands.snapToCommand(() -> 0, () -> 0, Suppliers.speakerOffset, DriveModes.FIELD_RELATIVE)
                     )
                 ).onlyIf(Suppliers.robotHasNote) // <-- This disables the optional vision prime/aim and the shot if there isn't a note,
                                                  // which saves a significant amount of time

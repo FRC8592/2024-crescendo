@@ -387,4 +387,21 @@ public class PoseVision {
             return -1.0; // tag not in view
         }
     }
+
+    public double rotationalOffsetFromAprilTag(List<Integer> ids) {
+        // check if it's tag 1 or tag 2, first check if it's in view
+        // return directly because we are more confidient in tag 1
+        if (getTagInView()) {
+            getCurrTagYaw();
+            // it's tag 1
+            return getCurrTagYaw();
+        }
+        else if (getTag2InView()) {
+            // it's tag 2
+            return getCurrTag2Yaw();
+        }
+        else {
+            return 0; // tag not in view
+        }
+    }
 }

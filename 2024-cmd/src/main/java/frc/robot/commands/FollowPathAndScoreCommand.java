@@ -42,7 +42,7 @@ public class FollowPathAndScoreCommand extends NewtonCommand{
                         Suppliers.leftRightSpeakerLocked
                     ).deadlineWith(
                         // This snapToCommand aims the robot at the speaker
-                        swerve.commands.snapToCommand(() -> 0, () -> 0, Suppliers.speakerOffset, DriveModes.FIELD_RELATIVE)
+                        swerve.commands.snapToCommand(() -> 0, () -> 0, Suppliers.rotationalSpeakerOffset, DriveModes.FIELD_RELATIVE)
                     )
                 ).onlyIf(Suppliers.robotHasNote) // <-- This disables the optional vision prime/aim and the shot if there isn't a note,
                                                  // which saves a significant amount of time

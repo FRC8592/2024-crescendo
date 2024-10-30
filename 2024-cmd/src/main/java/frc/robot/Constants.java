@@ -391,4 +391,8 @@ public final class Constants {
     public class RANGE_TABLE{
         public static final double OFFSET_ANGLE = 0.5; // prev. -0.5
     }
+
+    public class SUPPLIERS{
+        public static final String LOG_PATH = SHARED.LOG_FOLDER+"/Suppliers/";
+    }
 }

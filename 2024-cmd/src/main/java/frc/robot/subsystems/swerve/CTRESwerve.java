@@ -101,7 +101,7 @@ public class CTRESwerve extends SwerveDrivetrain{
      * Define whatever direction the robot is facing as forward
      */
     public void resetHeading(){
-        this.setGyroscopeYaw(Suppliers.currentRotationOffset.get());
+        this.setGyroscopeYaw(Suppliers.currentGyroscopeRotationOffset.get());
         this.seedFieldRelative();
     }
 
@@ -160,7 +160,7 @@ public class CTRESwerve extends SwerveDrivetrain{
         // the alliance perspective.
         if (!hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent((allianceColor) -> {
-                this.setOperatorPerspectiveForward(Suppliers.currentRotationOffset.get());
+                this.setOperatorPerspectiveForward(Suppliers.currentGyroscopeRotationOffset.get());
                 hasAppliedOperatorPerspective = true;
             });
         }

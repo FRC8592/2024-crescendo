@@ -21,7 +21,7 @@ public class AmpScoreCommand extends NewtonCommand {
      */
     public AmpScoreCommand(BooleanSupplier readyToScore){
         super(
-            stopSubsystems(shooter.commands, intake.commands).andThen(
+            stopSubsystems(shooter.commands).andThen(
                 elevator.commands.setStaticPositionCommand(Positions.AMP)
                 .andThen(
                     new WaitUntilCommand(readyToScore)

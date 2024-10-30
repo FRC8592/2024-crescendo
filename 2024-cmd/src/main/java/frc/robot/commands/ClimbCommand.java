@@ -16,7 +16,7 @@ public class ClimbCommand extends NewtonCommand {
      */
     public ClimbCommand(){
         super(
-            stopSubsystems(shooter.commands, intake.commands).andThen(
+            stopSubsystems(shooter.commands).andThen(
                 elevator.commands.setMalleablePositionCommand(
                     ELEVATOR.PIVOT_ANGLE_MAX,
                     ELEVATOR.EXTENSION_METERS_MAX

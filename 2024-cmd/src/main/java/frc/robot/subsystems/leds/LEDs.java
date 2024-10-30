@@ -3,11 +3,11 @@ package frc.robot.subsystems.leds;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.NewtonSubsystem;
 
 import frc.robot.Constants.*;
 
-public class LEDs extends SubsystemBase {
+public class LEDs extends NewtonSubsystem {
     private static LEDs instance = null;
     public static LEDs getInstance(){
         if(instance == null){
@@ -113,4 +113,6 @@ public class LEDs extends SubsystemBase {
         return new int[]{(int)R1, (int)G1, (int)B1};
     }
 
+    // Not applicable to LEDs, but required by NewtonSubsystem
+    protected void stop(){}
 }

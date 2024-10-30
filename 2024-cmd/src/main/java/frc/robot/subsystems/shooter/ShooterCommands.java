@@ -97,7 +97,7 @@ public class ShooterCommands extends SubsystemCommands{
         return shooter.run(() -> {
             shooter.setFeederPower(SHOOTER.SHOOTING_FEEDER_POWER);
         }).withTimeout(SHOOTER.SHOOT_SCORE_TIME).finallyDo(
-            () -> shooter.stopAll()
+            () -> shooter.stop()
         );
     }
 
@@ -115,7 +115,7 @@ public class ShooterCommands extends SubsystemCommands{
             shooter.setFeederVelocity(SHOOTER.AMP_FEEDER_SPEED);
             shooter.setShooterVelocity(SHOOTER.AMP_FLYWHEEL_SPEED);
         }).withTimeout(SHOOTER.AMP_SCORE_TIME).finallyDo(
-            () -> shooter.stopAll()
+            () -> shooter.stop()
         );
     }
 
@@ -128,7 +128,7 @@ public class ShooterCommands extends SubsystemCommands{
      * ends on the same frame
      */
     public Command stopCommand(){
-        return shooter.runOnce(() -> shooter.stopAll());
+        return shooter.runOnce(() -> shooter.stop());
     }
 
     /**
@@ -196,7 +196,7 @@ public class ShooterCommands extends SubsystemCommands{
             }
         ).until(
             () -> !shooter.isTopBeamBreakTripped())
-        ).finallyDo(() -> shooter.stopAll());
+        ).finallyDo(() -> shooter.stop());
     }
 
     /**
@@ -213,7 +213,7 @@ public class ShooterCommands extends SubsystemCommands{
         return shooter.run(() -> {
             shooter.setShooterVelocity(SHOOTER.OUTAKE_FLYWHEEL_SPEED);
             shooter.setFeederVelocity(SHOOTER.OUTAKE_FEEDER_SPEED);
-        }).finallyDo(() -> shooter.stopAll());
+        }).finallyDo(() -> shooter.stop());
     }
 
     /**
@@ -234,6 +234,6 @@ public class ShooterCommands extends SubsystemCommands{
                 shooter.setFeederVelocity(SHOOTER.INTAKE_FEEDER_SPEED, 0);
             }
             shooter.setShooterVelocity(SHOOTER.PASSTHROUGH_SHOOTER_SPEED);
-        }).finallyDo(() -> shooter.stopAll());
+        }).finallyDo(() -> shooter.stop());
     }
 }

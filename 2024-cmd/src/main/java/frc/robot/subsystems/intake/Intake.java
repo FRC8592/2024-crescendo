@@ -6,12 +6,12 @@ package frc.robot.subsystems.intake;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.NewtonSubsystem;
 
 import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
-public class Intake extends SubsystemBase{
+public class Intake extends NewtonSubsystem{
     private static Intake instance = null;
     public static Intake getInstance(){
         if(instance == null){
@@ -56,5 +56,10 @@ public class Intake extends SubsystemBase{
     protected void setIntakeVelocity(double velocity){
         targetIntakeVelocity = velocity;
         intakeMotor.setVelocity(velocity);
+    }
+
+    protected void stop(){
+        targetIntakeVelocity = 0;
+        setIntakeVelocity(0);
     }
 }

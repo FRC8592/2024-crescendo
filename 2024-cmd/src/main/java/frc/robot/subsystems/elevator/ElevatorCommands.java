@@ -33,7 +33,7 @@ public class ElevatorCommands extends SubsystemCommands{
             elevator.setUserDesiredTargetExtension(extensionMeters);
             elevator.runElevator();
         }).until(() -> elevator.isAtTargetPosition() && elevator.isTargeting(pivotDegrees, extensionMeters)) // Run the elevator until it's at its target.
-        .finallyDo(() -> {elevator.freezeElevator(); Logger.recordOutput(ELEVATOR.LOG_PATH+"StaticPositionCommandRunning", false);}); // When the command ends, stop the elevator
+        .finallyDo(() -> {elevator.stop(); Logger.recordOutput(ELEVATOR.LOG_PATH+"StaticPositionCommandRunning", false);}); // When the command ends, stop the elevator
     }
 
     /**
@@ -64,7 +64,7 @@ public class ElevatorCommands extends SubsystemCommands{
             elevator.setUserDesiredTargetPivot(pivotDegrees.getAsDouble());
             elevator.setUserDesiredTargetExtension(extensionMeters.getAsDouble());
             elevator.runElevator();
-        }).finallyDo(() -> elevator.freezeElevator());
+        }).finallyDo(() -> elevator.stop());
     }
 
     /**
@@ -85,7 +85,7 @@ public class ElevatorCommands extends SubsystemCommands{
             elevator.setUserDesiredTargetExtension(extensionMeters);
         }).andThen(elevator.run(() -> {
             elevator.runElevator();
-        })).finallyDo(() -> elevator.freezeElevator());
+        })).finallyDo(() -> elevator.stop());
     }
 
     /**
@@ -130,6 +130,6 @@ public class ElevatorCommands extends SubsystemCommands{
      * @apiNote This command runs instantly and ends on the same frame
      */
     public Command stopCommand(){
-        return elevator.runOnce(() -> elevator.freezeElevator());
+        return elevator.runOnce(() -> elevator.stop());
     }
 }

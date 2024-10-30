@@ -19,16 +19,14 @@ public class PrimeCommand extends NewtonCommand {
      */
     public PrimeCommand(RangeEntry entry, DoubleSupplier offsetSupplier){
         super(
-            stopSubsystems(intake.commands).andThen(
                 // Spins up the shooter flywheels
-                shooter.commands.primeCommand(entry)
+            shooter.commands.primeCommand(entry)
 
-                // Gets the elevator in position
-                .alongWith(elevator.commands.setStaticPositionCommand(entry.pivotAngle, entry.elevatorHeight))
+            // Gets the elevator in position
+            .alongWith(elevator.commands.setStaticPositionCommand(entry.pivotAngle, entry.elevatorHeight))
 
-                // Runs the honing lights (which indicate to the drivers how far off their target they are)
-                .alongWith(leds.commands.honeCommand(offsetSupplier))
-            )
+            // Runs the honing lights (which indicate to the drivers how far off their target they are)
+            .alongWith(leds.commands.honeCommand(offsetSupplier))
         );
     }
 
@@ -44,21 +42,18 @@ public class PrimeCommand extends NewtonCommand {
      */
     public PrimeCommand(Supplier<RangeEntry> entry, DoubleSupplier offsetSupplier){
         super(
-            stopSubsystems(intake.commands).andThen(
-                // The shooter's primeCommand is overloaded; the version that
-                // takes in a Supplier will automatically update the flywheel
-                // target speeds as the RangeEntry returned by the Supplier
-                // changes.
-                shooter.commands.primeCommand(entry)
+            // The shooter's primeCommand is overloaded; the version that
+            // takes in a Supplier will automatically update the flywheel
+            // target speeds as the RangeEntry returned by the Supplier
+            // changes.
+            shooter.commands.primeCommand(entry)
 
-                // This is similar to the shooter primeCommand; the elevator
-                // will update itself with the supplier.
-                .alongWith(elevator.commands.setUpdatingPositionCommand(() -> entry.get().pivotAngle, () -> entry.get().elevatorHeight))
+            // This is similar to the shooter primeCommand; the elevator
+            // will update itself with the supplier.
+            .alongWith(elevator.commands.setUpdatingPositionCommand(() -> entry.get().pivotAngle, () -> entry.get().elevatorHeight))
 
-                // Runs the honing lights (which indicate to the drivers how far off their target they are)
-                .alongWith(leds.commands.honeCommand(offsetSupplier))
-            )
+            // Runs the honing lights (which indicate to the drivers how far off their target they are)
+            .alongWith(leds.commands.honeCommand(offsetSupplier))
         );
-        addRequirements(intake); //We don't actually need this subsystem, but this keeps the intake from doing anything funny while we prime
     }
 }

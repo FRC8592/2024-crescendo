@@ -1,11 +1,8 @@
 package frc.robot.commands.proxies;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
-import frc.robot.Constants.SHARED;
 import frc.robot.subsystems.SubsystemCommands;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;

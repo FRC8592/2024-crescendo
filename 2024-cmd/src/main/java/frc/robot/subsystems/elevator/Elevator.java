@@ -7,11 +7,11 @@ package frc.robot.subsystems.elevator;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.CANSparkBase.ControlType;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.NewtonSubsystem;
 import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
-public class Elevator extends SubsystemBase {
+public class Elevator extends NewtonSubsystem {
     private static Elevator instance = null;
     public static Elevator getInstance(){
         if(instance == null){
@@ -304,7 +304,7 @@ public class Elevator extends SubsystemBase {
      * the elevator can reverse (as needed) to reach where it was when commanded
      * to stop.
      */
-    protected void freezeElevator(){
+    protected void stop(){
         pivotMotor.setPositionSmartMotion(pivotMotor.getPosition());
         extensionMotor.setPositionSmartMotion(extensionMotor.getPosition());
     }

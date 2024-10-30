@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -31,7 +30,7 @@ public class ShootCommand extends NewtonCommand {
      */
     public ShootCommand(Supplier<RangeEntry> entrySupplier, BooleanSupplier readyToShoot, DoubleSupplier offsetSupplier){
         super(
-            stopSubsystems(elevator.commands, intake.commands).andThen(
+            stopSubsystems(elevator.commands).andThen(
                 // Start by priming the robot
                 new PrimeCommand(entrySupplier, offsetSupplier).until(() -> (
                     readyToShoot.getAsBoolean()

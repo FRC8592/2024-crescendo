@@ -5,13 +5,13 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.*;
 
 import org.littletonrobotics.junction.Logger;
 import frc.robot.helpers.*;
+import frc.robot.subsystems.NewtonSubsystem;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends NewtonSubsystem {
     private static Shooter instance = null;
     public static Shooter getInstance(){
         if(instance == null){
@@ -175,11 +175,14 @@ public class Shooter extends SubsystemBase {
     /**
      * Stop all shooter motors
      */
-    protected void stopAll(){
+    protected void stop(){
         setFeederVelocity(0);
         setShooterVelocity(0);
     }
 
+    /**
+     * @return the feeder motor's current measured velocity
+     */
     protected double getFeederVelocity(){
         return feederMotor.getVelocity();
     }

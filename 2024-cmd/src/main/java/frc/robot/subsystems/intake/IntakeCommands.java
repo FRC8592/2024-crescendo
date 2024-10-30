@@ -45,16 +45,14 @@ public class IntakeCommands extends SubsystemCommands{
     }
 
     /**
-     * Command to stop the intake
+     * Command to stop the intake roller
      *
      * @return the command
      *
      * @apiNote This command runs instantly and ends on the same frame
      */
     public Command stopCommand(){
-        return intake.runOnce(() -> {
-            intake.setIntakeVelocity(0);
-        });
+        return intake.runOnce(() -> {intake.stop();});
     }
 
     /**

@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.swerve;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
@@ -27,9 +25,10 @@ import org.littletonrobotics.junction.Logger;
 
 import frc.robot.*;
 import frc.robot.helpers.*;
+import frc.robot.subsystems.NewtonSubsystem;
 import frc.robot.Constants.*;
 
-public class Swerve extends SubsystemBase {
+public class Swerve extends NewtonSubsystem {
     private static Swerve instance = null;
     public static Swerve getInstance(){
         if(instance == null){
@@ -223,6 +222,13 @@ public class Swerve extends SubsystemBase {
 
     public void simulationPeriodic() {
         Robot.FIELD.setRobotPose(getCurrentPosition());
+    }
+
+    /**
+     * Stop the swerve (feed zeros for all target velocities)
+     */
+    protected void stop(){
+        drive(new ChassisSpeeds());
     }
 
     /**

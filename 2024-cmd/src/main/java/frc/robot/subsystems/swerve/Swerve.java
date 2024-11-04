@@ -5,6 +5,7 @@
 package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -68,6 +69,9 @@ public class Swerve extends SubsystemBase {
     private SmoothingFilter smoothingFilter;
 
     private CTRESwerve swerve;
+
+    private SysID swerveSysID;
+    private SysIdRoutine swerveRoutine;
 
     private Swerve() {
         smoothingFilter = new SmoothingFilter(
@@ -173,38 +177,46 @@ public class Swerve extends SubsystemBase {
 
         // This lambda is run every time the odometry is updated (100hz for classic CAN or 250hz for CAN FD)
         swerve.registerTelemetry((drivetrainState, kinematics, modules) -> {
-            Logger.recordOutput(SWERVE.LOG_PATH+"TargetSwerveStates", drivetrainState.ModuleTargets);
-            Logger.recordOutput(SWERVE.LOG_PATH+"ReadSwerveStates", drivetrainState.ModuleStates);
-            Logger.recordOutput(SWERVE.LOG_PATH+"OdometryPosition", drivetrainState.Pose);
-            Logger.recordOutput(SWERVE.LOG_PATH+"ActualChassisSpeeds", drivetrainState.speeds);
-            Logger.recordOutput(SWERVE.LOG_PATH+"TargetChassisSpeeds", kinematics.toChassisSpeeds(
-                modules[0].getTargetState(), modules[1].getTargetState(), modules[2].getTargetState(), modules[3].getTargetState()
-            ));
+            // Logger.recordOutput(SWERVE.LOG_PATH+"TargetSwerveStates", drivetrainState.ModuleTargets);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"ReadSwerveStates", drivetrainState.ModuleStates);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"OdometryPosition", drivetrainState.Pose);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"ActualChassisSpeeds", drivetrainState.speeds);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"TargetChassisSpeeds", kinematics.toChassisSpeeds(
+            //     modules[0].getTargetState(), modules[1].getTargetState(), modules[2].getTargetState(), modules[3].getTargetState()
+            // ));
 
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/DriveReadVelocityMPS", modules[0].getCurrentState().speedMetersPerSecond);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/DriveTargetVelocityMPS", modules[0].getTargetState().speedMetersPerSecond);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/SteerReadAngle", modules[0].getCurrentState().angle);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/SteerTargetAngle", modules[0].getTargetState().angle);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/SteerReadVelocityRPM", modules[0].getSteerMotor().getVelocity().getValueAsDouble());
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/DriveReadVelocityMPS", modules[0].getCurrentState().speedMetersPerSecond);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/DriveTargetVelocityMPS", modules[0].getTargetState().speedMetersPerSecond);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/SteerReadAngle", modules[0].getCurrentState().angle);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/SteerTargetAngle", modules[0].getTargetState().angle);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontLeft/SteerReadVelocityRPM", modules[0].getSteerMotor().getVelocity().getValueAsDouble());
 
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/DriveReadVelocityMPS", modules[1].getCurrentState().speedMetersPerSecond);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/DriveTargetVelocityMPS", modules[1].getTargetState().speedMetersPerSecond);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/SteerReadAngle", modules[1].getCurrentState().angle);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/SteerTargetAngle", modules[1].getTargetState().angle);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/SteerReadVelocityRPM", modules[1].getSteerMotor().getVelocity().getValueAsDouble());
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/DriveReadVelocityMPS", modules[1].getCurrentState().speedMetersPerSecond);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/DriveTargetVelocityMPS", modules[1].getTargetState().speedMetersPerSecond);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/SteerReadAngle", modules[1].getCurrentState().angle);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/SteerTargetAngle", modules[1].getTargetState().angle);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/FrontRight/SteerReadVelocityRPM", modules[1].getSteerMotor().getVelocity().getValueAsDouble());
 
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/DriveReadVelocityMPS", modules[2].getCurrentState().speedMetersPerSecond);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/DriveTargetVelocityMPS", modules[2].getTargetState().speedMetersPerSecond);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/SteerReadAngle", modules[2].getCurrentState().angle);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/SteerTargetAngle", modules[2].getTargetState().angle);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/SteerReadVelocityRPM", modules[2].getSteerMotor().getVelocity().getValueAsDouble());
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/DriveReadVelocityMPS", modules[2].getCurrentState().speedMetersPerSecond);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/DriveTargetVelocityMPS", modules[2].getTargetState().speedMetersPerSecond);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/SteerReadAngle", modules[2].getCurrentState().angle);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/SteerTargetAngle", modules[2].getTargetState().angle);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackLeft/SteerReadVelocityRPM", modules[2].getSteerMotor().getVelocity().getValueAsDouble());
 
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/DriveReadVelocityMPS", modules[3].getCurrentState().speedMetersPerSecond);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/DriveTargetVelocityMPS", modules[3].getTargetState().speedMetersPerSecond);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerReadAngle", modules[3].getCurrentState().angle);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerTargetAngle", modules[3].getTargetState().angle);
-            Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerReadVelocityRPM", modules[3].getSteerMotor().getVelocity().getValueAsDouble());
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/DriveReadVelocityMPS", modules[3].getCurrentState().speedMetersPerSecond);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/DriveTargetVelocityMPS", modules[3].getTargetState().speedMetersPerSecond);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerReadAngle", modules[3].getCurrentState().angle);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerTargetAngle", modules[3].getTargetState().angle);
+            // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerReadVelocityRPM", modules[3].getSteerMotor().getVelocity().getValueAsDouble());
         });
+
+        swerveSysID = new SysID(swerve.getModule(0).getDriveMotor(), swerve.getModule(1).getDriveMotor(), swerve.getModule(2).getDriveMotor(), swerve.getModule(3).getDriveMotor(), "swerveMotors", this);
+        swerveRoutine = swerveSysID.createRoutineSwerve(5);
+        
+    }
+
+    public SysIdRoutine getSwerveRoutine(){
+        return swerveRoutine;
     }
 
     public void periodic() {}

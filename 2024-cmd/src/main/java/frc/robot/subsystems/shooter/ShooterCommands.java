@@ -241,11 +241,11 @@ public class ShooterCommands extends SubsystemCommands{
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         
-        return shooter.getLeftShooterRoutine().quasistatic(direction).andThen(shooter.getRightShooterRoutine().quasistatic(direction)).andThen(shooter.getFeederRoutine().quasistatic(direction));
+        return shooter.getFeederRoutine().quasistatic(direction);
     }
       
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return shooter.getLeftShooterRoutine().dynamic(direction).andThen(shooter.getRightShooterRoutine().dynamic(direction)).andThen(shooter.getFeederRoutine().dynamic(direction));
+        return shooter.getFeederRoutine().dynamic(direction);
     }
 
     public Command sysIdTests(){
@@ -265,10 +265,6 @@ public class ShooterCommands extends SubsystemCommands{
 
     public Command setVoltage(int left, int right, int feeder, int feederSlotID){
 
-        return shooter.run(()->{
-            shooter.setFeederVoltage(feeder, feederSlotID);})
-            .andThen(
-            shooter.run(()->{
-            shooter.setShooterVoltage(left, right);}));
+        return shooter.run(()->{shooter.setShooterVoltage(left, right);});
     }
 }

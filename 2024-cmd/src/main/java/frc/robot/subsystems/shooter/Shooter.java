@@ -107,7 +107,6 @@ public class Shooter extends SubsystemBase {
         rightShooterMotor.setPIDF(SHOOTER.SYS_ID_FEEDER_MOTOR_kP, SHOOTER.SYS_ID_FEEDER_MOTOR_kI, SHOOTER.SYS_ID_FEEDER_MOTOR_kD,  feederMotorSysID.calculatedFeedforward(feederTargetSpeed), 3);
 
         feederMotorRoutine = feederMotorSysID.createRoutine();
-
          //--------------------------------------------Beambreaks--------------------------------------------//
         bottomBeamBreak = new DigitalInput(SHOOTER.BOTTOM_BEAM_BREAK_DIO_PORT);
         topBeamBreak = new DigitalInput   (SHOOTER.TOP_BEAM_BREAK_DIO_PORT);
@@ -124,6 +123,7 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput(SHOOTER.LOG_PATH+"Left/ActualVoltage (Supposedly)", leftShooterMotor.motor.getAppliedOutput()*leftShooterMotor.motor.getBusVoltage());
 
         Logger.recordOutput(SHOOTER.LOG_PATH+"Left/CalculatedFF", leftShooterMotorSysID.calculatedFeedforward(leftTargetSpeed));
+        Logger.recordOutput(SHOOTER.LOG_PATH+"Left/CalculatedFF", leftShooterMotorSysID.calculateVoltage(leftShooterMotor.getVelocity(), leftTargetVoltage));
 
         //--------------------------------------------Right Motor Logging--------------------------------------------//
         Logger.recordOutput(SHOOTER.LOG_PATH+"Right/TargetVelocity", rightTargetSpeed);
@@ -183,6 +183,9 @@ public class Shooter extends SubsystemBase {
 
         leftTargetVoltage = leftShooterMotorSysID.calculateVoltage(leftShooterMotor.getVelocity(), leftTargetSpeed);
         leftShooterMotor.motor.setVoltage(leftTargetVoltage);
+
+        Logger.recordOutput(SHOOTER.LOG_PATH+"VoltageModeStatus", true);
+        Logger.recordOutput(SHOOTER.LOG_PATH+"VoltageVal", leftShooterMotorSysID.calculateVoltage(leftShooterMotor.getVelocity(), leftTargetSpeed));
 
         rightTargetVoltage = rightShooterMotorSysID.calculateVoltage(rightShooterMotor.getVelocity(), rightTargetSpeed);
         rightShooterMotor.motor.setVoltage(rightTargetVoltage);

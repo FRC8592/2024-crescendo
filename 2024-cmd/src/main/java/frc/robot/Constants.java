@@ -152,26 +152,55 @@ public final class Constants {
         public static final double LEFT_SHOOTER_MOTOR_kD = 0.01;
         public static final double LEFT_SHOOTER_MOTOR_kF = 0.000155;
 
-        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 3.2051e-07;
+        /*OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD */
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 3.2051e-07;
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kI = 0;
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 6.4102e-06; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kS = 0.24185;
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kV = 0.0017864;
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kA = 0.00020715;
+
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 0;
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kI = 0;
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kS = 0;
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kV = 0;
+        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kA = 0;
+
+        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kP = 0;
+        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kI = 0;
+        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
+        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kS = 0;
+        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kV = 0;
+        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kA = 0;
+
+        // public static final double SYS_ID_FEEDER_MOTOR_kP = 0;
+        // public static final double SYS_ID_FEEDER_MOTOR_kI = 0;
+        // public static final double SYS_ID_FEEDER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
+        // public static final double SYS_ID_FEEDER_MOTOR_kS = 0;
+        // public static final double SYS_ID_FEEDER_MOTOR_kV = 0;
+        // public static final double SYS_ID_FEEDER_MOTOR_kA = 0;
+
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 3.77e-07;
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kI = 0;
-        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 6.4102e-06; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
-        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kS = 0.24185;
-        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kV = 0.0017864;
-        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kA = 0.00020715;
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kS = 0.23509;
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kV = 0.0017832;
+        public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kA = 0.00022124;
 
-        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kP = 0;
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kP = 7.5505e-07;
         public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kI = 0;
-        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
-        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kS = 0;
-        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kV = 0;
-        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kA = 0;
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kD = 1.5101e-07; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kS = 0.10495;
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kV = 0.0018032;
+        public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kA = 0.00031594;
 
-        public static final double SYS_ID_FEEDER_MOTOR_kP = 0;
+        public static final double SYS_ID_FEEDER_MOTOR_kP = 1.3361e-06;
         public static final double SYS_ID_FEEDER_MOTOR_kI = 0;
-        public static final double SYS_ID_FEEDER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
-        public static final double SYS_ID_FEEDER_MOTOR_kS = 0;
-        public static final double SYS_ID_FEEDER_MOTOR_kV = 0;
-        public static final double SYS_ID_FEEDER_MOTOR_kA = 0;
+        public static final double SYS_ID_FEEDER_MOTOR_kD = 2.6722e-05; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
+        public static final double SYS_ID_FEEDER_MOTOR_kS = 0.15961;
+        public static final double SYS_ID_FEEDER_MOTOR_kV = 0.0018399;
+        public static final double SYS_ID_FEEDER_MOTOR_kA = 0.00048403;
 
         // public static final double RIGHT_SHOOTER_MOTOR_kP = LEFT_SHOOTER_MOTOR_kP;
         // public static final double RIGHT_SHOOTER_MOTOR_kI = LEFT_SHOOTER_MOTOR_kI;

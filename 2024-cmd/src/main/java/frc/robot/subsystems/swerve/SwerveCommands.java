@@ -246,13 +246,21 @@ public class SwerveCommands extends SubsystemCommands{
     
 
     public Command sysIdTests(){
-        return sysIdQuasistatic(Direction.kForward)
-            .andThen(new WaitCommand(2))
-            .andThen(swerve.commands.sysIdQuasistatic(Direction.kReverse))
-            .andThen(new WaitCommand(2))
-            .andThen(swerve.commands.sysIdDynamic(Direction.kForward))
-            .andThen(new WaitCommand(2))
-            .andThen(swerve.commands.sysIdDynamic(Direction.kReverse));
+        return swerve.runOnce(()->{
+
+            try {
+                swerve.wait();
+            } catch (Exception e) {
+                System.out.println("EXCEPTION SWERVE SYSID");
+            }
+             
+        }).andThen(sysIdQuasistatic(Direction.kForward))
+        .andThen(new WaitCommand(2))
+        .andThen(swerve.commands.sysIdQuasistatic(Direction.kReverse))
+        .andThen(new WaitCommand(2))
+        .andThen(swerve.commands.sysIdDynamic(Direction.kForward))
+        .andThen(new WaitCommand(2))
+        .andThen(swerve.commands.sysIdDynamic(Direction.kReverse));
     }
 
     /**

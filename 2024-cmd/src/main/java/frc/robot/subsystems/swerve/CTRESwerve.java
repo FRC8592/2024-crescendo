@@ -138,6 +138,10 @@ public class CTRESwerve extends SwerveDrivetrain{
         this.seedFieldRelative(pose);
     }
 
+    public void pauseThread(){
+        this.m_odometryThread.stop();
+    }
+
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 

@@ -66,8 +66,8 @@ public class RobotContainer {
     );
 
     // Useful suppliers that are private to RobotContainer (can't go in Suppliers)
-    private DoubleSupplier translateX = () -> -driverController.getLeftX();
-    private DoubleSupplier translateY = () -> -driverController.getLeftY();
+    private DoubleSupplier translateX = () -> driverController.getLeftX();
+    private DoubleSupplier translateY = () -> driverController.getLeftY();
     private DoubleSupplier rotate = () -> -driverController.getRightX();
 
     /**
@@ -134,18 +134,18 @@ public class RobotContainer {
      * @param controlSet the set of controls to use
      */
     private void configureBindings(ControlSets controlSet) {
-        // CommandScheduler.getInstance().getDefaultButtonLoop().clear();
-        // Controls.applyControlSet(controlSet);
+        CommandScheduler.getInstance().getDefaultButtonLoop().clear();
+        Controls.applyControlSet(controlSet);
 
-        // Controls.slowMode.onTrue(
-        //     swerve.commands.slowModeCommand(true) // Enable slow mode
-        // ).onFalse(
-        //     swerve.commands.slowModeCommand(false) // Disable slow mode
-        // );
+        Controls.slowMode.onTrue(
+            swerve.commands.slowModeCommand(true) // Enable slow mode
+        ).onFalse(
+            swerve.commands.slowModeCommand(false) // Disable slow mode
+        );
 
-        // Controls.zeroGryoscope.onTrue(
-        //     swerve.commands.zeroGyroscopeCommand()
-        // );
+        Controls.zeroGryoscope.onTrue(
+            swerve.commands.zeroGyroscopeCommand()
+        );
 
         driverController.a().whileTrue(
             shooter.commands.setVoltage(3000, 3000, 2000, 3)
@@ -168,6 +168,8 @@ public class RobotContainer {
         driverController.x().onTrue(
             swerve.commands.sysIdTests()
         );
+
+        
 
         driverController.b().whileTrue(
             shooter.commands.setLeftShooterVelocity(3000)

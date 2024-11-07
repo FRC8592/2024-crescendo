@@ -197,7 +197,7 @@ public class SysID {
         MutableMeasure<Time> time = mutable(Seconds.of(timeout)); //Not being used yet, for testing purposes.
 
         SysIdRoutine routine = new SysIdRoutine(
-            new SysIdRoutine.Config(),
+            new SysIdRoutine.Config(null, null, time),
             new SysIdRoutine.Mechanism(
                 (voltage) -> {
                     runSwerveMotorsAtVoltage(voltage);

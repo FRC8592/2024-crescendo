@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.CANSparkBase.ControlType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.helpers.*;
 import frc.robot.Constants.*;
 
@@ -64,24 +65,44 @@ public class Elevator extends SubsystemBase {
     private double actualTargetPivot;
     private double actualTargetExtension;
 
+    private SysID extensionMotorSysID;
+    private SysIdRoutine extensionMotorRoutine;
+
+    private SysID pivotMotorSysID;
+    private SysIdRoutine pivotMotorRoutine;
+
     private Elevator(){
         extensionMotor = new SparkFlexControl(CAN.ELEVATOR_MOTOR_CAN_ID, false);
-        extensionMotor.setPIDF(ELEVATOR.EXTENSION_kP, ELEVATOR.EXTENSION_kI, ELEVATOR.EXTENSION_kD, ELEVATOR.EXTENSION_kFF, 0);
         extensionMotor.setMaxVelocity(5000, 0);
         extensionMotor.setMaxAcceleration(10000, 0);
+        
+        extensionMotorSysID = new SysID(extensionMotor, "extensionMotor", this);
+        extensionMotorSysID.setPID(ELEVATOR.EXTENSION_kP, ELEVATOR.EXTENSION_kI, ELEVATOR.EXTENSION_kD);
+        extensionMotorSysID.setFeedforward(ELEVATOR.EXTENSION_kS, ELEVATOR.EXTENSION_kV, ELEVATOR.EXTENSION_kA);
+        extensionMotor.setPIDF(ELEVATOR.EXTENSION_kP, ELEVATOR.EXTENSION_kI, ELEVATOR.EXTENSION_kD, extensionMotorSysID.calculatedFeedforward(actualTargetExtension), 0);
+        
+        extensionMotorRoutine = extensionMotorSysID.createRoutineLinear();
 
         pivotMotor = new SparkFlexControl(CAN.PIVOT_MOTOR_CAN_ID, false);
-        pivotMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
         pivotMotor.setMaxVelocity(6500, 0);
         pivotMotor.setMaxAcceleration(7000, 0); //Going higher than this caused slamming
-        pivotMotor.motorControl.setIZone(ELEVATOR.PIVOT_IZONE * ELEVATOR.PIVOT_GEAR_RATIO);
         pivotMotor.motorControl.setReference(0, ControlType.kVoltage);
         pivotMotor.setInverted();
 
+        pivotMotorSysID = new SysID(pivotMotor, pivotFollowMotor, "pivotMotors", this);
+        pivotMotorSysID.setPID(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD);
+        pivotMotorSysID.setFeedforward(ELEVATOR.PIVOT_kS, ELEVATOR.PIVOT_kV, ELEVATOR.PIVOT_kA);
+        pivotMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, pivotMotorSysID.calculatedFeedforward(actualTargetPivot), 0);
+
+        pivotMotorRoutine = pivotMotorSysID.createRoutine();
+
+        //TODO: create sys id object and routine for pivot and pivot follow motors
+
         pivotFollowMotor = new SparkFlexControl(CAN.PIVOT_FOLLOW_MOTOR_CAN_ID, false);
-        pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, ELEVATOR.PIVOT_kFF, 0);
+        pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, pivotMotorSysID.calculatedFeedforward(actualTargetPivot), 0);
         pivotFollowMotor.setMaxVelocity(6500, 0);
         pivotFollowMotor.setMaxAcceleration(7000, 0);
+
     }
 
     public void periodic() {
@@ -191,7 +212,7 @@ public class Elevator extends SubsystemBase {
     /**
      * Return the elevator's measured pivot angle
      */
-    private double getPivotAngle() {
+    public double getPivotAngle() {
         double ticksConverted = (
             (pivotMotor.getTicks()*CONVERSIONS.TICKS_TO_ANGLE_DEGREES_SPARKFLEX)
             /ELEVATOR.PIVOT_GEAR_RATIO
@@ -307,5 +328,13 @@ public class Elevator extends SubsystemBase {
     protected void freezeElevator(){
         pivotMotor.setPositionSmartMotion(pivotMotor.getPosition());
         extensionMotor.setPositionSmartMotion(extensionMotor.getPosition());
+    }
+
+    protected SysIdRoutine getExtensionRoutine(){
+        return extensionMotorRoutine;
+    }
+
+    protected SysIdRoutine getPivotRoutine(){
+        return pivotMotorRoutine;
     }
 }

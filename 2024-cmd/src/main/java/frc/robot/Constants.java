@@ -152,35 +152,6 @@ public final class Constants {
         public static final double LEFT_SHOOTER_MOTOR_kD = 0.01;
         public static final double LEFT_SHOOTER_MOTOR_kF = 0.000155;
 
-        /*OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD */
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 3.2051e-07;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kI = 0;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 6.4102e-06; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kS = 0.24185;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kV = 0.0017864;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kA = 0.00020715;
-
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 0;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kI = 0;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kS = 0;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kV = 0;
-        // public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kA = 0;
-
-        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kP = 0;
-        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kI = 0;
-        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
-        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kS = 0;
-        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kV = 0;
-        // public static final double SYS_ID_RIGHT_SHOOTER_MOTOR_kA = 0;
-
-        // public static final double SYS_ID_FEEDER_MOTOR_kP = 0;
-        // public static final double SYS_ID_FEEDER_MOTOR_kI = 0;
-        // public static final double SYS_ID_FEEDER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
-        // public static final double SYS_ID_FEEDER_MOTOR_kS = 0;
-        // public static final double SYS_ID_FEEDER_MOTOR_kV = 0;
-        // public static final double SYS_ID_FEEDER_MOTOR_kA = 0;
-
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 3.77e-07;
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kI = 0;
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kD = 0; //Took the base of P and multiplied it by 2 and multiplied the base 10 thing by 10.
@@ -238,16 +209,19 @@ public final class Constants {
     public final class ELEVATOR {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
 
-        public static final double PIVOT_kP = 0.000000375;
+        public static final double PIVOT_kP = 0;
         public static final double PIVOT_kI = 0;
-        public static final double PIVOT_kD = 0.000001;
-        public static final double PIVOT_kFF = 0.00025;
-        public static final double PIVOT_IZONE = 1.0; // angle in deg
+        public static final double PIVOT_kD = 0;
+        public static final double PIVOT_kS = 0;
+        public static final double PIVOT_kV = 0;
+        public static final double PIVOT_kA = 0;
 
-        public static final double EXTENSION_kP = 0.000001;
-        public static final double EXTENSION_kI = 0.0;
-        public static final double EXTENSION_kD = 0.0;
-        public static final double EXTENSION_kFF = 0.00025;
+        public static final double EXTENSION_kP = 0;
+        public static final double EXTENSION_kI = 0;
+        public static final double EXTENSION_kD = 0;
+        public static final double EXTENSION_kS = 0;
+        public static final double EXTENSION_kV = 0;
+        public static final double EXTENSION_kA = 0;
 
         // When the extension is retracted below this many meters, we can safetly lower the pivot to the home position
         public static final double EXTENSION_FULLY_RETRACTED = 0.01;
@@ -364,10 +338,10 @@ public final class Constants {
         public static final Rotation2d BLUE_PERSPECTIVE_ROTATION = Rotation2d.fromDegrees(0);
         public static final Rotation2d RED_PERSPECTIVE_ROTATION = Rotation2d.fromDegrees(180);
 
-        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -0.388427734375;
-        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -0.462646484375;
-        public static final double TEAL_BACK_LEFT_STEER_OFFSET = -0.18017578125;
-        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -0.4853515625;
+        public static final double BLACK_FRONT_LEFT_STEER_OFFSET = 0.499512;
+        public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = 0.499512;
+        public static final double TEAL_BACK_LEFT_STEER_OFFSET = 0.5;
+        public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -0.499268;
 
         public static final boolean BLACK_FRONT_LEFT_STEER_INVERT = true;
         public static final boolean ORANGE_FRONT_RIGHT_STEER_INVERT = true;

@@ -25,6 +25,7 @@ public class SysID {
 
     private Measure<Voltage> volts;
     private SparkFlexControl testMotor;
+    private SparkFlexControl testMotor2;
     private TalonFX[] swerveMotors;
     private String name;
     private SubsystemBase subsystemBase;
@@ -41,6 +42,13 @@ public class SysID {
      */
     public SysID(SparkFlexControl testMotor, String name, SubsystemBase subsystemBase){
         this.testMotor = testMotor;
+        this.name = name;
+        this.subsystemBase = subsystemBase;
+    }
+
+    public SysID(SparkFlexControl testMotor1, SparkFlexControl testMotor2, String name, SubsystemBase subsystemBase){
+        testMotor = testMotor1;
+        this.testMotor2 = testMotor2;
         this.name = name;
         this.subsystemBase = subsystemBase;
     }
@@ -97,11 +105,6 @@ public class SysID {
 
     }
 
-    /**
-     * The current position of the motor turned into WPILib distance units to use in SysID tests so we can appropriately measure for the application.
-     *
-     * @return the angle of the motor in WPILib units
-     */
     private Measure<Distance> getPositionDoubleToPositionUnitsLinear(TalonFX swerveMotor){
 
         MutableMeasure<Distance> distance = mutable(Meters.of(0));
@@ -110,6 +113,15 @@ public class SysID {
 
 
     }
+
+    private Measure<Distance> getPositionDoubleToPositionUnitsLinear(){
+
+        MutableMeasure<Distance> distance = mutable(Meters.of(0));
+
+        return distance.mut_replace(testMotor.getPosition(), Meters);
+
+    }
+
 
     private Measure<Velocity<Angle>> getVelocityDoubleToVelocityUnits(){
 
@@ -127,6 +139,14 @@ public class SysID {
 
     }
 
+    private Measure<Velocity<Distance>> getVelocityDoubleToVelocityUnitsLinear(){
+
+        MutableMeasure<Velocity<Distance>> velocity = mutable(MetersPerSecond.of(0));
+
+        return velocity.mut_replace(testMotor.getVelocity(), MetersPerSecond);
+
+    }
+
     private void runMotorAtVoltage(Measure<Voltage> volts){
         this.volts = volts;
         Logger.recordOutput(name + "/Voltage", volts.baseUnitMagnitude());
@@ -134,6 +154,16 @@ public class SysID {
         Logger.recordOutput(name + "/Velocity", testMotor.getVelocity());
 
         testMotor.motor.setVoltage(volts.baseUnitMagnitude());
+    }
+
+    private void runMotorAtVoltageDouble(Measure<Voltage> volts){
+        this.volts = volts;
+        Logger.recordOutput(name + "/Voltage", volts.baseUnitMagnitude());
+        Logger.recordOutput(name + "/Position", testMotor.getPosition());
+        Logger.recordOutput(name + "/Velocity", testMotor.getVelocity());
+
+        testMotor.motor.setVoltage(volts.baseUnitMagnitude());
+        testMotor2.motor.setVoltage(volts.baseUnitMagnitude());
     }
 
     private void runSwerveMotorAtVoltage(Measure<Voltage> volts, TalonFX swerveMotor, String nameString){
@@ -180,6 +210,42 @@ public class SysID {
             new SysIdRoutine.Config(),
             new SysIdRoutine.Mechanism(
                 (voltage) -> {runMotorAtVoltage(voltage);}, 
+                (log)->{log.motor(name)
+                    .voltage(getVoltageDoubleToVoltageUnits())
+                    .angularPosition(getPositionDoubleToPositionUnits())
+                    .angularVelocity(getVelocityDoubleToVelocityUnits());
+                }, subsystemBase
+            )
+        );
+
+        return routine;
+
+    }
+
+    public SysIdRoutine createRoutineLinear(){
+
+        SysIdRoutine routine = new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> {runMotorAtVoltage(voltage);}, 
+                (log)->{log.motor(name)
+                    .voltage(getVoltageDoubleToVoltageUnits())
+                    .linearPosition(getPositionDoubleToPositionUnitsLinear())
+                    .linearVelocity(getVelocityDoubleToVelocityUnitsLinear());
+                }, subsystemBase
+            )
+        );
+
+        return routine;
+
+    }
+
+    public SysIdRoutine createRoutineTwoMotors(){
+
+        SysIdRoutine routine = new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> {runMotorAtVoltageDouble(voltage);}, 
                 (log)->{log.motor(name)
                     .voltage(getVoltageDoubleToVoltageUnits())
                     .angularPosition(getPositionDoubleToPositionUnits())

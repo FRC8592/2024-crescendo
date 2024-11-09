@@ -2,10 +2,15 @@ package frc.robot.subsystems.elevator;
 
 import java.util.function.DoubleSupplier;
 
+import javax.swing.text.Position;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.SubsystemCommands;
 import frc.robot.subsystems.elevator.Elevator.Positions;
@@ -122,5 +127,32 @@ public class ElevatorCommands extends SubsystemCommands{
             elevator.setUserDesiredTargetPivot(elevator.getUserDesiredTargetPivot()+pivotDegrees);
             elevator.setUserDesiredTargetExtension(elevator.getUserDesiredTargetExtension()+extensionMeters);
         });
+    }
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        
+        return elevator.getPivotRoutine().quasistatic(direction).until(
+            ()->{
+                return elevator.getPivotAngle()>=ELEVATOR.PIVOT_ANGLE_MAX-2 || elevator.getPivotAngle()<=ELEVATOR.PIVOT_ANGLE_MIN+2;
+            }
+        );
+    }
+      
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return elevator.getPivotRoutine().dynamic(direction).until(
+            ()->{
+                return elevator.getPivotAngle()>=ELEVATOR.PIVOT_ANGLE_MAX || elevator.getPivotAngle()<=ELEVATOR.PIVOT_ANGLE_MIN;
+            }
+        );
+    }
+
+    public Command sysIdTests(){
+        return elevator.commands.sysIdQuasistatic(Direction.kForward)
+            .andThen(new WaitCommand(2))
+            .andThen(elevator.commands.sysIdQuasistatic(Direction.kReverse))
+            .andThen(new WaitCommand(2))
+            .andThen(elevator.commands.sysIdDynamic(Direction.kForward))
+            .andThen(new WaitCommand(2))
+            .andThen(elevator.commands.sysIdDynamic(Direction.kReverse));
     }
 }

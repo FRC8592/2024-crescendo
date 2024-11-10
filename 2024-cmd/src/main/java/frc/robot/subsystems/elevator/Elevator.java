@@ -121,6 +121,8 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Setpoints/IsTargetingStowed", isTargeting(Positions.STOWED));
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Setpoints/IsTargetingAmp", isTargeting(Positions.AMP));
         Logger.recordOutput(ELEVATOR.LOG_PATH+"Setpoints/IsTargetingClimb", isTargeting(Positions.CLIMB));
+
+        Logger.recordOutput(ELEVATOR.LOG_PATH+"cannotRun", getPivotAngle()>=ELEVATOR.PIVOT_ANGLE_MAX-2 || getPivotAngle()<=ELEVATOR.PIVOT_ANGLE_MIN+2);
     }
 
     public void simulationPeriodic() {

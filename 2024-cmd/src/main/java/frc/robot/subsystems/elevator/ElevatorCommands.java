@@ -1,11 +1,13 @@
 package frc.robot.subsystems.elevator;
 
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 
 import javax.swing.text.Position;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -135,7 +137,7 @@ public class ElevatorCommands extends SubsystemCommands{
             ()->{
                 return elevator.getPivotAngle()>=ELEVATOR.PIVOT_ANGLE_MAX-2 || elevator.getPivotAngle()<=ELEVATOR.PIVOT_ANGLE_MIN+2;
             }
-        );
+        ).andThen(Commands.runOnce(()->elevator.freezeElevator()));
     }
       
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
@@ -143,16 +145,19 @@ public class ElevatorCommands extends SubsystemCommands{
             ()->{
                 return elevator.getPivotAngle()>=ELEVATOR.PIVOT_ANGLE_MAX-2 || elevator.getPivotAngle()<=ELEVATOR.PIVOT_ANGLE_MIN+2;
             }
-        );
+        ).andThen(Commands.runOnce(()->elevator.freezeElevator()));
     }
 
     public Command sysIdTests(){
-        return elevator.commands.sysIdQuasistatic(Direction.kForward)
-            .andThen(new WaitCommand(2))
-            .andThen(elevator.commands.sysIdQuasistatic(Direction.kReverse))
-            .andThen(new WaitCommand(2))
-            .andThen(elevator.commands.sysIdDynamic(Direction.kForward))
-            .andThen(new WaitCommand(2))
-            .andThen(elevator.commands.sysIdDynamic(Direction.kReverse));
+        
+        return Commands.runOnce(()->Logger.recordOutput(ELEVATOR.LOG_PATH+"checkRun", "I RUNNNNNN"))
+            .andThen(setStaticPositionCommand(45.0, 0));
+            // .andThen(elevator.commands.sysIdQuasistatic(Direction.kForward))
+            // .andThen(new WaitCommand(2))
+            // .andThen(elevator.commands.sysIdQuasistatic(Direction.kReverse))
+            // .andThen(new WaitCommand(2))
+            // .andThen(elevator.commands.sysIdDynamic(Direction.kForward))
+            // .andThen(new WaitCommand(2))
+            // .andThen(elevator.commands.sysIdDynamic(Direction.kReverse));
     }
 }

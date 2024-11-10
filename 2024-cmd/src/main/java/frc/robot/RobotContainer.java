@@ -100,9 +100,9 @@ public class RobotContainer {
      */
     private void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
-        setDefaultCommand(swerve, swerve.commands.driveCommand(
-            translateX, translateY, rotate, DriveModes.AUTOMATIC
-        ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        // setDefaultCommand(swerve, swerve.commands.driveCommand(
+        //     translateX, translateY, rotate, DriveModes.AUTOMATIC
+        // ).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         // Set the LED strip's default command to showing whether or not the robot is loaded
         setDefaultCommand(leds, leds.commands.indicateLoadedCommand(Suppliers.robotHasNote)
@@ -135,17 +135,17 @@ public class RobotContainer {
      */
     private void configureBindings(ControlSets controlSet) {
         CommandScheduler.getInstance().getDefaultButtonLoop().clear();
-        Controls.applyControlSet(controlSet);
+        // Controls.applyControlSet(controlSet);
 
-        Controls.slowMode.onTrue(
-            swerve.commands.slowModeCommand(true) // Enable slow mode
-        ).onFalse(
-            swerve.commands.slowModeCommand(false) // Disable slow mode
-        );
+        // Controls.slowMode.onTrue(
+        //     swerve.commands.slowModeCommand(true) // Enable slow mode
+        // ).onFalse(
+        //     swerve.commands.slowModeCommand(false) // Disable slow mode
+        // );
 
-        Controls.zeroGryoscope.onTrue(
-            swerve.commands.zeroGyroscopeCommand()
-        );
+        // Controls.zeroGryoscope.onTrue(
+        //     swerve.commands.zeroGyroscopeCommand()
+        // );
 
         driverController.a().whileTrue(
             shooter.commands.setVoltage(3000, 3000, 2000, 3)
@@ -166,7 +166,11 @@ public class RobotContainer {
         // );
 
         driverController.x().onTrue(
-            swerve.commands.sysIdTests()
+            elevator.commands.sysIdTests()
+        );
+
+        driverController.y().onTrue(
+            elevator.commands.setStaticPositionCommand(45d, 0)
         );
 
         

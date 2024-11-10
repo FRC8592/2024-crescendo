@@ -141,7 +141,7 @@ public class ElevatorCommands extends SubsystemCommands{
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return elevator.getPivotRoutine().dynamic(direction).until(
             ()->{
-                return elevator.getPivotAngle()>=ELEVATOR.PIVOT_ANGLE_MAX || elevator.getPivotAngle()<=ELEVATOR.PIVOT_ANGLE_MIN;
+                return elevator.getPivotAngle()>=ELEVATOR.PIVOT_ANGLE_MAX-2 || elevator.getPivotAngle()<=ELEVATOR.PIVOT_ANGLE_MIN+2;
             }
         );
     }

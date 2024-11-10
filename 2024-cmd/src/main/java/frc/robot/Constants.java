@@ -79,9 +79,8 @@ public final class Constants {
         public static final int PIVOT_FOLLOW_MOTOR_CURRENT_LIMIT = 40;
 
         public static final int SWERVE_MAX_VOLTAGE = 12;
-        public static final int SWERVE_TELEOP_THROTTLE_CURRENT_LIMIT = 80;
-        public static final int SWERVE_AUTO_THROTTLE_CURRENT_LIMIT = 60;
-        public static final int SWERVE_AZIMUTH_CURRENT_LIMIT = 40;
+        public static final int SWERVE_DRIVE_CURRENT_LIMIT = 80;
+        public static final int SWERVE_STEER_CURRENT_LIMIT = 40;
     }
 
     public final class NOTELOCK {
@@ -192,10 +191,13 @@ public final class Constants {
         public static final double INTAKE_FEEDER_POWER = 1d; // Used between when the note contacts the feeder and when it reaches the flywheels
 
         // public static final int SHOOTING_FEEDER_SPEED = 2500;
-        public static final double SHOOTING_FEEDER_POWER = 1d;
+        public static final double SHOOTING_FEEDER_POWER = 1;
 
         public static final int OUTAKE_FLYWHEEL_SPEED = -500;
         public static final int OUTAKE_FEEDER_SPEED = -2000;
+
+        public static final int PASSTHROUGH_SHOOTER_SPEED = 5000;
+        public static final double PASSTHROUGH_FEEDER_POWER = 1;
 
         public static final double SHOOT_SCORE_TIME = 0.5;
         public static final double AMP_SCORE_TIME = 2;
@@ -222,6 +224,11 @@ public final class Constants {
         public static final double EXTENSION_kS = 0;
         public static final double EXTENSION_kV = 0;
         public static final double EXTENSION_kA = 0;
+
+        public static final int EXTENSION_MAX_VELOCITY = 5000;
+        public static final int EXTENSION_MAX_ACCELERATION = 10000;
+        public static final int PIVOT_MAX_VELOCITY = 6500;
+        public static final int PIVOT_MAX_ACCELERATION = 7000;
 
         // When the extension is retracted below this many meters, we can safetly lower the pivot to the home position
         public static final double EXTENSION_FULLY_RETRACTED = 0.01;
@@ -304,12 +311,16 @@ public final class Constants {
         public static final double DRIVE_V = 0;
         public static final double DRIVE_A = 0;
 
+        public static final double SNAP_TO_kP = 3.7;
+        public static final double SNAP_TO_kI = 0.0;
+        public static final double SNAP_TO_kD = 0.1;
+
         public static final int STEER_STATOR_CURRENT_LIMIT = 60;
 
         public static final int CALCULATED_SLIP_CURRENT = 150;
 
         public static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = 4.73;
-        public static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(270);
+        public static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(720);
         public static final double COUPLING_GEAR_RATIO = 3.5714285714285716;
         public static final double DRIVE_GEAR_RATIO = 6.746031746031747;
         public static final double STEER_GEAR_RATIO = 21.428571428571427;
@@ -327,7 +338,7 @@ public final class Constants {
         // Scaling for teleop driving. 1.0 is maximum.
         public static final double TRANSLATE_POWER_FAST = 1.0;
         public static final double ROTATE_POWER_FAST = 0.75;
-        public static final double TRANSLATE_POWER_SLOW = 0.25;
+        public static final double TRANSLATE_POWER_SLOW = 0.15;
         public static final double ROTATE_POWER_SLOW = 0.15;
 
         public static final int TRANSLATION_SMOOTHING_AMOUNT = 3;
@@ -361,7 +372,7 @@ public final class Constants {
         public static final double WHITE_BACK_RIGHT_X_POSITION = -10.25;
         public static final double WHITE_BACK_RIGHT_Y_POSITION = -9.25;
 
-        public static final double PATH_FOLLOW_TRANSLATE_kP = 1d;
+        public static final double PATH_FOLLOW_TRANSLATE_kP = 6d;
         public static final double PATH_FOLLOW_TRANSLATE_kI = 0d;
         public static final double PATH_FOLLOW_TRANSLATE_kD = 0d;
 

@@ -14,8 +14,7 @@ public class StowCommand extends NewtonCommand {
      */
     public StowCommand(){
         super(
-            shooter.commands.stopCommand()
-            .alongWith(intake.commands.stopCommand())
+            stopSubsystems(shooter.commands, intake.commands)
             .alongWith(elevator.commands.setStaticPositionCommand(0, 0))
         );
     }

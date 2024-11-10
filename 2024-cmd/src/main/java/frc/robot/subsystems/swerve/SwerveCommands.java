@@ -128,8 +128,7 @@ public class SwerveCommands extends SubsystemCommands{
      * control)
      * @param translationYSupplier a lambda for forward-back translation input (will be optimized for human
      * control)
-     * @param angle the angle to snap to (doesn't have any corrections applied; this should be left-right
-     * inverted).
+     * @param angle the angle to snap to 
      * @param driveMode the drive mode to use (robot-relative, field-relative, or based on driver request)
      *
      * @return the command
@@ -201,11 +200,11 @@ public class SwerveCommands extends SubsystemCommands{
      *
      * @apiNote This command runs for one frame and ends immediately
      */
-    public Command zeroGyroscopeCommand() {
+    public Command resetHeadingCommand() {
         // See slowModeCommand above for comment on the Commands.runOnce
         return Commands.runOnce(() -> {
-            swerve.zeroGyroscope();
-            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Gyroscope zeroed");
+            swerve.resetHeading();
+            Logger.recordOutput(SWERVE.LOG_PATH+"Console", "Swerve heading reset");
         });
     }
 
@@ -290,7 +289,7 @@ public class SwerveCommands extends SubsystemCommands{
      * @apiNote This command runs for one frame and ends immediately
      */
     public Command autonomousInitCommand(){
-        return this.stopCommand().alongWith(this.zeroGyroscopeCommand());
+        return this.stopCommand().alongWith(this.resetHeadingCommand());
     }
 
     /**

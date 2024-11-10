@@ -30,16 +30,15 @@ public class FollowPathAndScoreCommand extends NewtonCommand{
             )
             .andThen(
                 ( // This block of commands runs the (optional) extra vision prime-and-aim and shoots
-                    (
-                        new ShootCommand(
-                            Suppliers.bestRangeEntry, Suppliers.leftRightSpeakerLocked
-                        ).alongWith(
-                            // This rawDriveCommand aims the robot at the speaker
-                            swerve.commands.rawDriveCommand(
-                                () -> 0, () -> 0, Suppliers.aimToSpeakerPidLoopNegativeSearch, DriveModes.ROBOT_RELATIVE
-                            )
+                    new ShootCommand(
+                        useVision ? Suppliers.bestRangeEntry : () -> RangeTable.get(primePosition),
+                        Suppliers.leftRightSpeakerLocked
+                    ).alongWith(
+                        // This rawDriveCommand aims the robot at the speaker
+                        swerve.commands.rawDriveCommand(
+                            () -> 0, () -> 0, Suppliers.aimToSpeakerPidLoopNegativeSearch, DriveModes.ROBOT_RELATIVE
                         )
-                    ).onlyIf(() -> useVision)
+                    )
                 ).onlyIf(Suppliers.robotHasNote) // <-- This disables the optional vision prime/aim and the shot if there isn't a note,
                                                  // which saves a significant amount of time
             )

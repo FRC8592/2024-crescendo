@@ -4,9 +4,10 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.Constants.APRILTAG_VISION;
+import frc.robot.Constants.*;
 import frc.robot.helpers.RangeTable.RangeEntry;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
@@ -80,5 +81,13 @@ public final class Suppliers {
      */
     public static final BooleanSupplier leftRightSpeakerLocked = (
         () -> offsetFromSpeakerTag.getAsDouble() < APRILTAG_VISION.X_ROT_LOCK_TOLERANCE
+    );
+
+    /**
+     * {@code get()} returns the direction the gyroscope should believe it's facing
+     * when the front of the robot is aimed away from the driver station.
+     */
+    public static final Supplier<Rotation2d> currentRotationOffset = (
+        () -> robotRunningOnRed.getAsBoolean() ? SWERVE.RED_PERSPECTIVE_ROTATION : SWERVE.BLUE_PERSPECTIVE_ROTATION
     );
 }

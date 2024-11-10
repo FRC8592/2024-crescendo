@@ -14,4 +14,6 @@ public abstract class SubsystemCommands{
     public Command autonomousInitCommand(){
         return Commands.none();
     }
+
+    public abstract Command stopCommand();
 }

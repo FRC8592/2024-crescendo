@@ -18,6 +18,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.Swerve.DriveModes;
 
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -26,7 +27,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -41,7 +42,7 @@ public class RobotContainer {
     private final Elevator elevator;
     private final LEDs leds;
 
-    //Helpers
+    // Helpers
     private final PoseVision poseVision;
     private final LimelightTargeting noteLock = new LimelightTargeting(
         NOTELOCK.LIMELIGHT_NAME, NOTELOCK.LOCK_ERROR,0,0,0,0
@@ -87,10 +88,9 @@ public class RobotContainer {
             0
         );
 
+        configureBindings(ControlSets.MAIN_TELEOP);
         configureDefaults();
 
-        Controls.addControllers(driverController, operatorController);
-        configureBindings(ControlSets.MAIN_TELEOP);
 
         AutoManager.prepare();
     }
@@ -111,22 +111,6 @@ public class RobotContainer {
 
 
     //Any commands that are reused a lot but can't go in a separate class go here
-
-    /**
-     * Snap the swerve to the set angle. Does NOT need to be left-right corrected
-     *
-     * @param angle Rotation2d containing the angle setpoint
-     * @return the swerve.snapToCommand
-     *
-     * @apiNote this command never ends on its own; it must be interrupted to end
-     */
-    private Command snapToCommand(Rotation2d angle){
-        return swerve.commands.snapToCommand(
-            translateX, translateY,
-            Rotation2d.fromDegrees((360-angle.getDegrees())%360),
-            DriveModes.AUTOMATIC
-        );
-    }
 
     /**
      * Configure all button bindings

@@ -11,8 +11,10 @@ public class OutakeCommand extends NewtonCommand {
      */
     public OutakeCommand(){
         super(
-            shooter.commands.outakeCommand()
-            .alongWith(intake.commands.outakeCommand())
+            stopSubsystems(elevator.commands).alongWith(
+                shooter.commands.outakeCommand()
+                .alongWith(intake.commands.outakeCommand())
+            )
         );
     }
 }

@@ -171,7 +171,7 @@ public class RangeTable {
      */
     public static RangeEntry getPodium() {
         // return get(2.83);
-        return new RangeEntry(5250, 3250, 27.5, 0.0);
+        return new RangeEntry(5250, 3250, 25.5, 0.0);
     }
 
     /**

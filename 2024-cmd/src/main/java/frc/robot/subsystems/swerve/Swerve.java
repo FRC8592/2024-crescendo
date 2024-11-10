@@ -80,6 +80,8 @@ public class Swerve extends SubsystemBase {
             SWERVE.ROTATION_SMOOTHING_AMOUNT
         );
 
+        snapToController = new PIDController(SWERVE.SNAP_TO_kP, SWERVE.SNAP_TO_kI, SWERVE.SNAP_TO_kD);
+
         // PID constants for the swerve's drive and steer controllers
         Slot0Configs driveGains = (
             new Slot0Configs()
@@ -100,13 +102,20 @@ public class Swerve extends SubsystemBase {
         );
 
         // This configuration object will apply to all of the swerve's drive motors
-        TalonFXConfiguration driveMotorsConfig = new TalonFXConfiguration();
+        TalonFXConfiguration driveMotorsConfig = (
+            new TalonFXConfiguration()
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(POWER.SWERVE_DRIVE_CURRENT_LIMIT)
+            )
+        );
 
         // This configuration object will apply to all of the swerve's steer motors
         TalonFXConfiguration steerMotorsConfig = (
             new TalonFXConfiguration().withCurrentLimits(
                 new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(60)
+                .withStatorCurrentLimit(POWER.SWERVE_STEER_CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true)
             )
         );
@@ -129,7 +138,7 @@ public class Swerve extends SubsystemBase {
                 .withSteerInertia(SWERVE.SIMULATED_STEER_INERTIA)
                 .withDriveFrictionVoltage(SWERVE.DRIVE_FRICTION_VOLTAGE)
                 .withSteerFrictionVoltage(SWERVE.STEER_FRICTION_VOLTAGE)
-                .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
+                .withFeedbackSource(SteerFeedbackType.RemoteCANcoder)
                 .withCouplingGearRatio(SWERVE.COUPLING_GEAR_RATIO)
                 .withDriveMotorInitialConfigs(driveMotorsConfig)
                 .withSteerMotorInitialConfigs(steerMotorsConfig)
@@ -223,7 +232,10 @@ public class Swerve extends SubsystemBase {
         swerve.pauseThread();
     }
 
-    public void periodic() {}
+    public void periodic() {
+        Logger.recordOutput(SWERVE.LOG_PATH+"Odometryvalid", swerve.odometryIsValid());
+        // swerve.periodic();
+    }
 
     public void simulationPeriodic() {
         Robot.FIELD.setRobotPose(getCurrentPosition());
@@ -277,10 +289,10 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Set the gyroscope heading to 0
+     * Define whatever direction the robot is facing as forward
      */
-    protected void zeroGyroscope(){
-        swerve.resetGyroscope();
+    protected void resetHeading(){
+        swerve.resetHeading();
     }
 
     /**
@@ -303,7 +315,7 @@ public class Swerve extends SubsystemBase {
      * @param yaw the rotation to set as a Rotation2d
      */
     public void setGyroscopeRotation(Rotation2d yaw){
-        swerve.setYaw(yaw);
+        swerve.setGyroscopeYaw(yaw);
     }
 
     /**
@@ -333,7 +345,7 @@ public class Swerve extends SubsystemBase {
      * @return the rotational velocity setpoint as a Rotation2d
      */
     protected double snapToAngle(Rotation2d setpoint) {
-        double currYaw = getYaw().getRadians();
+        double currYaw = Math.toRadians(getYaw().getDegrees()%360);
         double errorAngle = setpoint.getRadians() - currYaw;
 
         if(errorAngle > Math.PI){

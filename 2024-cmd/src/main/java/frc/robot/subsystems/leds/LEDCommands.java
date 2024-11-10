@@ -6,7 +6,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.*;
 import frc.robot.subsystems.SubsystemCommands;
 
@@ -49,6 +49,9 @@ public class LEDCommands extends SubsystemCommands{
             leds.write();
         });
     }
+
+    /** @return {@link Commands#none()}; stopCommand() is not applicable to LEDs */
+    public Command stopCommand(){return Commands.none();}
 
     /**
      * Command to blink the lights at a certain color with the specified speed

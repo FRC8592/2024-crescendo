@@ -150,7 +150,27 @@ public class RobotContainer {
         // );
 
         driverController.x().onTrue(
-            elevator.commands.sysIdTests()
+            elevator.commands.setStaticPositionCommand(0.0, 0)
+            .andThen(elevator.commands.setStaticPositionCommand(2.5, 0))
+            .andThen(elevator.commands.setSysIdState("Quasistatic Forward"))
+            .andThen(elevator.commands.sysIdQuasistatic(Direction.kForward))
+            .andThen(elevator.commands.setSysIdState("Transition"))
+            .andThen(new WaitCommand(2))
+            .andThen(elevator.commands.setStaticPositionCommand(25, 0))
+            .andThen(elevator.commands.setSysIdState("Quasistatic Reverse"))
+            .andThen(elevator.commands.sysIdQuasistatic(Direction.kReverse))
+            .andThen(elevator.commands.setSysIdState("Transition"))
+            .andThen(new WaitCommand(2))
+            .andThen(elevator.commands.setStaticPositionCommand(25, 0))
+            .andThen(elevator.commands.setSysIdState("Dynamic Forward"))
+            .andThen(elevator.commands.sysIdDynamic(Direction.kForward))
+            .andThen(elevator.commands.setSysIdState("Transition"))
+            .andThen(new WaitCommand(2))
+            .andThen(elevator.commands.setStaticPositionCommand(45, 0))
+            .andThen(elevator.commands.setSysIdState("Dynamic Reverse"))
+            .andThen(elevator.commands.sysIdDynamic(Direction.kReverse))
+            .andThen(elevator.commands.setSysIdState("Done"))
+            .andThen(elevator.commands.setStaticPositionCommand(0, 0))
         );
 
         driverController.y().onTrue(
@@ -162,7 +182,6 @@ public class RobotContainer {
         driverController.b().whileTrue(
             shooter.commands.setLeftShooterVelocity(3000)
         );
-
         // Controls.passAim.whileTrue(
         //     new ConditionalCommand(
         //         snapToCommand(Rotation2d.fromDegrees(330)),

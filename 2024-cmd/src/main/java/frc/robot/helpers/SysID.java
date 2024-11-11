@@ -163,7 +163,7 @@ public class SysID {
         Logger.recordOutput(name + "/Velocity", testMotor.getVelocity());
 
         testMotor.motor.setVoltage(volts.baseUnitMagnitude());
-        testMotor2.motor.setVoltage(volts.baseUnitMagnitude());
+        testMotor2.motor.setVoltage(-volts.baseUnitMagnitude());
     }
 
     private void runSwerveMotorAtVoltage(Measure<Voltage> volts, TalonFX swerveMotor, String nameString){
@@ -243,7 +243,7 @@ public class SysID {
     public SysIdRoutine createRoutineTwoMotors(){
 
         SysIdRoutine routine = new SysIdRoutine(
-            new SysIdRoutine.Config(),
+            new SysIdRoutine.Config(null, null, null, null),
             new SysIdRoutine.Mechanism(
                 (voltage) -> {runMotorAtVoltageDouble(voltage);}, 
                 (log)->{log.motor(name)

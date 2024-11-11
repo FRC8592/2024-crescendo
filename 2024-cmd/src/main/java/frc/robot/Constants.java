@@ -134,22 +134,6 @@ public final class Constants {
 
         // Alternate constants to use while in contact with the note. Used for
         // the alignment routine that runs after the note has entered the robot.
-        public static final double FEEDER_MOTOR_LOADED_kP = 0.001;
-        public static final double FEEDER_MOTOR_LOADED_kI = 0.0000005;
-        public static final double FEEDER_MOTOR_LOADED_kD = 0.01;
-        public static final double FEEDER_MOTOR_LOADED_kF = 0.00018;
-        public static final double FEEDER_MOTOR_LOADED_IZONE = 160;
-
-        public static final double FEEDER_MOTOR_OUTAKE_kP = 0.001;
-        public static final double FEEDER_MOTOR_OUTAKE_kI = 0.00001;
-        public static final double FEEDER_MOTOR_OUTAKE_kD = 0.01;
-        public static final double FEEDER_MOTOR_OUTAKE_kF = 0.00018;
-        public static final double FEEDER_MOTOR_OUTAKE_IZONE = 160;
-
-        public static final double LEFT_SHOOTER_MOTOR_kP = 0.0003;
-        public static final double LEFT_SHOOTER_MOTOR_kI = 0.0000012;
-        public static final double LEFT_SHOOTER_MOTOR_kD = 0.01;
-        public static final double LEFT_SHOOTER_MOTOR_kF = 0.000155;
 
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kP = 3.77e-07;
         public static final double SYS_ID_LEFT_SHOOTER_MOTOR_kI = 0;
@@ -211,12 +195,12 @@ public final class Constants {
     public final class ELEVATOR {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Elevator/";
 
-        public static final double PIVOT_kP = 0;
+        public static final double PIVOT_kP = 0.029213;
         public static final double PIVOT_kI = 0;
-        public static final double PIVOT_kD = 0;
-        public static final double PIVOT_kS = 0;
-        public static final double PIVOT_kV = 0;
-        public static final double PIVOT_kA = 0;
+        public static final double PIVOT_kD = 0.06031;
+        public static final double PIVOT_kS = 0.45476;
+        public static final double PIVOT_kV = 0.0020563;
+        public static final double PIVOT_kA = 0.0;
 
         public static final double EXTENSION_kP = 0;
         public static final double EXTENSION_kI = 0;
@@ -224,6 +208,18 @@ public final class Constants {
         public static final double EXTENSION_kS = 0;
         public static final double EXTENSION_kV = 0;
         public static final double EXTENSION_kA = 0;
+
+        //OLDDD
+        // public static final double PIVOT_kP = 0.000000375;
+        // public static final double PIVOT_kI = 0;
+        // public static final double PIVOT_kD = 0.000001;
+        // public static final double PIVOT_kFF = 0.00025;
+        // public static final double PIVOT_IZONE = 1.0; // angle in deg
+
+        // public static final double EXTENSION_kP = 0.000001;
+        // public static final double EXTENSION_kI = 0.0;
+        // public static final double EXTENSION_kD = 0.0;
+        // public static final double EXTENSION_kFF = 0.00025;
 
         public static final int EXTENSION_MAX_VELOCITY = 5000;
         public static final int EXTENSION_MAX_ACCELERATION = 10000;

@@ -140,6 +140,10 @@ public class ElevatorCommands extends SubsystemCommands{
         return elevator.runOnce(() -> elevator.freezeElevator());
     }
 
+    public Command setSysIdState(String state){
+        return elevator.runOnce(() -> {elevator.setStateSysId(state);});
+    }
+
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         
         return elevator.getPivotRoutine().quasistatic(direction).until(
@@ -159,14 +163,12 @@ public class ElevatorCommands extends SubsystemCommands{
 
     public Command sysIdTests(){
         
-        return Commands.runOnce(()->Logger.recordOutput(ELEVATOR.LOG_PATH+"checkRun", "I RUNNNNNN"))
-            .andThen(setStaticPositionCommand(45.0, 0));
-            // .andThen(elevator.commands.sysIdQuasistatic(Direction.kForward))
-            // .andThen(new WaitCommand(2))
-            // .andThen(elevator.commands.sysIdQuasistatic(Direction.kReverse))
-            // .andThen(new WaitCommand(2))
-            // .andThen(elevator.commands.sysIdDynamic(Direction.kForward))
-            // .andThen(new WaitCommand(2))
-            // .andThen(elevator.commands.sysIdDynamic(Direction.kReverse));
+        return elevator.commands.sysIdQuasistatic(Direction.kForward)
+            .andThen(new WaitCommand(2))
+            .andThen(elevator.commands.sysIdQuasistatic(Direction.kReverse))
+            .andThen(new WaitCommand(2))
+            .andThen(elevator.commands.sysIdDynamic(Direction.kForward))
+            .andThen(new WaitCommand(2))
+            .andThen(elevator.commands.sysIdDynamic(Direction.kReverse));
     }
 }

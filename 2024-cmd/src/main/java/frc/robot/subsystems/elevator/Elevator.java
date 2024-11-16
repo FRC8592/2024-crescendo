@@ -114,21 +114,21 @@ public class Elevator extends SubsystemBase {
         pivotMotor.motorControl.setReference(0, ControlType.kVoltage);
         pivotMotor.setInverted();
 
+        pivotFollowMotor = new SparkFlexControl(CAN.PIVOT_FOLLOW_MOTOR_CAN_ID, false);
+        pivotFollowMotor.setMaxVelocity(ELEVATOR.PIVOT_MAX_VELOCITY, 0);
+        pivotFollowMotor.setMaxAcceleration(ELEVATOR.PIVOT_MAX_ACCELERATION, 0);
+        
         pivotMotorSysID = new SysID(pivotMotor, pivotFollowMotor, "pivotMotors", this);
         pivotMotorSysID.setPID(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD);
         pivotMotorSysID.setFeedforward(ELEVATOR.PIVOT_kS, ELEVATOR.PIVOT_kV, ELEVATOR.PIVOT_kA);
         pivotMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, pivotMotorSysID.calculatedFeedforward(actualTargetPivot), 0);
+        pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, pivotMotorSysID.calculatedFeedforward(actualTargetPivot), 0);
 
 
         pivotMotorRoutine = pivotMotorSysID.createRoutine();
         stateSysID = null;
 
-        // //TODO: create sys id object and routine for pivot and pivot follow motors
-
-        pivotFollowMotor = new SparkFlexControl(CAN.PIVOT_FOLLOW_MOTOR_CAN_ID, false);
-        pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, pivotMotorSysID.calculatedFeedforward(actualTargetPivot), 0);
-        pivotFollowMotor.setMaxVelocity(ELEVATOR.PIVOT_MAX_VELOCITY, 0);
-        pivotFollowMotor.setMaxAcceleration(ELEVATOR.PIVOT_MAX_ACCELERATION, 0);
+        
 
     }
 

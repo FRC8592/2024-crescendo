@@ -127,6 +127,13 @@ public class SparkFlexControl {
     }
 
     /**
+     * Returns the motor's voltage in volts
+     */
+    public double getVoltage(){
+        return motor.getBusVoltage();
+    }
+
+    /**
      * Set a motor for this motor to mimmick the movements of.
      *
      * @param motorToFollow the motor for this one to follow

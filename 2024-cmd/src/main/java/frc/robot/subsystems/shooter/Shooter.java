@@ -75,7 +75,7 @@ public class Shooter extends SubsystemBase {
         leftShooterMotorSysID.setFeedforward(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kS, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kV, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kA);
         leftShooterMotor.setPIDF(SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kP, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kI, SHOOTER.SYS_ID_LEFT_SHOOTER_MOTOR_kD, leftShooterMotorSysID.calculatedFeedforward(leftTargetSpeed), 0);
         
-        leftShooterMotorRoutine = leftShooterMotorSysID.createRoutine(); 
+        leftShooterMotorRoutine = leftShooterMotorSysID.createAngularRoutine(); 
         
         //--------------------------------------------Right Motor--------------------------------------------//
         rightShooterMotor = new SparkFlexControl(CAN.BOTTOM_SHOOTER_MOTOR_CAN_ID, false);
@@ -88,7 +88,7 @@ public class Shooter extends SubsystemBase {
         rightShooterMotorSysID.setFeedforward(SHOOTER.SYS_ID_RIGHT_SHOOTER_MOTOR_kS, SHOOTER.SYS_ID_RIGHT_SHOOTER_MOTOR_kV, SHOOTER.SYS_ID_RIGHT_SHOOTER_MOTOR_kA);
         rightShooterMotor.setPIDF(SHOOTER.SYS_ID_RIGHT_SHOOTER_MOTOR_kP, SHOOTER.SYS_ID_RIGHT_SHOOTER_MOTOR_kI, SHOOTER.SYS_ID_RIGHT_SHOOTER_MOTOR_kD,  rightShooterMotorSysID.calculatedFeedforward(rightTargetSpeed), 0);
 
-        rightShooterMotorRoutine = rightShooterMotorSysID.createRoutine(); 
+        rightShooterMotorRoutine = rightShooterMotorSysID.createAngularRoutine(); 
 
         //--------------------------------------------Feeder Motor--------------------------------------------//
         feederMotor = new SparkFlexControl(CAN.FEEDER_MOTOR_CAN_ID, false);
@@ -102,7 +102,7 @@ public class Shooter extends SubsystemBase {
         feederMotorSysID.setFeedforward(SHOOTER.SYS_ID_FEEDER_MOTOR_kS, SHOOTER.SYS_ID_FEEDER_MOTOR_kV, SHOOTER.SYS_ID_FEEDER_MOTOR_kA);
         rightShooterMotor.setPIDF(SHOOTER.SYS_ID_FEEDER_MOTOR_kP, SHOOTER.SYS_ID_FEEDER_MOTOR_kI, SHOOTER.SYS_ID_FEEDER_MOTOR_kD,  feederMotorSysID.calculatedFeedforward(feederTargetSpeed), 3);
 
-        feederMotorRoutine = feederMotorSysID.createRoutine();
+        feederMotorRoutine = feederMotorSysID.createAngularRoutine();
          //--------------------------------------------Beambreaks--------------------------------------------//
         bottomBeamBreak = new DigitalInput(SHOOTER.BOTTOM_BEAM_BREAK_DIO_PORT);
         topBeamBreak = new DigitalInput   (SHOOTER.TOP_BEAM_BREAK_DIO_PORT);

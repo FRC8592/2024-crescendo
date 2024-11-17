@@ -103,7 +103,7 @@ public class Elevator extends SubsystemBase {
         extensionMotorSysID.setFeedforward(ELEVATOR.EXTENSION_kS, ELEVATOR.EXTENSION_kV, ELEVATOR.EXTENSION_kA);
         extensionMotor.setPIDF(ELEVATOR.EXTENSION_kP, ELEVATOR.EXTENSION_kI, ELEVATOR.EXTENSION_kD, extensionMotorSysID.calculatedFeedforward(actualTargetExtension), 0);
         
-        extensionMotorRoutine = extensionMotorSysID.createRoutineLinear();
+        extensionMotorRoutine = extensionMotorSysID.createLinearRoutine();
         extensionMotor.setMaxVelocity(ELEVATOR.EXTENSION_MAX_VELOCITY, 0);
         extensionMotor.setMaxAcceleration(ELEVATOR.EXTENSION_MAX_ACCELERATION, 0);
 
@@ -125,7 +125,7 @@ public class Elevator extends SubsystemBase {
         pivotFollowMotor.setPIDF(ELEVATOR.PIVOT_kP, ELEVATOR.PIVOT_kI, ELEVATOR.PIVOT_kD, pivotMotorSysID.calculatedFeedforward(actualTargetPivot), 0);
 
 
-        pivotMotorRoutine = pivotMotorSysID.createRoutine();
+        pivotMotorRoutine = pivotMotorSysID.createAngularRoutine();
         stateSysID = null;
 
         

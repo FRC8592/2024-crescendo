@@ -220,7 +220,7 @@ public class Swerve extends SubsystemBase {
         });
 
         swerveSysID = new SysID(swerve.getModule(0).getDriveMotor(), swerve.getModule(1).getDriveMotor(), swerve.getModule(2).getDriveMotor(), swerve.getModule(3).getDriveMotor(), "swerveMotors", this);
-        swerveRoutine = swerveSysID.createRoutineSwerve(3);
+        swerveRoutine = swerveSysID.createSwerveRoutine(3);
         
     }
 
